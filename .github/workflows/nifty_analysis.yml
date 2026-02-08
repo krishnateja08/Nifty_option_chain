@@ -28,7 +28,7 @@ jobs:
       env:
         # These MUST match the "Name" column in your GitHub Secrets screenshot
         GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASS }} # Changed to match screenshot
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }} # Changed to match screenshot
         RECIPIENT_EMAIL_1: ${{ secrets.RECIPIENT_EMAIL_1 }}
         RECIPIENT_EMAIL_2: ${{ secrets.RECIPIENT_EMAIL_2 }}
       run: |
