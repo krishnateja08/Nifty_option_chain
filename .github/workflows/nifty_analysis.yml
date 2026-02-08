@@ -32,7 +32,7 @@ jobs:
         RECIPIENT_EMAIL_1: ${{ secrets.RECIPIENT_EMAIL_1 }}
         RECIPIENT_EMAIL_2: ${{ secrets.RECIPIENT_EMAIL_2 }}
       run: |
-        python nifty_automated.py
+        python nifty50_option_analysis.py
     
     - name: Upload reports as artifacts
       uses: actions/upload-artifact@v4 
