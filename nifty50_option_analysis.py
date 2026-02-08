@@ -909,6 +909,8 @@ class NiftyHTMLAnalyzer:
                     <tr>
                         <th>#</th>
                         <th>Strike</th>
+                        <th>CE OI</th>
+                        <th>PE OI</th>
                         <th>Total OI</th>
                     </tr>
                 </thead>
@@ -919,7 +921,9 @@ class NiftyHTMLAnalyzer:
                     <tr>
                         <td>{i}</td>
                         <td>₹{int(strike['Strike']):,}</td>
-                        <td>{int(strike['Total_OI']):,}</td>
+                        <td>{int(strike['CE_OI']):,}</td>
+                        <td>{int(strike['PE_OI']):,}</td>
+                        <td><strong>{int(strike['Total_OI']):,}</strong></td>
                     </tr>
 """
             html += """
