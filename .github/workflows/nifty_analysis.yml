@@ -2,12 +2,9 @@ name: Nifty 50 Option Chain Daily Analysis
 
 on:
   schedule:
-    # Runs at 03:30 UTC (09:00 IST) - Market Pre-open
     - cron: '30 3 * * 1-5'
-    # Runs every hour from 04:30 to 10:30 UTC (10:00 IST to 16:00 IST) - Market Hours
     - cron: '30 4-10 * * 1-5'
-  
-  workflow_dispatch: # Allows you to run it manually for testing
+  workflow_dispatch:
 
 jobs:
   analyze-and-email:
@@ -29,24 +26,20 @@ jobs:
     
     - name: Run Nifty Analysis
       env:
-        # Credentials from GitHub Secrets
         GMAIL_USER: ${{ secrets.GMAIL_USER }}
         GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         RECIPIENT_EMAIL_1: ${{ secrets.RECIPIENT_EMAIL_1 }}
         RECIPIENT_EMAIL_2: ${{ secrets.RECIPIENT_EMAIL_2 }}
-        
-        # GitHub System Variables (Needed for the Email Link)
-        GITHUB_RUN_ID: ${{ github.run_id }}
-        GITHUB_REPO: ${{ github.repository }}
+        # This creates the browser link
+        SUMMARY_URL: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
       run: |
         python nifty50_option_analysis.py
     
-    - name: Upload reports as artifacts
+    - name: Upload reports
       uses: actions/upload-artifact@v4 
       if: always()
       with:
-        name: nifty-analysis-${{ github.run_number }}
+        name: Nifty-Report-${{ github.run_number }}
         path: |
           *.xlsx
           *.txt
-        retention-days: 30
