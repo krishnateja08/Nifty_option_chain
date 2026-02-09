@@ -1,12 +1,13 @@
 """
-NIFTY 50 COMPLETE ANALYSIS - GitHub Automated Version with HTML Email
-Technical Analysis + Live NSE Option Chain + Beautiful HTML Email Reports
+NIFTY 50 COMPLETE ANALYSIS - GitHub Pages + Email Version
+Technical Analysis + Live NSE Option Chain + Beautiful HTML Reports
 
 This script:
 1. Fetches live NSE option chain data
 2. Performs technical analysis
 3. Generates trading recommendations
-4. Sends BEAUTIFUL HTML emails to specified recipients
+4. Sends HTML emails to specified recipients
+5. SAVES HTML REPORT TO FILE for GitHub Pages deployment
 
 Environment Variables Required (GitHub Secrets):
 - GMAIL_USER: Your Gmail address
@@ -25,6 +26,7 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import json
 warnings.filterwarnings('ignore')
 
 
@@ -32,8 +34,8 @@ class NiftyHTMLAnalyzer:
     def __init__(self):
         self.yf_symbol = "^NSEI"
         self.nse_symbol = "NIFTY"
-        self.report_lines = []  # Store report lines for console
-        self.html_data = {}  # Store data for HTML generation
+        self.report_lines = []
+        self.html_data = {}
         
     def log(self, message):
         """Log message to console only"""
@@ -215,7 +217,7 @@ class NiftyHTMLAnalyzer:
     # ==================== ANALYSIS & DATA COLLECTION ====================
     
     def generate_analysis_data(self, technical, option_analysis):
-        """Generate analysis and collect data for HTML"""
+        """Generate analysis and collect data for HTML - NO LOGIC CHANGES"""
         
         if not technical:
             self.log("⚠️  Technical data unavailable")
@@ -267,7 +269,7 @@ class NiftyHTMLAnalyzer:
             elif current < max_pain - 100:
                 bullish_score += 1
         
-        # Determine bias
+        # Determine bias - EXACT SAME LOGIC
         score_diff = bullish_score - bearish_score
         
         if bullish_score > bearish_score + 2:
@@ -387,10 +389,10 @@ class NiftyHTMLAnalyzer:
                 'profit_high': resistance
             }
     
-    # ==================== HTML GENERATION ====================
+    # ==================== HTML GENERATION (SAME AS EMAIL) ====================
     
     def generate_html_email(self):
-        """Generate beautiful HTML email"""
+        """Generate beautiful HTML - EXACT SAME AS EMAIL VERSION"""
         
         data = self.html_data
         
@@ -955,6 +957,41 @@ class NiftyHTMLAnalyzer:
         
         return html
     
+    # ==================== FILE SAVING (NEW FUNCTIONALITY) ====================
+    
+    def save_html_to_file(self, filename='index.html'):
+        """Save HTML report to file for GitHub Pages"""
+        try:
+            print(f"\n📄 Saving HTML report to {filename}...")
+            
+            html_content = self.generate_html_email()
+            
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(html_content)
+            
+            print(f"   ✅ HTML report saved to {filename}")
+            
+            # Also save metadata as JSON for historical tracking
+            metadata = {
+                'timestamp': self.html_data['timestamp'],
+                'current_price': float(self.html_data['current_price']),
+                'bias': self.html_data['bias'],
+                'confidence': self.html_data['confidence'],
+                'rsi': float(self.html_data['rsi']),
+                'pcr': float(self.html_data['pcr']) if self.html_data['has_option_data'] else None
+            }
+            
+            with open('latest_report.json', 'w') as f:
+                json.dump(metadata, f, indent=2)
+            
+            print(f"   ✅ Metadata saved to latest_report.json")
+            
+            return True
+            
+        except Exception as e:
+            print(f"\n❌ Failed to save HTML: {e}")
+            return False
+    
     # ==================== MAIN REPORT ====================
     
     def generate_full_report(self):
@@ -990,8 +1027,8 @@ class NiftyHTMLAnalyzer:
         recipient2 = os.getenv('RECIPIENT_EMAIL_2')
         
         if not all([gmail_user, gmail_password, recipient1, recipient2]):
-            print("\n❌ Email credentials not found in environment variables!")
-            print("Required: GMAIL_USER, GMAIL_APP_PASSWORD, RECIPIENT_EMAIL_1, RECIPIENT_EMAIL_2")
+            print("\n⚠️  Email credentials not found in environment variables!")
+            print("   Skipping email send...")
             return False
         
         try:
@@ -1022,11 +1059,6 @@ class NiftyHTMLAnalyzer:
             
         except Exception as e:
             print(f"\n❌ Failed to send email: {e}")
-            print("\nTroubleshooting:")
-            print("1. Make sure you're using Gmail App Password, not regular password")
-            print("2. Enable 2-factor authentication in Gmail")
-            print("3. Generate App Password: https://myaccount.google.com/apppasswords")
-            print("4. Check environment variables are set correctly")
             return False
 
 
@@ -1037,6 +1069,12 @@ def main():
         
         analyzer = NiftyHTMLAnalyzer()
         option_analysis = analyzer.generate_full_report()
+        
+        # Save HTML report to file (NEW!)
+        print("\n" + "="*80)
+        print("💾 SAVING HTML REPORT FOR GITHUB PAGES")
+        print("="*80)
+        analyzer.save_html_to_file('index.html')
         
         # Send HTML email report
         print("\n" + "="*80)
@@ -1050,11 +1088,6 @@ def main():
         print(f"\n❌ Critical Error: {e}")
         import traceback
         traceback.print_exc()
-        print("\nTroubleshooting:")
-        print("1. Install: pip install curl_cffi pandas yfinance")
-        print("2. Check internet connection")
-        print("3. Verify environment variables are set")
-        print("4. Run during market hours for best results")
 
 
 if __name__ == "__main__":
