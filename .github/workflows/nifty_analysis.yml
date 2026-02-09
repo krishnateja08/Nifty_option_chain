@@ -1,9 +1,12 @@
 name: Nifty 50 Option Chain Daily Analysis
 
 on:
-  schedule:
-    - cron: '0 4 * * 1-5'
-    - cron: '30 9 * * 1-5'
+ schedule:
+  # Runs at 03:30 UTC (09:00 IST)
+  - cron: '30 3 * * 1-5'
+  # Runs every hour from 04:30 to 10:30 UTC (10:00 IST to 16:00 IST)
+  - cron: '30 4-10 * * 1-5'
+  
   workflow_dispatch:
 
 jobs:
