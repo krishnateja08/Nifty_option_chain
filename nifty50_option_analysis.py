@@ -945,7 +945,7 @@ class NiftyHTMLAnalyzer:
 
         <!-- Footer -->
         <div class="footer">
-            <p>Automated Nifty 50 Analysis Report</p>
+            <p>Automated Nifty 50 Option Chain Analysis Report</p>
             <p>© 2026 - For Educational Purposes Only</p>
         </div>
     </div>
@@ -1004,7 +1004,7 @@ class NiftyHTMLAnalyzer:
             msg = MIMEMultipart('alternative')
             msg['From'] = gmail_user
             msg['To'] = f"{recipient1}, {recipient2}"
-            msg['Subject'] = f"📊 Nifty 50 Analysis Report - {datetime.now().strftime('%d-%b-%Y %H:%M')}"
+            msg['Subject'] = f"📊 Nifty 50 Option Chain Analysis Report - {datetime.now().strftime('%d-%b-%Y %H:%M')}"
             
             # Attach HTML
             html_part = MIMEText(html_content, 'html')
