@@ -36,7 +36,7 @@ jobs:
           RECIPIENT_EMAIL_1: ${{ secrets.RECIPIENT_EMAIL_1 }}
           RECIPIENT_EMAIL_2: ${{ secrets.RECIPIENT_EMAIL_2 }}
         run: |
-          python nifty50_github_pages.py
+          python nifty50_option_analysis.py
           echo "✅ Analysis complete"
           ls -la index.html
       
