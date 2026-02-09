@@ -1,13 +1,13 @@
 name: Nifty 50 Option Chain Daily Analysis
 
 on:
- schedule:
-  # Runs at 03:30 UTC (09:00 IST)
-  - cron: '30 3 * * 1-5'
-  # Runs every hour from 04:30 to 10:30 UTC (10:00 IST to 16:00 IST)
-  - cron: '30 4-10 * * 1-5'
+  schedule:
+    # Runs at 03:30 UTC (09:00 IST) - Market Pre-open
+    - cron: '30 3 * * 1-5'
+    # Runs every hour from 04:30 to 10:30 UTC (10:00 IST to 16:00 IST) - Market Hours
+    - cron: '30 4-10 * * 1-5'
   
-  workflow_dispatch:
+  workflow_dispatch: # Allows you to run it manually for testing
 
 jobs:
   analyze-and-email:
@@ -29,11 +29,15 @@ jobs:
     
     - name: Run Nifty Analysis
       env:
-        # These MUST match the "Name" column in your GitHub Secrets screenshot
+        # Credentials from GitHub Secrets
         GMAIL_USER: ${{ secrets.GMAIL_USER }}
-        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }} # Changed to match screenshot
+        GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         RECIPIENT_EMAIL_1: ${{ secrets.RECIPIENT_EMAIL_1 }}
         RECIPIENT_EMAIL_2: ${{ secrets.RECIPIENT_EMAIL_2 }}
+        
+        # GitHub System Variables (Needed for the Email Link)
+        GITHUB_RUN_ID: ${{ github.run_id }}
+        GITHUB_REPO: ${{ github.repository }}
       run: |
         python nifty50_option_analysis.py
     
