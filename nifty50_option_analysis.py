@@ -226,6 +226,10 @@ class NiftyHTMLAnalyzer:
         
         current = technical['current_price']
         
+        # Get IST timezone for timestamp
+        ist_tz = pytz.timezone('Asia/Kolkata')
+        ist_now = datetime.now(ist_tz)
+        
         # Calculate scores (NO CHANGES TO LOGIC)
         bullish_score = 0
         bearish_score = 0
@@ -333,9 +337,9 @@ class NiftyHTMLAnalyzer:
             max_ce_strike = int(current/50)*50 + 200
             max_pe_strike = int(current/50)*50 - 200
         
-        # Store all data for HTML generation
+        # Store all data for HTML generation - USE IST TIME
         self.html_data = {
-            'timestamp': datetime.now().strftime('%d-%b-%Y %H:%M IST'),
+            'timestamp': ist_now.strftime('%d-%b-%Y %H:%M IST'),
             'current_price': current,
             'expiry': option_analysis['expiry'] if option_analysis else 'N/A',
             'bias': bias,
@@ -1039,6 +1043,10 @@ class NiftyHTMLAnalyzer:
             return False
         
         try:
+            # Get IST time for email subject
+            ist_tz = pytz.timezone('Asia/Kolkata')
+            ist_now = datetime.now(ist_tz)
+            
             print(f"\n📧 Preparing HTML email report...")
             
             # Generate HTML
@@ -1048,7 +1056,7 @@ class NiftyHTMLAnalyzer:
             msg = MIMEMultipart('alternative')
             msg['From'] = gmail_user
             msg['To'] = f"{recipient1}, {recipient2}"
-            msg['Subject'] = f"📊 Nifty 50 Option Chain Analysis Report - {datetime.now().strftime('%d-%b-%Y %H:%M')}"
+            msg['Subject'] = f"📊 Nifty 50 Option Chain Analysis Report - {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
             
             # Attach HTML
             html_part = MIMEText(html_content, 'html')
