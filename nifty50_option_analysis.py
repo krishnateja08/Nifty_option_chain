@@ -999,8 +999,6 @@ class NiftyHTMLAnalyzer:
         """Generate complete analysis report"""
         # 1. Define the IST timezone
     ist_tz = pytz.timezone('Asia/Kolkata') 
-    
-    # 2. Get the current time in IST
     ist_now = datetime.now(ist_tz)
         print("=" * 75)
         print("NIFTY 50 DAILY REPORT")
