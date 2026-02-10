@@ -200,6 +200,23 @@
             color: #2c3e50;
             font-weight: 600;
         }
+        .rec-value.stop-loss {
+            color: #dc3545;
+            font-weight: 700;
+        }
+        .risk-box {
+            background-color: #fff3cd;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        .risk-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+        }
         .strikes-table {
             width: 100%;
             border-collapse: collapse;
@@ -250,13 +267,11 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>📊 NIFTY 50 DAILY REPORT</h1>
-            <p>Generated: 11-Feb-2026 01:02 IST</p>
+            <p>Generated: 11-Feb-2026 01:16 IST</p>
         </div>
 
-        <!-- Market Snapshot -->
         <div class="section">
             <div class="section-title">
                 <span>📈</span> MARKET SNAPSHOT
@@ -273,7 +288,6 @@
             </div>
         </div>
 
-        <!-- Market Direction -->
         <div class="section">
             <div class="direction-box bullish">
                 <div class="direction-title">📈 MARKET DIRECTION: BULLISH</div>
@@ -281,7 +295,6 @@
             </div>
         </div>
 
-        <!-- Technical Indicators -->
         <div class="section">
             <div class="section-title">
                 <span>🔍</span> TECHNICAL INDICATORS
@@ -327,7 +340,6 @@
             </div>
         </div>
 
-        <!-- Option Chain Analysis -->
         <div class="section">
             <div class="section-title">
                 <span>🎯</span> OPTION CHAIN ANALYSIS
@@ -357,7 +369,6 @@
             </div>
         </div>
 
-        <!-- Key Levels -->
         <div class="section">
             <div class="section-title">
                 <span>📊</span> KEY LEVELS
@@ -393,7 +404,6 @@
             </div>
         </div>
 
-        <!-- Trading Recommendation -->
         <div class="section">
             <div class="section-title">
                 <span>💡</span> TRADING RECOMMENDATION
@@ -420,18 +430,27 @@
                 
                 <div class="rec-detail">
                     <span class="rec-label">Stop Loss</span>
-                    <span class="rec-value">₹25,071</span>
+                    <span class="rec-value stop-loss">₹25,785</span>
                 </div>
                 
                 <div class="rec-detail">
                     <span class="rec-label">Option Play</span>
                     <span class="rec-value">Buy 25950 CE</span>
                 </div>
+                
+                <div class="risk-box">
+                    <div class="risk-detail">
+                        <span><strong>Risk:</strong> 150 points</span>
+                        <span><strong>Reward:</strong> 339 points</span>
+                    </div>
+                    <div class="risk-detail">
+                        <span><strong>Risk:Reward Ratio:</strong> 1:2.26</span>
+                    </div>
+                </div>
 
             </div>
         </div>
 
-        <!-- Top Strikes -->
         <div class="section">
             <div class="section-title">
                 <span>📋</span> TOP 5 STRIKES (by Open Interest)
@@ -493,7 +512,6 @@
             </table>
         </div>
 
-        <!-- Disclaimer -->
         <div class="section">
             <div class="disclaimer">
                 <strong>⚠️ DISCLAIMER</strong><br><br>
@@ -502,7 +520,6 @@
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <p>Automated Nifty 50 Option Chain Analysis Report</p>
             <p>© 2026 - For Educational Purposes Only</p>
