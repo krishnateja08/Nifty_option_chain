@@ -46,14 +46,33 @@ class NiftyHTMLAnalyzer:
     # ==================== NSE OPTION CHAIN LOGIC ====================
     
     def get_upcoming_expiry_tuesday(self):
-        """Calculates the date of the current or next Tuesday"""
-        now = datetime.now()
-        days_ahead = (1 - now.weekday() + 7) % 7
+        """Calculates the date of the current or next Tuesday - FIXED WITH IST"""
+        # CRITICAL: Use IST timezone, not UTC!
+        ist_tz = pytz.timezone('Asia/Kolkata')
+        now = datetime.now(ist_tz)
         
-        if days_ahead == 0 and now.hour >= 15 and now.minute >= 30:
-            days_ahead = 7
-            
-        expiry_date = now + timedelta(days=days_ahead)
+        current_weekday = now.weekday()  # 0=Mon, 1=Tue, ..., 6=Sun
+        
+        # Case 1: Today is Tuesday
+        if current_weekday == 1:
+            # Before 3:30 PM IST → expiry is today
+            if now.hour < 15 or (now.hour == 15 and now.minute < 30):
+                expiry_date = now
+            else:
+                # After 3:30 PM IST → expiry is next Tuesday
+                expiry_date = now + timedelta(days=7)
+        
+        # Case 2: Today is Monday (day before Tuesday)
+        elif current_weekday == 0:
+            # Next Tuesday is tomorrow
+            expiry_date = now + timedelta(days=1)
+        
+        # Case 3: Today is Wed/Thu/Fri/Sat/Sun (after Tuesday)
+        else:
+            # Days until next Tuesday
+            days_ahead = (8 - current_weekday) % 7
+            expiry_date = now + timedelta(days=days_ahead)
+        
         return expiry_date.strftime('%d-%b-%Y')
     
     def fetch_nse_option_chain_silent(self):
