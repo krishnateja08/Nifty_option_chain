@@ -1,8 +1,8 @@
 {
-  "timestamp": "10-Feb-2026 12:17 IST",
-  "current_price": 25961.75,
+  "timestamp": "10-Feb-2026 13:58 IST",
+  "current_price": 25913.650390625,
   "bias": "BULLISH",
-  "confidence": "HIGH",
-  "rsi": 65.92841224390894,
-  "pcr": 1.32
+  "confidence": "MEDIUM",
+  "rsi": 65.19713408464403,
+  "pcr": 1.042
 }
