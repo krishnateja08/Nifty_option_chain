@@ -996,16 +996,19 @@ class NiftyHTMLAnalyzer:
     # ==================== MAIN REPORT ====================
     
     def generate_full_report(self):
-        """Generate complete analysis report"""
-        # 1. Define the IST timezone
-    ist_tz = pytz.timezone('Asia/Kolkata') 
+    """Generate complete analysis report"""
+    # 1. Define the IST timezone
+    ist_tz = pytz.timezone('Asia/Kolkata')
+    
+    # 2. Get the current time localized to India
     ist_now = datetime.now(ist_tz)
-        print("=" * 75)
-        print("NIFTY 50 DAILY REPORT")
-        print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
-        #print(f"Generated: {datetime.now().strftime('%d-%b-%Y %H:%M IST')}")
-        print("=" * 75)
-        print()
+    
+    # 3. Ensure all lines below are aligned perfectly
+    print("=" * 75)
+    print("NIFTY 50 DAILY REPORT")
+    print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
+    print("=" * 75)
+    print()
         
         # Fetch Option Chain (silent mode)
         oc_data = self.fetch_nse_option_chain_silent()
