@@ -27,6 +27,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import json
+import pytz
 warnings.filterwarnings('ignore')
 
 
@@ -996,9 +997,15 @@ class NiftyHTMLAnalyzer:
     
     def generate_full_report(self):
         """Generate complete analysis report"""
+        # Define the IST timezone
+        ist_tz = pytz.timezone('Asia/Kolkata')
+        
+        # Get the current time localized to India
+        ist_now = datetime.now(ist_tz)
+        
         print("=" * 75)
         print("NIFTY 50 DAILY REPORT")
-        print(f"Generated: {datetime.now().strftime('%d-%b-%Y %H:%M IST')}")
+        print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 75)
         print()
         
