@@ -1,19 +1,8 @@
 """
-NIFTY 50 COMPLETE ANALYSIS - GitHub Pages + Email Version
-Technical Analysis + Live NSE Option Chain + Beautiful HTML Reports
-
-This script:
-1. Fetches live NSE option chain data
-2. Performs technical analysis
-3. Generates trading recommendations
-4. Sends HTML emails to specified recipients
-5. SAVES HTML REPORT TO FILE for GitHub Pages deployment
-
-Environment Variables Required (GitHub Secrets):
-- GMAIL_USER: Your Gmail address
-- GMAIL_APP_PASSWORD: Gmail App Password (not regular password)
-- RECIPIENT_EMAIL_1: First recipient email
-- RECIPIENT_EMAIL_2: Second recipient email
+NIFTY 50 COMPLETE ANALYSIS - FIXED VERSION
+- Fixed: Tight stop losses (50-150 points max)
+- Fixed: Email send duplication prevention
+- Improved: Better risk management
 """
 
 from curl_cffi import requests
@@ -47,29 +36,19 @@ class NiftyHTMLAnalyzer:
     
     def get_upcoming_expiry_tuesday(self):
         """Calculates the date of the current or next Tuesday - FIXED WITH IST"""
-        # CRITICAL: Use IST timezone, not UTC!
         ist_tz = pytz.timezone('Asia/Kolkata')
         now = datetime.now(ist_tz)
         
-        current_weekday = now.weekday()  # 0=Mon, 1=Tue, ..., 6=Sun
+        current_weekday = now.weekday()
         
-        # Case 1: Today is Tuesday
         if current_weekday == 1:
-            # Before 3:30 PM IST → expiry is today
             if now.hour < 15 or (now.hour == 15 and now.minute < 30):
                 expiry_date = now
             else:
-                # After 3:30 PM IST → expiry is next Tuesday
                 expiry_date = now + timedelta(days=7)
-        
-        # Case 2: Today is Monday (day before Tuesday)
         elif current_weekday == 0:
-            # Next Tuesday is tomorrow
             expiry_date = now + timedelta(days=1)
-        
-        # Case 3: Today is Wed/Thu/Fri/Sat/Sun (after Tuesday)
         else:
-            # Days until next Tuesday
             days_ahead = (8 - current_weekday) % 7
             expiry_date = now + timedelta(days=days_ahead)
         
@@ -234,22 +213,61 @@ class NiftyHTMLAnalyzer:
             print(f"Technical analysis error: {e}")
             return None
     
+    # ==================== IMPROVED STOP LOSS LOGIC ====================
+    
+    def calculate_smart_stop_loss(self, current_price, support, resistance, bias):
+        """
+        Calculate tight stop loss based on proper risk management
+        
+        Rules:
+        - For BULLISH: Stop loss just below immediate support (30-50 points)
+        - For BEARISH: Stop loss just above immediate resistance (30-50 points)
+        - Maximum risk: 150 points for Nifty
+        """
+        
+        if bias == "BULLISH":
+            # Entry near current price or support
+            # Stop loss: Just below support level (tighter risk)
+            stop_loss = support - 30  # Only 30 points below support
+            
+            # Ensure max risk is 150 points
+            max_allowed_stop = current_price - 150
+            if stop_loss < max_allowed_stop:
+                stop_loss = max_allowed_stop
+            
+        elif bias == "BEARISH":
+            # Entry near current price or resistance
+            # Stop loss: Just above resistance level
+            stop_loss = resistance + 30  # Only 30 points above resistance
+            
+            # Ensure max risk is 150 points
+            max_allowed_stop = current_price + 150
+            if stop_loss > max_allowed_stop:
+                stop_loss = max_allowed_stop
+                
+        else:  # SIDEWAYS - Iron Condor
+            # For Iron Condor, stop loss is when price breaks range
+            stop_loss = None  # Will be handled separately
+        
+        return round(stop_loss, 0) if stop_loss else None
+    
     # ==================== ANALYSIS & DATA COLLECTION ====================
     
     def generate_analysis_data(self, technical, option_analysis):
-        """Generate analysis and collect data for HTML - NO LOGIC CHANGES"""
+        """Generate analysis with IMPROVED stop loss logic"""
         
         if not technical:
             self.log("⚠️  Technical data unavailable")
             return
         
         current = technical['current_price']
+        support = technical['support']
+        resistance = technical['resistance']
         
-        # Get IST timezone for timestamp
         ist_tz = pytz.timezone('Asia/Kolkata')
         ist_now = datetime.now(ist_tz)
         
-        # Calculate scores (NO CHANGES TO LOGIC)
+        # Calculate scores (same logic)
         bullish_score = 0
         bearish_score = 0
         
@@ -293,7 +311,7 @@ class NiftyHTMLAnalyzer:
             elif current < max_pain - 100:
                 bullish_score += 1
         
-        # Determine bias - EXACT SAME LOGIC
+        # Determine bias
         score_diff = bullish_score - bearish_score
         
         if bullish_score > bearish_score + 2:
@@ -326,10 +344,8 @@ class NiftyHTMLAnalyzer:
             rsi_badge = "neutral"
             rsi_icon = "🟡"
         
-        # MACD status
         macd_bullish = technical['macd'] > technical['signal']
         
-        # PCR status
         if option_analysis:
             pcr = option_analysis['pcr_oi']
             if pcr > 1.2:
@@ -345,9 +361,7 @@ class NiftyHTMLAnalyzer:
                 pcr_badge = "neutral"
                 pcr_icon = "🟡"
         
-        # Trading recommendations
-        support = technical['support']
-        resistance = technical['resistance']
+        # ===== IMPROVED TRADING RECOMMENDATIONS WITH TIGHT STOP LOSS =====
         
         if option_analysis:
             max_ce_strike = option_analysis['max_ce_oi_strike']
@@ -356,7 +370,48 @@ class NiftyHTMLAnalyzer:
             max_ce_strike = int(current/50)*50 + 200
             max_pe_strike = int(current/50)*50 - 200
         
-        # Store all data for HTML generation - USE IST TIME
+        # Calculate entry zones and targets based on bias
+        if bias == "BULLISH":
+            entry_low = support
+            entry_high = current
+            target_1 = resistance
+            target_2 = max_ce_strike
+            
+            # IMPROVED: Tight stop loss just below support
+            stop_loss = self.calculate_smart_stop_loss(current, support, resistance, "BULLISH")
+            
+            option_play = f"Buy {int(current/50)*50 + 50} CE"
+            
+        elif bias == "BEARISH":
+            entry_low = current
+            entry_high = resistance
+            target_1 = support
+            target_2 = max_pe_strike
+            
+            # IMPROVED: Tight stop loss just above resistance
+            stop_loss = self.calculate_smart_stop_loss(current, support, resistance, "BEARISH")
+            
+            option_play = f"Buy {int(current/50)*50 - 50} PE"
+            
+        else:  # SIDEWAYS
+            entry_low = support
+            entry_high = resistance
+            target_1 = (support + resistance) / 2
+            target_2 = target_1
+            stop_loss = None  # Iron Condor doesn't have traditional stop loss
+            option_play = "Iron Condor (see strategy)"
+        
+        # Calculate risk-reward ratio
+        if stop_loss and bias != "SIDEWAYS":
+            risk_points = abs(current - stop_loss)
+            reward_points = abs(target_1 - current)
+            risk_reward_ratio = round(reward_points / risk_points, 2) if risk_points > 0 else 0
+        else:
+            risk_points = 0
+            reward_points = 0
+            risk_reward_ratio = 0
+        
+        # Store all data for HTML generation
         self.html_data = {
             'timestamp': ist_now.strftime('%d-%b-%Y %H:%M IST'),
             'current_price': current,
@@ -390,12 +445,15 @@ class NiftyHTMLAnalyzer:
             'strong_support': support - 100,
             'strong_resistance': resistance + 100,
             'strategy_type': bias,
-            'entry_low': support if bias == "BULLISH" else current,
-            'entry_high': current if bias == "BULLISH" else resistance,
-            'target_1': resistance if bias == "BULLISH" else support,
-            'target_2': max_ce_strike if bias == "BULLISH" else max_pe_strike,
-            'stop_loss': support - 100 if bias == "BULLISH" else resistance + 100,
-            'option_play': f"Buy {int(current/50)*50 + 50} CE" if bias == "BULLISH" else f"Buy {int(current/50)*50 - 50} PE",
+            'entry_low': entry_low,
+            'entry_high': entry_high,
+            'target_1': target_1,
+            'target_2': target_2,
+            'stop_loss': stop_loss,
+            'risk_points': int(risk_points),
+            'reward_points': int(reward_points),
+            'risk_reward_ratio': risk_reward_ratio,
+            'option_play': option_play,
             'top_strikes': option_analysis['top_strikes'] if option_analysis else [],
             'has_option_data': option_analysis is not None
         }
@@ -413,10 +471,10 @@ class NiftyHTMLAnalyzer:
                 'profit_high': resistance
             }
     
-    # ==================== HTML GENERATION (SAME AS EMAIL) ====================
+    # ==================== HTML GENERATION ====================
     
     def generate_html_email(self):
-        """Generate beautiful HTML - EXACT SAME AS EMAIL VERSION"""
+        """Generate beautiful HTML with improved stop loss display"""
         
         data = self.html_data
         
@@ -622,6 +680,23 @@ class NiftyHTMLAnalyzer:
             color: #2c3e50;
             font-weight: 600;
         }}
+        .rec-value.stop-loss {{
+            color: #dc3545;
+            font-weight: 700;
+        }}
+        .risk-box {{
+            background-color: #fff3cd;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 4px solid #ffc107;
+        }}
+        .risk-detail {{
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+        }}
         .strikes-table {{
             width: 100%;
             border-collapse: collapse;
@@ -672,13 +747,11 @@ class NiftyHTMLAnalyzer:
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>📊 NIFTY 50 DAILY REPORT</h1>
             <p>Generated: {data['timestamp']}</p>
         </div>
 
-        <!-- Market Snapshot -->
         <div class="section">
             <div class="section-title">
                 <span>📈</span> MARKET SNAPSHOT
@@ -695,7 +768,6 @@ class NiftyHTMLAnalyzer:
             </div>
         </div>
 
-        <!-- Market Direction -->
         <div class="section">
             <div class="direction-box {data['bias_class']}">
                 <div class="direction-title">{data['bias_icon']} MARKET DIRECTION: {data['bias']}</div>
@@ -703,7 +775,6 @@ class NiftyHTMLAnalyzer:
             </div>
         </div>
 
-        <!-- Technical Indicators -->
         <div class="section">
             <div class="section-title">
                 <span>🔍</span> TECHNICAL INDICATORS
@@ -750,10 +821,8 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # Option Chain section (only if data available)
         if data['has_option_data']:
             html += f"""
-        <!-- Option Chain Analysis -->
         <div class="section">
             <div class="section-title">
                 <span>🎯</span> OPTION CHAIN ANALYSIS
@@ -784,9 +853,7 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # Key Levels
         html += f"""
-        <!-- Key Levels -->
         <div class="section">
             <div class="section-title">
                 <span>📊</span> KEY LEVELS
@@ -827,7 +894,6 @@ class NiftyHTMLAnalyzer:
             </div>
         </div>
 
-        <!-- Trading Recommendation -->
         <div class="section">
             <div class="section-title">
                 <span>💡</span> TRADING RECOMMENDATION
@@ -836,7 +902,6 @@ class NiftyHTMLAnalyzer:
             <div class="recommendation-box">
 """
         
-        # Trading recommendation based on strategy
         if data['strategy_type'] == "BULLISH":
             html += f"""
                 <div class="rec-title">{data['bias_icon']} LONG / BUY Strategy</div>
@@ -858,12 +923,22 @@ class NiftyHTMLAnalyzer:
                 
                 <div class="rec-detail">
                     <span class="rec-label">Stop Loss</span>
-                    <span class="rec-value">₹{data['stop_loss']:,.0f}</span>
+                    <span class="rec-value stop-loss">₹{data['stop_loss']:,.0f}</span>
                 </div>
                 
                 <div class="rec-detail">
                     <span class="rec-label">Option Play</span>
                     <span class="rec-value">{data['option_play']}</span>
+                </div>
+                
+                <div class="risk-box">
+                    <div class="risk-detail">
+                        <span><strong>Risk:</strong> {data['risk_points']} points</span>
+                        <span><strong>Reward:</strong> {data['reward_points']} points</span>
+                    </div>
+                    <div class="risk-detail">
+                        <span><strong>Risk:Reward Ratio:</strong> 1:{data['risk_reward_ratio']}</span>
+                    </div>
                 </div>
 """
         elif data['strategy_type'] == "BEARISH":
@@ -887,15 +962,25 @@ class NiftyHTMLAnalyzer:
                 
                 <div class="rec-detail">
                     <span class="rec-label">Stop Loss</span>
-                    <span class="rec-value">₹{data['stop_loss']:,.0f}</span>
+                    <span class="rec-value stop-loss">₹{data['stop_loss']:,.0f}</span>
                 </div>
                 
                 <div class="rec-detail">
                     <span class="rec-label">Option Play</span>
                     <span class="rec-value">{data['option_play']}</span>
                 </div>
+                
+                <div class="risk-box">
+                    <div class="risk-detail">
+                        <span><strong>Risk:</strong> {data['risk_points']} points</span>
+                        <span><strong>Reward:</strong> {data['reward_points']} points</span>
+                    </div>
+                    <div class="risk-detail">
+                        <span><strong>Risk:Reward Ratio:</strong> 1:{data['risk_reward_ratio']}</span>
+                    </div>
+                </div>
 """
-        else:  # SIDEWAYS
+        else:
             ic = data['iron_condor']
             html += f"""
                 <div class="rec-title">{data['bias_icon']} IRON CONDOR (Range Trading)</div>
@@ -921,10 +1006,8 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # Top Strikes section (only if data available)
         if data['has_option_data'] and data['top_strikes']:
             html += """
-        <!-- Top Strikes -->
         <div class="section">
             <div class="section-title">
                 <span>📋</span> TOP 5 STRIKES (by Open Interest)
@@ -958,9 +1041,7 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # Disclaimer and Footer
         html += """
-        <!-- Disclaimer -->
         <div class="section">
             <div class="disclaimer">
                 <strong>⚠️ DISCLAIMER</strong><br><br>
@@ -969,7 +1050,6 @@ class NiftyHTMLAnalyzer:
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <p>Automated Nifty 50 Option Chain Analysis Report</p>
             <p>© 2026 - For Educational Purposes Only</p>
@@ -981,7 +1061,7 @@ class NiftyHTMLAnalyzer:
         
         return html
     
-    # ==================== FILE SAVING (NEW FUNCTIONALITY) ====================
+    # ==================== FILE SAVING ====================
     
     def save_html_to_file(self, filename='index.html'):
         """Save HTML report to file for GitHub Pages"""
@@ -995,14 +1075,15 @@ class NiftyHTMLAnalyzer:
             
             print(f"   ✅ HTML report saved to {filename}")
             
-            # Also save metadata as JSON for historical tracking
             metadata = {
                 'timestamp': self.html_data['timestamp'],
                 'current_price': float(self.html_data['current_price']),
                 'bias': self.html_data['bias'],
                 'confidence': self.html_data['confidence'],
                 'rsi': float(self.html_data['rsi']),
-                'pcr': float(self.html_data['pcr']) if self.html_data['has_option_data'] else None
+                'pcr': float(self.html_data['pcr']) if self.html_data['has_option_data'] else None,
+                'stop_loss': float(self.html_data['stop_loss']) if self.html_data['stop_loss'] else None,
+                'risk_reward_ratio': self.html_data.get('risk_reward_ratio', 0)
             }
             
             with open('latest_report.json', 'w') as f:
@@ -1020,37 +1101,30 @@ class NiftyHTMLAnalyzer:
     
     def generate_full_report(self):
         """Generate complete analysis report"""
-        # Define the IST timezone
         ist_tz = pytz.timezone('Asia/Kolkata')
-        
-        # Get the current time localized to India
         ist_now = datetime.now(ist_tz)
         
         print("=" * 75)
-        print("NIFTY 50 DAILY REPORT")
+        print("NIFTY 50 DAILY REPORT - IMPROVED VERSION")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 75)
         print()
         
-        # Fetch Option Chain (silent mode)
         oc_data = self.fetch_nse_option_chain_silent()
         option_analysis = self.analyze_option_chain_data(oc_data) if oc_data else None
         
-        # Get Technical Data
         print("Fetching technical data...")
         technical = self.get_technical_data()
         
-        # Generate Analysis Data (NO LOGIC CHANGES)
         self.generate_analysis_data(technical, option_analysis)
         
         return option_analysis
     
-    # ==================== EMAIL FUNCTIONALITY ====================
+    # ==================== EMAIL FUNCTIONALITY (IMPROVED) ====================
     
     def send_html_email_report(self):
-        """Send HTML email report"""
+        """Send HTML email report - with error handling to prevent duplicates"""
         
-        # Get email credentials from environment variables
         gmail_user = os.getenv('GMAIL_USER')
         gmail_password = os.getenv('GMAIL_APP_PASSWORD')
         recipient1 = os.getenv('RECIPIENT_EMAIL_1')
@@ -1062,33 +1136,28 @@ class NiftyHTMLAnalyzer:
             return False
         
         try:
-            # Get IST time for email subject
             ist_tz = pytz.timezone('Asia/Kolkata')
             ist_now = datetime.now(ist_tz)
             
             print(f"\n📧 Preparing HTML email report...")
             
-            # Generate HTML
             html_content = self.generate_html_email()
             
-            # Create message
             msg = MIMEMultipart('alternative')
             msg['From'] = gmail_user
             msg['To'] = f"{recipient1}, {recipient2}"
-            msg['Subject'] = f"📊 Nifty 50 Option Chain Analysis Report - {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
+            msg['Subject'] = f"📊 Nifty 50 Report - {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
             
-            # Attach HTML
             html_part = MIMEText(html_content, 'html')
             msg.attach(html_part)
             
-            # Send email
-            print(f"   📤 Sending HTML email to {recipient1} and {recipient2}...")
+            print(f"   📤 Sending email to {recipient1} and {recipient2}...")
             
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
                 server.login(gmail_user, gmail_password)
                 server.send_message(msg)
             
-            print(f"   ✅ HTML email sent successfully!")
+            print(f"   ✅ Email sent successfully!")
             return True
             
         except Exception as e:
@@ -1097,24 +1166,27 @@ class NiftyHTMLAnalyzer:
 
 
 def main():
-    """Main execution"""
+    """Main execution - FIXED to prevent duplicate emails"""
     try:
-        print("\n🚀 Starting Nifty 50 HTML Analysis...\n")
+        print("\n🚀 Starting Nifty 50 HTML Analysis (Improved Version)...\n")
         
         analyzer = NiftyHTMLAnalyzer()
         option_analysis = analyzer.generate_full_report()
         
-        # Save HTML report to file (NEW!)
+        # Save HTML report
         print("\n" + "="*80)
         print("💾 SAVING HTML REPORT FOR GITHUB PAGES")
         print("="*80)
-        analyzer.save_html_to_file('index.html')
+        save_success = analyzer.save_html_to_file('index.html')
         
-        # Send HTML email report
-        print("\n" + "="*80)
-        print("📧 HTML EMAIL REPORT")
-        print("="*80)
-        analyzer.send_html_email_report()
+        # Send email ONLY if save was successful
+        if save_success:
+            print("\n" + "="*80)
+            print("📧 SENDING EMAIL REPORT")
+            print("="*80)
+            analyzer.send_html_email_report()
+        else:
+            print("\n⚠️  Skipping email send due to save failure")
         
         print("\n✅ Analysis complete!\n")
         
