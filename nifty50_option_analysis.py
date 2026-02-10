@@ -370,10 +370,18 @@ class NiftyHTMLAnalyzer:
             max_ce_strike = int(current/50)*50 + 200
             max_pe_strike = int(current/50)*50 - 200
         
-        # Calculate entry zones and targets based on bias
+        # ===== IMPROVED: TIGHT ENTRY ZONES (50-100 points max) =====
+        
         if bias == "BULLISH":
-            entry_low = support
+            # For bullish: Entry should be near current price with small range
             entry_high = current
+            entry_low = current - 50  # Only 50 points below current price
+            
+            # If current price is closer to resistance, adjust entry zone down
+            if current > (support + resistance) / 2:
+                entry_low = current - 100
+                entry_high = current - 50
+            
             target_1 = resistance
             target_2 = max_ce_strike
             
@@ -383,8 +391,15 @@ class NiftyHTMLAnalyzer:
             option_play = f"Buy {int(current/50)*50 + 50} CE"
             
         elif bias == "BEARISH":
+            # For bearish: Entry should be near current price with small range
             entry_low = current
-            entry_high = resistance
+            entry_high = current + 50  # Only 50 points above current price
+            
+            # If current price is closer to support, adjust entry zone up
+            if current < (support + resistance) / 2:
+                entry_low = current + 50
+                entry_high = current + 100
+            
             target_1 = support
             target_2 = max_pe_strike
             
