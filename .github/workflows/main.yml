@@ -3,7 +3,7 @@ name: Nifty 50 Analysis + GitHub Pages
 on:
   schedule:
     - cron: '37 3 * * 1-5'  # 9:07 AM IST - Less competition than 9:00 or 9:30
-    - cron: '30 4-10 * * 1-5'  # Market hours
+    - cron: '42 4-10 * * 1-5'  # Market hours
   workflow_dispatch:
 
 # Required permissions
