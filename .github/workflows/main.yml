@@ -3,8 +3,8 @@ name: Nifty 50 Analysis + GitHub Pages
 on:
   schedule:
     - cron: '37 3 * * 1-5'  # 9:07 AM IST - Less competition than 9:00 or 9:30
-    - cron: '42 4-10 * * 1-5'  # Market hours (every hour from 10:12 AM to 4:12 PM IST)
-  workflow_dispatch:  # Manual trigger option
+    - cron: '42 4-10 * * 1-5'  # Market hours
+  workflow_dispatch:
 
 # Required permissions
 permissions:
@@ -27,32 +27,20 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install curl-cffi pandas numpy yfinance pytz pyyaml
-          echo "✅ Dependencies installed"
+          pip install curl_cffi pandas yfinance openpyxl
       
-      - name: Run Nifty Analysis
+      - name: Run Analysis
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           RECIPIENT_EMAIL_1: ${{ secrets.RECIPIENT_EMAIL_1 }}
           RECIPIENT_EMAIL_2: ${{ secrets.RECIPIENT_EMAIL_2 }}
         run: |
-          echo "🚀 Starting Nifty 50 Analysis..."
-          python nifty_analyzer_complete.py
+          python nifty50_option_analysis.py
           echo "✅ Analysis complete"
-          
-          # Check if HTML report was generated
-          if [ -f "reports/nifty_analysis_*.html" ]; then
-            echo "✅ HTML report generated"
-            # Copy latest report to index.html for GitHub Pages
-            cp reports/nifty_analysis_*.html index.html
-            ls -la index.html
-          else
-            echo "⚠️ Warning: HTML report not found in reports directory"
-            ls -la reports/
-          fi
+          ls -la index.html
       
-      # Deploy using peaceiris/actions-gh-pages
+      # Deploy using peaceiris/actions-gh-pages (easiest method)
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -60,17 +48,13 @@ jobs:
           publish_dir: .
           publish_branch: gh-pages
           keep_files: false
-          commit_message: "📊 Update Nifty Report - $(date +'%Y-%m-%d %H:%M IST')"
+          commit_message: "📊 Update Nifty Report - ${{ github.event.head_commit.message }}"
       
-      - name: Show Deployment URL
+      - name: Show URL
         run: |
           echo "=============================================="
           echo "✅ Deployed successfully!"
           echo "=============================================="
           echo "🔗 Your report is live at:"
           echo "   https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          echo "=============================================="
-          echo "📧 Email sent to:"
-          echo "   - ${{ secrets.RECIPIENT_EMAIL_1 }}"
-          echo "   - ${{ secrets.RECIPIENT_EMAIL_2 }}"
           echo "=============================================="
