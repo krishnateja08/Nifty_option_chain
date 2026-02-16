@@ -138,6 +138,76 @@ class NiftyHTMLAnalyzer:
         pcr_oi = total_pe_oi / total_ce_oi if total_ce_oi > 0 else 0
         pcr_vol = total_pe_vol / total_ce_vol if total_ce_vol > 0 else 0
         
+        # ========== CHANGE IN OI ANALYSIS ==========
+        # Extract Change in OI from API data
+        ce_oi_change_list = []
+        pe_oi_change_list = []
+        
+        for item in oc_data['raw_data']:
+            ce = item.get('CE', {})
+            pe = item.get('PE', {})
+            
+            ce_chng = ce.get('changeinOpenInterest', 0)
+            pe_chng = pe.get('changeinOpenInterest', 0)
+            
+            if ce_chng != 0:
+                ce_oi_change_list.append(ce_chng)
+            if pe_chng != 0:
+                pe_oi_change_list.append(pe_chng)
+        
+        total_ce_oi_change = sum(ce_oi_change_list)
+        total_pe_oi_change = sum(pe_oi_change_list)
+        net_oi_change = total_pe_oi_change - total_ce_oi_change
+        
+        # Determine market direction based on OI changes
+        if total_ce_oi_change > 0 and total_pe_oi_change < 0:
+            oi_direction = "Strong Bearish"
+            oi_signal = "Call Build-up + Put Unwinding"
+            oi_icon = "🔴"
+            oi_class = "bearish"
+        elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
+            oi_direction = "Strong Bullish"
+            oi_signal = "Put Build-up + Call Unwinding"
+            oi_icon = "🟢"
+            oi_class = "bullish"
+        elif total_ce_oi_change > 0 and total_pe_oi_change > 0:
+            if total_pe_oi_change > total_ce_oi_change * 1.5:
+                oi_direction = "Bullish"
+                oi_signal = "Put Build-up Dominant"
+                oi_icon = "🟢"
+                oi_class = "bullish"
+            elif total_ce_oi_change > total_pe_oi_change * 1.5:
+                oi_direction = "Bearish"
+                oi_signal = "Call Build-up Dominant"
+                oi_icon = "🔴"
+                oi_class = "bearish"
+            else:
+                oi_direction = "Neutral (High Volatility)"
+                oi_signal = "Both Calls & Puts Building"
+                oi_icon = "🟡"
+                oi_class = "neutral"
+        elif total_ce_oi_change < 0 and total_pe_oi_change < 0:
+            oi_direction = "Neutral (Unwinding)"
+            oi_signal = "Both Calls & Puts Unwinding"
+            oi_icon = "🟡"
+            oi_class = "neutral"
+        else:
+            if net_oi_change > 0:
+                oi_direction = "Moderately Bullish"
+                oi_signal = "Net Put Accumulation"
+                oi_icon = "🟢"
+                oi_class = "bullish"
+            elif net_oi_change < 0:
+                oi_direction = "Moderately Bearish"
+                oi_signal = "Net Call Accumulation"
+                oi_icon = "🔴"
+                oi_class = "bearish"
+            else:
+                oi_direction = "Neutral"
+                oi_signal = "Balanced OI Changes"
+                oi_icon = "🟡"
+                oi_class = "neutral"
+        
         max_ce_oi_row = df.loc[df['CE_OI'].idxmax()]
         max_pe_oi_row = df.loc[df['PE_OI'].idxmax()]
         
@@ -166,6 +236,14 @@ class NiftyHTMLAnalyzer:
             'max_pain': int(max_pain_row['Strike']),
             'top_ce_strikes': top_ce_strikes,
             'top_pe_strikes': top_pe_strikes,
+            # OI Change Analysis
+            'total_ce_oi_change': int(total_ce_oi_change),
+            'total_pe_oi_change': int(total_pe_oi_change),
+            'net_oi_change': int(net_oi_change),
+            'oi_direction': oi_direction,
+            'oi_signal': oi_signal,
+            'oi_icon': oi_icon,
+            'oi_class': oi_class,
             'df': df
         }
         
@@ -444,6 +522,14 @@ class NiftyHTMLAnalyzer:
             'max_pain': option_analysis['max_pain'] if option_analysis else 0,
             'max_ce_oi': max_ce_strike,
             'max_pe_oi': max_pe_strike,
+            # OI Change data
+            'total_ce_oi_change': option_analysis['total_ce_oi_change'] if option_analysis else 0,
+            'total_pe_oi_change': option_analysis['total_pe_oi_change'] if option_analysis else 0,
+            'net_oi_change': option_analysis['net_oi_change'] if option_analysis else 0,
+            'oi_direction': option_analysis['oi_direction'] if option_analysis else 'N/A',
+            'oi_signal': option_analysis['oi_signal'] if option_analysis else 'N/A',
+            'oi_icon': option_analysis['oi_icon'] if option_analysis else '🟡',
+            'oi_class': option_analysis['oi_class'] if option_analysis else 'neutral',
             'support': support,
             'resistance': resistance,
             'strong_support': support - 100,
@@ -1103,6 +1189,62 @@ class NiftyHTMLAnalyzer:
                     <div class="card-value">₹{data['max_pe_oi']:,}</div>
                     <span class="card-change positive">Support</span>
                 </div>
+            </div>
+        </div>
+"""
+
+        # OI CHANGE ANALYSIS - NEW SECTION
+        if data['has_option_data']:
+            html += f"""
+        <div class="section">
+            <div class="section-title">
+                <span>📊</span> CHANGE IN OPEN INTEREST (Today's Market Direction)
+            </div>
+            
+            <!-- OI Direction Box -->
+            <div class="direction-box {data['oi_class']}" style="margin: 15px 0;">
+                <div class="direction-title" style="font-size: 26px;">{data['oi_icon']} {data['oi_direction']}</div>
+                <div class="direction-subtitle" style="font-size: 13px;">{data['oi_signal']}</div>
+            </div>
+            
+            <!-- OI Change Cards -->
+            <div class="card-grid" style="margin-top: 20px;">
+                <div class="card {'bearish' if data['total_ce_oi_change'] > 0 else 'bullish'}">
+                    <span class="card-icon">{'🔴' if data['total_ce_oi_change'] > 0 else '🟢'}</span>
+                    <div class="card-label">CALL OI CHANGE</div>
+                    <div class="card-value">{data['total_ce_oi_change']:+,}</div>
+                    <span class="card-change {'negative' if data['total_ce_oi_change'] > 0 else 'positive'}">
+                        {'Bearish Signal' if data['total_ce_oi_change'] > 0 else 'Bullish Signal'}
+                    </span>
+                </div>
+                
+                <div class="card {'bullish' if data['total_pe_oi_change'] > 0 else 'bearish'}">
+                    <span class="card-icon">{'🟢' if data['total_pe_oi_change'] > 0 else '🔴'}</span>
+                    <div class="card-label">PUT OI CHANGE</div>
+                    <div class="card-value">{data['total_pe_oi_change']:+,}</div>
+                    <span class="card-change {'positive' if data['total_pe_oi_change'] > 0 else 'negative'}">
+                        {'Bullish Signal' if data['total_pe_oi_change'] > 0 else 'Bearish Signal'}
+                    </span>
+                </div>
+                
+                <div class="card highlight">
+                    <span class="card-icon">⚖️</span>
+                    <div class="card-label">NET OI CHANGE</div>
+                    <div class="card-value">{data['net_oi_change']:+,}</div>
+                    <span class="card-change {'positive' if data['net_oi_change'] > 0 else 'negative' if data['net_oi_change'] < 0 else 'neutral'}">
+                        {'Bullish Net' if data['net_oi_change'] > 0 else 'Bearish Net' if data['net_oi_change'] < 0 else 'Balanced'}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- OI Change Explanation -->
+            <div style="background: rgba(79, 195, 247, 0.1); padding: 18px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #4fc3f7;">
+                <p style="font-size: 13px; line-height: 1.8; color: #80deea;">
+                    <strong style="color: #4fc3f7;">📖 How to Read:</strong><br>
+                    • <strong>Call OI Increase (+)</strong> = Writers selling calls (Bearish) | <strong>Decrease (-)</strong> = Unwinding (Bullish)<br>
+                    • <strong>Put OI Increase (+)</strong> = Writers selling puts (Bullish) | <strong>Decrease (-)</strong> = Unwinding (Bearish)<br>
+                    • <strong>Net OI</strong> = Put Change - Call Change (Positive = Bullish, Negative = Bearish)
+                </p>
             </div>
         </div>
 """
