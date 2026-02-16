@@ -1,5 +1,6 @@
 """
-NIFTY 50 COMPLETE ANALYSIS - FIXED VERSION
+NIFTY 50 COMPLETE ANALYSIS - DEEP OCEAN THEME
+- Professional Deep Ocean Blue Theme
 - Fixed: Tight stop losses (50-150 points max)
 - Fixed: Email send duplication prevention
 - Improved: Better risk management
@@ -226,28 +227,19 @@ class NiftyHTMLAnalyzer:
         """
         
         if bias == "BULLISH":
-            # Entry near current price or support
-            # Stop loss: Just below support level (tighter risk)
-            stop_loss = support - 30  # Only 30 points below support
-            
-            # Ensure max risk is 150 points
+            stop_loss = support - 30
             max_allowed_stop = current_price - 150
             if stop_loss < max_allowed_stop:
                 stop_loss = max_allowed_stop
             
         elif bias == "BEARISH":
-            # Entry near current price or resistance
-            # Stop loss: Just above resistance level
-            stop_loss = resistance + 30  # Only 30 points above resistance
-            
-            # Ensure max risk is 150 points
+            stop_loss = resistance + 30
             max_allowed_stop = current_price + 150
             if stop_loss > max_allowed_stop:
                 stop_loss = max_allowed_stop
                 
         else:  # SIDEWAYS - Iron Condor
-            # For Iron Condor, stop loss is when price breaks range
-            stop_loss = None  # Will be handled separately
+            stop_loss = None
         
         return round(stop_loss, 0) if stop_loss else None
     
@@ -267,7 +259,7 @@ class NiftyHTMLAnalyzer:
         ist_tz = pytz.timezone('Asia/Kolkata')
         ist_now = datetime.now(ist_tz)
         
-        # Calculate scores (same logic)
+        # Calculate scores
         bullish_score = 0
         bearish_score = 0
         
@@ -361,8 +353,7 @@ class NiftyHTMLAnalyzer:
                 pcr_badge = "neutral"
                 pcr_icon = "🟡"
         
-        # ===== IMPROVED TRADING RECOMMENDATIONS WITH TIGHT STOP LOSS =====
-        
+        # Trading recommendations
         if option_analysis:
             max_ce_strike = option_analysis['max_ce_oi_strike']
             max_pe_strike = option_analysis['max_pe_oi_strike']
@@ -370,42 +361,30 @@ class NiftyHTMLAnalyzer:
             max_ce_strike = int(current/50)*50 + 200
             max_pe_strike = int(current/50)*50 - 200
         
-        # ===== IMPROVED: TIGHT ENTRY ZONES (50-100 points max) =====
-        
         if bias == "BULLISH":
-            # For bullish: Entry should be near current price with small range
             entry_high = current
-            entry_low = current - 50  # Only 50 points below current price
+            entry_low = current - 50
             
-            # If current price is closer to resistance, adjust entry zone down
             if current > (support + resistance) / 2:
                 entry_low = current - 100
                 entry_high = current - 50
             
             target_1 = resistance
             target_2 = max_ce_strike
-            
-            # IMPROVED: Tight stop loss just below support
             stop_loss = self.calculate_smart_stop_loss(current, support, resistance, "BULLISH")
-            
             option_play = f"Buy {int(current/50)*50 + 50} CE"
             
         elif bias == "BEARISH":
-            # For bearish: Entry should be near current price with small range
             entry_low = current
-            entry_high = current + 50  # Only 50 points above current price
+            entry_high = current + 50
             
-            # If current price is closer to support, adjust entry zone up
             if current < (support + resistance) / 2:
                 entry_low = current + 50
                 entry_high = current + 100
             
             target_1 = support
             target_2 = max_pe_strike
-            
-            # IMPROVED: Tight stop loss just above resistance
             stop_loss = self.calculate_smart_stop_loss(current, support, resistance, "BEARISH")
-            
             option_play = f"Buy {int(current/50)*50 - 50} PE"
             
         else:  # SIDEWAYS
@@ -413,7 +392,7 @@ class NiftyHTMLAnalyzer:
             entry_high = resistance
             target_1 = (support + resistance) / 2
             target_2 = target_1
-            stop_loss = None  # Iron Condor doesn't have traditional stop loss
+            stop_loss = None
             option_play = "Iron Condor (see strategy)"
         
         # Calculate risk-reward ratio
@@ -486,10 +465,10 @@ class NiftyHTMLAnalyzer:
                 'profit_high': resistance
             }
     
-    # ==================== HTML GENERATION ====================
+    # ==================== HTML GENERATION - DEEP OCEAN THEME ====================
     
     def generate_html_email(self):
-        """Generate beautiful HTML with improved stop loss display"""
+        """Generate beautiful HTML with Deep Ocean Theme"""
         
         data = self.html_data
         
@@ -498,264 +477,380 @@ class NiftyHTMLAnalyzer:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nifty 50 Daily Report</title>
+    <title>Nifty 50 Daily Report - Deep Ocean</title>
     <style>
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
+        
         body {{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
             padding: 20px;
-            color: #333;
+            color: #b0bec5;
         }}
+        
         .container {{
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: rgba(15, 32, 39, 0.95);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(79, 195, 247, 0.2);
+        }}
+        
+        .header {{
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 100%);
+            padding: 40px 30px;
+            text-align: center;
+            border-bottom: 3px solid #4fc3f7;
+            position: relative;
             overflow: hidden;
         }}
-        .header {{
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
+        
+        .header::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(79, 195, 247, 0.1) 0%, transparent 70%);
+            pointer-events: none;
         }}
+        
         .header h1 {{
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
+            font-size: 32px;
+            font-weight: 700;
+            color: #4fc3f7;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(79, 195, 247, 0.5);
+            position: relative;
+            z-index: 1;
         }}
+        
         .header p {{
-            margin: 10px 0 0 0;
+            color: #80deea;
             font-size: 14px;
             opacity: 0.9;
+            position: relative;
+            z-index: 1;
         }}
+        
         .section {{
-            padding: 25px 30px;
-            border-bottom: 1px solid #eee;
+            padding: 30px;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.1);
         }}
+        
         .section:last-child {{
             border-bottom: none;
         }}
+        
         .section-title {{
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-        }}
-        .section-title span {{
-            margin-right: 10px;
-            font-size: 22px;
-        }}
-        .metric-grid {{
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }}
-        .metric-box {{
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }}
-        .metric-label {{
-            font-size: 12px;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
-        }}
-        .metric-value {{
             font-size: 20px;
             font-weight: 600;
-            color: #2c3e50;
+            margin-bottom: 20px;
+            color: #4fc3f7;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
         }}
-        .direction-box {{
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
+        
+        .section-title span {{
+            font-size: 24px;
+        }}
+        
+        .metric-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }}
+        
+        .metric-box {{
+            background: linear-gradient(135deg, rgba(79, 195, 247, 0.1) 0%, rgba(79, 195, 247, 0.05) 100%);
             padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 15px 0;
+            border-radius: 12px;
+            border-left: 4px solid #4fc3f7;
+            transition: all 0.3s ease;
         }}
-        .direction-box.bullish {{
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        
+        .metric-box:hover {{
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 195, 247, 0.2);
         }}
-        .direction-box.bearish {{
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        
+        .metric-label {{
+            font-size: 11px;
+            color: #80deea;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }}
-        .direction-box.sideways {{
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-        }}
-        .direction-title {{
+        
+        .metric-value {{
             font-size: 24px;
             font-weight: 700;
-            margin-bottom: 10px;
+            color: #ffffff;
         }}
+        
+        .direction-box {{
+            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            border: 2px solid #4fc3f7;
+            box-shadow: 0 0 30px rgba(79, 195, 247, 0.3);
+        }}
+        
+        .direction-box.bullish {{
+            background: linear-gradient(135deg, #00bcd4 0%, #26c6da 100%);
+            border-color: #00bcd4;
+            box-shadow: 0 0 30px rgba(0, 188, 212, 0.4);
+        }}
+        
+        .direction-box.bearish {{
+            background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
+            border-color: #f44336;
+            box-shadow: 0 0 30px rgba(244, 67, 54, 0.4);
+        }}
+        
+        .direction-box.sideways {{
+            background: linear-gradient(135deg, #ffa726 0%, #ffb74d 100%);
+            border-color: #ffb74d;
+            box-shadow: 0 0 30px rgba(255, 183, 77, 0.4);
+        }}
+        
+        .direction-title {{
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #000;
+        }}
+        
         .direction-subtitle {{
             font-size: 14px;
             opacity: 0.9;
+            color: #000;
         }}
+        
         .indicator-row {{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.1);
         }}
+        
         .indicator-row:last-child {{
             border-bottom: none;
         }}
+        
         .indicator-name {{
-            font-weight: 500;
-            color: #495057;
-        }}
-        .indicator-value {{
             font-weight: 600;
+            color: #b0bec5;
+            font-size: 15px;
+        }}
+        
+        .indicator-value {{
+            font-weight: 700;
+            color: #ffffff;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-size: 15px;
         }}
+        
         .badge {{
             display: inline-block;
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }}
+        
         .badge.bullish {{
-            background-color: #d4edda;
-            color: #155724;
+            background: rgba(0, 188, 212, 0.2);
+            color: #00bcd4;
+            border: 1px solid #00bcd4;
         }}
+        
         .badge.bearish {{
-            background-color: #f8d7da;
-            color: #721c24;
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
         }}
+        
         .badge.neutral {{
-            background-color: #fff3cd;
-            color: #856404;
+            background: rgba(255, 183, 77, 0.2);
+            color: #ffb74d;
+            border: 1px solid #ffb74d;
         }}
+        
         .levels-container {{
-            position: relative;
-            padding: 20px 0;
+            margin: 20px 0;
         }}
+        
         .level-item {{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
-            margin: 8px 0;
-            border-radius: 6px;
-            font-weight: 500;
-        }}
-        .level-item.resistance {{
-            background-color: #ffe5e5;
-            border-left: 4px solid #dc3545;
-        }}
-        .level-item.current {{
-            background-color: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            font-weight: 700;
-        }}
-        .level-item.support {{
-            background-color: #e8f5e9;
-            border-left: 4px solid #28a745;
-        }}
-        .recommendation-box {{
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border: 2px solid #667eea;
-            margin: 15px 0;
-        }}
-        .rec-title {{
-            font-size: 18px;
+            padding: 14px 20px;
+            margin: 10px 0;
+            border-radius: 8px;
             font-weight: 600;
-            color: #667eea;
-            margin-bottom: 15px;
+            transition: all 0.3s ease;
         }}
+        
+        .level-item:hover {{
+            transform: translateX(5px);
+        }}
+        
+        .level-item.resistance {{
+            background: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid #f44336;
+        }}
+        
+        .level-item.current {{
+            background: rgba(79, 195, 247, 0.2);
+            border-left: 4px solid #4fc3f7;
+            font-size: 16px;
+            box-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
+        }}
+        
+        .level-item.support {{
+            background: rgba(0, 188, 212, 0.1);
+            border-left: 4px solid #00bcd4;
+        }}
+        
+        .recommendation-box {{
+            background: linear-gradient(135deg, rgba(79, 195, 247, 0.1) 0%, rgba(79, 195, 247, 0.05) 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #4fc3f7;
+            margin: 20px 0;
+        }}
+        
+        .rec-title {{
+            font-size: 20px;
+            font-weight: 700;
+            color: #4fc3f7;
+            margin-bottom: 20px;
+        }}
+        
         .rec-detail {{
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #dee2e6;
+            padding: 12px 0;
+            border-bottom: 1px dashed rgba(79, 195, 247, 0.2);
         }}
+        
         .rec-detail:last-child {{
             border-bottom: none;
         }}
+        
         .rec-label {{
-            color: #6c757d;
-            font-weight: 500;
-        }}
-        .rec-value {{
-            color: #2c3e50;
+            color: #80deea;
             font-weight: 600;
+            font-size: 14px;
         }}
-        .rec-value.stop-loss {{
-            color: #dc3545;
+        
+        .rec-value {{
+            color: #ffffff;
             font-weight: 700;
+            font-size: 15px;
         }}
+        
+        .rec-value.stop-loss {{
+            color: #f44336;
+            font-size: 16px;
+        }}
+        
         .risk-box {{
-            background-color: #fff3cd;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 10px;
-            border-left: 4px solid #ffc107;
+            background: rgba(255, 183, 77, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #ffb74d;
         }}
+        
         .risk-detail {{
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
+            padding: 6px 0;
             font-size: 14px;
+            color: #ffb74d;
         }}
+        
         .strikes-table {{
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 20px;
         }}
+        
         .strikes-table th {{
-            background-color: #667eea;
-            color: white;
-            padding: 12px;
+            background: linear-gradient(135deg, #4fc3f7 0%, #26c6da 100%);
+            color: #000;
+            padding: 14px;
             text-align: left;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }}
+        
+        .strikes-table td {{
+            padding: 14px;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.1);
+            color: #b0bec5;
             font-size: 14px;
         }}
-        .strikes-table td {{
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }}
+        
         .strikes-table tr:hover {{
-            background-color: #f8f9fa;
+            background: rgba(79, 195, 247, 0.05);
         }}
+        
         .disclaimer {{
-            background-color: #fff3cd;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #ffc107;
+            background: rgba(255, 183, 77, 0.15);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #ffb74d;
             font-size: 13px;
-            color: #856404;
-            line-height: 1.6;
+            color: #ffb74d;
+            line-height: 1.8;
         }}
+        
         .footer {{
             text-align: center;
-            padding: 20px;
-            color: #6c757d;
+            padding: 25px;
+            color: #607d8b;
             font-size: 12px;
+            background: rgba(15, 32, 39, 0.5);
         }}
+        
         @media only screen and (max-width: 600px) {{
             .metric-grid {{
                 grid-template-columns: 1fr;
             }}
-            .container {{
-                border-radius: 0;
+            
+            .header h1 {{
+                font-size: 24px;
             }}
+            
+            .direction-title {{
+                font-size: 22px;
+            }}
+            
             body {{
-                padding: 0;
+                padding: 10px;
             }}
         }}
     </style>
@@ -1061,7 +1156,8 @@ class NiftyHTMLAnalyzer:
             <div class="disclaimer">
                 <strong>⚠️ DISCLAIMER</strong><br><br>
                 This is for EDUCATIONAL purposes only - NOT financial advice.<br>
-                Always use stop losses and consult a SEBI registered advisor.
+                Always use stop losses and consult a SEBI registered advisor.<br>
+                Past performance does not guarantee future results.
             </div>
         </div>
 
@@ -1120,7 +1216,7 @@ class NiftyHTMLAnalyzer:
         ist_now = datetime.now(ist_tz)
         
         print("=" * 75)
-        print("NIFTY 50 DAILY REPORT - IMPROVED VERSION")
+        print("NIFTY 50 DAILY REPORT - DEEP OCEAN THEME")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 75)
         print()
@@ -1135,7 +1231,7 @@ class NiftyHTMLAnalyzer:
         
         return option_analysis
     
-    # ==================== EMAIL FUNCTIONALITY (IMPROVED) ====================
+    # ==================== EMAIL FUNCTIONALITY ====================
     
     def send_html_email_report(self):
         """Send HTML email report - with error handling to prevent duplicates"""
@@ -1183,7 +1279,7 @@ class NiftyHTMLAnalyzer:
 def main():
     """Main execution - FIXED to prevent duplicate emails"""
     try:
-        print("\n🚀 Starting Nifty 50 HTML Analysis (Improved Version)...\n")
+        print("\n🚀 Starting Nifty 50 HTML Analysis (Deep Ocean Theme)...\n")
         
         analyzer = NiftyHTMLAnalyzer()
         option_analysis = analyzer.generate_full_report()
