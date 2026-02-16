@@ -96,15 +96,15 @@
         
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
             margin-top: 20px;
         }
         
         .card {
             background: linear-gradient(135deg, rgba(15, 32, 39, 0.8) 0%, rgba(32, 58, 67, 0.6) 100%);
             border-radius: 14px;
-            padding: 20px;
+            padding: 16px;
             border: 1.5px solid rgba(79, 195, 247, 0.25);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -463,6 +463,11 @@
                 grid-template-columns: 1fr;
             }
             
+            /* Stack strike tables on mobile */
+            .section > div[style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+            
             .header h1 {
                 font-size: 24px;
             }
@@ -488,7 +493,7 @@
         <!-- HEADER -->
         <div class="header">
             <h1>📊 NIFTY 50 DAILY REPORT</h1>
-            <p>Generated: 17-Feb-2026 04:36 IST</p>
+            <p>Generated: 17-Feb-2026 04:42 IST</p>
         </div>
 
         <!-- MARKET SNAPSHOT -->
@@ -679,60 +684,117 @@
                 <span>📋</span> TOP 5 STRIKES (by Open Interest)
             </div>
             
-            <table class="strikes-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Strike</th>
-                        <th>CE OI</th>
-                        <th>PE OI</th>
-                        <th>Total OI</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- CALL OPTIONS (LEFT) -->
+                <div>
+                    <h3 style="color: #00bcd4; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span>📞</span> CALL OPTIONS (CE)
+                    </h3>
+                    <table class="strikes-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Strike</th>
+                                <th>OI</th>
+                                <th>LTP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                    <tr>
-                        <td><strong>1</strong></td>
-                        <td><strong>₹25,500</strong></td>
-                        <td>48,871</td>
-                        <td>217,530</td>
-                        <td><strong>266,401</strong></td>
-                    </tr>
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td><strong>₹26,000</strong></td>
+                                <td>210,612</td>
+                                <td style="color: #00bcd4; font-weight: 700;">₹13.05</td>
+                            </tr>
 
-                    <tr>
-                        <td><strong>2</strong></td>
-                        <td><strong>₹25,600</strong></td>
-                        <td>88,513</td>
-                        <td>161,794</td>
-                        <td><strong>250,307</strong></td>
-                    </tr>
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td><strong>₹26,500</strong></td>
+                                <td>190,792</td>
+                                <td style="color: #00bcd4; font-weight: 700;">₹1.85</td>
+                            </tr>
 
-                    <tr>
-                        <td><strong>3</strong></td>
-                        <td><strong>₹26,000</strong></td>
-                        <td>210,612</td>
-                        <td>18,116</td>
-                        <td><strong>228,728</strong></td>
-                    </tr>
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td><strong>₹25,800</strong></td>
+                                <td>152,117</td>
+                                <td style="color: #00bcd4; font-weight: 700;">₹37.40</td>
+                            </tr>
 
-                    <tr>
-                        <td><strong>4</strong></td>
-                        <td><strong>₹25,700</strong></td>
-                        <td>127,548</td>
-                        <td>99,482</td>
-                        <td><strong>227,030</strong></td>
-                    </tr>
+                            <tr>
+                                <td><strong>4</strong></td>
+                                <td><strong>₹25,900</strong></td>
+                                <td>144,059</td>
+                                <td style="color: #00bcd4; font-weight: 700;">₹21.15</td>
+                            </tr>
 
-                    <tr>
-                        <td><strong>5</strong></td>
-                        <td><strong>₹26,500</strong></td>
-                        <td>190,792</td>
-                        <td>2,354</td>
-                        <td><strong>193,146</strong></td>
-                    </tr>
+                            <tr>
+                                <td><strong>5</strong></td>
+                                <td><strong>₹27,000</strong></td>
+                                <td>135,736</td>
+                                <td style="color: #00bcd4; font-weight: 700;">₹1.10</td>
+                            </tr>
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- PUT OPTIONS (RIGHT) -->
+                <div>
+                    <h3 style="color: #f44336; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span>📉</span> PUT OPTIONS (PE)
+                    </h3>
+                    <table class="strikes-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Strike</th>
+                                <th>OI</th>
+                                <th>LTP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td><strong>₹25,500</strong></td>
+                                <td>217,530</td>
+                                <td style="color: #f44336; font-weight: 700;">₹22.35</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td><strong>₹24,500</strong></td>
+                                <td>190,326</td>
+                                <td style="color: #f44336; font-weight: 700;">₹4.50</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td><strong>₹24,000</strong></td>
+                                <td>166,422</td>
+                                <td style="color: #f44336; font-weight: 700;">₹2.85</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>4</strong></td>
+                                <td><strong>₹25,600</strong></td>
+                                <td>161,794</td>
+                                <td style="color: #f44336; font-weight: 700;">₹36.45</td>
+                            </tr>
+
+                            <tr>
+                                <td><strong>5</strong></td>
+                                <td><strong>₹25,400</strong></td>
+                                <td>155,707</td>
+                                <td style="color: #f44336; font-weight: 700;">₹16.65</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <div class="section">
