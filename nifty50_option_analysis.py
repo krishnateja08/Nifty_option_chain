@@ -1,9 +1,11 @@
 """
-NIFTY 50 COMPLETE ANALYSIS - DEEP OCEAN THEME
+NIFTY 50 COMPLETE ANALYSIS - DEEP OCEAN THEME - ENHANCED CARD LAYOUT
 - Professional Deep Ocean Blue Theme
+- Card-based grid layout for indicators (like stock tickers)
 - Fixed: Tight stop losses (50-150 points max)
 - Fixed: Email send duplication prevention
 - Improved: Better risk management
+- NEW: Beautiful card grids for all sections
 """
 
 from curl_cffi import requests
@@ -426,6 +428,8 @@ class NiftyHTMLAnalyzer:
             'sma_50_above': current > technical['sma_50'],
             'sma_200': technical['sma_200'],
             'sma_200_above': current > technical['sma_200'],
+            'macd': technical['macd'],
+            'macd_signal': technical['signal'],
             'macd_bullish': macd_bullish,
             'pcr': option_analysis['pcr_oi'] if option_analysis else 0,
             'pcr_status': pcr_status if option_analysis else 'N/A',
@@ -465,10 +469,10 @@ class NiftyHTMLAnalyzer:
                 'profit_high': resistance
             }
     
-    # ==================== HTML GENERATION - DEEP OCEAN THEME ====================
+    # ==================== HTML GENERATION - ENHANCED CARD LAYOUT ====================
     
     def generate_html_email(self):
-        """Generate beautiful HTML with Deep Ocean Theme"""
+        """Generate beautiful HTML with Enhanced Card Grid Layout"""
         
         data = self.html_data
         
@@ -477,7 +481,7 @@ class NiftyHTMLAnalyzer:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nifty 50 Daily Report - Deep Ocean</title>
+    <title>Nifty 50 Daily Report - Enhanced Cards</title>
     <style>
         * {{
             margin: 0;
@@ -494,7 +498,7 @@ class NiftyHTMLAnalyzer:
         }}
         
         .container {{
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             background: rgba(15, 32, 39, 0.95);
             border-radius: 16px;
@@ -553,12 +557,12 @@ class NiftyHTMLAnalyzer:
         .section-title {{
             font-size: 20px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             color: #4fc3f7;
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             border-bottom: 2px solid rgba(79, 195, 247, 0.3);
         }}
         
@@ -566,45 +570,123 @@ class NiftyHTMLAnalyzer:
             font-size: 24px;
         }}
         
-        .metric-grid {{
+        /* ========== CARD GRID LAYOUT (STOCK TICKER STYLE) ========== */
+        
+        .card-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
             margin-top: 20px;
         }}
         
-        .metric-box {{
-            background: linear-gradient(135deg, rgba(79, 195, 247, 0.1) 0%, rgba(79, 195, 247, 0.05) 100%);
+        .card {{
+            background: linear-gradient(135deg, rgba(15, 32, 39, 0.8) 0%, rgba(32, 58, 67, 0.6) 100%);
+            border-radius: 14px;
             padding: 20px;
-            border-radius: 12px;
-            border-left: 4px solid #4fc3f7;
-            transition: all 0.3s ease;
+            border: 1.5px solid rgba(79, 195, 247, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }}
         
-        .metric-box:hover {{
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(79, 195, 247, 0.2);
+        .card::before {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #4fc3f7, #26c6da);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
         }}
         
-        .metric-label {{
+        .card:hover {{
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(79, 195, 247, 0.25);
+            border-color: #4fc3f7;
+        }}
+        
+        .card:hover::before {{
+            transform: scaleX(1);
+        }}
+        
+        .card-icon {{
+            font-size: 28px;
+            margin-bottom: 10px;
+            display: block;
+        }}
+        
+        .card-label {{
             font-size: 11px;
             color: #80deea;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 1.2px;
+            margin-bottom: 10px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }}
         
-        .metric-value {{
-            font-size: 24px;
+        .card-value {{
+            font-size: 26px;
             font-weight: 700;
             color: #ffffff;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }}
+        
+        .card-change {{
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }}
+        
+        .card-change.positive {{
+            color: #00bcd4;
+            background: rgba(0, 188, 212, 0.15);
+        }}
+        
+        .card-change.negative {{
+            color: #f44336;
+            background: rgba(244, 67, 54, 0.15);
+        }}
+        
+        .card-change.neutral {{
+            color: #ffb74d;
+            background: rgba(255, 183, 77, 0.15);
+        }}
+        
+        /* Special styling for different card types */
+        .card.bullish {{
+            border-left: 4px solid #00bcd4;
+        }}
+        
+        .card.bearish {{
+            border-left: 4px solid #f44336;
+        }}
+        
+        .card.neutral {{
+            border-left: 4px solid #ffb74d;
+        }}
+        
+        .card.highlight {{
+            background: linear-gradient(135deg, rgba(79, 195, 247, 0.15) 0%, rgba(79, 195, 247, 0.05) 100%);
+            border: 2px solid #4fc3f7;
+        }}
+        
+        /* ========== DIRECTION BOX ========== */
         
         .direction-box {{
             background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
             padding: 30px;
-            border-radius: 12px;
+            border-radius: 14px;
             text-align: center;
             margin: 20px 0;
             border: 2px solid #4fc3f7;
@@ -630,176 +712,176 @@ class NiftyHTMLAnalyzer:
         }}
         
         .direction-title {{
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
             margin-bottom: 10px;
             color: #000;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }}
         
         .direction-subtitle {{
             font-size: 14px;
-            opacity: 0.9;
+            opacity: 0.95;
             color: #000;
+            font-weight: 600;
         }}
         
-        .indicator-row {{
+        /* ========== KEY LEVELS CARDS ========== */
+        
+        .levels-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }}
+        
+        .level-card {{
+            background: rgba(15, 32, 39, 0.6);
+            border-radius: 12px;
+            padding: 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid rgba(79, 195, 247, 0.1);
-        }}
-        
-        .indicator-row:last-child {{
-            border-bottom: none;
-        }}
-        
-        .indicator-name {{
-            font-weight: 600;
-            color: #b0bec5;
-            font-size: 15px;
-        }}
-        
-        .indicator-value {{
-            font-weight: 700;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-        }}
-        
-        .badge {{
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }}
-        
-        .badge.bullish {{
-            background: rgba(0, 188, 212, 0.2);
-            color: #00bcd4;
-            border: 1px solid #00bcd4;
-        }}
-        
-        .badge.bearish {{
-            background: rgba(244, 67, 54, 0.2);
-            color: #f44336;
-            border: 1px solid #f44336;
-        }}
-        
-        .badge.neutral {{
-            background: rgba(255, 183, 77, 0.2);
-            color: #ffb74d;
-            border: 1px solid #ffb74d;
-        }}
-        
-        .levels-container {{
-            margin: 20px 0;
-        }}
-        
-        .level-item {{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 20px;
-            margin: 10px 0;
-            border-radius: 8px;
-            font-weight: 600;
+            border: 1.5px solid;
             transition: all 0.3s ease;
         }}
         
-        .level-item:hover {{
-            transform: translateX(5px);
+        .level-card:hover {{
+            transform: translateX(6px);
+            box-shadow: -8px 0 20px rgba(79, 195, 247, 0.2);
         }}
         
-        .level-item.resistance {{
-            background: rgba(244, 67, 54, 0.1);
+        .level-card.resistance {{
+            border-color: rgba(244, 67, 54, 0.5);
             border-left: 4px solid #f44336;
+            background: linear-gradient(90deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
         }}
         
-        .level-item.current {{
-            background: rgba(79, 195, 247, 0.2);
+        .level-card.support {{
+            border-color: rgba(0, 188, 212, 0.5);
+            border-left: 4px solid #00bcd4;
+            background: linear-gradient(90deg, rgba(0, 188, 212, 0.1) 0%, rgba(0, 188, 212, 0.05) 100%);
+        }}
+        
+        .level-card.current {{
+            border-color: #4fc3f7;
             border-left: 4px solid #4fc3f7;
-            font-size: 16px;
+            background: linear-gradient(90deg, rgba(79, 195, 247, 0.2) 0%, rgba(79, 195, 247, 0.1) 100%);
             box-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
         }}
         
-        .level-item.support {{
-            background: rgba(0, 188, 212, 0.1);
-            border-left: 4px solid #00bcd4;
+        .level-name {{
+            font-weight: 600;
+            font-size: 14px;
+            color: #b0bec5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }}
+        
+        .level-value {{
+            font-weight: 700;
+            font-size: 18px;
+            color: #ffffff;
+        }}
+        
+        /* ========== RECOMMENDATION BOX ========== */
         
         .recommendation-box {{
             background: linear-gradient(135deg, rgba(79, 195, 247, 0.1) 0%, rgba(79, 195, 247, 0.05) 100%);
             padding: 25px;
-            border-radius: 12px;
+            border-radius: 14px;
             border: 2px solid #4fc3f7;
             margin: 20px 0;
         }}
         
         .rec-title {{
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: #4fc3f7;
             margin-bottom: 20px;
-        }}
-        
-        .rec-detail {{
             display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px dashed rgba(79, 195, 247, 0.2);
+            align-items: center;
+            gap: 10px;
         }}
         
-        .rec-detail:last-child {{
-            border-bottom: none;
+        .rec-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }}
+        
+        .rec-card {{
+            background: rgba(15, 32, 39, 0.6);
+            border-radius: 10px;
+            padding: 16px;
+            border-left: 3px solid #4fc3f7;
         }}
         
         .rec-label {{
             color: #80deea;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
         }}
         
         .rec-value {{
             color: #ffffff;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 18px;
         }}
         
         .rec-value.stop-loss {{
             color: #f44336;
-            font-size: 16px;
+            font-size: 20px;
         }}
         
         .risk-box {{
-            background: rgba(255, 183, 77, 0.15);
-            padding: 15px;
-            border-radius: 8px;
+            background: rgba(255, 183, 77, 0.12);
+            padding: 18px;
+            border-radius: 10px;
             margin-top: 15px;
             border-left: 4px solid #ffb74d;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
         }}
         
-        .risk-detail {{
+        .risk-item {{
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
-            font-size: 14px;
-            color: #ffb74d;
+            align-items: center;
         }}
+        
+        .risk-label {{
+            font-size: 13px;
+            color: #ffb74d;
+            font-weight: 600;
+        }}
+        
+        .risk-value {{
+            font-size: 16px;
+            color: #ffb74d;
+            font-weight: 700;
+        }}
+        
+        /* ========== STRIKES TABLE ========== */
         
         .strikes-table {{
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            overflow: hidden;
+            border-radius: 10px;
         }}
         
         .strikes-table th {{
             background: linear-gradient(135deg, #4fc3f7 0%, #26c6da 100%);
             color: #000;
-            padding: 14px;
+            padding: 16px;
             text-align: left;
             font-weight: 700;
             font-size: 13px;
@@ -808,20 +890,27 @@ class NiftyHTMLAnalyzer:
         }}
         
         .strikes-table td {{
-            padding: 14px;
+            padding: 16px;
             border-bottom: 1px solid rgba(79, 195, 247, 0.1);
             color: #b0bec5;
             font-size: 14px;
+            font-weight: 500;
         }}
         
         .strikes-table tr:hover {{
-            background: rgba(79, 195, 247, 0.05);
+            background: rgba(79, 195, 247, 0.08);
         }}
+        
+        .strikes-table tbody tr:last-child td {{
+            border-bottom: none;
+        }}
+        
+        /* ========== DISCLAIMER ========== */
         
         .disclaimer {{
             background: rgba(255, 183, 77, 0.15);
             padding: 25px;
-            border-radius: 10px;
+            border-radius: 12px;
             border-left: 4px solid #ffb74d;
             font-size: 13px;
             color: #ffb74d;
@@ -836,8 +925,19 @@ class NiftyHTMLAnalyzer:
             background: rgba(15, 32, 39, 0.5);
         }}
         
-        @media only screen and (max-width: 600px) {{
-            .metric-grid {{
+        /* ========== RESPONSIVE ========== */
+        
+        @media only screen and (max-width: 768px) {{
+            .card-grid {{
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }}
+            
+            .levels-grid {{
+                grid-template-columns: 1fr;
+            }}
+            
+            .rec-grid {{
                 grid-template-columns: 1fr;
             }}
             
@@ -853,157 +953,190 @@ class NiftyHTMLAnalyzer:
                 padding: 10px;
             }}
         }}
+        
+        @media only screen and (max-width: 480px) {{
+            .card-grid {{
+                grid-template-columns: 1fr;
+            }}
+        }}
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- HEADER -->
         <div class="header">
             <h1>📊 NIFTY 50 DAILY REPORT</h1>
             <p>Generated: {data['timestamp']}</p>
         </div>
 
+        <!-- MARKET SNAPSHOT -->
         <div class="section">
             <div class="section-title">
                 <span>📈</span> MARKET SNAPSHOT
             </div>
-            <div class="metric-grid">
-                <div class="metric-box">
-                    <div class="metric-label">Nifty 50</div>
-                    <div class="metric-value">₹{data['current_price']:,.2f}</div>
+            <div class="card-grid">
+                <div class="card highlight">
+                    <span class="card-icon">💹</span>
+                    <div class="card-label">NIFTY 50</div>
+                    <div class="card-value">₹{data['current_price']:,.2f}</div>
                 </div>
-                <div class="metric-box">
-                    <div class="metric-label">Expiry Date</div>
-                    <div class="metric-value">{data['expiry']}</div>
+                <div class="card">
+                    <span class="card-icon">📅</span>
+                    <div class="card-label">EXPIRY DATE</div>
+                    <div class="card-value" style="font-size: 20px;">{data['expiry']}</div>
                 </div>
             </div>
         </div>
 
+        <!-- MARKET DIRECTION -->
         <div class="section">
             <div class="direction-box {data['bias_class']}">
-                <div class="direction-title">{data['bias_icon']} MARKET DIRECTION: {data['bias']}</div>
-                <div class="direction-subtitle">Confidence: {data['confidence']} | Score: {data['bullish_score']} Bullish vs {data['bearish_score']} Bearish</div>
+                <div class="direction-title">{data['bias_icon']} {data['bias']}</div>
+                <div class="direction-subtitle">Confidence: {data['confidence']} | Bullish: {data['bullish_score']} vs Bearish: {data['bearish_score']}</div>
             </div>
         </div>
 
+        <!-- TECHNICAL INDICATORS - CARD GRID -->
         <div class="section">
             <div class="section-title">
                 <span>🔍</span> TECHNICAL INDICATORS
             </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">RSI (14)</span>
-                <span class="indicator-value">
-                    {data['rsi']:.1f}
-                    <span class="badge {data['rsi_badge']}">{data['rsi_icon']} {data['rsi_status']}</span>
-                </span>
-            </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">SMA 20</span>
-                <span class="indicator-value">
-                    ₹{data['sma_20']:,.0f}
-                    <span class="badge {'bullish' if data['sma_20_above'] else 'bearish'}">{'✅ Above' if data['sma_20_above'] else '❌ Below'}</span>
-                </span>
-            </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">SMA 50</span>
-                <span class="indicator-value">
-                    ₹{data['sma_50']:,.0f}
-                    <span class="badge {'bullish' if data['sma_50_above'] else 'bearish'}">{'✅ Above' if data['sma_50_above'] else '❌ Below'}</span>
-                </span>
-            </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">SMA 200</span>
-                <span class="indicator-value">
-                    ₹{data['sma_200']:,.0f}
-                    <span class="badge {'bullish' if data['sma_200_above'] else 'bearish'}">{'✅ Above' if data['sma_200_above'] else '❌ Below'}</span>
-                </span>
-            </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">MACD</span>
-                <span class="indicator-value">
-                    <span class="badge {'bullish' if data['macd_bullish'] else 'bearish'}">{'✅ Bullish' if data['macd_bullish'] else '❌ Bearish'}</span>
-                </span>
+            <div class="card-grid">
+                <!-- RSI Card -->
+                <div class="card {data['rsi_badge']}">
+                    <span class="card-icon">{data['rsi_icon']}</span>
+                    <div class="card-label">RSI (14)</div>
+                    <div class="card-value">{data['rsi']:.1f}</div>
+                    <span class="card-change {data['rsi_badge']}">{data['rsi_status']}</span>
+                </div>
+                
+                <!-- SMA 20 Card -->
+                <div class="card {'bullish' if data['sma_20_above'] else 'bearish'}">
+                    <span class="card-icon">{'✅' if data['sma_20_above'] else '❌'}</span>
+                    <div class="card-label">SMA 20</div>
+                    <div class="card-value">₹{data['sma_20']:,.0f}</div>
+                    <span class="card-change {'positive' if data['sma_20_above'] else 'negative'}">
+                        {'Above' if data['sma_20_above'] else 'Below'}
+                    </span>
+                </div>
+                
+                <!-- SMA 50 Card -->
+                <div class="card {'bullish' if data['sma_50_above'] else 'bearish'}">
+                    <span class="card-icon">{'✅' if data['sma_50_above'] else '❌'}</span>
+                    <div class="card-label">SMA 50</div>
+                    <div class="card-value">₹{data['sma_50']:,.0f}</div>
+                    <span class="card-change {'positive' if data['sma_50_above'] else 'negative'}">
+                        {'Above' if data['sma_50_above'] else 'Below'}
+                    </span>
+                </div>
+                
+                <!-- SMA 200 Card -->
+                <div class="card {'bullish' if data['sma_200_above'] else 'bearish'}">
+                    <span class="card-icon">{'✅' if data['sma_200_above'] else '❌'}</span>
+                    <div class="card-label">SMA 200</div>
+                    <div class="card-value">₹{data['sma_200']:,.0f}</div>
+                    <span class="card-change {'positive' if data['sma_200_above'] else 'negative'}">
+                        {'Above' if data['sma_200_above'] else 'Below'}
+                    </span>
+                </div>
+                
+                <!-- MACD Card -->
+                <div class="card {'bullish' if data['macd_bullish'] else 'bearish'}">
+                    <span class="card-icon">{'🟢' if data['macd_bullish'] else '🔴'}</span>
+                    <div class="card-label">MACD</div>
+                    <div class="card-value">{data['macd']:.2f}</div>
+                    <span class="card-change {'positive' if data['macd_bullish'] else 'negative'}">
+                        {'Bullish' if data['macd_bullish'] else 'Bearish'}
+                    </span>
+                </div>
             </div>
         </div>
 """
 
+        # OPTION CHAIN ANALYSIS - CARD GRID
         if data['has_option_data']:
             html += f"""
         <div class="section">
             <div class="section-title">
                 <span>🎯</span> OPTION CHAIN ANALYSIS
             </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">PCR Ratio (OI)</span>
-                <span class="indicator-value">
-                    {data['pcr']:.3f}
-                    <span class="badge {data['pcr_badge']}">{data['pcr_icon']} {data['pcr_status']}</span>
-                </span>
-            </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">Max Pain</span>
-                <span class="indicator-value">{data['max_pain']:,}</span>
-            </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">Max Call OI (Resistance)</span>
-                <span class="indicator-value">{data['max_ce_oi']:,}</span>
-            </div>
-            
-            <div class="indicator-row">
-                <span class="indicator-name">Max Put OI (Support)</span>
-                <span class="indicator-value">{data['max_pe_oi']:,}</span>
+            <div class="card-grid">
+                <!-- PCR Ratio Card -->
+                <div class="card {data['pcr_badge']}">
+                    <span class="card-icon">{data['pcr_icon']}</span>
+                    <div class="card-label">PCR RATIO (OI)</div>
+                    <div class="card-value">{data['pcr']:.3f}</div>
+                    <span class="card-change {data['pcr_badge']}">{data['pcr_status']}</span>
+                </div>
+                
+                <!-- Max Pain Card -->
+                <div class="card neutral">
+                    <span class="card-icon">🎯</span>
+                    <div class="card-label">MAX PAIN</div>
+                    <div class="card-value">₹{data['max_pain']:,}</div>
+                </div>
+                
+                <!-- Max Call OI Card -->
+                <div class="card bearish">
+                    <span class="card-icon">🔴</span>
+                    <div class="card-label">MAX CALL OI</div>
+                    <div class="card-value">₹{data['max_ce_oi']:,}</div>
+                    <span class="card-change negative">Resistance</span>
+                </div>
+                
+                <!-- Max Put OI Card -->
+                <div class="card bullish">
+                    <span class="card-icon">🟢</span>
+                    <div class="card-label">MAX PUT OI</div>
+                    <div class="card-value">₹{data['max_pe_oi']:,}</div>
+                    <span class="card-change positive">Support</span>
+                </div>
             </div>
         </div>
 """
 
+        # KEY LEVELS - CARD GRID
         html += f"""
         <div class="section">
             <div class="section-title">
                 <span>📊</span> KEY LEVELS
             </div>
-            
-            <div class="levels-container">
-                <div class="level-item resistance">
-                    <span>🔴 Strong Resistance</span>
-                    <strong>₹{data['strong_resistance']:,.0f}</strong>
+            <div class="levels-grid">
+                <div class="level-card resistance">
+                    <span class="level-name">🔴 Strong Resistance</span>
+                    <strong class="level-value">₹{data['strong_resistance']:,.0f}</strong>
                 </div>
-                <div class="level-item resistance">
-                    <span>🟠 Resistance</span>
-                    <strong>₹{data['resistance']:,.0f}</strong>
+                <div class="level-card resistance">
+                    <span class="level-name">🟠 Resistance</span>
+                    <strong class="level-value">₹{data['resistance']:,.0f}</strong>
                 </div>
-                <div class="level-item current">
-                    <span>⚪ Current Price</span>
-                    <strong>₹{data['current_price']:,.0f}</strong>
+                <div class="level-card current">
+                    <span class="level-name">⚪ Current Price</span>
+                    <strong class="level-value">₹{data['current_price']:,.0f}</strong>
                 </div>
 """
         
         if data['has_option_data']:
             html += f"""
-                <div class="level-item support">
-                    <span>🟡 Max Pain</span>
-                    <strong>₹{data['max_pain']:,}</strong>
+                <div class="level-card support">
+                    <span class="level-name">🟡 Max Pain</span>
+                    <strong class="level-value">₹{data['max_pain']:,}</strong>
                 </div>
 """
         
         html += f"""
-                <div class="level-item support">
-                    <span>🟢 Support</span>
-                    <strong>₹{data['support']:,.0f}</strong>
+                <div class="level-card support">
+                    <span class="level-name">🟢 Support</span>
+                    <strong class="level-value">₹{data['support']:,.0f}</strong>
                 </div>
-                <div class="level-item support">
-                    <span>🟢 Strong Support</span>
-                    <strong>₹{data['strong_support']:,.0f}</strong>
+                <div class="level-card support">
+                    <span class="level-name">🟢 Strong Support</span>
+                    <strong class="level-value">₹{data['strong_support']:,.0f}</strong>
                 </div>
             </div>
         </div>
 
+        <!-- TRADING RECOMMENDATION -->
         <div class="section">
             <div class="section-title">
                 <span>💡</span> TRADING RECOMMENDATION
@@ -1016,38 +1149,41 @@ class NiftyHTMLAnalyzer:
             html += f"""
                 <div class="rec-title">{data['bias_icon']} LONG / BUY Strategy</div>
                 
-                <div class="rec-detail">
-                    <span class="rec-label">Entry Zone</span>
-                    <span class="rec-value">₹{data['entry_low']:,.0f} - ₹{data['entry_high']:,.0f}</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Target 1</span>
-                    <span class="rec-value">₹{data['target_1']:,.0f}</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Target 2</span>
-                    <span class="rec-value">₹{data['target_2']:,}</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Stop Loss</span>
-                    <span class="rec-value stop-loss">₹{data['stop_loss']:,.0f}</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Option Play</span>
-                    <span class="rec-value">{data['option_play']}</span>
+                <div class="rec-grid">
+                    <div class="rec-card">
+                        <div class="rec-label">Entry Zone</div>
+                        <div class="rec-value">₹{data['entry_low']:,.0f} - ₹{data['entry_high']:,.0f}</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Target 1</div>
+                        <div class="rec-value">₹{data['target_1']:,.0f}</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Target 2</div>
+                        <div class="rec-value">₹{data['target_2']:,}</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Stop Loss</div>
+                        <div class="rec-value stop-loss">₹{data['stop_loss']:,.0f}</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Option Play</div>
+                        <div class="rec-value" style="font-size: 16px;">{data['option_play']}</div>
+                    </div>
                 </div>
                 
                 <div class="risk-box">
-                    <div class="risk-detail">
-                        <span><strong>Risk:</strong> {data['risk_points']} points</span>
-                        <span><strong>Reward:</strong> {data['reward_points']} points</span>
+                    <div class="risk-item">
+                        <span class="risk-label">RISK</span>
+                        <span class="risk-value">{data['risk_points']} pts</span>
                     </div>
-                    <div class="risk-detail">
-                        <span><strong>Risk:Reward Ratio:</strong> 1:{data['risk_reward_ratio']}</span>
+                    <div class="risk-item">
+                        <span class="risk-label">REWARD</span>
+                        <span class="risk-value">{data['reward_points']} pts</span>
+                    </div>
+                    <div class="risk-item">
+                        <span class="risk-label">R:R RATIO</span>
+                        <span class="risk-value">1:{data['risk_reward_ratio']}</span>
                     </div>
                 </div>
 """
@@ -1055,59 +1191,62 @@ class NiftyHTMLAnalyzer:
             html += f"""
                 <div class="rec-title">{data['bias_icon']} SHORT / SELL Strategy</div>
                 
-                <div class="rec-detail">
-                    <span class="rec-label">Entry Zone</span>
-                    <span class="rec-value">₹{data['entry_low']:,.0f} - ₹{data['entry_high']:,.0f}</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Target 1</span>
-                    <span class="rec-value">₹{data['target_1']:,.0f}</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Target 2</span>
-                    <span class="rec-value">₹{data['target_2']:,}</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Stop Loss</span>
-                    <span class="rec-value stop-loss">₹{data['stop_loss']:,.0f}</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Option Play</span>
-                    <span class="rec-value">{data['option_play']}</span>
+                <div class="rec-grid">
+                    <div class="rec-card">
+                        <div class="rec-label">Entry Zone</div>
+                        <div class="rec-value">₹{data['entry_low']:,.0f} - ₹{data['entry_high']:,.0f}</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Target 1</div>
+                        <div class="rec-value">₹{data['target_1']:,.0f}</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Target 2</div>
+                        <div class="rec-value">₹{data['target_2']:,}</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Stop Loss</div>
+                        <div class="rec-value stop-loss">₹{data['stop_loss']:,.0f}</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Option Play</div>
+                        <div class="rec-value" style="font-size: 16px;">{data['option_play']}</div>
+                    </div>
                 </div>
                 
                 <div class="risk-box">
-                    <div class="risk-detail">
-                        <span><strong>Risk:</strong> {data['risk_points']} points</span>
-                        <span><strong>Reward:</strong> {data['reward_points']} points</span>
+                    <div class="risk-item">
+                        <span class="risk-label">RISK</span>
+                        <span class="risk-value">{data['risk_points']} pts</span>
                     </div>
-                    <div class="risk-detail">
-                        <span><strong>Risk:Reward Ratio:</strong> 1:{data['risk_reward_ratio']}</span>
+                    <div class="risk-item">
+                        <span class="risk-label">REWARD</span>
+                        <span class="risk-value">{data['reward_points']} pts</span>
+                    </div>
+                    <div class="risk-item">
+                        <span class="risk-label">R:R RATIO</span>
+                        <span class="risk-value">1:{data['risk_reward_ratio']}</span>
                     </div>
                 </div>
 """
-        else:
+        else:  # SIDEWAYS
             ic = data['iron_condor']
             html += f"""
                 <div class="rec-title">{data['bias_icon']} IRON CONDOR (Range Trading)</div>
                 
-                <div class="rec-detail">
-                    <span class="rec-label">Sell Options</span>
-                    <span class="rec-value">{ic['sell_ce']} CE + {ic['sell_pe']} PE</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Buy Options</span>
-                    <span class="rec-value">{ic['buy_ce']} CE + {ic['buy_pe']} PE</span>
-                </div>
-                
-                <div class="rec-detail">
-                    <span class="rec-label">Profit Zone</span>
-                    <span class="rec-value">₹{ic['profit_low']:,.0f} - ₹{ic['profit_high']:,.0f}</span>
+                <div class="rec-grid">
+                    <div class="rec-card">
+                        <div class="rec-label">Sell Options</div>
+                        <div class="rec-value" style="font-size: 15px;">{ic['sell_ce']} CE + {ic['sell_pe']} PE</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Buy Options</div>
+                        <div class="rec-value" style="font-size: 15px;">{ic['buy_ce']} CE + {ic['buy_pe']} PE</div>
+                    </div>
+                    <div class="rec-card">
+                        <div class="rec-label">Profit Zone</div>
+                        <div class="rec-value">₹{ic['profit_low']:,.0f} - ₹{ic['profit_high']:,.0f}</div>
+                    </div>
                 </div>
 """
         
@@ -1116,6 +1255,7 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
+        # TOP STRIKES TABLE
         if data['has_option_data'] and data['top_strikes']:
             html += """
         <div class="section">
@@ -1138,8 +1278,8 @@ class NiftyHTMLAnalyzer:
             for i, strike in enumerate(data['top_strikes'], 1):
                 html += f"""
                     <tr>
-                        <td>{i}</td>
-                        <td>₹{int(strike['Strike']):,}</td>
+                        <td><strong>{i}</strong></td>
+                        <td><strong>₹{int(strike['Strike']):,}</strong></td>
                         <td>{int(strike['CE_OI']):,}</td>
                         <td>{int(strike['PE_OI']):,}</td>
                         <td><strong>{int(strike['Total_OI']):,}</strong></td>
@@ -1151,6 +1291,7 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
+        # DISCLAIMER & FOOTER
         html += """
         <div class="section">
             <div class="disclaimer">
@@ -1216,7 +1357,7 @@ class NiftyHTMLAnalyzer:
         ist_now = datetime.now(ist_tz)
         
         print("=" * 75)
-        print("NIFTY 50 DAILY REPORT - DEEP OCEAN THEME")
+        print("NIFTY 50 DAILY REPORT - ENHANCED CARD LAYOUT")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 75)
         print()
@@ -1279,7 +1420,7 @@ class NiftyHTMLAnalyzer:
 def main():
     """Main execution - FIXED to prevent duplicate emails"""
     try:
-        print("\n🚀 Starting Nifty 50 HTML Analysis (Deep Ocean Theme)...\n")
+        print("\n🚀 Starting Nifty 50 HTML Analysis (Enhanced Card Layout)...\n")
         
         analyzer = NiftyHTMLAnalyzer()
         option_analysis = analyzer.generate_full_report()
