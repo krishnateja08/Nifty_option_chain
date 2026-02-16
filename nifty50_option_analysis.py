@@ -6,6 +6,7 @@ NIFTY 50 COMPLETE ANALYSIS - DEEP OCEAN THEME - ENHANCED CARD LAYOUT
 - Fixed: Email send duplication prevention
 - Improved: Better risk management
 - NEW: Beautiful card grids for all sections
+- ENHANCED: Market Direction section with logic explanation
 """
 
 from curl_cffi import requests
@@ -139,7 +140,6 @@ class NiftyHTMLAnalyzer:
         pcr_vol = total_pe_vol / total_ce_vol if total_ce_vol > 0 else 0
         
         # ========== CHANGE IN OI ANALYSIS ==========
-        # Extract Change in OI from API data
         ce_oi_change_list = []
         pe_oi_change_list = []
         
@@ -216,10 +216,7 @@ class NiftyHTMLAnalyzer:
         
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
         
-        # Get top 5 Call strikes by CE OI
         top_ce_strikes = df.nlargest(5, 'CE_OI')[['Strike', 'CE_OI', 'CE_LTP']].to_dict('records')
-        
-        # Get top 5 Put strikes by PE OI
         top_pe_strikes = df.nlargest(5, 'PE_OI')[['Strike', 'PE_OI', 'PE_LTP']].to_dict('records')
         
         analysis = {
@@ -236,7 +233,6 @@ class NiftyHTMLAnalyzer:
             'max_pain': int(max_pain_row['Strike']),
             'top_ce_strikes': top_ce_strikes,
             'top_pe_strikes': top_pe_strikes,
-            # OI Change Analysis
             'total_ce_oi_change': int(total_ce_oi_change),
             'total_pe_oi_change': int(total_pe_oi_change),
             'net_oi_change': int(net_oi_change),
@@ -303,14 +299,7 @@ class NiftyHTMLAnalyzer:
     # ==================== IMPROVED STOP LOSS LOGIC ====================
     
     def calculate_smart_stop_loss(self, current_price, support, resistance, bias):
-        """
-        Calculate tight stop loss based on proper risk management
-        
-        Rules:
-        - For BULLISH: Stop loss just below immediate support (30-50 points)
-        - For BEARISH: Stop loss just above immediate resistance (30-50 points)
-        - Maximum risk: 150 points for Nifty
-        """
+        """Calculate tight stop loss based on proper risk management"""
         
         if bias == "BULLISH":
             stop_loss = support - 30
@@ -324,7 +313,7 @@ class NiftyHTMLAnalyzer:
             if stop_loss > max_allowed_stop:
                 stop_loss = max_allowed_stop
                 
-        else:  # SIDEWAYS - Iron Condor
+        else:  # SIDEWAYS
             stop_loss = None
         
         return round(stop_loss, 0) if stop_loss else None
@@ -522,7 +511,6 @@ class NiftyHTMLAnalyzer:
             'max_pain': option_analysis['max_pain'] if option_analysis else 0,
             'max_ce_oi': max_ce_strike,
             'max_pe_oi': max_pe_strike,
-            # OI Change data
             'total_ce_oi_change': option_analysis['total_ce_oi_change'] if option_analysis else 0,
             'total_pe_oi_change': option_analysis['total_pe_oi_change'] if option_analysis else 0,
             'net_oi_change': option_analysis['net_oi_change'] if option_analysis else 0,
@@ -562,10 +550,10 @@ class NiftyHTMLAnalyzer:
                 'profit_high': resistance
             }
     
-    # ==================== HTML GENERATION - ENHANCED CARD LAYOUT ====================
+    # ==================== HTML GENERATION - ENHANCED WITH DIRECTION LOGIC ====================
     
     def generate_html_email(self):
-        """Generate beautiful HTML with Enhanced Card Grid Layout"""
+        """Generate beautiful HTML with Enhanced Card Grid Layout and Direction Logic"""
         
         data = self.html_data
         
@@ -663,7 +651,7 @@ class NiftyHTMLAnalyzer:
             font-size: 22px;
         }}
         
-        /* ========== CARD GRID LAYOUT (STOCK TICKER STYLE) ========== */
+        /* ========== CARD GRID LAYOUT ========== */
         
         .card-grid {{
             display: grid;
@@ -756,7 +744,6 @@ class NiftyHTMLAnalyzer:
             background: rgba(255, 183, 77, 0.15);
         }}
         
-        /* Special styling for different card types */
         .card.bullish {{
             border-left: 4px solid #00bcd4;
         }}
@@ -819,7 +806,28 @@ class NiftyHTMLAnalyzer:
             font-weight: 600;
         }}
         
-        /* ========== KEY LEVELS CARDS ========== */
+        /* ========== LOGIC EXPLANATION BOX ========== */
+        
+        .logic-box {{
+            background: rgba(79, 195, 247, 0.1);
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #4fc3f7;
+        }}
+        
+        .logic-box p {{
+            font-size: 13px;
+            line-height: 1.8;
+            color: #80deea;
+            margin: 0;
+        }}
+        
+        .logic-box strong {{
+            color: #4fc3f7;
+        }}
+        
+        /* ========== KEY LEVELS ========== */
         
         .levels-grid {{
             display: grid;
@@ -1034,7 +1042,6 @@ class NiftyHTMLAnalyzer:
                 grid-template-columns: 1fr;
             }}
             
-            /* Stack strike tables on mobile */
             .section > div[style*="grid-template-columns: 1fr 1fr"] {{
                 grid-template-columns: 1fr !important;
             }}
@@ -1086,11 +1093,26 @@ class NiftyHTMLAnalyzer:
             </div>
         </div>
 
-        <!-- MARKET DIRECTION -->
+        <!-- MARKET DIRECTION WITH LOGIC EXPLANATION -->
         <div class="section">
+            <div class="section-title">
+                <span>🎯</span> MARKET DIRECTION (Algorithmic Analysis)
+            </div>
+            
             <div class="direction-box {data['bias_class']}">
                 <div class="direction-title">{data['bias_icon']} {data['bias']}</div>
                 <div class="direction-subtitle">Confidence: {data['confidence']} | Bullish: {data['bullish_score']} vs Bearish: {data['bearish_score']}</div>
+            </div>
+            
+            <!-- Direction Logic Explanation -->
+            <div class="logic-box">
+                <p>
+                    <strong>📊 Direction Logic:</strong><br>
+                    • <strong>BULLISH</strong>: Score difference ≥ 3 points (Price above SMAs, RSI oversold, positive MACD, high PCR)<br>
+                    • <strong>BEARISH</strong>: Score difference ≤ -3 points (Price below SMAs, RSI overbought, negative MACD, low PCR)<br>
+                    • <strong>SIDEWAYS</strong>: Score difference between -2 and +2 (Mixed signals, consolidation phase)<br>
+                    • <strong>Confidence</strong>: HIGH when score gap ≥ 4 points, MEDIUM otherwise
+                </p>
             </div>
         </div>
 
@@ -1151,7 +1173,10 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # OPTION CHAIN ANALYSIS - CARD GRID
+        # Continue with rest of sections (Option Chain, OI Change, etc.)
+        # [Rest of the HTML generation code remains the same as in your original file]
+        
+        # OPTION CHAIN ANALYSIS
         if data['has_option_data']:
             html += f"""
         <div class="section">
@@ -1159,30 +1184,23 @@ class NiftyHTMLAnalyzer:
                 <span>🎯</span> OPTION CHAIN ANALYSIS
             </div>
             <div class="card-grid">
-                <!-- PCR Ratio Card -->
                 <div class="card {data['pcr_badge']}">
                     <span class="card-icon">{data['pcr_icon']}</span>
                     <div class="card-label">PCR RATIO (OI)</div>
                     <div class="card-value">{data['pcr']:.3f}</div>
                     <span class="card-change {data['pcr_badge']}">{data['pcr_status']}</span>
                 </div>
-                
-                <!-- Max Pain Card -->
                 <div class="card neutral">
                     <span class="card-icon">🎯</span>
                     <div class="card-label">MAX PAIN</div>
                     <div class="card-value">₹{data['max_pain']:,}</div>
                 </div>
-                
-                <!-- Max Call OI Card -->
                 <div class="card bearish">
                     <span class="card-icon">🔴</span>
                     <div class="card-label">MAX CALL OI</div>
                     <div class="card-value">₹{data['max_ce_oi']:,}</div>
                     <span class="card-change negative">Resistance</span>
                 </div>
-                
-                <!-- Max Put OI Card -->
                 <div class="card bullish">
                     <span class="card-icon">🟢</span>
                     <div class="card-label">MAX PUT OI</div>
@@ -1193,7 +1211,7 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # OI CHANGE ANALYSIS - NEW SECTION
+        # OI CHANGE ANALYSIS
         if data['has_option_data']:
             html += f"""
         <div class="section">
@@ -1201,13 +1219,11 @@ class NiftyHTMLAnalyzer:
                 <span>📊</span> CHANGE IN OPEN INTEREST (Today's Market Direction)
             </div>
             
-            <!-- OI Direction Box -->
             <div class="direction-box {data['oi_class']}" style="margin: 15px 0;">
                 <div class="direction-title" style="font-size: 26px;">{data['oi_icon']} {data['oi_direction']}</div>
                 <div class="direction-subtitle" style="font-size: 13px;">{data['oi_signal']}</div>
             </div>
             
-            <!-- OI Change Cards -->
             <div class="card-grid" style="margin-top: 20px;">
                 <div class="card {'bearish' if data['total_ce_oi_change'] > 0 else 'bullish'}">
                     <span class="card-icon">{'🔴' if data['total_ce_oi_change'] > 0 else '🟢'}</span>
@@ -1217,7 +1233,6 @@ class NiftyHTMLAnalyzer:
                         {'Bearish Signal' if data['total_ce_oi_change'] > 0 else 'Bullish Signal'}
                     </span>
                 </div>
-                
                 <div class="card {'bullish' if data['total_pe_oi_change'] > 0 else 'bearish'}">
                     <span class="card-icon">{'🟢' if data['total_pe_oi_change'] > 0 else '🔴'}</span>
                     <div class="card-label">PUT OI CHANGE</div>
@@ -1226,7 +1241,6 @@ class NiftyHTMLAnalyzer:
                         {'Bullish Signal' if data['total_pe_oi_change'] > 0 else 'Bearish Signal'}
                     </span>
                 </div>
-                
                 <div class="card highlight">
                     <span class="card-icon">⚖️</span>
                     <div class="card-label">NET OI CHANGE</div>
@@ -1237,10 +1251,9 @@ class NiftyHTMLAnalyzer:
                 </div>
             </div>
             
-            <!-- OI Change Explanation -->
-            <div style="background: rgba(79, 195, 247, 0.1); padding: 18px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #4fc3f7;">
-                <p style="font-size: 13px; line-height: 1.8; color: #80deea;">
-                    <strong style="color: #4fc3f7;">📖 How to Read:</strong><br>
+            <div class="logic-box">
+                <p>
+                    <strong>📖 How to Read:</strong><br>
                     • <strong>Call OI Increase (+)</strong> = Writers selling calls (Bearish) | <strong>Decrease (-)</strong> = Unwinding (Bullish)<br>
                     • <strong>Put OI Increase (+)</strong> = Writers selling puts (Bullish) | <strong>Decrease (-)</strong> = Unwinding (Bearish)<br>
                     • <strong>Net OI</strong> = Put Change - Call Change (Positive = Bullish, Negative = Bearish)
@@ -1249,7 +1262,7 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # KEY LEVELS - CARD GRID
+        # KEY LEVELS
         html += f"""
         <div class="section">
             <div class="section-title">
@@ -1302,7 +1315,6 @@ class NiftyHTMLAnalyzer:
         if data['strategy_type'] == "BULLISH":
             html += f"""
                 <div class="rec-title">{data['bias_icon']} LONG / BUY Strategy</div>
-                
                 <div class="rec-grid">
                     <div class="rec-card">
                         <div class="rec-label">Entry Zone</div>
@@ -1325,7 +1337,6 @@ class NiftyHTMLAnalyzer:
                         <div class="rec-value" style="font-size: 16px;">{data['option_play']}</div>
                     </div>
                 </div>
-                
                 <div class="risk-box">
                     <div class="risk-item">
                         <span class="risk-label">RISK</span>
@@ -1344,7 +1355,6 @@ class NiftyHTMLAnalyzer:
         elif data['strategy_type'] == "BEARISH":
             html += f"""
                 <div class="rec-title">{data['bias_icon']} SHORT / SELL Strategy</div>
-                
                 <div class="rec-grid">
                     <div class="rec-card">
                         <div class="rec-label">Entry Zone</div>
@@ -1367,7 +1377,6 @@ class NiftyHTMLAnalyzer:
                         <div class="rec-value" style="font-size: 16px;">{data['option_play']}</div>
                     </div>
                 </div>
-                
                 <div class="risk-box">
                     <div class="risk-item">
                         <span class="risk-label">RISK</span>
@@ -1387,7 +1396,6 @@ class NiftyHTMLAnalyzer:
             ic = data['iron_condor']
             html += f"""
                 <div class="rec-title">{data['bias_icon']} IRON CONDOR (Range Trading)</div>
-                
                 <div class="rec-grid">
                     <div class="rec-card">
                         <div class="rec-label">Sell Options</div>
@@ -1409,16 +1417,14 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # TOP STRIKES TABLE - SPLIT CALLS AND PUTS
+        # TOP STRIKES TABLE
         if data['has_option_data'] and (data['top_ce_strikes'] or data['top_pe_strikes']):
             html += """
         <div class="section">
             <div class="section-title">
                 <span>📋</span> TOP 5 STRIKES (by Open Interest)
             </div>
-            
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <!-- CALL OPTIONS (LEFT) -->
                 <div>
                     <h3 style="color: #00bcd4; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
                         <span>📞</span> CALL OPTIONS (CE)
@@ -1447,8 +1453,6 @@ class NiftyHTMLAnalyzer:
                         </tbody>
                     </table>
                 </div>
-                
-                <!-- PUT OPTIONS (RIGHT) -->
                 <div>
                     <h3 style="color: #f44336; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
                         <span>📉</span> PUT OPTIONS (PE)
@@ -1491,7 +1495,6 @@ class NiftyHTMLAnalyzer:
                 Past performance does not guarantee future results.
             </div>
         </div>
-
         <div class="footer">
             <p>Automated Nifty 50 Option Chain Analysis Report</p>
             <p>© 2026 - For Educational Purposes Only</p>
@@ -1547,7 +1550,7 @@ class NiftyHTMLAnalyzer:
         ist_now = datetime.now(ist_tz)
         
         print("=" * 75)
-        print("NIFTY 50 DAILY REPORT - ENHANCED CARD LAYOUT")
+        print("NIFTY 50 DAILY REPORT - ENHANCED WITH DIRECTION LOGIC")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 75)
         print()
@@ -1565,8 +1568,7 @@ class NiftyHTMLAnalyzer:
     # ==================== EMAIL FUNCTIONALITY ====================
     
     def send_html_email_report(self):
-        """Send HTML email report - with error handling to prevent duplicates"""
-        
+        """Send HTML email report"""
         gmail_user = os.getenv('GMAIL_USER')
         gmail_password = os.getenv('GMAIL_APP_PASSWORD')
         recipient1 = os.getenv('RECIPIENT_EMAIL_1')
@@ -1608,20 +1610,18 @@ class NiftyHTMLAnalyzer:
 
 
 def main():
-    """Main execution - FIXED to prevent duplicate emails"""
+    """Main execution"""
     try:
-        print("\n🚀 Starting Nifty 50 HTML Analysis (Enhanced Card Layout)...\n")
+        print("\n🚀 Starting Nifty 50 HTML Analysis (Enhanced with Direction Logic)...\n")
         
         analyzer = NiftyHTMLAnalyzer()
         option_analysis = analyzer.generate_full_report()
         
-        # Save HTML report
         print("\n" + "="*80)
         print("💾 SAVING HTML REPORT FOR GITHUB PAGES")
         print("="*80)
         save_success = analyzer.save_html_to_file('index.html')
         
-        # Send email ONLY if save was successful
         if save_success:
             print("\n" + "="*80)
             print("📧 SENDING EMAIL REPORT")
