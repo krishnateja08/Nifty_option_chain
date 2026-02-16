@@ -145,7 +145,12 @@ class NiftyHTMLAnalyzer:
         max_pain_row = df.loc[df['pain'].idxmin()]
         
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
-        top_strikes = df.nlargest(5, 'Total_OI')[['Strike', 'CE_OI', 'PE_OI', 'Total_OI']]
+        
+        # Get top 5 Call strikes by CE OI
+        top_ce_strikes = df.nlargest(5, 'CE_OI')[['Strike', 'CE_OI', 'CE_LTP']].to_dict('records')
+        
+        # Get top 5 Put strikes by PE OI
+        top_pe_strikes = df.nlargest(5, 'PE_OI')[['Strike', 'PE_OI', 'PE_LTP']].to_dict('records')
         
         analysis = {
             'expiry': oc_data['expiry'],
@@ -159,7 +164,8 @@ class NiftyHTMLAnalyzer:
             'max_pe_oi_strike': int(max_pe_oi_row['Strike']),
             'max_pe_oi_value': int(max_pe_oi_row['PE_OI']),
             'max_pain': int(max_pain_row['Strike']),
-            'top_strikes': top_strikes.to_dict('records'),
+            'top_ce_strikes': top_ce_strikes,
+            'top_pe_strikes': top_pe_strikes,
             'df': df
         }
         
@@ -452,7 +458,8 @@ class NiftyHTMLAnalyzer:
             'reward_points': int(reward_points),
             'risk_reward_ratio': risk_reward_ratio,
             'option_play': option_play,
-            'top_strikes': option_analysis['top_strikes'] if option_analysis else [],
+            'top_ce_strikes': option_analysis['top_ce_strikes'] if option_analysis else [],
+            'top_pe_strikes': option_analysis['top_pe_strikes'] if option_analysis else [],
             'has_option_data': option_analysis is not None
         }
         
@@ -574,15 +581,15 @@ class NiftyHTMLAnalyzer:
         
         .card-grid {{
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
             margin-top: 20px;
         }}
         
         .card {{
             background: linear-gradient(135deg, rgba(15, 32, 39, 0.8) 0%, rgba(32, 58, 67, 0.6) 100%);
             border-radius: 14px;
-            padding: 20px;
+            padding: 16px;
             border: 1.5px solid rgba(79, 195, 247, 0.25);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -941,6 +948,11 @@ class NiftyHTMLAnalyzer:
                 grid-template-columns: 1fr;
             }}
             
+            /* Stack strike tables on mobile */
+            .section > div[style*="grid-template-columns: 1fr 1fr"] {{
+                grid-template-columns: 1fr !important;
+            }}
+            
             .header h1 {{
                 font-size: 24px;
             }}
@@ -1255,39 +1267,75 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        # TOP STRIKES TABLE
-        if data['has_option_data'] and data['top_strikes']:
+        # TOP STRIKES TABLE - SPLIT CALLS AND PUTS
+        if data['has_option_data'] and (data['top_ce_strikes'] or data['top_pe_strikes']):
             html += """
         <div class="section">
             <div class="section-title">
                 <span>📋</span> TOP 5 STRIKES (by Open Interest)
             </div>
             
-            <table class="strikes-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Strike</th>
-                        <th>CE OI</th>
-                        <th>PE OI</th>
-                        <th>Total OI</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- CALL OPTIONS (LEFT) -->
+                <div>
+                    <h3 style="color: #00bcd4; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span>📞</span> CALL OPTIONS (CE)
+                    </h3>
+                    <table class="strikes-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Strike</th>
+                                <th>OI</th>
+                                <th>LTP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 """
-            for i, strike in enumerate(data['top_strikes'], 1):
+            for i, strike in enumerate(data['top_ce_strikes'], 1):
                 html += f"""
-                    <tr>
-                        <td><strong>{i}</strong></td>
-                        <td><strong>₹{int(strike['Strike']):,}</strong></td>
-                        <td>{int(strike['CE_OI']):,}</td>
-                        <td>{int(strike['PE_OI']):,}</td>
-                        <td><strong>{int(strike['Total_OI']):,}</strong></td>
-                    </tr>
+                            <tr>
+                                <td><strong>{i}</strong></td>
+                                <td><strong>₹{int(strike['Strike']):,}</strong></td>
+                                <td>{int(strike['CE_OI']):,}</td>
+                                <td style="color: #00bcd4; font-weight: 700;">₹{strike['CE_LTP']:.2f}</td>
+                            </tr>
 """
             html += """
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- PUT OPTIONS (RIGHT) -->
+                <div>
+                    <h3 style="color: #f44336; margin-bottom: 15px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                        <span>📉</span> PUT OPTIONS (PE)
+                    </h3>
+                    <table class="strikes-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Strike</th>
+                                <th>OI</th>
+                                <th>LTP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+"""
+            for i, strike in enumerate(data['top_pe_strikes'], 1):
+                html += f"""
+                            <tr>
+                                <td><strong>{i}</strong></td>
+                                <td><strong>₹{int(strike['Strike']):,}</strong></td>
+                                <td>{int(strike['PE_OI']):,}</td>
+                                <td style="color: #f44336; font-weight: 700;">₹{strike['PE_LTP']:.2f}</td>
+                            </tr>
+"""
+            html += """
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 """
 
