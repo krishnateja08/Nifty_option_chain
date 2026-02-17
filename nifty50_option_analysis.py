@@ -1875,7 +1875,7 @@ class NiftyHTMLAnalyzer:
             msg = MIMEMultipart('alternative')
             msg['From'] = gmail_user
             msg['To'] = f"{recipient1}, {recipient2}"
-            msg['Subject'] = f"📊 Nifty 50 Report - {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
+            msg['Subject'] = f"📊 Nifty 50 1-Day OI & Technical Report for Options - {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
             
             html_part = MIMEText(html_content, 'html')
             msg.attach(html_part)
