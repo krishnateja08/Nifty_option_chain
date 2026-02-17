@@ -892,17 +892,62 @@ class NiftyHTMLAnalyzer:
         .pl-loss{{background:rgba(244,67,54,0.1);border-left:3px solid #f44336;}}
         .pl-loss .pl-val{{color:#f44336;}}
 
-        /* ── RISK BOX ── */
-        .risk-box{{
-            background:rgba(255,183,77,0.08);
-            backdrop-filter:blur(8px);
-            padding:18px; border-radius:10px; margin-top:14px;
-            border-left:4px solid #ffb74d;
-            display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;
+        /* ── FIRE ROW — KEY TRADING LEVELS ── */
+        .fire-row{{
+            background:rgba(12,6,0,0.75);
+            backdrop-filter:blur(14px);
+            -webkit-backdrop-filter:blur(14px);
+            border:1px solid rgba(255,140,0,0.25);
+            border-left:4px solid #ff8c00;
+            border-radius:10px;
+            margin-top:18px;
+            padding:18px 22px;
+            display:grid;
+            grid-template-columns:1.4fr 1.6fr 1.6fr 1.8fr;
+            gap:0;
+            align-items:center;
+            box-shadow:0 0 28px rgba(255,140,0,0.08), inset 0 1px 0 rgba(255,140,0,0.08);
+            transition:box-shadow 0.3s ease;
         }}
-        .risk-item{{display:flex;justify-content:space-between;align-items:center;}}
-        .risk-label{{font-size:12px;color:#ffb74d;font-weight:700;letter-spacing:0.5px;}}
-        .risk-value{{font-size:16px;color:#ffb74d;font-weight:700;}}
+        .fire-row:hover{{
+            box-shadow:0 0 40px rgba(255,140,0,0.15), inset 0 1px 0 rgba(255,140,0,0.12);
+        }}
+        .fire-col{{
+            padding:4px 18px;
+            border-right:1px solid rgba(255,140,0,0.12);
+        }}
+        .fire-col:first-child{{padding-left:6px;}}
+        .fire-col:last-child{{border-right:none;}}
+        .fire-heading{{
+            display:flex; align-items:center; gap:8px;
+            font-family:'Oxanium',sans-serif;
+            font-size:11px; font-weight:800;
+            color:#ff8c00; letter-spacing:2.5px;
+            text-transform:uppercase; line-height:1.4;
+        }}
+        .fire-col-label{{
+            font-size:9px; letter-spacing:2px; color:rgba(255,140,0,0.5);
+            text-transform:uppercase; font-weight:700;
+            margin-bottom:7px; font-family:'Rajdhani',sans-serif;
+        }}
+        .fire-col-value{{
+            font-family:'Oxanium',sans-serif;
+            font-size:20px; font-weight:800;
+            color:#ff8c00; letter-spacing:0.5px;
+            line-height:1.2;
+        }}
+        .fire-col-value.stop-text{{
+            font-size:13px; font-weight:700; color:#ff8c00;
+            line-height:1.5; opacity:0.85;
+        }}
+        .fire-col-value.stop-price{{
+            color:#f44336; font-size:20px;
+        }}
+        .fire-rr{{
+            margin-top:6px;
+            font-size:10px; color:rgba(255,140,0,0.45);
+            font-family:'JetBrains Mono',monospace; letter-spacing:1px;
+        }}
 
         /* ── STRIKES TABLE ── */
         .strikes-table{{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}}
@@ -1247,30 +1292,38 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        html += f"""
-        <div class="risk-box">
-            <div style="grid-column:1/-1;margin-bottom:10px;">
-                <h4 style="color:#ffb74d;font-family:'Oxanium',sans-serif;font-size:14px;letter-spacing:1px;">📍 KEY TRADING LEVELS</h4>
-            </div>
-            <div class="risk-item"><span class="risk-label">ENTRY ZONE</span><span class="risk-value">₹{d['entry_low']:,.0f} – ₹{d['entry_high']:,.0f}</span></div>
-            <div class="risk-item"><span class="risk-label">TARGET 1</span><span class="risk-value">₹{d['target_1']:,.0f}</span></div>
-            <div class="risk-item"><span class="risk-label">TARGET 2</span><span class="risk-value">₹{d['target_2']:,.0f}</span></div>
-"""
+        # ── build stop-loss column content
         if d['stop_loss']:
-            html += f"""
-            <div class="risk-item"><span class="risk-label">STOP LOSS</span><span class="risk-value" style="color:#f44336;">₹{d['stop_loss']:,.0f}</span></div>
-            <div class="risk-item"><span class="risk-label">RISK</span><span class="risk-value">{d['risk_points']} pts</span></div>
-            <div class="risk-item"><span class="risk-label">REWARD</span><span class="risk-value">{d['reward_points']} pts</span></div>
-            <div class="risk-item"><span class="risk-label">R:R RATIO</span><span class="risk-value">1 : {d['risk_reward_ratio']}</span></div>
-"""
+            sl_html = f"""
+                <div class="fire-col-label">STOP LOSS</div>
+                <div class="fire-col-value stop-price">₹{d['stop_loss']:,.0f}</div>
+                <div class="fire-rr">Risk {d['risk_points']} pts &nbsp;·&nbsp; R:R 1:{d['risk_reward_ratio']}</div>"""
         else:
-            html += """
-            <div class="risk-item" style="grid-column:1/-1;">
-                <span class="risk-label">STOP LOSS</span>
-                <span class="risk-value" style="color:#ffb74d;">Use option premium as max loss (credit strategy)</span>
+            sl_html = f"""
+                <div class="fire-col-label">STOP LOSS</div>
+                <div class="fire-col-value stop-text">Use option premium<br>as max loss</div>"""
+
+        html += f"""
+        <!-- ── FIRE ROW — KEY TRADING LEVELS ── -->
+        <div class="fire-row">
+            <!-- col 1: heading -->
+            <div class="fire-col">
+                <div class="fire-heading">📍 KEY<br>LEVELS</div>
             </div>
-"""
-        html += """
+            <!-- col 2: entry zone -->
+            <div class="fire-col">
+                <div class="fire-col-label">ENTRY ZONE</div>
+                <div class="fire-col-value">₹{d['entry_low']:,.0f}–₹{d['entry_high']:,.0f}</div>
+            </div>
+            <!-- col 3: targets -->
+            <div class="fire-col">
+                <div class="fire-col-label">TARGET 1 / 2</div>
+                <div class="fire-col-value">₹{d['target_1']:,.0f} &nbsp;/&nbsp; ₹{d['target_2']:,.0f}</div>
+            </div>
+            <!-- col 4: stop loss -->
+            <div class="fire-col">
+                {sl_html}
+            </div>
         </div>
     </div>
 """
