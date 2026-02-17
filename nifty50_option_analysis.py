@@ -8,6 +8,7 @@ FIXES:
   4. Stop loss fallback text for neutral strategies
   5. [NEW] Option chain filtered to ATM ±10 strikes only — eliminates far
      OTM noise that was distorting PCR, OI direction, max pain, and top strikes
+  6. [NEW] KEY TRADING LEVELS — Theme B (Fire Row) compact single-line layout
 """
 
 from curl_cffi import requests
@@ -65,36 +66,21 @@ class NiftyHTMLAnalyzer:
     # ==================== EXPIRY DETECTION ====================
 
     def get_upcoming_expiry_tuesday(self):
-        """
-        Always returns the NEXT Tuesday date (never today).
-
-        Examples:
-          Today = Tue 17-Feb  →  returns 24-Feb  (next Tuesday)
-          Today = Wed 18-Feb  →  returns 24-Feb
-          Today = Mon 23-Feb  →  returns 24-Feb
-          Today = Tue 24-Feb  →  returns 03-Mar  (next Tuesday again)
-        """
         ist_tz    = pytz.timezone('Asia/Kolkata')
         today_ist = datetime.now(ist_tz).date()
-
-        weekday = today_ist.weekday()   # Mon=0, Tue=1, ..., Sun=6
-
+        weekday = today_ist.weekday()
         if weekday == 1:
-            # Today IS Tuesday → always jump to next Tuesday (7 days ahead)
             days_ahead = 7
         else:
             days_ahead = (1 - weekday) % 7
             if days_ahead == 0:
                 days_ahead = 7
-
         next_tuesday = today_ist + timedelta(days=days_ahead)
         expiry_str   = next_tuesday.strftime('%d-%b-%Y')
-
         print(f"  📅 Today (IST): {today_ist.strftime('%A %d-%b-%Y')} | Expiry: {expiry_str}")
         return expiry_str
 
     def fetch_available_expiries(self, session, headers):
-        """Ask NSE for available expiry dates and return the nearest one"""
         try:
             url  = f"https://www.nseindia.com/api/option-chain-v3?type=Indices&symbol={self.nse_symbol}"
             resp = session.get(url, headers=headers, impersonate="chrome", timeout=20)
@@ -111,26 +97,21 @@ class NiftyHTMLAnalyzer:
     # ==================== NSE OPTION CHAIN FETCH ====================
 
     def fetch_nse_option_chain_silent(self):
-        """Fetch option chain — tries calculated Tuesday, falls back to NSE list"""
         session, headers = self._make_nse_session()
-
         selected_expiry = self.get_upcoming_expiry_tuesday()
         print(f"  🗓️  Fetching option chain for: {selected_expiry}")
         result = self._fetch_chain_for_expiry(session, headers, selected_expiry)
-
         if result is None:
             print(f"  ⚠️  No data for {selected_expiry}. Trying NSE expiry list...")
             real_expiry = self.fetch_available_expiries(session, headers)
             if real_expiry and real_expiry != selected_expiry:
                 print(f"  🔄 Retrying with: {real_expiry}")
                 result = self._fetch_chain_for_expiry(session, headers, real_expiry)
-
         if result is None:
             print("  ❌ Option chain fetch failed after all attempts.")
         return result
 
     def _fetch_chain_for_expiry(self, session, headers, expiry):
-        """Fetch option chain for a specific expiry. Returns dict or None."""
         api_url = (
             f"https://www.nseindia.com/api/option-chain-v3"
             f"?type=Indices&symbol={self.nse_symbol}&expiry={expiry}"
@@ -140,18 +121,14 @@ class NiftyHTMLAnalyzer:
                 print(f"    Attempt {attempt}: expiry={expiry}")
                 resp = session.get(api_url, headers=headers, impersonate="chrome", timeout=30)
                 print(f"    HTTP {resp.status_code}")
-
                 if resp.status_code != 200:
                     time.sleep(2)
                     continue
-
                 json_data = resp.json()
                 data      = json_data.get('records', {}).get('data', [])
-
                 if not data:
                     print(f"    ⚠️  Empty data for expiry={expiry}")
                     return None
-
                 rows = []
                 for item in data:
                     strike = item.get('strikePrice')
@@ -169,39 +146,22 @@ class NiftyHTMLAnalyzer:
                         'CE_OI_Change': ce.get('changeinOpenInterest', 0),
                         'PE_OI_Change': pe.get('changeinOpenInterest', 0),
                     })
-
                 df_full    = pd.DataFrame(rows).sort_values('Strike').reset_index(drop=True)
                 underlying = json_data.get('records', {}).get('underlyingValue', 0)
-
-                # ── FILTER TO ATM ± 10 STRIKES ONLY ─────────────────────────
-                # WHY: Reading all 100+ strikes pulls in massive far-OTM OI
-                # (hedges, institutional positions, tail-risk protection) that
-                # has NOTHING to do with this week's price action. This distorts:
-                #   • PCR  (far PE OI inflates ratio → false bullish readings)
-                #   • OI direction (CE/PE change signals get diluted)
-                #   • Max Pain (gravitates toward far-out hedged positions)
-                #   • Top 5 Strikes (often dominated by deep OTM strikes)
-                # Filtering to ±10 around ATM = focused, tradeable zone only.
                 atm_strike  = round(underlying / 50) * 50
                 all_strikes = sorted(df_full['Strike'].unique())
-
                 if atm_strike in all_strikes:
                     atm_idx = all_strikes.index(atm_strike)
                 else:
-                    # Snap to closest available strike if ATM not exact
-                    atm_idx    = min(range(len(all_strikes)),
-                                     key=lambda i: abs(all_strikes[i] - underlying))
+                    atm_idx    = min(range(len(all_strikes)), key=lambda i: abs(all_strikes[i] - underlying))
                     atm_strike = all_strikes[atm_idx]
-
                 lower_idx        = max(0, atm_idx - 10)
                 upper_idx        = min(len(all_strikes) - 1, atm_idx + 10)
                 selected_strikes = all_strikes[lower_idx : upper_idx + 1]
                 df = df_full[df_full['Strike'].isin(selected_strikes)].reset_index(drop=True)
-
                 print(f"    ✅ Total strikes fetched: {len(df_full)} → ATM±10 filtered: {len(df)} strikes")
                 print(f"    📍 ATM: {atm_strike} | Strike range: {selected_strikes[0]} – {selected_strikes[-1]}")
                 print(f"    💹 Underlying: {underlying}")
-
                 return {
                     'expiry':     expiry,
                     'df':         df,
@@ -209,7 +169,6 @@ class NiftyHTMLAnalyzer:
                     'underlying': underlying,
                     'atm_strike': atm_strike,
                 }
-
             except Exception as e:
                 print(f"    ❌ Attempt {attempt} error: {e}")
                 time.sleep(2)
@@ -220,21 +179,16 @@ class NiftyHTMLAnalyzer:
     def analyze_option_chain_data(self, oc_data):
         if not oc_data:
             return None
-
-        df = oc_data['df']   # Already filtered to ATM ± 10 strikes
-
+        df = oc_data['df']
         total_ce_oi  = df['CE_OI'].sum()
         total_pe_oi  = df['PE_OI'].sum()
         total_ce_vol = df['CE_Vol'].sum()
         total_pe_vol = df['PE_Vol'].sum()
-
         pcr_oi  = total_pe_oi  / total_ce_oi  if total_ce_oi  > 0 else 0
         pcr_vol = total_pe_vol / total_ce_vol if total_ce_vol > 0 else 0
-
         total_ce_oi_change = int(df['CE_OI_Change'].sum())
         total_pe_oi_change = int(df['PE_OI_Change'].sum())
         net_oi_change      = total_pe_oi_change - total_ce_oi_change
-
         if total_ce_oi_change > 0 and total_pe_oi_change < 0:
             oi_direction, oi_signal, oi_icon, oi_class = "Strong Bearish", "Call Build-up + Put Unwinding", "🔴", "bearish"
         elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
@@ -255,16 +209,13 @@ class NiftyHTMLAnalyzer:
                 oi_direction, oi_signal, oi_icon, oi_class = "Moderately Bearish", "Net Call Accumulation", "🔴", "bearish"
             else:
                 oi_direction, oi_signal, oi_icon, oi_class = "Neutral", "Balanced OI Changes", "🟡", "neutral"
-
         max_ce_oi_row  = df.loc[df['CE_OI'].idxmax()]
         max_pe_oi_row  = df.loc[df['PE_OI'].idxmax()]
         df['pain']     = abs(df['CE_OI'] - df['PE_OI'])
         max_pain_row   = df.loc[df['pain'].idxmin()]
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
-
         top_ce_strikes = df.nlargest(5, 'CE_OI')[['Strike', 'CE_OI', 'CE_LTP']].to_dict('records')
         top_pe_strikes = df.nlargest(5, 'PE_OI')[['Strike', 'PE_OI', 'PE_LTP']].to_dict('records')
-
         return {
             'expiry':             oc_data['expiry'],
             'underlying_value':   oc_data['underlying'],
@@ -300,11 +251,9 @@ class NiftyHTMLAnalyzer:
             if df.empty:
                 print("Warning: Failed to fetch historical data")
                 return None
-
             df['SMA_20']  = df['Close'].rolling(20).mean()
             df['SMA_50']  = df['Close'].rolling(50).mean()
             df['SMA_200'] = df['Close'].rolling(200).mean()
-
             delta        = df['Close'].diff()
             gain         = delta.where(delta > 0, 0).rolling(14).mean()
             loss         = (-delta.where(delta < 0, 0)).rolling(14).mean()
@@ -313,10 +262,8 @@ class NiftyHTMLAnalyzer:
             df['EMA_26'] = df['Close'].ewm(span=26, adjust=False).mean()
             df['MACD']   = df['EMA_12'] - df['EMA_26']
             df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
-
             latest = df.iloc[-1]
             recent = df.tail(60)
-
             technical = {
                 'current_price': latest['Close'],
                 'sma_20':        latest['SMA_20'],
@@ -330,7 +277,6 @@ class NiftyHTMLAnalyzer:
             }
             print(f"✓ Technical done | Price: {technical['current_price']:.2f} | RSI: {technical['rsi']:.1f}")
             return technical
-
         except Exception as e:
             print(f"Technical analysis error: {e}")
             return None
@@ -638,10 +584,8 @@ class NiftyHTMLAnalyzer:
         .direction-box.bearish{{background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.4);}}
         .direction-box.sideways{{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.4);}}
         .direction-box.neutral{{background:linear-gradient(135deg,#1a3a4a,#1e4d5e);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.25);}}
-        /* Default title/subtitle color for dark-background boxes (neutral/default) */
         .direction-title{{font-size:30px;font-weight:700;margin-bottom:10px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.4);}}
         .direction-subtitle{{font-size:14px;opacity:0.9;color:#e0f7fa;font-weight:600;}}
-        /* Override to black text only for light-background boxes */
         .direction-box.bullish .direction-title,
         .direction-box.bearish .direction-title,
         .direction-box.sideways .direction-title{{color:#000;text-shadow:none;}}
@@ -660,11 +604,6 @@ class NiftyHTMLAnalyzer:
         .level-card.current{{border-color:#4fc3f7;border-left:4px solid #4fc3f7;background:linear-gradient(90deg,rgba(79,195,247,0.2),rgba(79,195,247,0.1));}}
         .level-name{{font-weight:600;font-size:12px;color:#b0bec5;}}
         .level-value{{font-weight:700;font-size:16px;color:#fff;}}
-        .risk-box{{background:rgba(255,183,77,0.12);padding:18px;border-radius:10px;margin-top:15px;
-                   border-left:4px solid #ffb74d;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}}
-        .risk-item{{display:flex;justify-content:space-between;align-items:center;}}
-        .risk-label{{font-size:13px;color:#ffb74d;font-weight:600;}}
-        .risk-value{{font-size:16px;color:#ffb74d;font-weight:700;}}
         .strikes-table{{width:100%;border-collapse:collapse;margin-top:20px;border-radius:10px;overflow:hidden;}}
         .strikes-table th{{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:16px;
                            text-align:left;font-weight:700;font-size:13px;text-transform:uppercase;}}
@@ -674,12 +613,40 @@ class NiftyHTMLAnalyzer:
         .disclaimer{{background:rgba(255,183,77,0.15);padding:25px;border-radius:12px;
                      border-left:4px solid #ffb74d;font-size:13px;color:#ffb74d;line-height:1.8;}}
         .footer{{text-align:center;padding:25px;color:#607d8b;font-size:12px;background:rgba(15,32,39,0.5);}}
+
+        /* ── THEME B: Fire Row — KEY TRADING LEVELS ── */
+        .fire-levels{{
+            background:#0f0800;
+            border:1px solid rgba(255,109,0,0.25);
+            border-left:3px solid #ff6d00;
+            border-radius:8px;
+            padding:12px 16px;
+            display:grid;
+            grid-template-columns:auto 1fr 1fr 1fr;
+            align-items:center;
+            gap:8px;
+            margin-top:16px;
+        }}
+        .fire-levels .fl-hdr{{
+            font-size:10px;color:#ff6d00;letter-spacing:2px;
+            text-transform:uppercase;font-family:monospace;font-weight:700;
+            white-space:nowrap;
+        }}
+        .fire-levels .fl-item{{display:flex;flex-direction:column;gap:2px;padding:0 10px;border-left:1px solid rgba(255,109,0,0.12);}}
+        .fire-levels .fl-lbl{{font-size:9px;color:#5a2500;letter-spacing:1.5px;text-transform:uppercase;font-family:monospace;}}
+        .fire-levels .fl-val{{font-size:16px;font-weight:700;color:#ffab40;}}
+        .fire-levels .fl-val.t1{{color:#ff8f00;}}
+        .fire-levels .fl-val.t2{{color:#ff6d00;}}
+        .fire-levels .fl-val.sl{{font-size:11px;color:#bf360c;font-family:monospace;font-weight:400;line-height:1.4;}}
+        .fire-levels .fl-val.rr{{color:#ffd54f;font-size:13px;}}
+
         @media(max-width:768px){{
             .card-grid{{grid-template-columns:repeat(2,1fr);}}
             .levels-grid{{grid-template-columns:1fr;}}
             .header h1{{font-size:24px;}}
             .direction-title{{font-size:22px;}}
             body{{padding:10px;}}
+            .fire-levels{{grid-template-columns:1fr 1fr;}}
         }}
         @media(max-width:480px){{.card-grid{{grid-template-columns:1fr;}}}}
     </style>
@@ -842,9 +809,7 @@ class NiftyHTMLAnalyzer:
     </div>
 """
 
-        # ── KEY LEVELS — fixed visual positions, price-independent ─────────────
-        # All 4 label nodes sit at FIXED % so they are always evenly spread.
-        # Only the ▼NOW badge + white pointer use real price math.
+        # KEY LEVELS section (unchanged)
         _ss  = data['strong_support']
         _sr  = data['strong_resistance']
         _rng = _sr - _ss if _sr != _ss else 1
@@ -853,10 +818,6 @@ class NiftyHTMLAnalyzer:
             return round(max(3, min(97, (val - _ss) / _rng * 100)), 2)
 
         _pct_cp = _pct_real(data['current_price'])
-
-        # Fixed visual positions (always evenly spread regardless of price gaps)
-        # ROW A (above track): Strong Support=3%  |  Support=22%  |  Resistance=75%  |  Strong Resistance=95%
-        # ROW B (below track): Max Pain=43%  (centred, only when option data available)
         _pts_to_res = int(data['resistance']    - data['current_price'])
         _pts_to_sup = int(data['current_price'] - data['support'])
 
@@ -872,55 +833,38 @@ class NiftyHTMLAnalyzer:
         html += f"""
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
-
-        <!-- Zone legend -->
         <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
             <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ SUPPORT ZONE</span>
             <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
         </div>
-
-        <!-- ══ ROW A — ABOVE track ══ -->
         <div style="position:relative;height:62px;">
-
-            <!-- Strong Support @ 3% -->
             <div class="rl-node-a" style="left:3%;">
                 <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
                 <div class="rl-val" style="color:#26c6da;">₹{data['strong_support']:,.0f}</div>
                 <div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div>
             </div>
-
-            <!-- Support @ 22% -->
             <div class="rl-node-a" style="left:22%;">
                 <div class="rl-lbl" style="color:#00bcd4;">Support</div>
                 <div class="rl-val" style="color:#00bcd4;">₹{data['support']:,.0f}</div>
                 <div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div>
             </div>
-
-            <!-- NOW badge at real price position -->
             <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);
                         bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
                         padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;
                         box-shadow:0 0 16px rgba(79,195,247,0.7);">
                 ▼ NOW &nbsp;₹{data['current_price']:,.0f}
             </div>
-
-            <!-- Resistance @ 75% -->
             <div class="rl-node-a" style="left:75%;">
                 <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
                 <div class="rl-val" style="color:#ff7043;">₹{data['resistance']:,.0f}</div>
                 <div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div>
             </div>
-
-            <!-- Strong Resistance @ 95% -->
             <div class="rl-node-a" style="left:95%;">
                 <div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div>
                 <div class="rl-val" style="color:#f44336;">₹{data['strong_resistance']:,.0f}</div>
                 <div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div>
             </div>
-
         </div>
-
-        <!-- ══ GRADIENT TRACK ══ -->
         <div style="position:relative;height:8px;border-radius:4px;
                     background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);
                     box-shadow:0 2px 14px rgba(0,0,0,0.5);">
@@ -928,13 +872,9 @@ class NiftyHTMLAnalyzer:
                         width:4px;height:22px;background:#fff;border-radius:2px;
                         box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
         </div>
-
-        <!-- ══ ROW B — BELOW track: Max Pain centred ══ -->
         <div style="position:relative;height:58px;">
             {_mp_node}
         </div>
-
-        <!-- ══ Distance bar ══ -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
             <div style="background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.3);
                         border-radius:8px;padding:10px 16px;
@@ -1077,25 +1017,32 @@ class NiftyHTMLAnalyzer:
         </div>
 """
 
-        html += f"""
-        <div class="risk-box" style="margin-top:20px;">
-            <div style="grid-column:1/-1;margin-bottom:12px;"><h4 style="color:#ffb74d;font-size:15px;margin:0;">📍 KEY TRADING LEVELS</h4></div>
-            <div class="risk-item"><span class="risk-label">ENTRY ZONE</span><span class="risk-value">₹{data['entry_low']:,.0f} – ₹{data['entry_high']:,.0f}</span></div>
-            <div class="risk-item"><span class="risk-label">TARGET 1</span><span class="risk-value">₹{data['target_1']:,.0f}</span></div>
-            <div class="risk-item"><span class="risk-label">TARGET 2</span><span class="risk-value">₹{data['target_2']:,.0f}</span></div>
-"""
+        # ── THEME B: Fire Row — KEY TRADING LEVELS ──────────────────────────
+        # Compact single-row layout: header | entry | target1/2 | stop loss
+        # With R:R ratio shown when available, else credit strategy note
         if data['stop_loss']:
-            html += f"""
-            <div class="risk-item"><span class="risk-label">STOP LOSS</span><span class="risk-value" style="color:#f44336;">₹{data['stop_loss']:,.0f}</span></div>
-            <div class="risk-item"><span class="risk-label">RISK</span><span class="risk-value">{data['risk_points']} pts</span></div>
-            <div class="risk-item"><span class="risk-label">REWARD</span><span class="risk-value">{data['reward_points']} pts</span></div>
-            <div class="risk-item"><span class="risk-label">R:R RATIO</span><span class="risk-value">1:{data['risk_reward_ratio']}</span></div>
-"""
+            sl_html   = f'<div class="fl-val t2">₹{data["stop_loss"]:,.0f}</div>'
+            rr_col    = f'<div class="fl-item"><div class="fl-lbl">R : R</div><div class="fl-val rr">1 : {data["risk_reward_ratio"]}</div></div>'
         else:
-            html += """
-            <div class="risk-item" style="grid-column:1/-1;"><span class="risk-label">STOP LOSS</span><span class="risk-value" style="color:#ffb74d;">Use option premium as max loss (credit strategy)</span></div>
-"""
-        html += """
+            sl_html   = '<div class="fl-val sl">Use option premium<br>as max loss</div>'
+            rr_col    = ''
+
+        html += f"""
+        <div class="fire-levels">
+            <div class="fl-hdr">📍 Key<br>Levels</div>
+            <div class="fl-item">
+                <div class="fl-lbl">Entry Zone</div>
+                <div class="fl-val">₹{data['entry_low']:,.0f} – ₹{data['entry_high']:,.0f}</div>
+            </div>
+            <div class="fl-item">
+                <div class="fl-lbl">Target 1 &nbsp;/&nbsp; Target 2</div>
+                <div class="fl-val t1">₹{data['target_1']:,.0f} &nbsp;<span style="color:#4a2000;">|</span>&nbsp; <span class="fl-val t2" style="display:inline;">₹{data['target_2']:,.0f}</span></div>
+            </div>
+            <div class="fl-item">
+                <div class="fl-lbl">Stop Loss</div>
+                {sl_html}
+            </div>
+            {rr_col}
         </div>
     </div>
 """
@@ -1161,15 +1108,12 @@ class NiftyHTMLAnalyzer:
         print("NIFTY 50 DAILY REPORT — TUESDAY EXPIRY + ATM±10 FILTER")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 75)
-
         oc_data         = self.fetch_nse_option_chain_silent()
         option_analysis = self.analyze_option_chain_data(oc_data) if oc_data else None
-
         if option_analysis:
             print(f"✅ Option data ready | Expiry: {option_analysis['expiry']} | Underlying: {option_analysis['underlying_value']}")
         else:
             print("⚠️  No option data — running in technical-only mode")
-
         print("\nFetching technical data...")
         technical = self.get_technical_data()
         self.generate_analysis_data(technical, option_analysis)
@@ -1181,16 +1125,13 @@ def main():
         print("\n🚀 Starting Nifty 50 Analysis (Tuesday expiry + ATM±10 filter)...\n")
         analyzer = NiftyHTMLAnalyzer()
         analyzer.generate_full_report()
-
         print("\n" + "=" * 80)
         save_success = analyzer.save_html_to_file('index.html')
         if save_success:
             analyzer.send_html_email_report()
         else:
             print("\n⚠️  Skipping email due to save failure")
-
         print("\n✅ Done!\n")
-
     except Exception as e:
         print(f"\n❌ Critical Error: {e}")
         import traceback
