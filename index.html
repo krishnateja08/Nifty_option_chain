@@ -3,288 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nifty 50 Daily Report - Enhanced Cards</title>
+    <title>Nifty 50 Daily Report</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+              background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);
+              min-height:100vh;padding:20px;color:#b0bec5;}
+        .container{max-width:1200px;margin:0 auto;background:rgba(15,32,39,0.95);
+                    border-radius:16px;overflow:hidden;
+                    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+                    border:1px solid rgba(79,195,247,0.2);}
+        .header{background:linear-gradient(135deg,#0f2027,#203a43);
+                 padding:40px 30px;text-align:center;
+                 border-bottom:3px solid #4fc3f7;position:relative;overflow:hidden;}
+        .header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+                         background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.1) 0%,transparent 70%);
+                         pointer-events:none;}
+        .header h1{font-size:32px;font-weight:700;color:#4fc3f7;margin-bottom:10px;
+                    text-shadow:0 0 20px rgba(79,195,247,0.5);position:relative;z-index:1;}
+        .header p{color:#80deea;font-size:14px;opacity:0.9;position:relative;z-index:1;}
+        .section{padding:25px;border-bottom:1px solid rgba(79,195,247,0.1);}
+        .section:last-child{border-bottom:none;}
+        .section-title{font-size:18px;font-weight:600;margin-bottom:20px;color:#4fc3f7;
+                         display:flex;align-items:center;gap:10px;
+                         padding-bottom:10px;border-bottom:2px solid rgba(79,195,247,0.3);}
+        .section-title span{font-size:22px;}
+        .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+                    gap:12px;margin-top:20px;}
+        .card{background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));
+               border-radius:12px;padding:14px;
+               border:1.5px solid rgba(79,195,247,0.25);
+               transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
+               position:relative;overflow:hidden;}
+        .card::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;
+                       background:linear-gradient(90deg,#4fc3f7,#26c6da);
+                       transform:scaleX(0);transform-origin:left;transition:transform 0.3s ease;}
+        .card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(79,195,247,0.25);border-color:#4fc3f7;}
+        .card:hover::before{transform:scaleX(1);}
+        .card-icon{font-size:24px;margin-bottom:8px;display:block;}
+        .card-label{font-size:10px;color:#80deea;text-transform:uppercase;
+                     letter-spacing:1px;margin-bottom:8px;font-weight:600;}
+        .card-value{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;
+                     text-shadow:0 2px 4px rgba(0,0,0,0.3);}
+        .card-change{font-size:14px;font-weight:600;display:inline-flex;
+                      align-items:center;gap:4px;padding:4px 10px;border-radius:6px;}
+        .card-change.positive{color:#00bcd4;background:rgba(0,188,212,0.15);}
+        .card-change.negative{color:#f44336;background:rgba(244,67,54,0.15);}
+        .card-change.neutral{color:#ffb74d;background:rgba(255,183,77,0.15);}
+        .card.bullish{border-left:4px solid #00bcd4;}
+        .card.bearish{border-left:4px solid #f44336;}
+        .card.neutral{border-left:4px solid #ffb74d;}
+        .card.highlight{background:linear-gradient(135deg,rgba(79,195,247,0.15),rgba(79,195,247,0.05));border:2px solid #4fc3f7;}
+        .direction-box{padding:30px;border-radius:14px;text-align:center;margin:20px 0;
+                        border:2px solid #4fc3f7;box-shadow:0 0 30px rgba(79,195,247,0.3);
+                        background:linear-gradient(135deg,#0f2027,#2c5364);}
+        .direction-box.bullish{background:linear-gradient(135deg,#00bcd4,#26c6da);border-color:#00bcd4;box-shadow:0 0 30px rgba(0,188,212,0.4);}
+        .direction-box.bearish{background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.4);}
+        .direction-box.sideways{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.4);}
+        .direction-title{font-size:30px;font-weight:700;margin-bottom:10px;color:#000;text-shadow:0 2px 4px rgba(0,0,0,0.2);}
+        .direction-subtitle{font-size:14px;opacity:0.95;color:#000;font-weight:600;}
+        .logic-box{background:rgba(79,195,247,0.1);padding:18px;border-radius:10px;
+                    margin-top:20px;border-left:4px solid #4fc3f7;}
+        .logic-box p{font-size:13px;line-height:1.8;color:#80deea;margin:0;}
+        .logic-box strong{color:#4fc3f7;}
+        .levels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:20px;}
+        .level-card{background:rgba(15,32,39,0.6);border-radius:10px;padding:14px;
+                     display:flex;justify-content:space-between;align-items:center;
+                     border:1.5px solid;transition:all 0.3s ease;}
+        .level-card:hover{transform:translateX(6px);box-shadow:-8px 0 20px rgba(79,195,247,0.2);}
+        .level-card.resistance{border-color:rgba(244,67,54,0.5);border-left:4px solid #f44336;background:linear-gradient(90deg,rgba(244,67,54,0.1),rgba(244,67,54,0.05));}
+        .level-card.support{border-color:rgba(0,188,212,0.5);border-left:4px solid #00bcd4;background:linear-gradient(90deg,rgba(0,188,212,0.1),rgba(0,188,212,0.05));}
+        .level-card.current{border-color:#4fc3f7;border-left:4px solid #4fc3f7;background:linear-gradient(90deg,rgba(79,195,247,0.2),rgba(79,195,247,0.1));box-shadow:0 0 20px rgba(79,195,247,0.3);}
+        .level-name{font-weight:600;font-size:12px;color:#b0bec5;display:flex;align-items:center;gap:6px;}
+        .level-value{font-weight:700;font-size:16px;color:#fff;}
+        .risk-box{background:rgba(255,183,77,0.12);padding:18px;border-radius:10px;
+                   margin-top:15px;border-left:4px solid #ffb74d;
+                   display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+        .risk-item{display:flex;justify-content:space-between;align-items:center;}
+        .risk-label{font-size:13px;color:#ffb74d;font-weight:600;}
+        .risk-value{font-size:16px;color:#ffb74d;font-weight:700;}
+        .strikes-table{width:100%;border-collapse:collapse;margin-top:20px;overflow:hidden;border-radius:10px;}
+        .strikes-table th{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:16px;
+                           text-align:left;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;}
+        .strikes-table td{padding:16px;border-bottom:1px solid rgba(79,195,247,0.1);color:#b0bec5;font-size:14px;font-weight:500;}
+        .strikes-table tr:hover{background:rgba(79,195,247,0.08);}
+        .strikes-table tbody tr:last-child td{border-bottom:none;}
+        .disclaimer{background:rgba(255,183,77,0.15);padding:25px;border-radius:12px;
+                     border-left:4px solid #ffb74d;font-size:13px;color:#ffb74d;line-height:1.8;}
+        .footer{text-align:center;padding:25px;color:#607d8b;font-size:12px;background:rgba(15,32,39,0.5);}
+        @media(max-width:768px){
+            .card-grid{grid-template-columns:repeat(2,1fr);}
+            .levels-grid{grid-template-columns:1fr;}
+            .header h1{font-size:24px;}
+            .direction-title{font-size:22px;}
+            body{padding:10px;}
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #b0bec5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(15, 32, 39, 0.95);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(79, 195, 247, 0.2);
-        }
-        .header {
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 100%);
-            padding: 40px 30px;
-            text-align: center;
-            border-bottom: 3px solid #4fc3f7;
-            position: relative;
-            overflow: hidden;
-        }
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(79, 195, 247, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        .header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: #4fc3f7;
-            margin-bottom: 10px;
-            text-shadow: 0 0 20px rgba(79, 195, 247, 0.5);
-            position: relative;
-            z-index: 1;
-        }
-        .header p {
-            color: #80deea;
-            font-size: 14px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-        .section {
-            padding: 25px;
-            border-bottom: 1px solid rgba(79, 195, 247, 0.1);
-        }
-        .section:last-child { border-bottom: none; }
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #4fc3f7;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(79, 195, 247, 0.3);
-        }
-        .section-title span { font-size: 22px; }
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-top: 20px;
-        }
-        .card {
-            background: linear-gradient(135deg, rgba(15, 32, 39, 0.8) 0%, rgba(32, 58, 67, 0.6) 100%);
-            border-radius: 12px;
-            padding: 14px;
-            border: 1.5px solid rgba(79, 195, 247, 0.25);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 4px;
-            background: linear-gradient(90deg, #4fc3f7, #26c6da);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(79, 195, 247, 0.25);
-            border-color: #4fc3f7;
-        }
-        .card:hover::before { transform: scaleX(1); }
-        .card-icon { font-size: 24px; margin-bottom: 8px; display: block; }
-        .card-label {
-            font-size: 10px;
-            color: #80deea;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .card-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 6px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        .card-change {
-            font-size: 14px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-        .card-change.positive { color: #00bcd4; background: rgba(0, 188, 212, 0.15); }
-        .card-change.negative { color: #f44336; background: rgba(244, 67, 54, 0.15); }
-        .card-change.neutral  { color: #ffb74d; background: rgba(255, 183, 77, 0.15); }
-        .card.bullish { border-left: 4px solid #00bcd4; }
-        .card.bearish { border-left: 4px solid #f44336; }
-        .card.neutral  { border-left: 4px solid #ffb74d; }
-        .card.highlight {
-            background: linear-gradient(135deg, rgba(79, 195, 247, 0.15) 0%, rgba(79, 195, 247, 0.05) 100%);
-            border: 2px solid #4fc3f7;
-        }
-        .direction-box {
-            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
-            padding: 30px;
-            border-radius: 14px;
-            text-align: center;
-            margin: 20px 0;
-            border: 2px solid #4fc3f7;
-            box-shadow: 0 0 30px rgba(79, 195, 247, 0.3);
-        }
-        .direction-box.bullish {
-            background: linear-gradient(135deg, #00bcd4 0%, #26c6da 100%);
-            border-color: #00bcd4;
-            box-shadow: 0 0 30px rgba(0, 188, 212, 0.4);
-        }
-        .direction-box.bearish {
-            background: linear-gradient(135deg, #d32f2f 0%, #f44336 100%);
-            border-color: #f44336;
-            box-shadow: 0 0 30px rgba(244, 67, 54, 0.4);
-        }
-        .direction-box.sideways {
-            background: linear-gradient(135deg, #ffa726 0%, #ffb74d 100%);
-            border-color: #ffb74d;
-            box-shadow: 0 0 30px rgba(255, 183, 77, 0.4);
-        }
-        .direction-title {
-            font-size: 30px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #000;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .direction-subtitle { font-size: 14px; opacity: 0.95; color: #000; font-weight: 600; }
-        .logic-box {
-            background: rgba(79, 195, 247, 0.1);
-            padding: 18px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border-left: 4px solid #4fc3f7;
-        }
-        .logic-box p { font-size: 13px; line-height: 1.8; color: #80deea; margin: 0; }
-        .logic-box strong { color: #4fc3f7; }
-        .levels-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px;
-            margin-top: 20px;
-        }
-        .level-card {
-            background: rgba(15, 32, 39, 0.6);
-            border-radius: 10px;
-            padding: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1.5px solid;
-            transition: all 0.3s ease;
-        }
-        .level-card:hover { transform: translateX(6px); box-shadow: -8px 0 20px rgba(79, 195, 247, 0.2); }
-        .level-card.resistance {
-            border-color: rgba(244, 67, 54, 0.5);
-            border-left: 4px solid #f44336;
-            background: linear-gradient(90deg, rgba(244, 67, 54, 0.1) 0%, rgba(244, 67, 54, 0.05) 100%);
-        }
-        .level-card.support {
-            border-color: rgba(0, 188, 212, 0.5);
-            border-left: 4px solid #00bcd4;
-            background: linear-gradient(90deg, rgba(0, 188, 212, 0.1) 0%, rgba(0, 188, 212, 0.05) 100%);
-        }
-        .level-card.current {
-            border-color: #4fc3f7;
-            border-left: 4px solid #4fc3f7;
-            background: linear-gradient(90deg, rgba(79, 195, 247, 0.2) 0%, rgba(79, 195, 247, 0.1) 100%);
-            box-shadow: 0 0 20px rgba(79, 195, 247, 0.3);
-        }
-        .level-name { font-weight: 600; font-size: 12px; color: #b0bec5; display: flex; align-items: center; gap: 6px; }
-        .level-value { font-weight: 700; font-size: 16px; color: #ffffff; }
-        .recommendation-box {
-            background: linear-gradient(135deg, rgba(79, 195, 247, 0.1) 0%, rgba(79, 195, 247, 0.05) 100%);
-            padding: 25px;
-            border-radius: 14px;
-            border: 2px solid #4fc3f7;
-            margin: 20px 0;
-        }
-        .risk-box {
-            background: rgba(255, 183, 77, 0.12);
-            padding: 18px;
-            border-radius: 10px;
-            margin-top: 15px;
-            border-left: 4px solid #ffb74d;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-        }
-        .risk-item { display: flex; justify-content: space-between; align-items: center; }
-        .risk-label { font-size: 13px; color: #ffb74d; font-weight: 600; }
-        .risk-value { font-size: 16px; color: #ffb74d; font-weight: 700; }
-        .strikes-table { width: 100%; border-collapse: collapse; margin-top: 20px; overflow: hidden; border-radius: 10px; }
-        .strikes-table th {
-            background: linear-gradient(135deg, #4fc3f7 0%, #26c6da 100%);
-            color: #000;
-            padding: 16px;
-            text-align: left;
-            font-weight: 700;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .strikes-table td { padding: 16px; border-bottom: 1px solid rgba(79, 195, 247, 0.1); color: #b0bec5; font-size: 14px; font-weight: 500; }
-        .strikes-table tr:hover { background: rgba(79, 195, 247, 0.08); }
-        .strikes-table tbody tr:last-child td { border-bottom: none; }
-        .disclaimer {
-            background: rgba(255, 183, 77, 0.15);
-            padding: 25px;
-            border-radius: 12px;
-            border-left: 4px solid #ffb74d;
-            font-size: 13px;
-            color: #ffb74d;
-            line-height: 1.8;
-        }
-        .footer { text-align: center; padding: 25px; color: #607d8b; font-size: 12px; background: rgba(15, 32, 39, 0.5); }
-        @media only screen and (max-width: 768px) {
-            .card-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .levels-grid { grid-template-columns: 1fr; }
-            .header h1 { font-size: 24px; }
-            .direction-title { font-size: 22px; }
-            body { padding: 10px; }
-        }
-        @media only screen and (max-width: 480px) {
-            .card-grid { grid-template-columns: 1fr; }
-        }
+        @media(max-width:480px){.card-grid{grid-template-columns:1fr;}}
     </style>
 </head>
 <body>
 <div class="container">
 
-    <!-- HEADER -->
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 02:13 IST</p>
+        <p>Generated: 18-Feb-2026 02:24 IST</p>
     </div>
 
-    <!-- MARKET SNAPSHOT -->
     <div class="section">
         <div class="section-title"><span>📈</span> MARKET SNAPSHOT</div>
         <div class="card-grid">
@@ -293,15 +117,14 @@
                 <div class="card-label">NIFTY 50</div>
                 <div class="card-value">₹25,725.40</div>
             </div>
-            <div class="card">
+            <div class="card neutral">
                 <span class="card-icon">📅</span>
                 <div class="card-label">EXPIRY DATE</div>
-                <div class="card-value" style="font-size: 20px;">N/A</div>
+                <div class="card-value" style="font-size:20px;">N/A</div>
             </div>
         </div>
     </div>
 
-    <!-- MARKET DIRECTION -->
     <div class="section">
         <div class="section-title"><span>🎯</span> MARKET DIRECTION (Algorithmic Analysis)</div>
         <div class="direction-box sideways">
@@ -311,15 +134,14 @@
         <div class="logic-box">
             <p>
                 <strong>📊 Direction Logic:</strong><br>
-                • <strong>BULLISH</strong>: Score difference ≥ 3 points (Price above SMAs, RSI oversold, positive MACD, high PCR)<br>
-                • <strong>BEARISH</strong>: Score difference ≤ -3 points (Price below SMAs, RSI overbought, negative MACD, low PCR)<br>
-                • <strong>SIDEWAYS</strong>: Score difference between -2 and +2 (Mixed signals, consolidation phase)<br>
-                • <strong>Confidence</strong>: HIGH when score gap ≥ 4 points, MEDIUM otherwise
+                • <strong>BULLISH</strong>: Score diff ≥ +3 (Price above SMAs, RSI oversold, positive MACD, high PCR)<br>
+                • <strong>BEARISH</strong>: Score diff ≤ -3 (Price below SMAs, RSI overbought, negative MACD, low PCR)<br>
+                • <strong>SIDEWAYS</strong>: Score diff between -2 and +2 (Mixed signals, consolidation phase)<br>
+                • <strong>Confidence</strong>: HIGH when gap ≥ 4, MEDIUM otherwise
             </p>
         </div>
     </div>
 
-    <!-- TECHNICAL INDICATORS -->
     <div class="section">
         <div class="section-title"><span>🔍</span> TECHNICAL INDICATORS</div>
         <div class="card-grid">
@@ -356,7 +178,6 @@
         </div>
     </div>
 
-    <!-- KEY LEVELS -->
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
         <div class="levels-grid">
@@ -384,84 +205,79 @@
         </div>
     </div>
 
-    <!-- TRADING RECOMMENDATIONS -->
     <div class="section">
         <div class="section-title"><span>💡</span> TRADING RECOMMENDATIONS (Dual Strategy Approach)</div>
-        <p style="color: #80deea; font-size: 13px; margin-bottom: 20px; line-height: 1.7;">
+        <p style="color:#80deea;font-size:13px;margin-bottom:20px;line-height:1.7;">
             We provide <strong>TWO independent strategy recommendations</strong> based on different analysis methods:
         </p>
 
-        <div style="background: linear-gradient(135deg, rgba(15,32,39,0.8) 0%, rgba(32,58,67,0.6) 100%);
-                    padding: 25px; border-radius: 14px; margin-bottom: 20px;
-                    border: 2px solid #ffb74d; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
-                <h3 style="color: #4fc3f7; font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px;">
+        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));
+                    padding:25px;border-radius:14px;margin-bottom:20px;
+                    border:2px solid #ffb74d;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+                <h3 style="color:#4fc3f7;font-size:18px;margin:0;display:flex;align-items:center;gap:10px;">
                     <span>1️⃣</span> TECHNICAL ANALYSIS STRATEGY
                 </h3>
-                <span style="background: rgba(79,195,247,0.2); color: #4fc3f7; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                <span style="background:rgba(79,195,247,0.2);color:#4fc3f7;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">
                     Positional • 1-5 Days
                 </span>
             </div>
-            <div style="background: rgba(79,195,247,0.08); padding: 20px; border-radius: 10px; border-left: 4px solid #ffb74d;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                    <div>
-                        <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Strategy</div>
-                        <div style="color: #fff; font-size: 18px; font-weight: 700;">Iron Condor</div>
-                    </div>
-                    <div>
-                        <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Market Bias</div>
-                        <span class="card-change neutral" style="display: inline-block;">Neutral</span>
-                    </div>
-                    <div>
-                        <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Type</div>
-                        <div style="color: #fff; font-size: 16px; font-weight: 600;">Credit</div>
-                    </div>
-                    <div>
-                        <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Risk Profile</div>
-                        <div style="color: #ffb74d; font-size: 16px; font-weight: 600;">Low</div>
-                    </div>
+            <div style="background:rgba(79,195,247,0.08);padding:20px;border-radius:10px;border-left:4px solid #ffb74d;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:15px;">
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div>
+                         <div style="color:#fff;font-size:18px;font-weight:700;">Iron Condor</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div>
+                         <span class="card-change neutral" style="display:inline-block;">Neutral</span></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div>
+                         <div style="color:#fff;font-size:16px;font-weight:600;">Credit</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div>
+                         <div style="color:#ffb74d;font-size:16px;font-weight:600;">Low</div></div>
                 </div>
-                <div style="background: rgba(15,32,39,0.6); padding: 15px; border-radius: 8px; margin-bottom: 12px;">
-                    <div style="color: #4fc3f7; font-size: 12px; font-weight: 600; margin-bottom: 8px;">📋 SETUP</div>
-                    <div style="color: #fff; font-size: 15px; font-weight: 500;">Sell 25800 CE + Buy 25900 CE, Sell 25600 PE + Buy 25500 PE</div>
+                <div style="background:rgba(15,32,39,0.6);padding:15px;border-radius:8px;margin-bottom:12px;">
+                    <div style="color:#4fc3f7;font-size:12px;font-weight:600;margin-bottom:8px;">📋 SETUP</div>
+                    <div style="color:#fff;font-size:15px;font-weight:500;">Sell 25800 CE + Buy 25900 CE, Sell 25600 PE + Buy 25500 PE</div>
                 </div>
-                <div style="color: #80deea; font-size: 13px; line-height: 1.6;">
-                    <strong style="color: #4fc3f7;">💡 Why This Strategy?</strong> Expect low volatility, range-bound market
+                <div style="color:#80deea;font-size:13px;line-height:1.6;">
+                    <strong style="color:#4fc3f7;">💡 Why This Strategy?</strong> Expect low volatility, range-bound market
                 </div>
             </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 15px;">
-                <div style="background: rgba(0,188,212,0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #00bcd4;">
-                    <div style="color: #80deea; font-size: 10px; margin-bottom: 4px;">MAX PROFIT</div>
-                    <div style="color: #00bcd4; font-size: 14px; font-weight: 700;">Premium Received</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:15px;">
+                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;">
+                    <div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div>
+                    <div style="color:#00bcd4;font-size:14px;font-weight:700;">Premium Received</div>
                 </div>
-                <div style="background: rgba(244,67,54,0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #f44336;">
-                    <div style="color: #80deea; font-size: 10px; margin-bottom: 4px;">MAX LOSS</div>
-                    <div style="color: #f44336; font-size: 14px; font-weight: 700;">Capped</div>
+                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;">
+                    <div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div>
+                    <div style="color:#f44336;font-size:14px;font-weight:700;">Capped</div>
                 </div>
             </div>
         </div>
 
-        <div class="risk-box" style="margin-top: 20px;">
-            <div style="grid-column: 1 / -1; margin-bottom: 12px;">
-                <h4 style="color: #ffb74d; font-size: 15px; margin: 0;">📍 KEY TRADING LEVELS</h4>
+        <div class="risk-box" style="margin-top:20px;">
+            <div style="grid-column:1/-1;margin-bottom:12px;">
+                <h4 style="color:#ffb74d;font-size:15px;margin:0;">📍 KEY TRADING LEVELS</h4>
             </div>
             <div class="risk-item">
                 <span class="risk-label">ENTRY ZONE</span>
-                <span class="risk-value">₹25,171 - ₹26,275</span>
+                <span class="risk-value">₹25,171 – ₹26,275</span>
             </div>
             <div class="risk-item">
                 <span class="risk-label">TARGET 1</span>
-                <span class="risk-value">₹25,723</span>
+                <span class="risk-value">₹26,275</span>
             </div>
             <div class="risk-item">
                 <span class="risk-label">TARGET 2</span>
-                <span class="risk-value">₹25,723</span>
+                <span class="risk-value">₹25,171</span>
+            </div>
+
+            <div class="risk-item" style="grid-column:1/-1;">
+                <span class="risk-label">STOP LOSS</span>
+                <span class="risk-value" style="color:#ffb74d;">Use option premium as max loss (credit strategy)</span>
             </div>
 
         </div>
     </div>
 
-    <!-- DISCLAIMER -->
     <div class="section">
         <div class="disclaimer">
             <strong>⚠️ DISCLAIMER</strong><br><br>
@@ -474,7 +290,6 @@
         <p>Automated Nifty 50 Option Chain Analysis Report</p>
         <p>© 2026 - For Educational Purposes Only</p>
     </div>
-
 </div>
 </body>
 </html>
