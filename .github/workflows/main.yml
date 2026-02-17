@@ -2,8 +2,14 @@ name: Nifty 50 Analysis + GitHub Pages
 
 on:
   schedule:
-    - cron: '37 3 * * 1-5'  # 9:07 AM IST - Less competition than 9:00 or 9:30
-    - cron: '42 4-10 * * 1-5'  # Market hours
+  - cron: '37 3 * * 1-5'          # 09:07 AM IST
+  - cron: '4,31,58 4 * * 1-5'    # 09:34, 10:01, 10:28
+  - cron: '25,52 5 * * 1-5'      # 10:55, 11:22
+  - cron: '19,46 6 * * 1-5'      # 11:49, 12:16
+  - cron: '13,40 7 * * 1-5'      # 12:43, 01:10
+  - cron: '7,34 8 * * 1-5'       # 01:37, 02:04
+  - cron: '1,28,55 9 * * 1-5'    # 02:31, 02:58, 03:25
+  - cron: '22 10 * * 1-5'        # 03:52 PM IST
   workflow_dispatch:
 
 # Required permissions
