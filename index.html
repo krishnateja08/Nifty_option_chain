@@ -52,10 +52,8 @@
         .direction-box.bearish{background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.4);}
         .direction-box.sideways{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.4);}
         .direction-box.neutral{background:linear-gradient(135deg,#1a3a4a,#1e4d5e);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.25);}
-        /* Default title/subtitle color for dark-background boxes (neutral/default) */
         .direction-title{font-size:30px;font-weight:700;margin-bottom:10px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.4);}
         .direction-subtitle{font-size:14px;opacity:0.9;color:#e0f7fa;font-weight:600;}
-        /* Override to black text only for light-background boxes */
         .direction-box.bullish .direction-title,
         .direction-box.bearish .direction-title,
         .direction-box.sideways .direction-title{color:#000;text-shadow:none;}
@@ -74,11 +72,6 @@
         .level-card.current{border-color:#4fc3f7;border-left:4px solid #4fc3f7;background:linear-gradient(90deg,rgba(79,195,247,0.2),rgba(79,195,247,0.1));}
         .level-name{font-weight:600;font-size:12px;color:#b0bec5;}
         .level-value{font-weight:700;font-size:16px;color:#fff;}
-        .risk-box{background:rgba(255,183,77,0.12);padding:18px;border-radius:10px;margin-top:15px;
-                   border-left:4px solid #ffb74d;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
-        .risk-item{display:flex;justify-content:space-between;align-items:center;}
-        .risk-label{font-size:13px;color:#ffb74d;font-weight:600;}
-        .risk-value{font-size:16px;color:#ffb74d;font-weight:700;}
         .strikes-table{width:100%;border-collapse:collapse;margin-top:20px;border-radius:10px;overflow:hidden;}
         .strikes-table th{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:16px;
                            text-align:left;font-weight:700;font-size:13px;text-transform:uppercase;}
@@ -88,12 +81,40 @@
         .disclaimer{background:rgba(255,183,77,0.15);padding:25px;border-radius:12px;
                      border-left:4px solid #ffb74d;font-size:13px;color:#ffb74d;line-height:1.8;}
         .footer{text-align:center;padding:25px;color:#607d8b;font-size:12px;background:rgba(15,32,39,0.5);}
+
+        /* ── THEME B: Fire Row — KEY TRADING LEVELS ── */
+        .fire-levels{
+            background:#0f0800;
+            border:1px solid rgba(255,109,0,0.25);
+            border-left:3px solid #ff6d00;
+            border-radius:8px;
+            padding:12px 16px;
+            display:grid;
+            grid-template-columns:auto 1fr 1fr 1fr;
+            align-items:center;
+            gap:8px;
+            margin-top:16px;
+        }
+        .fire-levels .fl-hdr{
+            font-size:10px;color:#ff6d00;letter-spacing:2px;
+            text-transform:uppercase;font-family:monospace;font-weight:700;
+            white-space:nowrap;
+        }
+        .fire-levels .fl-item{display:flex;flex-direction:column;gap:2px;padding:0 10px;border-left:1px solid rgba(255,109,0,0.12);}
+        .fire-levels .fl-lbl{font-size:9px;color:#5a2500;letter-spacing:1.5px;text-transform:uppercase;font-family:monospace;}
+        .fire-levels .fl-val{font-size:16px;font-weight:700;color:#ffab40;}
+        .fire-levels .fl-val.t1{color:#ff8f00;}
+        .fire-levels .fl-val.t2{color:#ff6d00;}
+        .fire-levels .fl-val.sl{font-size:11px;color:#bf360c;font-family:monospace;font-weight:400;line-height:1.4;}
+        .fire-levels .fl-val.rr{color:#ffd54f;font-size:13px;}
+
         @media(max-width:768px){
             .card-grid{grid-template-columns:repeat(2,1fr);}
             .levels-grid{grid-template-columns:1fr;}
             .header h1{font-size:24px;}
             .direction-title{font-size:22px;}
             body{padding:10px;}
+            .fire-levels{grid-template-columns:1fr 1fr;}
         }
         @media(max-width:480px){.card-grid{grid-template-columns:1fr;}}
     </style>
@@ -103,7 +124,7 @@
 
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 03:41 IST</p>
+        <p>Generated: 18-Feb-2026 04:01 IST</p>
     </div>
 
     <div class="section">
@@ -254,55 +275,38 @@
 
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
-
-        <!-- Zone legend -->
         <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
             <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ SUPPORT ZONE</span>
             <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
         </div>
-
-        <!-- ══ ROW A — ABOVE track ══ -->
         <div style="position:relative;height:62px;">
-
-            <!-- Strong Support @ 3% -->
             <div class="rl-node-a" style="left:3%;">
                 <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
                 <div class="rl-val" style="color:#26c6da;">₹25,071</div>
                 <div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div>
             </div>
-
-            <!-- Support @ 22% -->
             <div class="rl-node-a" style="left:22%;">
                 <div class="rl-lbl" style="color:#00bcd4;">Support</div>
                 <div class="rl-val" style="color:#00bcd4;">₹25,171</div>
                 <div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div>
             </div>
-
-            <!-- NOW badge at real price position -->
             <div style="position:absolute;left:50.2%;transform:translateX(-50%);
                         bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
                         padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;
                         box-shadow:0 0 16px rgba(79,195,247,0.7);">
                 ▼ NOW &nbsp;₹25,725
             </div>
-
-            <!-- Resistance @ 75% -->
             <div class="rl-node-a" style="left:75%;">
                 <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
                 <div class="rl-val" style="color:#ff7043;">₹26,275</div>
                 <div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div>
             </div>
-
-            <!-- Strong Resistance @ 95% -->
             <div class="rl-node-a" style="left:95%;">
                 <div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div>
                 <div class="rl-val" style="color:#f44336;">₹26,375</div>
                 <div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div>
             </div>
-
         </div>
-
-        <!-- ══ GRADIENT TRACK ══ -->
         <div style="position:relative;height:8px;border-radius:4px;
                     background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);
                     box-shadow:0 2px 14px rgba(0,0,0,0.5);">
@@ -310,8 +314,6 @@
                         width:4px;height:22px;background:#fff;border-radius:2px;
                         box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
         </div>
-
-        <!-- ══ ROW B — BELOW track: Max Pain centred ══ -->
         <div style="position:relative;height:58px;">
             
               <div class="rl-node-b" style="left:43%;">
@@ -320,8 +322,6 @@
                 <div class="rl-val" style="color:#ffb74d;">₹25,700</div>
               </div>
         </div>
-
-        <!-- ══ Distance bar ══ -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
             <div style="background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.3);
                         border-radius:8px;padding:10px 16px;
@@ -405,14 +405,21 @@
             </div>
         </div>
 
-        <div class="risk-box" style="margin-top:20px;">
-            <div style="grid-column:1/-1;margin-bottom:12px;"><h4 style="color:#ffb74d;font-size:15px;margin:0;">📍 KEY TRADING LEVELS</h4></div>
-            <div class="risk-item"><span class="risk-label">ENTRY ZONE</span><span class="risk-value">₹25,171 – ₹26,275</span></div>
-            <div class="risk-item"><span class="risk-label">TARGET 1</span><span class="risk-value">₹26,275</span></div>
-            <div class="risk-item"><span class="risk-label">TARGET 2</span><span class="risk-value">₹25,171</span></div>
-
-            <div class="risk-item" style="grid-column:1/-1;"><span class="risk-label">STOP LOSS</span><span class="risk-value" style="color:#ffb74d;">Use option premium as max loss (credit strategy)</span></div>
-
+        <div class="fire-levels">
+            <div class="fl-hdr">📍 Key<br>Levels</div>
+            <div class="fl-item">
+                <div class="fl-lbl">Entry Zone</div>
+                <div class="fl-val">₹25,171 – ₹26,275</div>
+            </div>
+            <div class="fl-item">
+                <div class="fl-lbl">Target 1 &nbsp;/&nbsp; Target 2</div>
+                <div class="fl-val t1">₹26,275 &nbsp;<span style="color:#4a2000;">|</span>&nbsp; <span class="fl-val t2" style="display:inline;">₹25,171</span></div>
+            </div>
+            <div class="fl-item">
+                <div class="fl-lbl">Stop Loss</div>
+                <div class="fl-val sl">Use option premium<br>as max loss</div>
+            </div>
+            
         </div>
     </div>
 
