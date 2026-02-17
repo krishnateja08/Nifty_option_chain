@@ -637,8 +637,17 @@ class NiftyHTMLAnalyzer:
         .direction-box.bullish{{background:linear-gradient(135deg,#00bcd4,#26c6da);border-color:#00bcd4;box-shadow:0 0 30px rgba(0,188,212,0.4);}}
         .direction-box.bearish{{background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.4);}}
         .direction-box.sideways{{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.4);}}
-        .direction-title{{font-size:30px;font-weight:700;margin-bottom:10px;color:#000;}}
-        .direction-subtitle{{font-size:14px;opacity:0.95;color:#000;font-weight:600;}}
+        .direction-box.neutral{{background:linear-gradient(135deg,#1a3a4a,#1e4d5e);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.25);}}
+        /* Default title/subtitle color for dark-background boxes (neutral/default) */
+        .direction-title{{font-size:30px;font-weight:700;margin-bottom:10px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.4);}}
+        .direction-subtitle{{font-size:14px;opacity:0.9;color:#e0f7fa;font-weight:600;}}
+        /* Override to black text only for light-background boxes */
+        .direction-box.bullish .direction-title,
+        .direction-box.bearish .direction-title,
+        .direction-box.sideways .direction-title{{color:#000;text-shadow:none;}}
+        .direction-box.bullish .direction-subtitle,
+        .direction-box.bearish .direction-subtitle,
+        .direction-box.sideways .direction-subtitle{{color:#000;}}
         .logic-box{{background:rgba(79,195,247,0.1);padding:18px;border-radius:10px;margin-top:20px;border-left:4px solid #4fc3f7;}}
         .logic-box p{{font-size:13px;line-height:1.8;color:#80deea;margin:0;}}
         .logic-box strong{{color:#4fc3f7;}}
