@@ -1,11 +1,11 @@
 """
 NIFTY 50 COMPLETE ANALYSIS - DEEP OCEAN THEME - ENHANCED CARD LAYOUT
 FIXES:
-  1. Expiry detection: tries Monday first, then fetches available expiries from NSE if that fails
-  2. Option chain fetch: added retry logic + debug prints
-  3. Bias logic: SIDEWAYS only when score diff is truly -2 to +2
-  4. SIDEWAYS targets: now shows resistance as T1 and support as T2 (not same midpoint)
-  5. Stop loss for SIDEWAYS: shows "use option premium as max loss" instead of blank
+  1. Expiry: TUESDAY weekly expiry (NIFTY standard)
+  2. Auto-fallback: if calculated Tuesday has no data, fetches real expiry list from NSE
+  3. Bias logic: meaningful BULLISH/BEARISH thresholds
+  4. SIDEWAYS targets: T1=Resistance, T2=Support (distinct values)
+  5. Stop loss fallback text for neutral strategies
 """
 
 from curl_cffi import requests
@@ -61,19 +61,26 @@ class NiftyHTMLAnalyzer:
 
     # ==================== EXPIRY DETECTION ====================
 
-    def get_upcoming_expiry_monday(self):
-        """Calculate next Monday expiry date string e.g. '24-Feb-2026'"""
+    def get_upcoming_expiry_tuesday(self):
+        """
+        Calculate the current or next TUESDAY expiry date.
+        - If today is Tuesday before 3:30 PM IST → use today
+        - If today is Tuesday after 3:30 PM IST  → use next Tuesday
+        - Any other day                           → find next Tuesday
+        Returns string like '24-Feb-2026'
+        """
         ist_tz = pytz.timezone('Asia/Kolkata')
         now = datetime.now(ist_tz)
-        weekday = now.weekday()  # Mon=0 … Sun=6
+        weekday = now.weekday()  # Mon=0, Tue=1, Wed=2, ..., Sun=6
 
-        if weekday == 0:  # Today is Monday
+        if weekday == 1:  # Today is Tuesday
             if now.hour < 15 or (now.hour == 15 and now.minute < 30):
-                expiry_date = now          # Before 3:30 PM → today
+                expiry_date = now          # before 3:30 PM → today
             else:
-                expiry_date = now + timedelta(days=7)
+                expiry_date = now + timedelta(days=7)   # after close → next Tuesday
         else:
-            days_ahead = (7 - weekday) % 7
+            # days until next Tuesday
+            days_ahead = (1 - weekday) % 7
             if days_ahead == 0:
                 days_ahead = 7
             expiry_date = now + timedelta(days=days_ahead)
@@ -81,7 +88,7 @@ class NiftyHTMLAnalyzer:
         return expiry_date.strftime('%d-%b-%Y')
 
     def fetch_available_expiries(self, session, headers):
-        """Ask NSE for available expiry dates and return the nearest one"""
+        """Ask NSE for available expiry dates for NIFTY and return the nearest one"""
         try:
             url = f"https://www.nseindia.com/api/option-chain-v3?type=Indices&symbol={self.nse_symbol}"
             resp = session.get(url, headers=headers, impersonate="chrome", timeout=20)
@@ -90,7 +97,7 @@ class NiftyHTMLAnalyzer:
                 expiries = data.get('records', {}).get('expiryDates', [])
                 if expiries:
                     print(f"  📅 Available expiries from NSE: {expiries[:5]}")
-                    return expiries[0]
+                    return expiries[0]   # nearest expiry
         except Exception as e:
             print(f"  ⚠️  Could not fetch expiry list: {e}")
         return None
@@ -98,13 +105,15 @@ class NiftyHTMLAnalyzer:
     # ==================== NSE OPTION CHAIN FETCH ====================
 
     def fetch_nse_option_chain_silent(self):
-        """Fetch NSE option chain with retry + automatic expiry fallback"""
+        """Fetch NSE option chain - tries calculated Tuesday, falls back to NSE expiry list"""
         session, headers = self._make_nse_session()
 
-        selected_expiry = self.get_upcoming_expiry_monday()
+        # Step 1: try calculated Tuesday
+        selected_expiry = self.get_upcoming_expiry_tuesday()
         print(f"  🗓️  Trying calculated expiry: {selected_expiry}")
         result = self._fetch_chain_for_expiry(session, headers, selected_expiry)
 
+        # Step 2: if empty, ask NSE for the real nearest expiry
         if result is None:
             print(f"  ⚠️  No data for {selected_expiry}. Fetching expiry list from NSE...")
             real_expiry = self.fetch_available_expiries(session, headers)
@@ -117,7 +126,7 @@ class NiftyHTMLAnalyzer:
         return result
 
     def _fetch_chain_for_expiry(self, session, headers, expiry):
-        """Fetch option chain for a specific expiry. Returns dict or None."""
+        """Fetch option chain for a specific expiry string. Returns dict or None."""
         api_url = (
             f"https://www.nseindia.com/api/option-chain-v3"
             f"?type=Indices&symbol={self.nse_symbol}&expiry={expiry}"
@@ -188,6 +197,7 @@ class NiftyHTMLAnalyzer:
         total_pe_oi_change = int(df['PE_OI_Change'].sum())
         net_oi_change      = total_pe_oi_change - total_ce_oi_change
 
+        # OI direction
         if total_ce_oi_change > 0 and total_pe_oi_change < 0:
             oi_direction, oi_signal, oi_icon, oi_class = "Strong Bearish", "Call Build-up + Put Unwinding", "🔴", "bearish"
         elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
@@ -346,8 +356,7 @@ class NiftyHTMLAnalyzer:
         current    = technical['current_price']
         support    = technical['support']
         resistance = technical['resistance']
-        ist_tz     = pytz.timezone('Asia/Kolkata')
-        ist_now    = datetime.now(ist_tz)
+        ist_now    = datetime.now(pytz.timezone('Asia/Kolkata'))
 
         # --- Scoring ---
         bullish_score = 0
@@ -445,11 +454,11 @@ class NiftyHTMLAnalyzer:
                  'description': f'Sell {atm_strike+100} CE, Buy {atm_strike+200} CE', 'best_for': 'Expect market to stay below resistance'},
             ]
 
-        else:  # SIDEWAYS — meaningful distinct targets
+        else:  # SIDEWAYS
             entry_low  = support
             entry_high = resistance
-            target_1   = resistance   # sell near resistance
-            target_2   = support      # buy near support
+            target_1   = resistance   # upper boundary
+            target_2   = support      # lower boundary
             stop_loss  = None
             option_strategies = [
                 {'name': 'Iron Condor',   'market_bias': 'Neutral', 'type': 'Credit', 'risk': 'Low',
@@ -843,9 +852,7 @@ class NiftyHTMLAnalyzer:
         <div class="section-title"><span>📋</span> TOP 5 STRIKES (by Open Interest)</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
             <div>
-                <h3 style="color:#00bcd4;margin-bottom:15px;font-size:16px;display:flex;align-items:center;gap:8px;">
-                    <span>📞</span> CALL OPTIONS (CE)
-                </h3>
+                <h3 style="color:#00bcd4;margin-bottom:15px;font-size:16px;">📞 CALL OPTIONS (CE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead>
                     <tbody>
@@ -857,9 +864,7 @@ class NiftyHTMLAnalyzer:
                 </table>
             </div>
             <div>
-                <h3 style="color:#f44336;margin-bottom:15px;font-size:16px;display:flex;align-items:center;gap:8px;">
-                    <span>📉</span> PUT OPTIONS (PE)
-                </h3>
+                <h3 style="color:#f44336;margin-bottom:15px;font-size:16px;">📉 PUT OPTIONS (PE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead>
                     <tbody>
@@ -912,9 +917,7 @@ class NiftyHTMLAnalyzer:
                     padding:25px;border-radius:14px;margin-bottom:20px;
                     border:2px solid {ts_border};box-shadow:0 8px 20px rgba(0,0,0,0.3);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-                <h3 style="color:#4fc3f7;font-size:18px;margin:0;display:flex;align-items:center;gap:10px;">
-                    <span>1️⃣</span> TECHNICAL ANALYSIS STRATEGY
-                </h3>
+                <h3 style="color:#4fc3f7;font-size:18px;margin:0;">1️⃣ TECHNICAL ANALYSIS STRATEGY</h3>
                 <span style="background:rgba(79,195,247,0.2);color:#4fc3f7;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">
                     Positional • 1-5 Days
                 </span>
@@ -961,9 +964,7 @@ class NiftyHTMLAnalyzer:
                     padding:25px;border-radius:14px;margin-bottom:20px;
                     border:2px solid {oi_border};box-shadow:0 8px 20px rgba(0,0,0,0.3);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-                <h3 style="color:#4fc3f7;font-size:18px;margin:0;display:flex;align-items:center;gap:10px;">
-                    <span>2️⃣</span> OPEN INTEREST MOMENTUM STRATEGY
-                </h3>
+                <h3 style="color:#4fc3f7;font-size:18px;margin:0;">2️⃣ OPEN INTEREST MOMENTUM STRATEGY</h3>
                 <span style="background:rgba(255,183,77,0.2);color:#ffb74d;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">
                     {oi.get('time_horizon','Intraday')}
                 </span>
@@ -1107,7 +1108,7 @@ class NiftyHTMLAnalyzer:
     def generate_full_report(self):
         ist_now = datetime.now(pytz.timezone('Asia/Kolkata'))
         print("=" * 75)
-        print("NIFTY 50 DAILY REPORT — MONDAY EXPIRY — FIXED VERSION")
+        print("NIFTY 50 DAILY REPORT — TUESDAY EXPIRY")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 75)
 
@@ -1127,7 +1128,7 @@ class NiftyHTMLAnalyzer:
 
 def main():
     try:
-        print("\n🚀 Starting Nifty 50 Analysis (Fixed: Monday expiry + auto-fallback)...\n")
+        print("\n🚀 Starting Nifty 50 Analysis (Tuesday expiry + auto-fallback)...\n")
         analyzer        = NiftyHTMLAnalyzer()
         option_analysis = analyzer.generate_full_report()
 
