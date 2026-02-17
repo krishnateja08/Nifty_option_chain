@@ -103,7 +103,7 @@
 
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 03:31 IST</p>
+        <p>Generated: 18-Feb-2026 03:41 IST</p>
     </div>
 
     <div class="section">
@@ -255,101 +255,96 @@
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
 
-        <!-- ── Zone legend: LOW prices LEFT, HIGH prices RIGHT ── -->
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ LOW / SUPPORT ZONE</span>
+        <!-- Zone legend -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ SUPPORT ZONE</span>
             <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
         </div>
 
-        <!-- ══ ROW A — nodes ABOVE the track (Strong Support | Strong Resistance) ══ -->
-        <div style="position:relative;height:56px;">
+        <!-- ══ ROW A — ABOVE track ══ -->
+        <div style="position:relative;height:62px;">
 
-            <!-- Strong Support — top row, far left -->
+            <!-- Strong Support @ 3% -->
             <div class="rl-node-a" style="left:3%;">
                 <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
                 <div class="rl-val" style="color:#26c6da;">₹25,071</div>
-                <div class="rl-tick" style="background:#26c6da;margin:4px auto 0;"></div>
+                <div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div>
             </div>
 
-            <!-- Current price callout — top row, middle -->
+            <!-- Support @ 22% -->
+            <div class="rl-node-a" style="left:22%;">
+                <div class="rl-lbl" style="color:#00bcd4;">Support</div>
+                <div class="rl-val" style="color:#00bcd4;">₹25,171</div>
+                <div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div>
+            </div>
+
+            <!-- NOW badge at real price position -->
             <div style="position:absolute;left:50.2%;transform:translateX(-50%);
-                        bottom:2px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
-                        padding:4px 12px;border-radius:6px;white-space:nowrap;z-index:10;
-                        box-shadow:0 0 12px rgba(79,195,247,0.5);">
+                        bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
+                        padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;
+                        box-shadow:0 0 16px rgba(79,195,247,0.7);">
                 ▼ NOW &nbsp;₹25,725
             </div>
 
-            <!-- Strong Resistance — top row, far right -->
-            <div class="rl-node-a" style="left:97%;">
+            <!-- Resistance @ 75% -->
+            <div class="rl-node-a" style="left:75%;">
+                <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
+                <div class="rl-val" style="color:#ff7043;">₹26,275</div>
+                <div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div>
+            </div>
+
+            <!-- Strong Resistance @ 95% -->
+            <div class="rl-node-a" style="left:95%;">
                 <div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div>
                 <div class="rl-val" style="color:#f44336;">₹26,375</div>
-                <div class="rl-tick" style="background:#f44336;margin:4px auto 0;"></div>
+                <div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div>
             </div>
 
         </div>
 
-        <!-- ══ GRADIENT TRACK + current price pointer ══ -->
+        <!-- ══ GRADIENT TRACK ══ -->
         <div style="position:relative;height:8px;border-radius:4px;
-                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 42%,#ffb74d 58%,#ff7043 78%,#f44336 100%);
-                    box-shadow:0 2px 12px rgba(0,0,0,0.5);">
-            <!-- White pointer at current price -->
+                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);
+                    box-shadow:0 2px 14px rgba(0,0,0,0.5);">
             <div style="position:absolute;left:50.2%;top:50%;transform:translate(-50%,-50%);
-                        width:4px;height:20px;background:#fff;border-radius:2px;
-                        box-shadow:0 0 12px rgba(255,255,255,1);z-index:10;"></div>
+                        width:4px;height:22px;background:#fff;border-radius:2px;
+                        box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
         </div>
 
-        <!-- ══ ROW B — nodes BELOW the track (Support | Max Pain | Resistance) ══ -->
-        <div style="position:relative;height:62px;">
-
-            <!-- Support — bottom row, left -->
-            <div class="rl-node-b" style="left:7.67%;">
-                <div class="rl-tick" style="background:#00bcd4;box-shadow:0 0 7px #00bcd4;margin:0 auto 4px;"></div>
-                <div class="rl-lbl" style="color:#00bcd4;">Support</div>
-                <div class="rl-val" style="color:#00bcd4;">₹25,171</div>
-            </div>
-
+        <!-- ══ ROW B — BELOW track: Max Pain centred ══ -->
+        <div style="position:relative;height:58px;">
             
-              <div class="rl-node-b" style="left:48.25%;">
-                <div class="rl-tick" style="background:#ffb74d;box-shadow:0 0 7px #ffb74d;"></div>
+              <div class="rl-node-b" style="left:43%;">
+                <div class="rl-dot" style="background:#ffb74d;box-shadow:0 0 8px #ffb74d;margin:0 auto 5px;"></div>
                 <div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>
                 <div class="rl-val" style="color:#ffb74d;">₹25,700</div>
               </div>
-
-            <!-- Resistance — bottom row, right -->
-            <div class="rl-node-b" style="left:92.33%;">
-                <div class="rl-tick" style="background:#ff7043;box-shadow:0 0 7px #ff7043;margin:0 auto 4px;"></div>
-                <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
-                <div class="rl-val" style="color:#ff7043;">₹26,275</div>
-            </div>
-
         </div>
 
-        <!-- ══ Distance info bar ══ -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;">
+        <!-- ══ Distance bar ══ -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
             <div style="background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.3);
-                        border-radius:8px;padding:10px 14px;
+                        border-radius:8px;padding:10px 16px;
                         display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:12px;color:#b0bec5;">📍 Distance to Resistance</span>
                 <span style="font-size:15px;font-weight:700;color:#f44336;">+549 pts</span>
             </div>
             <div style="background:rgba(0,188,212,0.1);border:1px solid rgba(0,188,212,0.3);
-                        border-radius:8px;padding:10px 14px;
+                        border-radius:8px;padding:10px 16px;
                         display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:12px;color:#b0bec5;">📍 Distance to Support</span>
-                <span style="font-size:15px;font-weight:700;color:#00bcd4;">-554 pts</span>
+                <span style="font-size:15px;font-weight:700;color:#00bcd4;">−554 pts</span>
             </div>
         </div>
     </div>
 
     <style>
-        /* Above-track nodes: label on top, tick pointing down to track */
-        .rl-node-a{position:absolute;transform:translateX(-50%);text-align:center;bottom:0;}
-        /* Below-track nodes: tick on top pointing up to track, label below */
-        .rl-node-b{position:absolute;transform:translateX(-50%);text-align:center;top:0;}
-        .rl-tick{width:12px;height:12px;border-radius:50%;border:2px solid rgba(15,32,39,0.8);}
-        .rl-lbl{font-size:10px;color:#80deea;line-height:1.35;white-space:nowrap;
-                 font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
-        .rl-val{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;}
+        .rl-node-a{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}
+        .rl-node-b{position:absolute;top:0;transform:translateX(-50%);text-align:center;}
+        .rl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}
+        .rl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;
+                 line-height:1.4;white-space:nowrap;}
+        .rl-val{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}
     </style>
 
     <div class="section">
