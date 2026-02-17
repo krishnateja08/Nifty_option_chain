@@ -1,17 +1,18 @@
 """
 NIFTY 50 COMPLETE ANALYSIS - DEEP OCEAN THEME - ENHANCED CARD LAYOUT
 FIXES:
-  1. Expiry: TUESDAY weekly expiry (NIFTY standard)
-  2. Auto-fallback: if calculated Tuesday has no data, fetches real expiry list from NSE
-  3. Bias logic: meaningful BULLISH/BEARISH thresholds
-  4. SIDEWAYS targets: T1=Resistance, T2=Support (distinct values)
-  5. Stop loss fallback text for neutral strategies
+  1. Expiry: TUESDAY weekly - always picks NEXT Tuesday (never today)
+     e.g. If today is Tue 17-Feb → expiry = Tue 24-Feb
+  2. Auto-fallback: if NSE returns empty, fetches real expiry list
+  3. SIDEWAYS targets: T1=Resistance, T2=Support (distinct values)
+  4. Stop loss fallback text for neutral strategies
 """
 
 from curl_cffi import requests
 import pandas as pd
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+import calendar
 import yfinance as yf
 import warnings
 import os
@@ -63,41 +64,46 @@ class NiftyHTMLAnalyzer:
 
     def get_upcoming_expiry_tuesday(self):
         """
-        Calculate the current or next TUESDAY expiry date.
-        - If today is Tuesday before 3:30 PM IST → use today
-        - If today is Tuesday after 3:30 PM IST  → use next Tuesday
-        - Any other day                           → find next Tuesday
-        Returns string like '24-Feb-2026'
-        """
-        ist_tz = pytz.timezone('Asia/Kolkata')
-        now = datetime.now(ist_tz)
-        weekday = now.weekday()  # Mon=0, Tue=1, Wed=2, ..., Sun=6
+        Always returns the NEXT Tuesday date (never today).
+        Uses Python's date + calendar — no manual weekday math errors.
 
-        if weekday == 1:  # Today is Tuesday
-            if now.hour < 15 or (now.hour == 15 and now.minute < 30):
-                expiry_date = now          # before 3:30 PM → today
-            else:
-                expiry_date = now + timedelta(days=7)   # after close → next Tuesday
+        Examples:
+          Today = Tue 17-Feb  →  returns 24-Feb  (next Tuesday)
+          Today = Wed 18-Feb  →  returns 24-Feb
+          Today = Mon 23-Feb  →  returns 24-Feb
+          Today = Tue 24-Feb  →  returns 03-Mar  (next Tuesday again)
+        """
+        ist_tz    = pytz.timezone('Asia/Kolkata')
+        today_ist = datetime.now(ist_tz).date()
+
+        weekday = today_ist.weekday()   # Mon=0, Tue=1, ..., Sun=6
+
+        if weekday == 1:
+            # Today IS Tuesday → always jump to next Tuesday (7 days ahead)
+            days_ahead = 7
         else:
-            # days until next Tuesday
+            # How many days until next Tuesday?
             days_ahead = (1 - weekday) % 7
             if days_ahead == 0:
                 days_ahead = 7
-            expiry_date = now + timedelta(days=days_ahead)
 
-        return expiry_date.strftime('%d-%b-%Y')
+        next_tuesday = today_ist + timedelta(days=days_ahead)
+        expiry_str   = next_tuesday.strftime('%d-%b-%Y')
+
+        print(f"  📅 Today (IST): {today_ist.strftime('%A %d-%b-%Y')} | Expiry: {expiry_str}")
+        return expiry_str
 
     def fetch_available_expiries(self, session, headers):
-        """Ask NSE for available expiry dates for NIFTY and return the nearest one"""
+        """Ask NSE for available expiry dates and return the nearest one"""
         try:
-            url = f"https://www.nseindia.com/api/option-chain-v3?type=Indices&symbol={self.nse_symbol}"
+            url  = f"https://www.nseindia.com/api/option-chain-v3?type=Indices&symbol={self.nse_symbol}"
             resp = session.get(url, headers=headers, impersonate="chrome", timeout=20)
             if resp.status_code == 200:
-                data = resp.json()
+                data     = resp.json()
                 expiries = data.get('records', {}).get('expiryDates', [])
                 if expiries:
-                    print(f"  📅 Available expiries from NSE: {expiries[:5]}")
-                    return expiries[0]   # nearest expiry
+                    print(f"  📅 NSE available expiries: {expiries[:5]}")
+                    return expiries[0]
         except Exception as e:
             print(f"  ⚠️  Could not fetch expiry list: {e}")
         return None
@@ -105,20 +111,18 @@ class NiftyHTMLAnalyzer:
     # ==================== NSE OPTION CHAIN FETCH ====================
 
     def fetch_nse_option_chain_silent(self):
-        """Fetch NSE option chain - tries calculated Tuesday, falls back to NSE expiry list"""
+        """Fetch option chain — tries calculated Tuesday, falls back to NSE list"""
         session, headers = self._make_nse_session()
 
-        # Step 1: try calculated Tuesday
         selected_expiry = self.get_upcoming_expiry_tuesday()
-        print(f"  🗓️  Trying calculated expiry: {selected_expiry}")
+        print(f"  🗓️  Fetching option chain for: {selected_expiry}")
         result = self._fetch_chain_for_expiry(session, headers, selected_expiry)
 
-        # Step 2: if empty, ask NSE for the real nearest expiry
         if result is None:
-            print(f"  ⚠️  No data for {selected_expiry}. Fetching expiry list from NSE...")
+            print(f"  ⚠️  No data for {selected_expiry}. Trying NSE expiry list...")
             real_expiry = self.fetch_available_expiries(session, headers)
             if real_expiry and real_expiry != selected_expiry:
-                print(f"  🔄 Retrying with NSE expiry: {real_expiry}")
+                print(f"  🔄 Retrying with: {real_expiry}")
                 result = self._fetch_chain_for_expiry(session, headers, real_expiry)
 
         if result is None:
@@ -126,14 +130,14 @@ class NiftyHTMLAnalyzer:
         return result
 
     def _fetch_chain_for_expiry(self, session, headers, expiry):
-        """Fetch option chain for a specific expiry string. Returns dict or None."""
+        """Fetch option chain for a specific expiry. Returns dict or None."""
         api_url = (
             f"https://www.nseindia.com/api/option-chain-v3"
             f"?type=Indices&symbol={self.nse_symbol}&expiry={expiry}"
         )
         for attempt in range(1, 3):
             try:
-                print(f"    Attempt {attempt}: fetching expiry={expiry}")
+                print(f"    Attempt {attempt}: expiry={expiry}")
                 resp = session.get(api_url, headers=headers, impersonate="chrome", timeout=30)
                 print(f"    HTTP {resp.status_code}")
 
@@ -142,7 +146,7 @@ class NiftyHTMLAnalyzer:
                     continue
 
                 json_data = resp.json()
-                data = json_data.get('records', {}).get('data', [])
+                data      = json_data.get('records', {}).get('data', [])
 
                 if not data:
                     print(f"    ⚠️  Empty data for expiry={expiry}")
@@ -166,7 +170,7 @@ class NiftyHTMLAnalyzer:
                         'PE_OI_Change': pe.get('changeinOpenInterest', 0),
                     })
 
-                df = pd.DataFrame(rows).sort_values('Strike').reset_index(drop=True)
+                df         = pd.DataFrame(rows).sort_values('Strike').reset_index(drop=True)
                 underlying = json_data.get('records', {}).get('underlyingValue', 0)
                 print(f"    ✅ {len(df)} strikes | Underlying: {underlying}")
 
@@ -197,7 +201,6 @@ class NiftyHTMLAnalyzer:
         total_pe_oi_change = int(df['PE_OI_Change'].sum())
         net_oi_change      = total_pe_oi_change - total_ce_oi_change
 
-        # OI direction
         if total_ce_oi_change > 0 and total_pe_oi_change < 0:
             oi_direction, oi_signal, oi_icon, oi_class = "Strong Bearish", "Call Build-up + Put Unwinding", "🔴", "bearish"
         elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
@@ -219,10 +222,10 @@ class NiftyHTMLAnalyzer:
             else:
                 oi_direction, oi_signal, oi_icon, oi_class = "Neutral", "Balanced OI Changes", "🟡", "neutral"
 
-        max_ce_oi_row = df.loc[df['CE_OI'].idxmax()]
-        max_pe_oi_row = df.loc[df['PE_OI'].idxmax()]
-        df['pain']    = abs(df['CE_OI'] - df['PE_OI'])
-        max_pain_row  = df.loc[df['pain'].idxmin()]
+        max_ce_oi_row  = df.loc[df['CE_OI'].idxmax()]
+        max_pe_oi_row  = df.loc[df['PE_OI'].idxmax()]
+        df['pain']     = abs(df['CE_OI'] - df['PE_OI'])
+        max_pain_row   = df.loc[df['pain'].idxmin()]
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
 
         top_ce_strikes = df.nlargest(5, 'CE_OI')[['Strike', 'CE_OI', 'CE_LTP']].to_dict('records')
@@ -258,7 +261,7 @@ class NiftyHTMLAnalyzer:
         try:
             print("Calculating technical indicators...")
             nifty = yf.Ticker(self.yf_symbol)
-            df = nifty.history(period="1y")
+            df    = nifty.history(period="1y")
             if df.empty:
                 print("Warning: Failed to fetch historical data")
                 return None
@@ -267,9 +270,9 @@ class NiftyHTMLAnalyzer:
             df['SMA_50']  = df['Close'].rolling(50).mean()
             df['SMA_200'] = df['Close'].rolling(200).mean()
 
-            delta = df['Close'].diff()
-            gain  = delta.where(delta > 0, 0).rolling(14).mean()
-            loss  = (-delta.where(delta < 0, 0)).rolling(14).mean()
+            delta        = df['Close'].diff()
+            gain         = delta.where(delta > 0, 0).rolling(14).mean()
+            loss         = (-delta.where(delta < 0, 0)).rolling(14).mean()
             df['RSI']    = 100 - (100 / (1 + gain / loss))
             df['EMA_12'] = df['Close'].ewm(span=12, adjust=False).mean()
             df['EMA_26'] = df['Close'].ewm(span=26, adjust=False).mean()
@@ -310,7 +313,7 @@ class NiftyHTMLAnalyzer:
 
     def select_best_technical_strategy(self, bias, option_strategies):
         name_map = {"BULLISH": "Bull Call Spread", "BEARISH": "Bear Put Spread", "SIDEWAYS": "Iron Condor"}
-        target = name_map.get(bias, "")
+        target   = name_map.get(bias, "")
         for s in option_strategies:
             if s['name'] == target:
                 return s
@@ -358,7 +361,6 @@ class NiftyHTMLAnalyzer:
         resistance = technical['resistance']
         ist_now    = datetime.now(pytz.timezone('Asia/Kolkata'))
 
-        # --- Scoring ---
         bullish_score = 0
         bearish_score = 0
 
@@ -384,19 +386,16 @@ class NiftyHTMLAnalyzer:
         score_diff = bullish_score - bearish_score
         print(f"  📊 Score → Bullish: {bullish_score} | Bearish: {bearish_score} | Diff: {score_diff}")
 
-        # --- Bias ---
         if   score_diff >= 3:  bias, bias_icon, bias_class = "BULLISH",  "📈", "bullish"; confidence = "HIGH" if score_diff >= 4 else "MEDIUM"
         elif score_diff <= -3: bias, bias_icon, bias_class = "BEARISH",  "📉", "bearish"; confidence = "HIGH" if score_diff <= -4 else "MEDIUM"
         else:                  bias, bias_icon, bias_class = "SIDEWAYS", "↔️",  "sideways"; confidence = "MEDIUM"
 
-        # --- RSI label ---
         if   rsi > 70: rsi_status, rsi_badge, rsi_icon = "Overbought", "bearish", "🔴"
         elif rsi < 30: rsi_status, rsi_badge, rsi_icon = "Oversold",   "bullish", "🟢"
         else:          rsi_status, rsi_badge, rsi_icon = "Neutral",    "neutral", "🟡"
 
         macd_bullish = technical['macd'] > technical['signal']
 
-        # --- PCR label ---
         if option_analysis:
             pcr = option_analysis['pcr_oi']
             if   pcr > 1.2: pcr_status, pcr_badge, pcr_icon = "Bullish", "bullish", "🟢"
@@ -405,7 +404,6 @@ class NiftyHTMLAnalyzer:
         else:
             pcr_status, pcr_badge, pcr_icon = "N/A", "neutral", "🟡"
 
-        # --- Strikes ---
         if option_analysis:
             max_ce_strike = option_analysis['max_ce_oi_strike']
             max_pe_strike = option_analysis['max_pe_oi_strike']
@@ -415,41 +413,40 @@ class NiftyHTMLAnalyzer:
 
         atm_strike = int(current/50)*50
 
-        # --- Strategies & levels ---
         if bias == "BULLISH":
-            mid = (support + resistance) / 2
+            mid        = (support + resistance) / 2
             entry_low  = current - 100 if current > mid else current - 50
             entry_high = current - 50  if current > mid else current
             target_1   = resistance
             target_2   = max_ce_strike
             stop_loss  = self.calculate_smart_stop_loss(current, support, resistance, "BULLISH")
             option_strategies = [
-                {'name': 'Long Call',       'market_bias': 'Bullish', 'type': 'Debit',  'risk': 'High',
-                 'max_profit': 'Unlimited', 'max_loss': 'Premium Paid',
+                {'name': 'Long Call',        'market_bias': 'Bullish', 'type': 'Debit',  'risk': 'High',
+                 'max_profit': 'Unlimited',  'max_loss': 'Premium Paid',
                  'description': f'Buy {atm_strike} CE', 'best_for': 'Strong upward momentum expected'},
-                {'name': 'Bull Call Spread', 'market_bias': 'Bullish', 'type': 'Debit',  'risk': 'Moderate',
-                 'max_profit': 'Capped',    'max_loss': 'Premium Paid',
+                {'name': 'Bull Call Spread',  'market_bias': 'Bullish', 'type': 'Debit',  'risk': 'Moderate',
+                 'max_profit': 'Capped',     'max_loss': 'Premium Paid',
                  'description': f'Buy {atm_strike} CE, Sell {atm_strike+200} CE', 'best_for': 'Moderate upside with limited risk'},
-                {'name': 'Bull Put Spread',  'market_bias': 'Bullish', 'type': 'Credit', 'risk': 'Moderate',
+                {'name': 'Bull Put Spread',   'market_bias': 'Bullish', 'type': 'Credit', 'risk': 'Moderate',
                  'max_profit': 'Premium Received', 'max_loss': 'Capped',
                  'description': f'Sell {atm_strike-100} PE, Buy {atm_strike-200} PE', 'best_for': 'Expect market to stay above support'},
             ]
 
         elif bias == "BEARISH":
-            mid = (support + resistance) / 2
+            mid        = (support + resistance) / 2
             entry_low  = current
             entry_high = current + 100 if current < mid else current + 50
             target_1   = support
             target_2   = max_pe_strike
             stop_loss  = self.calculate_smart_stop_loss(current, support, resistance, "BEARISH")
             option_strategies = [
-                {'name': 'Long Put',        'market_bias': 'Bearish', 'type': 'Debit',  'risk': 'High',
+                {'name': 'Long Put',          'market_bias': 'Bearish', 'type': 'Debit',  'risk': 'High',
                  'max_profit': 'Huge (to ₹0)', 'max_loss': 'Premium Paid',
                  'description': f'Buy {atm_strike} PE', 'best_for': 'Strong downward momentum expected'},
-                {'name': 'Bear Put Spread',  'market_bias': 'Bearish', 'type': 'Debit',  'risk': 'Moderate',
-                 'max_profit': 'Capped',    'max_loss': 'Premium Paid',
+                {'name': 'Bear Put Spread',   'market_bias': 'Bearish', 'type': 'Debit',  'risk': 'Moderate',
+                 'max_profit': 'Capped',      'max_loss': 'Premium Paid',
                  'description': f'Buy {atm_strike} PE, Sell {atm_strike-200} PE', 'best_for': 'Moderate downside with limited risk'},
-                {'name': 'Bear Call Spread', 'market_bias': 'Bearish', 'type': 'Credit', 'risk': 'Moderate',
+                {'name': 'Bear Call Spread',  'market_bias': 'Bearish', 'type': 'Credit', 'risk': 'Moderate',
                  'max_profit': 'Premium Received', 'max_loss': 'Capped',
                  'description': f'Sell {atm_strike+100} CE, Buy {atm_strike+200} CE', 'best_for': 'Expect market to stay below resistance'},
             ]
@@ -457,19 +454,19 @@ class NiftyHTMLAnalyzer:
         else:  # SIDEWAYS
             entry_low  = support
             entry_high = resistance
-            target_1   = resistance   # upper boundary
-            target_2   = support      # lower boundary
+            target_1   = resistance
+            target_2   = support
             stop_loss  = None
             option_strategies = [
-                {'name': 'Iron Condor',   'market_bias': 'Neutral', 'type': 'Credit', 'risk': 'Low',
+                {'name': 'Iron Condor',    'market_bias': 'Neutral',  'type': 'Credit', 'risk': 'Low',
                  'max_profit': 'Premium Received', 'max_loss': 'Capped',
                  'description': f'Sell {atm_strike+100} CE + Buy {atm_strike+200} CE, Sell {atm_strike-100} PE + Buy {atm_strike-200} PE',
                  'best_for': 'Expect low volatility, range-bound market'},
-                {'name': 'Iron Butterfly', 'market_bias': 'Neutral', 'type': 'Credit', 'risk': 'Low',
+                {'name': 'Iron Butterfly', 'market_bias': 'Neutral',  'type': 'Credit', 'risk': 'Low',
                  'max_profit': 'Premium Received', 'max_loss': 'Capped',
                  'description': f'Sell {atm_strike} CE + Sell {atm_strike} PE, Buy {atm_strike+100} CE + Buy {atm_strike-100} PE',
                  'best_for': 'Expect price to remain near ATM strike'},
-                {'name': 'Short Straddle', 'market_bias': 'Neutral', 'type': 'Credit', 'risk': 'Very High',
+                {'name': 'Short Straddle', 'market_bias': 'Neutral',  'type': 'Credit', 'risk': 'Very High',
                  'max_profit': 'Premium Received', 'max_loss': 'Unlimited',
                  'description': f'Sell {atm_strike} CE + Sell {atm_strike} PE',
                  'best_for': 'ONLY for experienced traders!'},
@@ -479,7 +476,6 @@ class NiftyHTMLAnalyzer:
                  'best_for': 'Expect big move but unsure of direction'},
             ]
 
-        # --- Risk/Reward ---
         if stop_loss and bias != "SIDEWAYS":
             risk_points       = abs(current - stop_loss)
             reward_points     = abs(target_1 - current)
@@ -514,7 +510,7 @@ class NiftyHTMLAnalyzer:
             'pcr_status':     pcr_status,
             'pcr_badge':      pcr_badge,
             'pcr_icon':       pcr_icon,
-            'max_pain':       option_analysis['max_pain']          if option_analysis else 0,
+            'max_pain':       option_analysis['max_pain']           if option_analysis else 0,
             'max_ce_oi':      max_ce_strike,
             'max_pe_oi':      max_pe_strike,
             'total_ce_oi_change': option_analysis['total_ce_oi_change'] if option_analysis else 0,
@@ -564,12 +560,10 @@ class NiftyHTMLAnalyzer:
               background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);
               min-height:100vh;padding:20px;color:#b0bec5;}}
         .container{{max-width:1200px;margin:0 auto;background:rgba(15,32,39,0.95);
-                    border-radius:16px;overflow:hidden;
-                    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+                    border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);
                     border:1px solid rgba(79,195,247,0.2);}}
-        .header{{background:linear-gradient(135deg,#0f2027,#203a43);
-                 padding:40px 30px;text-align:center;
-                 border-bottom:3px solid #4fc3f7;position:relative;overflow:hidden;}}
+        .header{{background:linear-gradient(135deg,#0f2027,#203a43);padding:40px 30px;
+                 text-align:center;border-bottom:3px solid #4fc3f7;position:relative;overflow:hidden;}}
         .header::before{{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
                          background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.1) 0%,transparent 70%);
                          pointer-events:none;}}
@@ -582,25 +576,19 @@ class NiftyHTMLAnalyzer:
                          display:flex;align-items:center;gap:10px;
                          padding-bottom:10px;border-bottom:2px solid rgba(79,195,247,0.3);}}
         .section-title span{{font-size:22px;}}
-        .card-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-                    gap:12px;margin-top:20px;}}
+        .card-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px;}}
         .card{{background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));
-               border-radius:12px;padding:14px;
-               border:1.5px solid rgba(79,195,247,0.25);
-               transition:all 0.3s cubic-bezier(0.4,0,0.2,1);
-               position:relative;overflow:hidden;}}
+               border-radius:12px;padding:14px;border:1.5px solid rgba(79,195,247,0.25);
+               transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;}}
         .card::before{{content:'';position:absolute;top:0;left:0;width:100%;height:4px;
                        background:linear-gradient(90deg,#4fc3f7,#26c6da);
                        transform:scaleX(0);transform-origin:left;transition:transform 0.3s ease;}}
         .card:hover{{transform:translateY(-4px);box-shadow:0 12px 30px rgba(79,195,247,0.25);border-color:#4fc3f7;}}
         .card:hover::before{{transform:scaleX(1);}}
         .card-icon{{font-size:24px;margin-bottom:8px;display:block;}}
-        .card-label{{font-size:10px;color:#80deea;text-transform:uppercase;
-                     letter-spacing:1px;margin-bottom:8px;font-weight:600;}}
-        .card-value{{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;
-                     text-shadow:0 2px 4px rgba(0,0,0,0.3);}}
-        .card-change{{font-size:14px;font-weight:600;display:inline-flex;
-                      align-items:center;gap:4px;padding:4px 10px;border-radius:6px;}}
+        .card-label{{font-size:10px;color:#80deea;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600;}}
+        .card-value{{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;text-shadow:0 2px 4px rgba(0,0,0,0.3);}}
+        .card-change{{font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;}}
         .card-change.positive{{color:#00bcd4;background:rgba(0,188,212,0.15);}}
         .card-change.negative{{color:#f44336;background:rgba(244,67,54,0.15);}}
         .card-change.neutral{{color:#ffb74d;background:rgba(255,183,77,0.15);}}
@@ -609,37 +597,33 @@ class NiftyHTMLAnalyzer:
         .card.neutral{{border-left:4px solid #ffb74d;}}
         .card.highlight{{background:linear-gradient(135deg,rgba(79,195,247,0.15),rgba(79,195,247,0.05));border:2px solid #4fc3f7;}}
         .direction-box{{padding:30px;border-radius:14px;text-align:center;margin:20px 0;
-                        border:2px solid #4fc3f7;box-shadow:0 0 30px rgba(79,195,247,0.3);
-                        background:linear-gradient(135deg,#0f2027,#2c5364);}}
+                        border:2px solid #4fc3f7;background:linear-gradient(135deg,#0f2027,#2c5364);}}
         .direction-box.bullish{{background:linear-gradient(135deg,#00bcd4,#26c6da);border-color:#00bcd4;box-shadow:0 0 30px rgba(0,188,212,0.4);}}
         .direction-box.bearish{{background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.4);}}
         .direction-box.sideways{{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.4);}}
-        .direction-title{{font-size:30px;font-weight:700;margin-bottom:10px;color:#000;text-shadow:0 2px 4px rgba(0,0,0,0.2);}}
+        .direction-title{{font-size:30px;font-weight:700;margin-bottom:10px;color:#000;}}
         .direction-subtitle{{font-size:14px;opacity:0.95;color:#000;font-weight:600;}}
-        .logic-box{{background:rgba(79,195,247,0.1);padding:18px;border-radius:10px;
-                    margin-top:20px;border-left:4px solid #4fc3f7;}}
+        .logic-box{{background:rgba(79,195,247,0.1);padding:18px;border-radius:10px;margin-top:20px;border-left:4px solid #4fc3f7;}}
         .logic-box p{{font-size:13px;line-height:1.8;color:#80deea;margin:0;}}
         .logic-box strong{{color:#4fc3f7;}}
         .levels-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:20px;}}
         .level-card{{background:rgba(15,32,39,0.6);border-radius:10px;padding:14px;
-                     display:flex;justify-content:space-between;align-items:center;
-                     border:1.5px solid;transition:all 0.3s ease;}}
-        .level-card:hover{{transform:translateX(6px);box-shadow:-8px 0 20px rgba(79,195,247,0.2);}}
+                     display:flex;justify-content:space-between;align-items:center;border:1.5px solid;transition:all 0.3s ease;}}
+        .level-card:hover{{transform:translateX(6px);}}
         .level-card.resistance{{border-color:rgba(244,67,54,0.5);border-left:4px solid #f44336;background:linear-gradient(90deg,rgba(244,67,54,0.1),rgba(244,67,54,0.05));}}
         .level-card.support{{border-color:rgba(0,188,212,0.5);border-left:4px solid #00bcd4;background:linear-gradient(90deg,rgba(0,188,212,0.1),rgba(0,188,212,0.05));}}
-        .level-card.current{{border-color:#4fc3f7;border-left:4px solid #4fc3f7;background:linear-gradient(90deg,rgba(79,195,247,0.2),rgba(79,195,247,0.1));box-shadow:0 0 20px rgba(79,195,247,0.3);}}
-        .level-name{{font-weight:600;font-size:12px;color:#b0bec5;display:flex;align-items:center;gap:6px;}}
+        .level-card.current{{border-color:#4fc3f7;border-left:4px solid #4fc3f7;background:linear-gradient(90deg,rgba(79,195,247,0.2),rgba(79,195,247,0.1));}}
+        .level-name{{font-weight:600;font-size:12px;color:#b0bec5;}}
         .level-value{{font-weight:700;font-size:16px;color:#fff;}}
-        .risk-box{{background:rgba(255,183,77,0.12);padding:18px;border-radius:10px;
-                   margin-top:15px;border-left:4px solid #ffb74d;
-                   display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}}
+        .risk-box{{background:rgba(255,183,77,0.12);padding:18px;border-radius:10px;margin-top:15px;
+                   border-left:4px solid #ffb74d;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}}
         .risk-item{{display:flex;justify-content:space-between;align-items:center;}}
         .risk-label{{font-size:13px;color:#ffb74d;font-weight:600;}}
         .risk-value{{font-size:16px;color:#ffb74d;font-weight:700;}}
-        .strikes-table{{width:100%;border-collapse:collapse;margin-top:20px;overflow:hidden;border-radius:10px;}}
+        .strikes-table{{width:100%;border-collapse:collapse;margin-top:20px;border-radius:10px;overflow:hidden;}}
         .strikes-table th{{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:16px;
-                           text-align:left;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;}}
-        .strikes-table td{{padding:16px;border-bottom:1px solid rgba(79,195,247,0.1);color:#b0bec5;font-size:14px;font-weight:500;}}
+                           text-align:left;font-weight:700;font-size:13px;text-transform:uppercase;}}
+        .strikes-table td{{padding:16px;border-bottom:1px solid rgba(79,195,247,0.1);color:#b0bec5;font-size:14px;}}
         .strikes-table tr:hover{{background:rgba(79,195,247,0.08);}}
         .strikes-table tbody tr:last-child td{{border-bottom:none;}}
         .disclaimer{{background:rgba(255,183,77,0.15);padding:25px;border-radius:12px;
@@ -671,7 +655,7 @@ class NiftyHTMLAnalyzer:
                 <div class="card-label">NIFTY 50</div>
                 <div class="card-value">₹{data['current_price']:,.2f}</div>
             </div>
-            <div class="card {'neutral' if data['expiry'] == 'N/A' else ''}">
+            <div class="card">
                 <span class="card-icon">📅</span>
                 <div class="card-label">EXPIRY DATE</div>
                 <div class="card-value" style="font-size:20px;">{data['expiry']}</div>
@@ -843,7 +827,6 @@ class NiftyHTMLAnalyzer:
         </div>
     </div>
 """
-
         html += self.generate_dual_recommendations_html(data)
 
         if data['has_option_data'] and (data['top_ce_strikes'] or data['top_pe_strikes']):
@@ -854,29 +837,19 @@ class NiftyHTMLAnalyzer:
             <div>
                 <h3 style="color:#00bcd4;margin-bottom:15px;font-size:16px;">📞 CALL OPTIONS (CE)</h3>
                 <table class="strikes-table">
-                    <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead>
-                    <tbody>
+                    <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
 """
             for i, s in enumerate(data['top_ce_strikes'], 1):
                 html += f"<tr><td><strong>{i}</strong></td><td><strong>₹{int(s['Strike']):,}</strong></td><td>{int(s['CE_OI']):,}</td><td style='color:#00bcd4;font-weight:700;'>₹{s['CE_LTP']:.2f}</td></tr>\n"
-            html += """
-                    </tbody>
-                </table>
-            </div>
+            html += """</tbody></table></div>
             <div>
                 <h3 style="color:#f44336;margin-bottom:15px;font-size:16px;">📉 PUT OPTIONS (PE)</h3>
                 <table class="strikes-table">
-                    <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead>
-                    <tbody>
+                    <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
 """
             for i, s in enumerate(data['top_pe_strikes'], 1):
                 html += f"<tr><td><strong>{i}</strong></td><td><strong>₹{int(s['Strike']):,}</strong></td><td>{int(s['PE_OI']):,}</td><td style='color:#f44336;font-weight:700;'>₹{s['PE_LTP']:.2f}</td></tr>\n"
-            html += """
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+            html += """</tbody></table></div></div></div>
 """
 
         html += """
@@ -892,9 +865,7 @@ class NiftyHTMLAnalyzer:
         <p>Automated Nifty 50 Option Chain Analysis Report</p>
         <p>© 2026 - For Educational Purposes Only</p>
     </div>
-</div>
-</body>
-</html>
+</div></body></html>
 """
         return html
 
@@ -908,66 +879,46 @@ class NiftyHTMLAnalyzer:
             We provide <strong>TWO independent strategy recommendations</strong> based on different analysis methods:
         </p>
 """
-        ts = data['recommended_technical_strategy']
+        ts       = data['recommended_technical_strategy']
         ts_class  = 'positive' if 'Bull' in ts['name'] else 'negative' if 'Bear' in ts['name'] else 'neutral'
         ts_border = '#00bcd4' if ts_class == 'positive' else '#f44336' if ts_class == 'negative' else '#ffb74d'
 
         html += f"""
-        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));
-                    padding:25px;border-radius:14px;margin-bottom:20px;
-                    border:2px solid {ts_border};box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));padding:25px;border-radius:14px;margin-bottom:20px;border:2px solid {ts_border};box-shadow:0 8px 20px rgba(0,0,0,0.3);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
                 <h3 style="color:#4fc3f7;font-size:18px;margin:0;">1️⃣ TECHNICAL ANALYSIS STRATEGY</h3>
-                <span style="background:rgba(79,195,247,0.2);color:#4fc3f7;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">
-                    Positional • 1-5 Days
-                </span>
+                <span style="background:rgba(79,195,247,0.2);color:#4fc3f7;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">Positional • 1-5 Days</span>
             </div>
             <div style="background:rgba(79,195,247,0.08);padding:20px;border-radius:10px;border-left:4px solid {ts_border};">
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:15px;">
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div>
-                         <div style="color:#fff;font-size:18px;font-weight:700;">{ts['name']}</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div>
-                         <span class="card-change {ts_class}" style="display:inline-block;">{ts['market_bias']}</span></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div>
-                         <div style="color:#fff;font-size:16px;font-weight:600;">{ts['type']}</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div>
-                         <div style="color:#ffb74d;font-size:16px;font-weight:600;">{ts['risk']}</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div><div style="color:#fff;font-size:18px;font-weight:700;">{ts['name']}</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div><span class="card-change {ts_class}" style="display:inline-block;">{ts['market_bias']}</span></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div><div style="color:#fff;font-size:16px;font-weight:600;">{ts['type']}</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div><div style="color:#ffb74d;font-size:16px;font-weight:600;">{ts['risk']}</div></div>
                 </div>
                 <div style="background:rgba(15,32,39,0.6);padding:15px;border-radius:8px;margin-bottom:12px;">
                     <div style="color:#4fc3f7;font-size:12px;font-weight:600;margin-bottom:8px;">📋 SETUP</div>
                     <div style="color:#fff;font-size:15px;font-weight:500;">{ts['description']}</div>
                 </div>
-                <div style="color:#80deea;font-size:13px;line-height:1.6;">
-                    <strong style="color:#4fc3f7;">💡 Why This Strategy?</strong> {ts['best_for']}
-                </div>
+                <div style="color:#80deea;font-size:13px;"><strong style="color:#4fc3f7;">💡 Why?</strong> {ts['best_for']}</div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:15px;">
-                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;">
-                    <div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div>
-                    <div style="color:#00bcd4;font-size:14px;font-weight:700;">{ts['max_profit']}</div>
-                </div>
-                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;">
-                    <div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div>
-                    <div style="color:#f44336;font-size:14px;font-weight:700;">{ts['max_loss']}</div>
-                </div>
+                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div><div style="color:#00bcd4;font-size:14px;font-weight:700;">{ts['max_profit']}</div></div>
+                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div><div style="color:#f44336;font-size:14px;font-weight:700;">{ts['max_loss']}</div></div>
             </div>
         </div>
 """
 
         if data['recommended_oi_strategy']:
-            oi = data['recommended_oi_strategy']
+            oi       = data['recommended_oi_strategy']
             oi_class  = 'positive' if oi['market_bias'] == 'Bullish' else 'negative' if oi['market_bias'] == 'Bearish' else 'neutral'
             oi_border = '#00bcd4' if oi_class == 'positive' else '#f44336' if oi_class == 'negative' else '#ffb74d'
 
             html += f"""
-        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));
-                    padding:25px;border-radius:14px;margin-bottom:20px;
-                    border:2px solid {oi_border};box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));padding:25px;border-radius:14px;margin-bottom:20px;border:2px solid {oi_border};box-shadow:0 8px 20px rgba(0,0,0,0.3);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
                 <h3 style="color:#4fc3f7;font-size:18px;margin:0;">2️⃣ OPEN INTEREST MOMENTUM STRATEGY</h3>
-                <span style="background:rgba(255,183,77,0.2);color:#ffb74d;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">
-                    {oi.get('time_horizon','Intraday')}
-                </span>
+                <span style="background:rgba(255,183,77,0.2);color:#ffb74d;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">{oi.get('time_horizon','Intraday')}</span>
             </div>
             <div style="background:rgba(255,183,77,0.08);padding:20px;border-radius:10px;border-left:4px solid {oi_border};">
                 <div style="background:rgba(79,195,247,0.1);padding:12px;border-radius:8px;margin-bottom:15px;">
@@ -975,70 +926,41 @@ class NiftyHTMLAnalyzer:
                     <div style="color:#fff;font-size:14px;">{oi.get('signal','Market signal detected')}</div>
                 </div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:15px;">
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div>
-                         <div style="color:#fff;font-size:18px;font-weight:700;">{oi['name']}</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div>
-                         <span class="card-change {oi_class}" style="display:inline-block;">{oi['market_bias']}</span></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div>
-                         <div style="color:#fff;font-size:16px;font-weight:600;">{oi['type']}</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div>
-                         <div style="color:#ffb74d;font-size:16px;font-weight:600;">{oi['risk']}</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div><div style="color:#fff;font-size:18px;font-weight:700;">{oi['name']}</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div><span class="card-change {oi_class}" style="display:inline-block;">{oi['market_bias']}</span></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div><div style="color:#fff;font-size:16px;font-weight:600;">{oi['type']}</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div><div style="color:#ffb74d;font-size:16px;font-weight:600;">{oi['risk']}</div></div>
                 </div>
                 <div style="background:rgba(15,32,39,0.6);padding:15px;border-radius:8px;margin-bottom:12px;">
                     <div style="color:#ffb74d;font-size:12px;font-weight:600;margin-bottom:8px;">📋 SETUP</div>
                     <div style="color:#fff;font-size:15px;font-weight:500;">{oi['description']}</div>
                 </div>
-                <div style="color:#80deea;font-size:13px;line-height:1.6;">
-                    <strong style="color:#ffb74d;">💡 Why This Strategy?</strong> {oi['best_for']}
-                </div>
+                <div style="color:#80deea;font-size:13px;"><strong style="color:#ffb74d;">💡 Why?</strong> {oi['best_for']}</div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:15px;">
-                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;">
-                    <div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div>
-                    <div style="color:#00bcd4;font-size:14px;font-weight:700;">{oi['max_profit']}</div>
-                </div>
-                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;">
-                    <div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div>
-                    <div style="color:#f44336;font-size:14px;font-weight:700;">{oi['max_loss']}</div>
-                </div>
+                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div><div style="color:#00bcd4;font-size:14px;font-weight:700;">{oi['max_profit']}</div></div>
+                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div><div style="color:#f44336;font-size:14px;font-weight:700;">{oi['max_loss']}</div></div>
             </div>
         </div>
 """
 
         html += f"""
         <div class="risk-box" style="margin-top:20px;">
-            <div style="grid-column:1/-1;margin-bottom:12px;">
-                <h4 style="color:#ffb74d;font-size:15px;margin:0;">📍 KEY TRADING LEVELS</h4>
-            </div>
-            <div class="risk-item">
-                <span class="risk-label">ENTRY ZONE</span>
-                <span class="risk-value">₹{data['entry_low']:,.0f} – ₹{data['entry_high']:,.0f}</span>
-            </div>
-            <div class="risk-item">
-                <span class="risk-label">TARGET 1</span>
-                <span class="risk-value">₹{data['target_1']:,.0f}</span>
-            </div>
-            <div class="risk-item">
-                <span class="risk-label">TARGET 2</span>
-                <span class="risk-value">₹{data['target_2']:,.0f}</span>
-            </div>
+            <div style="grid-column:1/-1;margin-bottom:12px;"><h4 style="color:#ffb74d;font-size:15px;margin:0;">📍 KEY TRADING LEVELS</h4></div>
+            <div class="risk-item"><span class="risk-label">ENTRY ZONE</span><span class="risk-value">₹{data['entry_low']:,.0f} – ₹{data['entry_high']:,.0f}</span></div>
+            <div class="risk-item"><span class="risk-label">TARGET 1</span><span class="risk-value">₹{data['target_1']:,.0f}</span></div>
+            <div class="risk-item"><span class="risk-label">TARGET 2</span><span class="risk-value">₹{data['target_2']:,.0f}</span></div>
 """
         if data['stop_loss']:
             html += f"""
-            <div class="risk-item">
-                <span class="risk-label">STOP LOSS</span>
-                <span class="risk-value" style="color:#f44336;">₹{data['stop_loss']:,.0f}</span>
-            </div>
+            <div class="risk-item"><span class="risk-label">STOP LOSS</span><span class="risk-value" style="color:#f44336;">₹{data['stop_loss']:,.0f}</span></div>
             <div class="risk-item"><span class="risk-label">RISK</span><span class="risk-value">{data['risk_points']} pts</span></div>
             <div class="risk-item"><span class="risk-label">REWARD</span><span class="risk-value">{data['reward_points']} pts</span></div>
             <div class="risk-item"><span class="risk-label">R:R RATIO</span><span class="risk-value">1:{data['risk_reward_ratio']}</span></div>
 """
         else:
             html += """
-            <div class="risk-item" style="grid-column:1/-1;">
-                <span class="risk-label">STOP LOSS</span>
-                <span class="risk-value" style="color:#ffb74d;">Use option premium as max loss (credit strategy)</span>
-            </div>
+            <div class="risk-item" style="grid-column:1/-1;"><span class="risk-label">STOP LOSS</span><span class="risk-value" style="color:#ffb74d;">Use option premium as max loss (credit strategy)</span></div>
 """
         html += """
         </div>
@@ -1051,11 +973,9 @@ class NiftyHTMLAnalyzer:
     def save_html_to_file(self, filename='index.html'):
         try:
             print(f"\n📄 Saving HTML to {filename}...")
-            html_content = self.generate_html_email()
             with open(filename, 'w', encoding='utf-8') as f:
-                f.write(html_content)
+                f.write(self.generate_html_email())
             print(f"   ✅ Saved {filename}")
-
             metadata = {
                 'timestamp':         self.html_data['timestamp'],
                 'current_price':     float(self.html_data['current_price']),
@@ -1081,19 +1001,16 @@ class NiftyHTMLAnalyzer:
         gmail_password = os.getenv('GMAIL_APP_PASSWORD')
         recipient1     = os.getenv('RECIPIENT_EMAIL_1')
         recipient2     = os.getenv('RECIPIENT_EMAIL_2')
-
         if not all([gmail_user, gmail_password, recipient1, recipient2]):
             print("\n⚠️  Email credentials not set. Skipping.")
             return False
-
         try:
             ist_now = datetime.now(pytz.timezone('Asia/Kolkata'))
-            html_content = self.generate_html_email()
             msg = MIMEMultipart('alternative')
             msg['From']    = gmail_user
             msg['To']      = f"{recipient1}, {recipient2}"
             msg['Subject'] = f"📊 Nifty 50 OI & Technical Report - {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
-            msg.attach(MIMEText(html_content, 'html'))
+            msg.attach(MIMEText(self.generate_html_email(), 'html'))
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
                 server.login(gmail_user, gmail_password)
                 server.send_message(msg)
@@ -1129,8 +1046,8 @@ class NiftyHTMLAnalyzer:
 def main():
     try:
         print("\n🚀 Starting Nifty 50 Analysis (Tuesday expiry + auto-fallback)...\n")
-        analyzer        = NiftyHTMLAnalyzer()
-        option_analysis = analyzer.generate_full_report()
+        analyzer = NiftyHTMLAnalyzer()
+        analyzer.generate_full_report()
 
         print("\n" + "=" * 80)
         save_success = analyzer.save_html_to_file('index.html')
