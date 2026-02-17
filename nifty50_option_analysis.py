@@ -318,6 +318,93 @@ class NiftyHTMLAnalyzer:
         
         return round(stop_loss, 0) if stop_loss else None
     
+    
+    def select_best_technical_strategy(self, bias, option_strategies):
+        """Select the best strategy based on technical analysis"""
+        if bias == "BULLISH":
+            for strategy in option_strategies:
+                if strategy['name'] == 'Bull Call Spread':
+                    return strategy
+            return option_strategies[0]
+        elif bias == "BEARISH":
+            for strategy in option_strategies:
+                if strategy['name'] == 'Bear Put Spread':
+                    return strategy
+            return option_strategies[0]
+        else:  # SIDEWAYS
+            for strategy in option_strategies:
+                if strategy['name'] == 'Iron Condor':
+                    return strategy
+            return option_strategies[0]
+    
+    def select_best_oi_strategy(self, oi_direction, atm_strike):
+        """Select strategy based on Change in Open Interest"""
+        if "Strong Bullish" in oi_direction or oi_direction == "Bullish":
+            return {
+                'name': 'Long Call',
+                'market_bias': 'Bullish',
+                'type': 'Debit',
+                'risk': 'High',
+                'max_profit': 'Unlimited',
+                'max_loss': 'Premium Paid',
+                'description': f'Buy {atm_strike} CE',
+                'best_for': 'Put build-up indicates bullish momentum',
+                'signal': '🟢 Institutional buying interest detected',
+                'time_horizon': 'Intraday to 1-2 days'
+            }
+        elif "Strong Bearish" in oi_direction or oi_direction == "Bearish":
+            return {
+                'name': 'Long Put',
+                'market_bias': 'Bearish',
+                'type': 'Debit',
+                'risk': 'High',
+                'max_profit': 'Huge (to ₹0)',
+                'max_loss': 'Premium Paid',
+                'description': f'Buy {atm_strike} PE',
+                'best_for': 'Call build-up indicates bearish momentum',
+                'signal': '🔴 Institutional selling interest detected',
+                'time_horizon': 'Intraday to 1-2 days'
+            }
+        elif "High Volatility" in oi_direction:
+            return {
+                'name': 'Long Straddle',
+                'market_bias': 'Volatile',
+                'type': 'Debit',
+                'risk': 'High',
+                'max_profit': 'Unlimited',
+                'max_loss': 'Premium Paid',
+                'description': f'Buy {atm_strike} CE + {atm_strike} PE',
+                'best_for': 'Both Calls & Puts building',
+                'signal': '🟡 Big move expected, direction uncertain',
+                'time_horizon': 'Intraday'
+            }
+        elif "Unwinding" in oi_direction:
+            return {
+                'name': 'Iron Butterfly',
+                'market_bias': 'Neutral',
+                'type': 'Credit',
+                'risk': 'Low',
+                'max_profit': 'Premium Received',
+                'max_loss': 'Capped',
+                'description': f'Sell {atm_strike} CE + PE, Buy {atm_strike+100} CE + {atm_strike-100} PE',
+                'best_for': 'Unwinding suggests reduced volatility',
+                'signal': '🟡 Position squaring, range-bound expected',
+                'time_horizon': 'Intraday'
+            }
+        else:
+            return {
+                'name': 'Vertical Spread',
+                'market_bias': 'Moderate',
+                'type': 'Debit',
+                'risk': 'Moderate',
+                'max_profit': 'Capped',
+                'max_loss': 'Limited',
+                'description': f'Vertical spread near {atm_strike}',
+                'best_for': 'Balanced OI changes',
+                'signal': '🟡 Moderate directional move expected',
+                'time_horizon': '1-2 days'
+            }
+
     # ==================== ANALYSIS & DATA COLLECTION ====================
     
     def generate_analysis_data(self, technical, option_analysis):
@@ -428,13 +515,15 @@ class NiftyHTMLAnalyzer:
                 pcr_badge = "neutral"
                 pcr_icon = "🟡"
         
-        # Trading recommendations
+        # Trading recommendations with comprehensive strategies
         if option_analysis:
             max_ce_strike = option_analysis['max_ce_oi_strike']
             max_pe_strike = option_analysis['max_pe_oi_strike']
         else:
             max_ce_strike = int(current/50)*50 + 200
             max_pe_strike = int(current/50)*50 - 200
+        
+        atm_strike = int(current/50)*50
         
         if bias == "BULLISH":
             entry_high = current
@@ -447,7 +536,39 @@ class NiftyHTMLAnalyzer:
             target_1 = resistance
             target_2 = max_ce_strike
             stop_loss = self.calculate_smart_stop_loss(current, support, resistance, "BULLISH")
-            option_play = f"Buy {int(current/50)*50 + 50} CE"
+            
+            option_strategies = [
+                {
+                    'name': 'Long Call',
+                    'market_bias': 'Bullish',
+                    'type': 'Debit',
+                    'risk': 'High',
+                    'max_profit': 'Unlimited',
+                    'max_loss': 'Premium Paid',
+                    'description': f'Buy {atm_strike} CE',
+                    'best_for': 'Strong upward momentum expected'
+                },
+                {
+                    'name': 'Bull Call Spread',
+                    'market_bias': 'Bullish',
+                    'type': 'Debit',
+                    'risk': 'Moderate',
+                    'max_profit': 'Capped',
+                    'max_loss': 'Premium Paid',
+                    'description': f'Buy {atm_strike} CE, Sell {atm_strike + 200} CE',
+                    'best_for': 'Moderate upside with limited risk'
+                },
+                {
+                    'name': 'Bull Put Spread',
+                    'market_bias': 'Bullish',
+                    'type': 'Credit',
+                    'risk': 'Moderate',
+                    'max_profit': 'Premium Received',
+                    'max_loss': 'Capped',
+                    'description': f'Sell {atm_strike - 100} PE, Buy {atm_strike - 200} PE',
+                    'best_for': 'Expect market to stay above support'
+                }
+            ]
             
         elif bias == "BEARISH":
             entry_low = current
@@ -460,7 +581,39 @@ class NiftyHTMLAnalyzer:
             target_1 = support
             target_2 = max_pe_strike
             stop_loss = self.calculate_smart_stop_loss(current, support, resistance, "BEARISH")
-            option_play = f"Buy {int(current/50)*50 - 50} PE"
+            
+            option_strategies = [
+                {
+                    'name': 'Long Put',
+                    'market_bias': 'Bearish',
+                    'type': 'Debit',
+                    'risk': 'High',
+                    'max_profit': 'Huge (to ₹0)',
+                    'max_loss': 'Premium Paid',
+                    'description': f'Buy {atm_strike} PE',
+                    'best_for': 'Strong downward momentum expected'
+                },
+                {
+                    'name': 'Bear Put Spread',
+                    'market_bias': 'Bearish',
+                    'type': 'Debit',
+                    'risk': 'Moderate',
+                    'max_profit': 'Capped',
+                    'max_loss': 'Premium Paid',
+                    'description': f'Buy {atm_strike} PE, Sell {atm_strike - 200} PE',
+                    'best_for': 'Moderate downside with limited risk'
+                },
+                {
+                    'name': 'Bear Call Spread',
+                    'market_bias': 'Bearish',
+                    'type': 'Credit',
+                    'risk': 'Moderate',
+                    'max_profit': 'Premium Received',
+                    'max_loss': 'Capped',
+                    'description': f'Sell {atm_strike + 100} CE, Buy {atm_strike + 200} CE',
+                    'best_for': 'Expect market to stay below resistance'
+                }
+            ]
             
         else:  # SIDEWAYS
             entry_low = support
@@ -468,7 +621,49 @@ class NiftyHTMLAnalyzer:
             target_1 = (support + resistance) / 2
             target_2 = target_1
             stop_loss = None
-            option_play = "Iron Condor (see strategy)"
+            
+            option_strategies = [
+                {
+                    'name': 'Iron Condor',
+                    'market_bias': 'Neutral',
+                    'type': 'Credit',
+                    'risk': 'Low',
+                    'max_profit': 'Premium Received',
+                    'max_loss': 'Capped',
+                    'description': f'Sell {atm_strike + 100} CE + Buy {atm_strike + 200} CE, Sell {atm_strike - 100} PE + Buy {atm_strike - 200} PE',
+                    'best_for': 'Expect low volatility, range-bound market'
+                },
+                {
+                    'name': 'Iron Butterfly',
+                    'market_bias': 'Neutral',
+                    'type': 'Credit',
+                    'risk': 'Low',
+                    'max_profit': 'Premium Received',
+                    'max_loss': 'Capped',
+                    'description': f'Sell {atm_strike} CE + Sell {atm_strike} PE, Buy {atm_strike + 100} CE + Buy {atm_strike - 100} PE',
+                    'best_for': 'Expect price to remain near ATM strike'
+                },
+                {
+                    'name': 'Short Straddle',
+                    'market_bias': 'Neutral',
+                    'type': 'Credit',
+                    'risk': 'Very High',
+                    'max_profit': 'Premium Received',
+                    'max_loss': 'Unlimited',
+                    'description': f'Sell {atm_strike} CE + Sell {atm_strike} PE',
+                    'best_for': 'ONLY for experienced traders!'
+                },
+                {
+                    'name': 'Long Strangle',
+                    'market_bias': 'Volatile',
+                    'type': 'Debit',
+                    'risk': 'High',
+                    'max_profit': 'Unlimited',
+                    'max_loss': 'Premium Paid',
+                    'description': f'Buy {atm_strike + 100} CE + Buy {atm_strike - 100} PE',
+                    'best_for': 'Expect big move but unsure of direction'
+                }
+            ]
         
         # Calculate risk-reward ratio
         if stop_loss and bias != "SIDEWAYS":
@@ -531,24 +726,18 @@ class NiftyHTMLAnalyzer:
             'risk_points': int(risk_points),
             'reward_points': int(reward_points),
             'risk_reward_ratio': risk_reward_ratio,
-            'option_play': option_play,
+            'option_strategies': option_strategies,
+            'recommended_technical_strategy': self.select_best_technical_strategy(bias, option_strategies),
+            'recommended_oi_strategy': self.select_best_oi_strategy(
+                option_analysis['oi_direction'] if option_analysis else 'Neutral',
+                atm_strike
+            ) if option_analysis else None,
             'top_ce_strikes': option_analysis['top_ce_strikes'] if option_analysis else [],
             'top_pe_strikes': option_analysis['top_pe_strikes'] if option_analysis else [],
             'has_option_data': option_analysis is not None
         }
         
-        # Special handling for Iron Condor
-        if bias == "SIDEWAYS":
-            sell_ce = int(resistance/50)*50
-            sell_pe = int(support/50)*50
-            self.html_data['iron_condor'] = {
-                'sell_ce': sell_ce,
-                'sell_pe': sell_pe,
-                'buy_ce': sell_ce + 50,
-                'buy_pe': sell_pe - 50,
-                'profit_low': support,
-                'profit_high': resistance
-            }
+
     
     # ==================== HTML GENERATION - ENHANCED WITH DIRECTION LOGIC ====================
     
@@ -1312,110 +1501,8 @@ class NiftyHTMLAnalyzer:
             <div class="recommendation-box">
 """
         
-        if data['strategy_type'] == "BULLISH":
-            html += f"""
-                <div class="rec-title">{data['bias_icon']} LONG / BUY Strategy</div>
-                <div class="rec-grid">
-                    <div class="rec-card">
-                        <div class="rec-label">Entry Zone</div>
-                        <div class="rec-value">₹{data['entry_low']:,.0f} - ₹{data['entry_high']:,.0f}</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Target 1</div>
-                        <div class="rec-value">₹{data['target_1']:,.0f}</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Target 2</div>
-                        <div class="rec-value">₹{data['target_2']:,}</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Stop Loss</div>
-                        <div class="rec-value stop-loss">₹{data['stop_loss']:,.0f}</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Option Play</div>
-                        <div class="rec-value" style="font-size: 16px;">{data['option_play']}</div>
-                    </div>
-                </div>
-                <div class="risk-box">
-                    <div class="risk-item">
-                        <span class="risk-label">RISK</span>
-                        <span class="risk-value">{data['risk_points']} pts</span>
-                    </div>
-                    <div class="risk-item">
-                        <span class="risk-label">REWARD</span>
-                        <span class="risk-value">{data['reward_points']} pts</span>
-                    </div>
-                    <div class="risk-item">
-                        <span class="risk-label">R:R RATIO</span>
-                        <span class="risk-value">1:{data['risk_reward_ratio']}</span>
-                    </div>
-                </div>
-"""
-        elif data['strategy_type'] == "BEARISH":
-            html += f"""
-                <div class="rec-title">{data['bias_icon']} SHORT / SELL Strategy</div>
-                <div class="rec-grid">
-                    <div class="rec-card">
-                        <div class="rec-label">Entry Zone</div>
-                        <div class="rec-value">₹{data['entry_low']:,.0f} - ₹{data['entry_high']:,.0f}</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Target 1</div>
-                        <div class="rec-value">₹{data['target_1']:,.0f}</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Target 2</div>
-                        <div class="rec-value">₹{data['target_2']:,}</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Stop Loss</div>
-                        <div class="rec-value stop-loss">₹{data['stop_loss']:,.0f}</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Option Play</div>
-                        <div class="rec-value" style="font-size: 16px;">{data['option_play']}</div>
-                    </div>
-                </div>
-                <div class="risk-box">
-                    <div class="risk-item">
-                        <span class="risk-label">RISK</span>
-                        <span class="risk-value">{data['risk_points']} pts</span>
-                    </div>
-                    <div class="risk-item">
-                        <span class="risk-label">REWARD</span>
-                        <span class="risk-value">{data['reward_points']} pts</span>
-                    </div>
-                    <div class="risk-item">
-                        <span class="risk-label">R:R RATIO</span>
-                        <span class="risk-value">1:{data['risk_reward_ratio']}</span>
-                    </div>
-                </div>
-"""
-        else:  # SIDEWAYS
-            ic = data['iron_condor']
-            html += f"""
-                <div class="rec-title">{data['bias_icon']} IRON CONDOR (Range Trading)</div>
-                <div class="rec-grid">
-                    <div class="rec-card">
-                        <div class="rec-label">Sell Options</div>
-                        <div class="rec-value" style="font-size: 15px;">{ic['sell_ce']} CE + {ic['sell_pe']} PE</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Buy Options</div>
-                        <div class="rec-value" style="font-size: 15px;">{ic['buy_ce']} CE + {ic['buy_pe']} PE</div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-label">Profit Zone</div>
-                        <div class="rec-value">₹{ic['profit_low']:,.0f} - ₹{ic['profit_high']:,.0f}</div>
-                    </div>
-                </div>
-"""
-        
-        html += """
-            </div>
-        </div>
-"""
+        # TRADING RECOMMENDATIONS (Dual Strategy)
+        html += self.generate_dual_recommendations_html(data)
 
         # TOP STRIKES TABLE
         if data['has_option_data'] and (data['top_ce_strikes'] or data['top_pe_strikes']):
@@ -1506,7 +1593,205 @@ class NiftyHTMLAnalyzer:
         
         return html
     
-    # ==================== FILE SAVING ====================
+    def generate_dual_recommendations_html(self, data):
+        """Generate HTML for dual strategy recommendations"""
+        
+        html = """
+        <!-- TRADING RECOMMENDATIONS -->
+        <div class="section">
+            <div class="section-title">
+                <span>💡</span> TRADING RECOMMENDATIONS (Dual Strategy Approach)
+            </div>
+            
+            <p style="color: #80deea; font-size: 13px; margin-bottom: 20px; line-height: 1.7;">
+                We provide <strong>TWO independent strategy recommendations</strong> based on different analysis methods:
+            </p>
+"""
+        
+        # RECOMMENDATION 1: TECHNICAL ANALYSIS
+        tech_strategy = data['recommended_technical_strategy']
+        tech_bias_class = 'positive' if 'Bull' in tech_strategy['name'] else 'negative' if 'Bear' in tech_strategy['name'] else 'neutral'
+        tech_border = '#00bcd4' if tech_bias_class == 'positive' else '#f44336' if tech_bias_class == 'negative' else '#ffb74d'
+        
+        html += f"""
+            <!-- Recommendation 1: Technical Analysis -->
+            <div style="background: linear-gradient(135deg, rgba(15, 32, 39, 0.8) 0%, rgba(32, 58, 67, 0.6) 100%); 
+                        padding: 25px; border-radius: 14px; margin-bottom: 20px; 
+                        border: 2px solid {tech_border}; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="color: #4fc3f7; font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <span>1️⃣</span> TECHNICAL ANALYSIS STRATEGY
+                    </h3>
+                    <span style="background: rgba(79, 195, 247, 0.2); color: #4fc3f7; padding: 6px 14px; 
+                                 border-radius: 8px; font-size: 12px; font-weight: 600;">
+                        Positional • 1-5 Days
+                    </span>
+                </div>
+                
+                <div style="background: rgba(79, 195, 247, 0.08); padding: 20px; border-radius: 10px; border-left: 4px solid {tech_border};">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Strategy</div>
+                            <div style="color: #ffffff; font-size: 18px; font-weight: 700;">{tech_strategy['name']}</div>
+                        </div>
+                        <div>
+                            <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Market Bias</div>
+                            <span class="card-change {tech_bias_class}" style="display: inline-block;">{tech_strategy['market_bias']}</span>
+                        </div>
+                        <div>
+                            <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Type</div>
+                            <div style="color: #ffffff; font-size: 16px; font-weight: 600;">{tech_strategy['type']}</div>
+                        </div>
+                        <div>
+                            <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Risk Profile</div>
+                            <div style="color: #ffb74d; font-size: 16px; font-weight: 600;">{tech_strategy['risk']}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(15, 32, 39, 0.6); padding: 15px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="color: #4fc3f7; font-size: 12px; font-weight: 600; margin-bottom: 8px;">📋 SETUP</div>
+                        <div style="color: #ffffff; font-size: 15px; font-weight: 500;">{tech_strategy['description']}</div>
+                    </div>
+                    
+                    <div style="color: #80deea; font-size: 13px; line-height: 1.6;">
+                        <strong style="color: #4fc3f7;">💡 Why This Strategy?</strong> {tech_strategy['best_for']}
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 15px;">
+                    <div style="background: rgba(0, 188, 212, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #00bcd4;">
+                        <div style="color: #80deea; font-size: 10px; margin-bottom: 4px;">MAX PROFIT</div>
+                        <div style="color: #00bcd4; font-size: 14px; font-weight: 700;">{tech_strategy['max_profit']}</div>
+                    </div>
+                    <div style="background: rgba(244, 67, 54, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #f44336;">
+                        <div style="color: #80deea; font-size: 10px; margin-bottom: 4px;">MAX LOSS</div>
+                        <div style="color: #f44336; font-size: 14px; font-weight: 700;">{tech_strategy['max_loss']}</div>
+                    </div>
+                </div>
+            </div>
+"""
+        
+        # RECOMMENDATION 2: OI-BASED STRATEGY
+        if data['recommended_oi_strategy']:
+            oi_strategy = data['recommended_oi_strategy']
+            oi_bias_class = 'positive' if oi_strategy['market_bias'] == 'Bullish' else 'negative' if oi_strategy['market_bias'] == 'Bearish' else 'neutral'
+            oi_border = '#00bcd4' if oi_bias_class == 'positive' else '#f44336' if oi_bias_class == 'negative' else '#ffb74d'
+            
+            html += f"""
+            <!-- Recommendation 2: OI-Based -->
+            <div style="background: linear-gradient(135deg, rgba(15, 32, 39, 0.8) 0%, rgba(32, 58, 67, 0.6) 100%); 
+                        padding: 25px; border-radius: 14px; margin-bottom: 20px; 
+                        border: 2px solid {oi_border}; box-shadow: 0 8px 20px rgba(0,0,0,0.3);">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="color: #4fc3f7; font-size: 18px; margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <span>2️⃣</span> OPEN INTEREST MOMENTUM STRATEGY
+                    </h3>
+                    <span style="background: rgba(255, 183, 77, 0.2); color: #ffb74d; padding: 6px 14px; 
+                                 border-radius: 8px; font-size: 12px; font-weight: 600;">
+                        {oi_strategy.get('time_horizon', 'Intraday')}
+                    </span>
+                </div>
+                
+                <div style="background: rgba(255, 183, 77, 0.08); padding: 20px; border-radius: 10px; border-left: 4px solid {oi_border};">
+                    <div style="background: rgba(79, 195, 247, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="color: #4fc3f7; font-size: 12px; font-weight: 600; margin-bottom: 6px;">📊 OI SIGNAL</div>
+                        <div style="color: #ffffff; font-size: 14px;">{oi_strategy.get('signal', 'Market signal detected')}</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Strategy</div>
+                            <div style="color: #ffffff; font-size: 18px; font-weight: 700;">{oi_strategy['name']}</div>
+                        </div>
+                        <div>
+                            <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Market Bias</div>
+                            <span class="card-change {oi_bias_class}" style="display: inline-block;">{oi_strategy['market_bias']}</span>
+                        </div>
+                        <div>
+                            <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Type</div>
+                            <div style="color: #ffffff; font-size: 16px; font-weight: 600;">{oi_strategy['type']}</div>
+                        </div>
+                        <div>
+                            <div style="color: #80deea; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">Risk Profile</div>
+                            <div style="color: #ffb74d; font-size: 16px; font-weight: 600;">{oi_strategy['risk']}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(15, 32, 39, 0.6); padding: 15px; border-radius: 8px; margin-bottom: 12px;">
+                        <div style="color: #ffb74d; font-size: 12px; font-weight: 600; margin-bottom: 8px;">📋 SETUP</div>
+                        <div style="color: #ffffff; font-size: 15px; font-weight: 500;">{oi_strategy['description']}</div>
+                    </div>
+                    
+                    <div style="color: #80deea; font-size: 13px; line-height: 1.6;">
+                        <strong style="color: #ffb74d;">💡 Why This Strategy?</strong> {oi_strategy['best_for']}
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 15px;">
+                    <div style="background: rgba(0, 188, 212, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #00bcd4;">
+                        <div style="color: #80deea; font-size: 10px; margin-bottom: 4px;">MAX PROFIT</div>
+                        <div style="color: #00bcd4; font-size: 14px; font-weight: 700;">{oi_strategy['max_profit']}</div>
+                    </div>
+                    <div style="background: rgba(244, 67, 54, 0.1); padding: 12px; border-radius: 8px; border-left: 3px solid #f44336;">
+                        <div style="color: #80deea; font-size: 10px; margin-bottom: 4px;">MAX LOSS</div>
+                        <div style="color: #f44336; font-size: 14px; font-weight: 700;">{oi_strategy['max_loss']}</div>
+                    </div>
+                </div>
+            </div>
+"""
+        
+        # KEY TRADING LEVELS
+        html += f"""
+            <!-- Key Trading Levels -->
+            <div class="risk-box" style="margin-top: 20px;">
+                <div style="grid-column: 1 / -1; margin-bottom: 12px;">
+                    <h4 style="color: #ffb74d; font-size: 15px; margin: 0;">📍 KEY TRADING LEVELS</h4>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label">ENTRY ZONE</span>
+                    <span class="risk-value">₹{data['entry_low']:,.0f} - ₹{data['entry_high']:,.0f}</span>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label">TARGET 1</span>
+                    <span class="risk-value">₹{data['target_1']:,.0f}</span>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label">TARGET 2</span>
+                    <span class="risk-value">₹{data['target_2']:,.0f}</span>
+                </div>
+"""
+        
+        if data['stop_loss']:
+            html += f"""
+                <div class="risk-item">
+                    <span class="risk-label">STOP LOSS</span>
+                    <span class="risk-value" style="color: #f44336;">₹{data['stop_loss']:,.0f}</span>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label">RISK</span>
+                    <span class="risk-value">{data['risk_points']} pts</span>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label">REWARD</span>
+                    <span class="risk-value">{data['reward_points']} pts</span>
+                </div>
+                <div class="risk-item">
+                    <span class="risk-label">R:R RATIO</span>
+                    <span class="risk-value">1:{data['risk_reward_ratio']}</span>
+                </div>
+"""
+        
+        html += """
+            </div>
+        </div>
+"""
+        
+        return html
+
+
+        # ==================== FILE SAVING ====================
     
     def save_html_to_file(self, filename='index.html'):
         """Save HTML report to file for GitHub Pages"""
