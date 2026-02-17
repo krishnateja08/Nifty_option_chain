@@ -4,281 +4,490 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nifty 50 Daily Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* ── RESET & BASE ── */
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
-              background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);
-              min-height:100vh;padding:20px;color:#b0bec5;}
-        .container{max-width:1200px;margin:0 auto;background:rgba(15,32,39,0.95);
-                    border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);
-                    border:1px solid rgba(79,195,247,0.2);}
-        .header{background:linear-gradient(135deg,#0f2027,#203a43);padding:40px 30px;
-                 text-align:center;border-bottom:3px solid #4fc3f7;position:relative;overflow:hidden;}
-        .header::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
-                         background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.1) 0%,transparent 70%);
-                         pointer-events:none;}
-        .header h1{font-size:32px;font-weight:700;color:#4fc3f7;margin-bottom:10px;
-                    text-shadow:0 0 20px rgba(79,195,247,0.5);position:relative;z-index:1;}
-        .header p{color:#80deea;font-size:14px;opacity:0.9;position:relative;z-index:1;}
-        .section{padding:25px;border-bottom:1px solid rgba(79,195,247,0.1);}
+        body{
+            font-family:'Rajdhani',sans-serif;
+            background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);
+            min-height:100vh; padding:20px; color:#b0bec5;
+        }
+        .container{
+            max-width:1200px; margin:0 auto;
+            background:rgba(15,32,39,0.85);
+            backdrop-filter:blur(20px);
+            border-radius:20px; overflow:hidden;
+            box-shadow:0 20px 60px rgba(0,0,0,0.5);
+            border:1px solid rgba(79,195,247,0.18);
+        }
+
+        /* ── HEADER ── */
+        .header{
+            background:linear-gradient(135deg,#0f2027,#203a43);
+            padding:40px 30px; text-align:center;
+            border-bottom:2px solid rgba(79,195,247,0.3);
+            position:relative; overflow:hidden;
+        }
+        .header::before{
+            content:''; position:absolute; inset:0;
+            background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);
+            pointer-events:none;
+        }
+        .header h1{
+            font-family:'Oxanium',sans-serif;
+            font-size:30px; font-weight:800; color:#4fc3f7;
+            text-shadow:0 0 30px rgba(79,195,247,0.5);
+            letter-spacing:2px; position:relative; z-index:1;
+        }
+        .header p{color:#80deea;font-size:13px;margin-top:8px;position:relative;z-index:1;}
+
+        /* ── SECTIONS ── */
+        .section{padding:28px 26px;border-bottom:1px solid rgba(79,195,247,0.08);}
         .section:last-child{border-bottom:none;}
-        .section-title{font-size:18px;font-weight:600;margin-bottom:20px;color:#4fc3f7;
-                         display:flex;align-items:center;gap:10px;
-                         padding-bottom:10px;border-bottom:2px solid rgba(79,195,247,0.3);}
-        .section-title span{font-size:22px;}
-        .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:20px;}
-        .card{background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));
-               border-radius:12px;padding:14px;border:1.5px solid rgba(79,195,247,0.25);
-               transition:all 0.3s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;}
-        .card::before{content:'';position:absolute;top:0;left:0;width:100%;height:4px;
-                       background:linear-gradient(90deg,#4fc3f7,#26c6da);
-                       transform:scaleX(0);transform-origin:left;transition:transform 0.3s ease;}
-        .card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(79,195,247,0.25);border-color:#4fc3f7;}
-        .card:hover::before{transform:scaleX(1);}
-        .card-icon{font-size:24px;margin-bottom:8px;display:block;}
-        .card-label{font-size:10px;color:#80deea;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600;}
-        .card-value{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px;text-shadow:0 2px 4px rgba(0,0,0,0.3);}
-        .card-change{font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;}
-        .card-change.positive{color:#00bcd4;background:rgba(0,188,212,0.15);}
-        .card-change.negative{color:#f44336;background:rgba(244,67,54,0.15);}
-        .card-change.neutral{color:#ffb74d;background:rgba(255,183,77,0.15);}
-        .card.bullish{border-left:4px solid #00bcd4;}
-        .card.bearish{border-left:4px solid #f44336;}
-        .card.neutral{border-left:4px solid #ffb74d;}
-        .card.highlight{background:linear-gradient(135deg,rgba(79,195,247,0.15),rgba(79,195,247,0.05));border:2px solid #4fc3f7;}
-        .direction-box{padding:30px;border-radius:14px;text-align:center;margin:20px 0;
-                        border:2px solid #4fc3f7;background:linear-gradient(135deg,#0f2027,#2c5364);}
-        .direction-box.bullish{background:linear-gradient(135deg,#00bcd4,#26c6da);border-color:#00bcd4;box-shadow:0 0 30px rgba(0,188,212,0.4);}
-        .direction-box.bearish{background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.4);}
-        .direction-box.sideways{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.4);}
-        .direction-box.neutral{background:linear-gradient(135deg,#1a3a4a,#1e4d5e);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.25);}
-        .direction-title{font-size:30px;font-weight:700;margin-bottom:10px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.4);}
-        .direction-subtitle{font-size:14px;opacity:0.9;color:#e0f7fa;font-weight:600;}
+        .section-title{
+            font-family:'Oxanium',sans-serif;
+            font-size:13px; font-weight:700; letter-spacing:2.5px; color:#4fc3f7;
+            text-transform:uppercase; display:flex; align-items:center; gap:10px;
+            margin-bottom:20px; padding-bottom:12px;
+            border-bottom:1px solid rgba(79,195,247,0.18);
+        }
+        .section-title span{font-size:18px;}
+
+        /* ── GLASS CARD BASE ── */
+        .g{
+            background:rgba(255,255,255,0.04);
+            backdrop-filter:blur(20px);
+            -webkit-backdrop-filter:blur(20px);
+            border:1px solid rgba(79,195,247,0.18);
+            border-radius:16px;
+            position:relative; overflow:hidden;
+            transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+        /* top shimmer line */
+        .g::before{
+            content:''; position:absolute; top:0; left:0; right:0; height:1px;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
+            z-index:1;
+        }
+        /* sweep shimmer on hover */
+        .g::after{
+            content:''; position:absolute; top:-60%; left:-30%; width:50%; height:200%;
+            background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);
+            transform:skewX(-15deg); transition:left 0.6s ease; z-index:0;
+        }
+        .g:hover::after{left:130%;}
+        .g:hover{
+            background:rgba(79,195,247,0.09);
+            border-color:rgba(79,195,247,0.45);
+            box-shadow:0 12px 40px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.1);
+            transform:translateY(-4px);
+        }
+        .g-hi{background:rgba(79,195,247,0.09);border-color:rgba(79,195,247,0.35);}
+        .g-red{background:rgba(244,67,54,0.06);border-color:rgba(244,67,54,0.25);}
+        .g-red:hover{background:rgba(244,67,54,0.1);border-color:rgba(244,67,54,0.45);}
+
+        /* ── STAT CARD + BAR (Layout 4) ── */
+        .card-grid{display:grid;gap:14px;}
+        .grid-5{grid-template-columns:repeat(5,1fr);}
+        .grid-4{grid-template-columns:repeat(4,1fr);}
+
+        .g .card-top-row{
+            display:flex; align-items:center; gap:10px;
+            margin-bottom:10px; position:relative; z-index:2;
+        }
+        .card-ico{font-size:22px;line-height:1;}
+        .lbl{
+            font-size:9px; letter-spacing:2.5px; color:rgba(128,222,234,0.65);
+            text-transform:uppercase; font-weight:600; line-height:1.3;
+        }
+        .val{
+            font-family:'Oxanium',sans-serif; font-size:24px; font-weight:700;
+            color:#fff; display:block; margin-bottom:10px; position:relative; z-index:2;
+            padding:0 16px;
+        }
+
+        /* progress bar */
+        .bar-wrap{
+            height:5px; background:rgba(0,0,0,0.35);
+            border-radius:3px; margin:0 16px 12px; overflow:hidden;
+            position:relative; z-index:2;
+        }
+        .bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+        .bar-teal{background:linear-gradient(90deg,#00bcd4,#4fc3f7);box-shadow:0 0 8px rgba(79,195,247,0.6);}
+        .bar-red {background:linear-gradient(90deg,#f44336,#ff5722);box-shadow:0 0 8px rgba(244,67,54,0.5);}
+        .bar-gold{background:linear-gradient(90deg,#ffb74d,#ffd54f);box-shadow:0 0 8px rgba(255,183,77,0.5);}
+        .bar-grn {background:linear-gradient(90deg,#00e676,#00bcd4);box-shadow:0 0 8px rgba(0,230,118,0.5);}
+
+        /* card footer: sub-text + badge */
+        .card-foot{
+            display:flex; justify-content:space-between; align-items:center;
+            padding:0 16px 14px; position:relative; z-index:2;
+        }
+        .sub{font-size:10px;color:#455a64;font-family:'JetBrains Mono',monospace;}
+
+        /* badge pills */
+        .tag{
+            display:inline-flex; align-items:center;
+            padding:3px 11px; border-radius:20px; font-size:11px; font-weight:700;
+            letter-spacing:0.5px; font-family:'Rajdhani',sans-serif;
+        }
+        .tag-neu {background:rgba(255,183,77,0.15); color:#ffb74d; border:1px solid rgba(255,183,77,0.35);}
+        .tag-bull{background:rgba(0,229,255,0.12);  color:#00e5ff; border:1px solid rgba(0,229,255,0.35);}
+        .tag-bear{background:rgba(255,82,82,0.12);  color:#ff5252; border:1px solid rgba(255,82,82,0.35);}
+
+        /* ── DIRECTION BOX ── */
+        .direction-box{
+            padding:28px; border-radius:14px; text-align:center; margin:20px 0;
+            border:2px solid #4fc3f7;
+            background:rgba(79,195,247,0.06);
+            backdrop-filter:blur(10px);
+        }
+        .direction-box.bullish {background:linear-gradient(135deg,#00bcd4,#26c6da);border-color:#00bcd4;box-shadow:0 0 30px rgba(0,188,212,0.35);}
+        .direction-box.bearish {background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.35);}
+        .direction-box.sideways{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.35);}
+        .direction-box.neutral {background:rgba(79,195,247,0.08);border-color:#4fc3f7;}
+        .direction-title{font-family:'Oxanium',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;color:#fff;}
         .direction-box.bullish .direction-title,
         .direction-box.bearish .direction-title,
-        .direction-box.sideways .direction-title{color:#000;text-shadow:none;}
+        .direction-box.sideways .direction-title{color:#000;}
+        .direction-subtitle{font-size:13px;opacity:0.9;color:#e0f7fa;font-weight:600;}
         .direction-box.bullish .direction-subtitle,
         .direction-box.bearish .direction-subtitle,
         .direction-box.sideways .direction-subtitle{color:#000;}
-        .logic-box{background:rgba(79,195,247,0.1);padding:18px;border-radius:10px;margin-top:20px;border-left:4px solid #4fc3f7;}
-        .logic-box p{font-size:13px;line-height:1.8;color:#80deea;margin:0;}
+
+        /* ── LOGIC BOX ── */
+        .logic-box{
+            background:rgba(79,195,247,0.07);
+            backdrop-filter:blur(8px);
+            padding:16px 18px; border-radius:10px; margin-top:18px;
+            border-left:4px solid #4fc3f7;
+        }
+        .logic-box p{font-size:13px;line-height:1.9;color:#80deea;}
         .logic-box strong{color:#4fc3f7;}
-        .levels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:20px;}
-        .level-card{background:rgba(15,32,39,0.6);border-radius:10px;padding:14px;
-                     display:flex;justify-content:space-between;align-items:center;border:1.5px solid;transition:all 0.3s ease;}
-        .level-card:hover{transform:translateX(6px);}
-        .level-card.resistance{border-color:rgba(244,67,54,0.5);border-left:4px solid #f44336;background:linear-gradient(90deg,rgba(244,67,54,0.1),rgba(244,67,54,0.05));}
-        .level-card.support{border-color:rgba(0,188,212,0.5);border-left:4px solid #00bcd4;background:linear-gradient(90deg,rgba(0,188,212,0.1),rgba(0,188,212,0.05));}
-        .level-card.current{border-color:#4fc3f7;border-left:4px solid #4fc3f7;background:linear-gradient(90deg,rgba(79,195,247,0.2),rgba(79,195,247,0.1));}
-        .level-name{font-weight:600;font-size:12px;color:#b0bec5;}
-        .level-value{font-weight:700;font-size:16px;color:#fff;}
-        .strikes-table{width:100%;border-collapse:collapse;margin-top:20px;border-radius:10px;overflow:hidden;}
-        .strikes-table th{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:16px;
-                           text-align:left;font-weight:700;font-size:13px;text-transform:uppercase;}
-        .strikes-table td{padding:16px;border-bottom:1px solid rgba(79,195,247,0.1);color:#b0bec5;font-size:14px;}
-        .strikes-table tr:hover{background:rgba(79,195,247,0.08);}
+
+        /* ── OI CHANGE CARDS ── */
+        .oi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
+
+        /* ── KEY LEVELS ── */
+        .rl-node-a{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}
+        .rl-node-b{position:absolute;top:0;transform:translateX(-50%);text-align:center;}
+        .rl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}
+        .rl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}
+        .rl-val{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}
+
+        /* ── STRATEGY CARDS ── */
+        .strat-card{
+            background:rgba(255,255,255,0.03);
+            backdrop-filter:blur(16px);
+            padding:24px; border-radius:14px; margin-bottom:18px;
+            border:1.5px solid rgba(79,195,247,0.2);
+            box-shadow:0 8px 20px rgba(0,0,0,0.25);
+        }
+        .strat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px;}
+        .strat-cell .cell-lbl{font-size:9px;letter-spacing:2px;color:#80deea;text-transform:uppercase;margin-bottom:5px;}
+        .strat-cell .cell-val{font-size:17px;font-weight:700;color:#fff;}
+        .setup-box{background:rgba(15,32,39,0.6);padding:14px;border-radius:8px;margin-bottom:12px;}
+        .setup-box .setup-lbl{font-size:11px;color:#4fc3f7;font-weight:700;margin-bottom:6px;}
+        .setup-box .setup-val{font-size:14px;font-weight:600;color:#fff;}
+        .why-text{font-size:13px;color:#80deea;}
+        .why-text strong{color:#4fc3f7;}
+        .profit-loss-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+        .pl-box{padding:12px;border-radius:8px;}
+        .pl-box .pl-lbl{font-size:9px;letter-spacing:2px;color:#80deea;text-transform:uppercase;margin-bottom:5px;}
+        .pl-box .pl-val{font-size:14px;font-weight:700;}
+        .pl-profit{background:rgba(0,188,212,0.1);border-left:3px solid #00bcd4;}
+        .pl-profit .pl-val{color:#00bcd4;}
+        .pl-loss{background:rgba(244,67,54,0.1);border-left:3px solid #f44336;}
+        .pl-loss .pl-val{color:#f44336;}
+
+        /* ── RISK BOX ── */
+        .risk-box{
+            background:rgba(255,183,77,0.08);
+            backdrop-filter:blur(8px);
+            padding:18px; border-radius:10px; margin-top:14px;
+            border-left:4px solid #ffb74d;
+            display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;
+        }
+        .risk-item{display:flex;justify-content:space-between;align-items:center;}
+        .risk-label{font-size:12px;color:#ffb74d;font-weight:700;letter-spacing:0.5px;}
+        .risk-value{font-size:16px;color:#ffb74d;font-weight:700;}
+
+        /* ── STRIKES TABLE ── */
+        .strikes-table{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}
+        .strikes-table th{
+            background:linear-gradient(135deg,#4fc3f7,#26c6da);
+            color:#000;padding:14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;
+        }
+        .strikes-table td{padding:14px;border-bottom:1px solid rgba(79,195,247,0.08);color:#b0bec5;font-size:13px;}
+        .strikes-table tr:hover{background:rgba(79,195,247,0.06);}
         .strikes-table tbody tr:last-child td{border-bottom:none;}
-        .disclaimer{background:rgba(255,183,77,0.15);padding:25px;border-radius:12px;
-                     border-left:4px solid #ffb74d;font-size:13px;color:#ffb74d;line-height:1.8;}
-        .footer{text-align:center;padding:25px;color:#607d8b;font-size:12px;background:rgba(15,32,39,0.5);}
 
-        /* ── THEME B: Fire Row — KEY TRADING LEVELS ── */
-        .fire-levels{
-            background:#0f0800;
-            border:1px solid rgba(255,109,0,0.25);
-            border-left:3px solid #ff6d00;
-            border-radius:8px;
-            padding:12px 16px;
-            display:grid;
-            grid-template-columns:auto 1fr 1fr 1fr;
-            align-items:center;
-            gap:8px;
-            margin-top:16px;
-        }
-        .fire-levels .fl-hdr{
-            font-size:10px;color:#ff6d00;letter-spacing:2px;
-            text-transform:uppercase;font-family:monospace;font-weight:700;
-            white-space:nowrap;
-        }
-        .fire-levels .fl-item{display:flex;flex-direction:column;gap:2px;padding:0 10px;border-left:1px solid rgba(255,109,0,0.12);}
-        .fire-levels .fl-lbl{font-size:9px;color:#5a2500;letter-spacing:1.5px;text-transform:uppercase;font-family:monospace;}
-        .fire-levels .fl-val{font-size:16px;font-weight:700;color:#ffab40;}
-        .fire-levels .fl-val.t1{color:#ff8f00;}
-        .fire-levels .fl-val.t2{color:#ff6d00;}
-        .fire-levels .fl-val.sl{font-size:11px;color:#bf360c;font-family:monospace;font-weight:400;line-height:1.4;}
-        .fire-levels .fl-val.rr{color:#ffd54f;font-size:13px;}
+        /* ── MARKET SNAPSHOT CARDS ── */
+        .snap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+        .snap-card{padding:18px 16px;}
+        .snap-card .card-top-row{margin-bottom:8px;}
+        .snap-card .val{font-size:26px;padding:0;margin-bottom:0;}
 
-        @media(max-width:768px){
-            .card-grid{grid-template-columns:repeat(2,1fr);}
-            .levels-grid{grid-template-columns:1fr;}
-            .header h1{font-size:24px;}
-            .direction-title{font-size:22px;}
-            body{padding:10px;}
-            .fire-levels{grid-template-columns:1fr 1fr;}
+        /* ── DISCLAIMER / FOOTER ── */
+        .disclaimer{
+            background:rgba(255,183,77,0.1);
+            backdrop-filter:blur(8px);
+            padding:22px; border-radius:12px;
+            border-left:4px solid #ffb74d;
+            font-size:13px; color:#ffb74d; line-height:1.8;
         }
-        @media(max-width:480px){.card-grid{grid-template-columns:1fr;}}
+        .footer{text-align:center;padding:24px;color:#546e7a;font-size:12px;background:rgba(10,20,28,0.4);}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:900px){
+            .grid-5{grid-template-columns:repeat(2,1fr);}
+            .grid-4{grid-template-columns:repeat(2,1fr);}
+            .snap-grid{grid-template-columns:1fr;}
+            .oi-grid{grid-template-columns:1fr;}
+        }
+        @media(max-width:480px){
+            .grid-5,.grid-4{grid-template-columns:1fr;}
+        }
     </style>
 </head>
 <body>
 <div class="container">
 
+    <!-- ── HEADER ── -->
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 04:01 IST</p>
+        <p>Generated: 18-Feb-2026 04:19 IST</p>
     </div>
 
+    <!-- ── MARKET SNAPSHOT ── -->
     <div class="section">
         <div class="section-title"><span>📈</span> MARKET SNAPSHOT</div>
-        <div class="card-grid">
-            <div class="card highlight">
-                <span class="card-icon">💹</span>
-                <div class="card-label">NIFTY 50</div>
-                <div class="card-value">₹25,725.40</div>
+        <div class="snap-grid">
+            <div class="g snap-card g-hi">
+                <div class="card-top-row"><span class="card-ico">💹</span><div class="lbl">NIFTY 50 SPOT</div></div>
+                <span class="val">₹25,725.40</span>
             </div>
-            <div class="card">
-                <span class="card-icon">🎯</span>
-                <div class="card-label">ATM STRIKE</div>
-                <div class="card-value">₹25,750</div>
+            <div class="g snap-card">
+                <div class="card-top-row"><span class="card-ico">🎯</span><div class="lbl">ATM STRIKE</div></div>
+                <span class="val">₹25,750</span>
             </div>
-            <div class="card">
-                <span class="card-icon">📅</span>
-                <div class="card-label">EXPIRY DATE</div>
-                <div class="card-value" style="font-size:20px;">24-Feb-2026</div>
+            <div class="g snap-card">
+                <div class="card-top-row"><span class="card-ico">📅</span><div class="lbl">EXPIRY DATE</div></div>
+                <span class="val" style="font-size:20px">24-Feb-2026</span>
             </div>
         </div>
     </div>
 
+    <!-- ── MARKET DIRECTION ── -->
     <div class="section">
-        <div class="section-title"><span>🎯</span> MARKET DIRECTION (Algorithmic Analysis)</div>
+        <div class="section-title"><span>🧭</span> MARKET DIRECTION (Algorithmic)</div>
         <div class="direction-box sideways">
             <div class="direction-title">↔️ SIDEWAYS</div>
-            <div class="direction-subtitle">Confidence: MEDIUM | Bullish: 3 vs Bearish: 1</div>
+            <div class="direction-subtitle">Confidence: MEDIUM &nbsp;|&nbsp; Bullish: 3 vs Bearish: 1</div>
         </div>
         <div class="logic-box">
             <p>
-                <strong>📊 Direction Logic:</strong><br>
-                • <strong>BULLISH</strong>: Score diff ≥ +3 (Price above SMAs, RSI oversold, positive MACD, high PCR)<br>
-                • <strong>BEARISH</strong>: Score diff ≤ -3 (Price below SMAs, RSI overbought, negative MACD, low PCR)<br>
-                • <strong>SIDEWAYS</strong>: Score diff between -2 and +2 (Mixed signals, consolidation phase)<br>
-                • <strong>Confidence</strong>: HIGH when gap ≥ 4, MEDIUM otherwise<br>
-                • <strong>OI Scope</strong>: All option signals computed from ATM ±10 strikes only
+                <strong>📊 Scoring Logic:</strong><br>
+                • <strong>BULLISH</strong>: Diff ≥ +3 · Price above SMAs, oversold RSI, +MACD, PCR &gt; 1.2<br>
+                • <strong>BEARISH</strong>: Diff ≤ −3 · Price below SMAs, overbought RSI, −MACD, PCR &lt; 0.7<br>
+                • <strong>SIDEWAYS</strong>: Diff −2 to +2 · Mixed signals, consolidation<br>
+                • <strong>Confidence</strong>: HIGH when gap ≥ 4 | OI scope: ATM ±10 strikes only
             </p>
         </div>
     </div>
 
+    <!-- ── TECHNICAL INDICATORS (Stat Card + Bar) ── -->
     <div class="section">
         <div class="section-title"><span>🔍</span> TECHNICAL INDICATORS</div>
-        <div class="card-grid">
-            <div class="card neutral">
-                <span class="card-icon">🟡</span>
-                <div class="card-label">RSI (14)</div>
-                <div class="card-value">58.4</div>
-                <span class="card-change neutral">Neutral</span>
+        <div class="card-grid grid-5">
+            
+            <div class="g ">
+                <div class="card-top-row">
+                    <span class="card-ico">🟡</span>
+                    <div class="lbl">RSI (14)</div>
+                </div>
+                <span class="val">58.4</span>
+                <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:58.4%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">14-period momentum</div>
+                    <span class="tag tag-neu">Neutral</span>
+                </div>
             </div>
-            <div class="card bullish">
-                <span class="card-icon">✅</span>
-                <div class="card-label">SMA 20</div>
-                <div class="card-value">₹25,518</div>
-                <span class="card-change positive">Above</span>
+            <div class="g g-hi">
+                <div class="card-top-row">
+                    <span class="card-ico">✅</span>
+                    <div class="lbl">SMA 20</div>
+                </div>
+                <span class="val">₹25,518</span>
+                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:58.1%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">20-day average</div>
+                    <span class="tag tag-bull">Above</span>
+                </div>
             </div>
-            <div class="card bearish">
-                <span class="card-icon">❌</span>
-                <div class="card-label">SMA 50</div>
-                <div class="card-value">₹25,783</div>
-                <span class="card-change negative">Below</span>
+            <div class="g g-red">
+                <div class="card-top-row">
+                    <span class="card-ico">❌</span>
+                    <div class="lbl">SMA 50</div>
+                </div>
+                <span class="val">₹25,783</span>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:47.8%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">50-day average</div>
+                    <span class="tag tag-bear">Below</span>
+                </div>
             </div>
-            <div class="card bullish">
-                <span class="card-icon">✅</span>
-                <div class="card-label">SMA 200</div>
-                <div class="card-value">₹25,304</div>
-                <span class="card-change positive">Above</span>
+            <div class="g g-hi">
+                <div class="card-top-row">
+                    <span class="card-ico">✅</span>
+                    <div class="lbl">SMA 200</div>
+                </div>
+                <span class="val">₹25,304</span>
+                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:66.6%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">200-day average</div>
+                    <span class="tag tag-bull">Above</span>
+                </div>
             </div>
-            <div class="card bullish">
-                <span class="card-icon">🟢</span>
-                <div class="card-label">MACD</div>
-                <div class="card-value">7.48</div>
-                <span class="card-change positive">Bullish</span>
+            <div class="g g-hi">
+                <div class="card-top-row">
+                    <span class="card-ico">🟢</span>
+                    <div class="lbl">MACD</div>
+                </div>
+                <span class="val">7.48</span>
+                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:65.0%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">Signal: -25.01</div>
+                    <span class="tag tag-bull">Bullish</span>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="section">
-        <div class="section-title"><span>🎯</span> OPTION CHAIN ANALYSIS <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
-        <div class="card-grid">
-            <div class="card neutral">
-                <span class="card-icon">🟡</span>
-                <div class="card-label">PCR RATIO (OI)</div>
-                <div class="card-value">0.820</div>
-                <span class="card-change neutral">Neutral</span>
+        <div class="section-title">
+            <span>🎯</span> OPTION CHAIN ANALYSIS
+            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Strikes Only)</span>
+        </div>
+        <div class="card-grid grid-4">
+            
+            <div class="g ">
+                <div class="card-top-row">
+                    <span class="card-ico">🟡</span>
+                    <div class="lbl">PCR Ratio (OI)</div>
+                </div>
+                <span class="val">0.820</span>
+                <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:41.0%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">Put/Call OI ratio</div>
+                    <span class="tag tag-neu">Neutral</span>
+                </div>
             </div>
-            <div class="card neutral">
-                <span class="card-icon">🎯</span>
-                <div class="card-label">MAX PAIN</div>
-                <div class="card-value">₹25,700</div>
+            <div class="g ">
+                <div class="card-top-row">
+                    <span class="card-ico">🎯</span>
+                    <div class="lbl">Max Pain</div>
+                </div>
+                <span class="val">₹25,700</span>
+                <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:47.9%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">Price gravity level</div>
+                    <span class="tag tag-neu">Expiry Magnet</span>
+                </div>
             </div>
-            <div class="card bearish">
-                <span class="card-icon">🔴</span>
-                <div class="card-label">MAX CALL OI</div>
-                <div class="card-value">₹26,000</div>
-                <span class="card-change negative">Resistance</span>
+            <div class="g g-red">
+                <div class="card-top-row">
+                    <span class="card-ico">🔴</span>
+                    <div class="lbl">Max Call OI</div>
+                </div>
+                <span class="val">₹26,000</span>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:55.0%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">CE wall</div>
+                    <span class="tag tag-bear">Resistance</span>
+                </div>
             </div>
-            <div class="card bullish">
-                <span class="card-icon">🟢</span>
-                <div class="card-label">MAX PUT OI</div>
-                <div class="card-value">₹25,500</div>
-                <span class="card-change positive">Support</span>
+            <div class="g g-hi">
+                <div class="card-top-row">
+                    <span class="card-ico">🟢</span>
+                    <div class="lbl">Max Put OI</div>
+                </div>
+                <span class="val">₹25,500</span>
+                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:45.0%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">PE floor</div>
+                    <span class="tag tag-bull">Support</span>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="section">
-        <div class="section-title"><span>📊</span> CHANGE IN OPEN INTEREST (Today's Direction) <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
-        <div class="direction-box neutral" style="margin:15px 0;">
-            <div class="direction-title" style="font-size:26px;">🟡 Neutral (High Volatility)</div>
-            <div class="direction-subtitle" style="font-size:13px;">Both Calls & Puts Building</div>
+        <div class="section-title">
+            <span>📊</span> CHANGE IN OPEN INTEREST
+            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(Today's Direction · ATM ±10 Only)</span>
         </div>
-        <div class="card-grid" style="margin-top:20px;">
-            <div class="card bearish">
-                <span class="card-icon">🔴</span>
-                <div class="card-label">CALL OI CHANGE</div>
-                <div class="card-value">+190,655</div>
-                <span class="card-change negative">
-                    Bearish Signal
-                </span>
+        <div class="direction-box neutral" style="margin:0 0 18px;">
+            <div class="direction-title" style="font-size:24px;">🟡 Neutral (High Vol)</div>
+            <div class="direction-subtitle">Both Calls & Puts Building</div>
+        </div>
+        <div class="oi-grid">
+
+            <div class="g g-red">
+                <div class="card-top-row">
+                    <span class="card-ico">🔴</span>
+                    <div class="lbl">CALL OI CHANGE</div>
+                </div>
+                <span class="val">+190,655</span>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:100.0%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">CE open interest Δ</div>
+                    <span class="tag tag-bear">Bearish Signal</span>
+                </div>
             </div>
-            <div class="card bullish">
-                <span class="card-icon">🟢</span>
-                <div class="card-label">PUT OI CHANGE</div>
-                <div class="card-value">+144,844</div>
-                <span class="card-change positive">
-                    Bullish Signal
-                </span>
+            <div class="g g-hi">
+                <div class="card-top-row">
+                    <span class="card-ico">🟢</span>
+                    <div class="lbl">PUT OI CHANGE</div>
+                </div>
+                <span class="val">+144,844</span>
+                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:100.0%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">PE open interest Δ</div>
+                    <span class="tag tag-bull">Bullish Signal</span>
+                </div>
             </div>
-            <div class="card highlight">
-                <span class="card-icon">⚖️</span>
-                <div class="card-label">NET OI CHANGE</div>
-                <div class="card-value">-45,811</div>
-                <span class="card-change negative">
-                    Bearish Net
-                </span>
+            <div class="g g-red">
+                <div class="card-top-row">
+                    <span class="card-ico">⚖️</span>
+                    <div class="lbl">NET OI CHANGE</div>
+                </div>
+                <span class="val">-45,811</span>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:91.6%"></div></div>
+                <div class="card-foot">
+                    <div class="sub">PE Δ − CE Δ</div>
+                    <span class="tag tag-bear">Bearish Net</span>
+                </div>
             </div>
         </div>
         <div class="logic-box">
             <p>
                 <strong>📖 How to Read:</strong><br>
-                • <strong>Call OI Increase (+)</strong> = Writers selling calls (Bearish) | <strong>Decrease (-)</strong> = Unwinding (Bullish)<br>
-                • <strong>Put OI Increase (+)</strong> = Writers selling puts (Bullish) | <strong>Decrease (-)</strong> = Unwinding (Bearish)<br>
-                • <strong>Net OI</strong> = Put Change - Call Change (Positive = Bullish, Negative = Bearish)
+                • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
+                • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
+                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)
             </p>
         </div>
     </div>
 
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
             <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ SUPPORT ZONE</span>
             <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
         </div>
+        <!-- ROW A -->
         <div style="position:relative;height:62px;">
             <div class="rl-node-a" style="left:3%;">
                 <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
@@ -307,6 +516,7 @@
                 <div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div>
             </div>
         </div>
+        <!-- GRADIENT TRACK -->
         <div style="position:relative;height:8px;border-radius:4px;
                     background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);
                     box-shadow:0 2px 14px rgba(0,0,0,0.5);">
@@ -314,6 +524,7 @@
                         width:4px;height:22px;background:#fff;border-radius:2px;
                         box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
         </div>
+        <!-- ROW B -->
         <div style="position:relative;height:58px;">
             
               <div class="rl-node-b" style="left:43%;">
@@ -322,141 +533,129 @@
                 <div class="rl-val" style="color:#ffb74d;">₹25,700</div>
               </div>
         </div>
+        <!-- Distance bar -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
-            <div style="background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.3);
-                        border-radius:8px;padding:10px 16px;
-                        display:flex;justify-content:space-between;align-items:center;">
+            <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);
+                        border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:12px;color:#b0bec5;">📍 Distance to Resistance</span>
                 <span style="font-size:15px;font-weight:700;color:#f44336;">+549 pts</span>
             </div>
-            <div style="background:rgba(0,188,212,0.1);border:1px solid rgba(0,188,212,0.3);
-                        border-radius:8px;padding:10px 16px;
-                        display:flex;justify-content:space-between;align-items:center;">
+            <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);
+                        border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:12px;color:#b0bec5;">📍 Distance to Support</span>
                 <span style="font-size:15px;font-weight:700;color:#00bcd4;">−554 pts</span>
             </div>
         </div>
     </div>
 
-    <style>
-        .rl-node-a{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}
-        .rl-node-b{position:absolute;top:0;transform:translateX(-50%);text-align:center;}
-        .rl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}
-        .rl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;
-                 line-height:1.4;white-space:nowrap;}
-        .rl-val{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}
-    </style>
-
     <div class="section">
-        <div class="section-title"><span>💡</span> TRADING RECOMMENDATIONS (Dual Strategy Approach)</div>
+        <div class="section-title"><span>💡</span> TRADING RECOMMENDATIONS (Dual Strategy)</div>
         <p style="color:#80deea;font-size:13px;margin-bottom:20px;line-height:1.7;">
-            We provide <strong>TWO independent strategy recommendations</strong> based on different analysis methods:
+            Two independent strategy recommendations based on <strong>Technical Analysis</strong> and <strong>OI Momentum</strong>.
         </p>
 
-        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));padding:25px;border-radius:14px;margin-bottom:20px;border:2px solid #ffb74d;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <div class="strat-card" style="border-color:#ffb74d;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-                <h3 style="color:#4fc3f7;font-size:18px;margin:0;">1️⃣ TECHNICAL ANALYSIS STRATEGY</h3>
-                <span style="background:rgba(79,195,247,0.2);color:#4fc3f7;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">Positional • 1-5 Days</span>
+                <h3 style="color:#4fc3f7;font-family:'Oxanium',sans-serif;font-size:17px;margin:0;">1️⃣ TECHNICAL ANALYSIS STRATEGY</h3>
+                <span style="background:rgba(79,195,247,0.15);color:#4fc3f7;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;">Positional · 1–5 Days</span>
             </div>
-            <div style="background:rgba(79,195,247,0.08);padding:20px;border-radius:10px;border-left:4px solid #ffb74d;">
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:15px;">
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div><div style="color:#fff;font-size:18px;font-weight:700;">Iron Condor</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div><span class="card-change neutral" style="display:inline-block;">Neutral</span></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div><div style="color:#fff;font-size:16px;font-weight:600;">Credit</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div><div style="color:#ffb74d;font-size:16px;font-weight:600;">Low</div></div>
-                </div>
-                <div style="background:rgba(15,32,39,0.6);padding:15px;border-radius:8px;margin-bottom:12px;">
-                    <div style="color:#4fc3f7;font-size:12px;font-weight:600;margin-bottom:8px;">📋 SETUP</div>
-                    <div style="color:#fff;font-size:15px;font-weight:500;">Sell 25850 CE + Buy 25950 CE, Sell 25650 PE + Buy 25550 PE</div>
-                </div>
-                <div style="color:#80deea;font-size:13px;"><strong style="color:#4fc3f7;">💡 Why?</strong> Expect low volatility, range-bound market</div>
+            <div class="strat-grid">
+                <div class="strat-cell"><div class="cell-lbl">Strategy</div><div class="cell-val">Iron Condor</div></div>
+                <div class="strat-cell"><div class="cell-lbl">Market Bias</div><span class="tag tag-neu">Neutral</span></div>
+                <div class="strat-cell"><div class="cell-lbl">Type</div><div class="cell-val">Credit</div></div>
+                <div class="strat-cell"><div class="cell-lbl">Risk</div><div class="cell-val" style="color:#ffb74d;">Low</div></div>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:15px;">
-                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div><div style="color:#00bcd4;font-size:14px;font-weight:700;">Premium Received</div></div>
-                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div><div style="color:#f44336;font-size:14px;font-weight:700;">Capped</div></div>
+            <div class="setup-box">
+                <div class="setup-lbl">📋 SETUP</div>
+                <div class="setup-val">Sell 25850 CE + Buy 25950 CE, Sell 25650 PE + Buy 25550 PE</div>
+            </div>
+            <div class="why-text"><strong>💡 Why?</strong> Expect low volatility, range-bound market</div>
+            <div class="profit-loss-row">
+                <div class="pl-box pl-profit"><div class="pl-lbl">MAX PROFIT</div><div class="pl-val">Premium Received</div></div>
+                <div class="pl-box pl-loss"><div class="pl-lbl">MAX LOSS</div><div class="pl-val">Capped</div></div>
             </div>
         </div>
 
-        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));padding:25px;border-radius:14px;margin-bottom:20px;border:2px solid #ffb74d;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <div class="strat-card" style="border-color:#ffb74d;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-                <h3 style="color:#4fc3f7;font-size:18px;margin:0;">2️⃣ OPEN INTEREST MOMENTUM STRATEGY</h3>
-                <span style="background:rgba(255,183,77,0.2);color:#ffb74d;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">Intraday</span>
+                <h3 style="color:#4fc3f7;font-family:'Oxanium',sans-serif;font-size:17px;margin:0;">2️⃣ OI MOMENTUM STRATEGY</h3>
+                <span style="background:rgba(255,183,77,0.15);color:#ffb74d;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;">Intraday</span>
             </div>
-            <div style="background:rgba(255,183,77,0.08);padding:20px;border-radius:10px;border-left:4px solid #ffb74d;">
-                <div style="background:rgba(79,195,247,0.1);padding:12px;border-radius:8px;margin-bottom:15px;">
-                    <div style="color:#4fc3f7;font-size:12px;font-weight:600;margin-bottom:6px;">📊 OI SIGNAL</div>
-                    <div style="color:#fff;font-size:14px;">🟡 Big move expected, direction uncertain</div>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:15px;">
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div><div style="color:#fff;font-size:18px;font-weight:700;">Long Straddle</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div><span class="card-change neutral" style="display:inline-block;">Volatile</span></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div><div style="color:#fff;font-size:16px;font-weight:600;">Debit</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div><div style="color:#ffb74d;font-size:16px;font-weight:600;">High</div></div>
-                </div>
-                <div style="background:rgba(15,32,39,0.6);padding:15px;border-radius:8px;margin-bottom:12px;">
-                    <div style="color:#ffb74d;font-size:12px;font-weight:600;margin-bottom:8px;">📋 SETUP</div>
-                    <div style="color:#fff;font-size:15px;font-weight:500;">Buy 25750 CE + 25750 PE</div>
-                </div>
-                <div style="color:#80deea;font-size:13px;"><strong style="color:#ffb74d;">💡 Why?</strong> Both Calls & Puts building</div>
+            <div style="background:rgba(79,195,247,0.07);padding:12px;border-radius:8px;margin-bottom:14px;border-left:3px solid #4fc3f7;">
+                <div style="color:#4fc3f7;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:5px;">📊 OI SIGNAL</div>
+                <div style="color:#fff;font-size:13px;">🟡 Big move expected, direction uncertain</div>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:15px;">
-                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div><div style="color:#00bcd4;font-size:14px;font-weight:700;">Unlimited</div></div>
-                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div><div style="color:#f44336;font-size:14px;font-weight:700;">Premium Paid</div></div>
+            <div class="strat-grid">
+                <div class="strat-cell"><div class="cell-lbl">Strategy</div><div class="cell-val">Long Straddle</div></div>
+                <div class="strat-cell"><div class="cell-lbl">Market Bias</div><span class="tag tag-neu">Volatile</span></div>
+                <div class="strat-cell"><div class="cell-lbl">Type</div><div class="cell-val">Debit</div></div>
+                <div class="strat-cell"><div class="cell-lbl">Risk</div><div class="cell-val" style="color:#ffb74d;">High</div></div>
+            </div>
+            <div class="setup-box">
+                <div class="setup-lbl" style="color:#ffb74d;">📋 SETUP</div>
+                <div class="setup-val">Buy 25750 CE + 25750 PE</div>
+            </div>
+            <div class="why-text"><strong style="color:#ffb74d;">💡 Why?</strong> Both Calls & Puts building</div>
+            <div class="profit-loss-row">
+                <div class="pl-box pl-profit"><div class="pl-lbl">MAX PROFIT</div><div class="pl-val">Unlimited</div></div>
+                <div class="pl-box pl-loss"><div class="pl-lbl">MAX LOSS</div><div class="pl-val">Premium Paid</div></div>
             </div>
         </div>
 
-        <div class="fire-levels">
-            <div class="fl-hdr">📍 Key<br>Levels</div>
-            <div class="fl-item">
-                <div class="fl-lbl">Entry Zone</div>
-                <div class="fl-val">₹25,171 – ₹26,275</div>
+        <div class="risk-box">
+            <div style="grid-column:1/-1;margin-bottom:10px;">
+                <h4 style="color:#ffb74d;font-family:'Oxanium',sans-serif;font-size:14px;letter-spacing:1px;">📍 KEY TRADING LEVELS</h4>
             </div>
-            <div class="fl-item">
-                <div class="fl-lbl">Target 1 &nbsp;/&nbsp; Target 2</div>
-                <div class="fl-val t1">₹26,275 &nbsp;<span style="color:#4a2000;">|</span>&nbsp; <span class="fl-val t2" style="display:inline;">₹25,171</span></div>
+            <div class="risk-item"><span class="risk-label">ENTRY ZONE</span><span class="risk-value">₹25,171 – ₹26,275</span></div>
+            <div class="risk-item"><span class="risk-label">TARGET 1</span><span class="risk-value">₹26,275</span></div>
+            <div class="risk-item"><span class="risk-label">TARGET 2</span><span class="risk-value">₹25,171</span></div>
+
+            <div class="risk-item" style="grid-column:1/-1;">
+                <span class="risk-label">STOP LOSS</span>
+                <span class="risk-value" style="color:#ffb74d;">Use option premium as max loss (credit strategy)</span>
             </div>
-            <div class="fl-item">
-                <div class="fl-lbl">Stop Loss</div>
-                <div class="fl-val sl">Use option premium<br>as max loss</div>
-            </div>
-            
+
         </div>
     </div>
 
     <div class="section">
-        <div class="section-title"><span>📋</span> TOP 5 STRIKES by Open Interest <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
+        <div class="section-title"><span>📋</span> TOP 5 STRIKES BY OPEN INTEREST
+            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Only)</span>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
             <div>
-                <h3 style="color:#00bcd4;margin-bottom:15px;font-size:16px;">📞 CALL OPTIONS (CE)</h3>
+                <h3 style="color:#00bcd4;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📞 CALL OPTIONS (CE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹26,000</strong></td><td>137,457</td><td style='color:#00bcd4;font-weight:700;'>₹53.05</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹26,200</strong></td><td>73,242</td><td style='color:#00bcd4;font-weight:700;'>₹20.55</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹25,700</strong></td><td>67,721</td><td style='color:#00bcd4;font-weight:700;'>₹174.40</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹25,800</strong></td><td>66,928</td><td style='color:#00bcd4;font-weight:700;'>₹123.00</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,900</strong></td><td>54,588</td><td style='color:#00bcd4;font-weight:700;'>₹82.05</td></tr>
+<tr><td><strong>1</strong></td><td><strong>₹26,000</strong></td><td>137,457</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹53.05</td></tr>
+<tr><td><strong>2</strong></td><td><strong>₹26,200</strong></td><td>73,242</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹20.55</td></tr>
+<tr><td><strong>3</strong></td><td><strong>₹25,700</strong></td><td>67,721</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹174.40</td></tr>
+<tr><td><strong>4</strong></td><td><strong>₹25,800</strong></td><td>66,928</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹123.00</td></tr>
+<tr><td><strong>5</strong></td><td><strong>₹25,900</strong></td><td>54,588</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹82.05</td></tr>
 </tbody></table></div>
             <div>
-                <h3 style="color:#f44336;margin-bottom:15px;font-size:16px;">📉 PUT OPTIONS (PE)</h3>
+                <h3 style="color:#f44336;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📉 PUT OPTIONS (PE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹25,500</strong></td><td>109,380</td><td style='color:#f44336;font-weight:700;'>₹71.95</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹25,700</strong></td><td>71,796</td><td style='color:#f44336;font-weight:700;'>₹136.00</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹25,600</strong></td><td>64,914</td><td style='color:#f44336;font-weight:700;'>₹98.35</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹25,400</strong></td><td>51,834</td><td style='color:#f44336;font-weight:700;'>₹52.95</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹26,000</strong></td><td>43,867</td><td style='color:#f44336;font-weight:700;'>₹312.90</td></tr>
+<tr><td><strong>1</strong></td><td><strong>₹25,500</strong></td><td>109,380</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹71.95</td></tr>
+<tr><td><strong>2</strong></td><td><strong>₹25,700</strong></td><td>71,796</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹136.00</td></tr>
+<tr><td><strong>3</strong></td><td><strong>₹25,600</strong></td><td>64,914</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹98.35</td></tr>
+<tr><td><strong>4</strong></td><td><strong>₹25,400</strong></td><td>51,834</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹52.95</td></tr>
+<tr><td><strong>5</strong></td><td><strong>₹26,000</strong></td><td>43,867</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹312.90</td></tr>
 </tbody></table></div></div></div>
 
     <div class="section">
         <div class="disclaimer">
             <strong>⚠️ DISCLAIMER</strong><br><br>
-            This is for EDUCATIONAL purposes only - NOT financial advice.<br>
-            Always use stop losses and consult a SEBI registered advisor.<br>
+            This report is for <strong>EDUCATIONAL purposes only</strong> — NOT financial advice.<br>
+            Always use stop losses and consult a SEBI registered investment advisor.<br>
             Past performance does not guarantee future results.
         </div>
     </div>
     <div class="footer">
-        <p>Automated Nifty 50 Option Chain Analysis Report</p>
-        <p>© 2026 - For Educational Purposes Only</p>
+        <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
+        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · For Educational Purposes Only</p>
     </div>
-</div></body></html>
+</div>
+</body>
+</html>
