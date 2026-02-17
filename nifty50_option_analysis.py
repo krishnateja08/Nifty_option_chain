@@ -6,6 +6,8 @@ FIXES:
   2. Auto-fallback: if NSE returns empty, fetches real expiry list
   3. SIDEWAYS targets: T1=Resistance, T2=Support (distinct values)
   4. Stop loss fallback text for neutral strategies
+  5. [NEW] Option chain filtered to ATM ±10 strikes only — eliminates far
+     OTM noise that was distorting PCR, OI direction, max pain, and top strikes
 """
 
 from curl_cffi import requests
@@ -65,7 +67,6 @@ class NiftyHTMLAnalyzer:
     def get_upcoming_expiry_tuesday(self):
         """
         Always returns the NEXT Tuesday date (never today).
-        Uses Python's date + calendar — no manual weekday math errors.
 
         Examples:
           Today = Tue 17-Feb  →  returns 24-Feb  (next Tuesday)
@@ -82,7 +83,6 @@ class NiftyHTMLAnalyzer:
             # Today IS Tuesday → always jump to next Tuesday (7 days ahead)
             days_ahead = 7
         else:
-            # How many days until next Tuesday?
             days_ahead = (1 - weekday) % 7
             if days_ahead == 0:
                 days_ahead = 7
@@ -170,11 +170,45 @@ class NiftyHTMLAnalyzer:
                         'PE_OI_Change': pe.get('changeinOpenInterest', 0),
                     })
 
-                df         = pd.DataFrame(rows).sort_values('Strike').reset_index(drop=True)
+                df_full    = pd.DataFrame(rows).sort_values('Strike').reset_index(drop=True)
                 underlying = json_data.get('records', {}).get('underlyingValue', 0)
-                print(f"    ✅ {len(df)} strikes | Underlying: {underlying}")
 
-                return {'expiry': expiry, 'df': df, 'raw_data': data, 'underlying': underlying}
+                # ── FILTER TO ATM ± 10 STRIKES ONLY ─────────────────────────
+                # WHY: Reading all 100+ strikes pulls in massive far-OTM OI
+                # (hedges, institutional positions, tail-risk protection) that
+                # has NOTHING to do with this week's price action. This distorts:
+                #   • PCR  (far PE OI inflates ratio → false bullish readings)
+                #   • OI direction (CE/PE change signals get diluted)
+                #   • Max Pain (gravitates toward far-out hedged positions)
+                #   • Top 5 Strikes (often dominated by deep OTM strikes)
+                # Filtering to ±10 around ATM = focused, tradeable zone only.
+                atm_strike  = round(underlying / 50) * 50
+                all_strikes = sorted(df_full['Strike'].unique())
+
+                if atm_strike in all_strikes:
+                    atm_idx = all_strikes.index(atm_strike)
+                else:
+                    # Snap to closest available strike if ATM not exact
+                    atm_idx    = min(range(len(all_strikes)),
+                                     key=lambda i: abs(all_strikes[i] - underlying))
+                    atm_strike = all_strikes[atm_idx]
+
+                lower_idx        = max(0, atm_idx - 10)
+                upper_idx        = min(len(all_strikes) - 1, atm_idx + 10)
+                selected_strikes = all_strikes[lower_idx : upper_idx + 1]
+                df = df_full[df_full['Strike'].isin(selected_strikes)].reset_index(drop=True)
+
+                print(f"    ✅ Total strikes fetched: {len(df_full)} → ATM±10 filtered: {len(df)} strikes")
+                print(f"    📍 ATM: {atm_strike} | Strike range: {selected_strikes[0]} – {selected_strikes[-1]}")
+                print(f"    💹 Underlying: {underlying}")
+
+                return {
+                    'expiry':     expiry,
+                    'df':         df,
+                    'raw_data':   data,
+                    'underlying': underlying,
+                    'atm_strike': atm_strike,
+                }
 
             except Exception as e:
                 print(f"    ❌ Attempt {attempt} error: {e}")
@@ -187,7 +221,7 @@ class NiftyHTMLAnalyzer:
         if not oc_data:
             return None
 
-        df = oc_data['df']
+        df = oc_data['df']   # Already filtered to ATM ± 10 strikes
 
         total_ce_oi  = df['CE_OI'].sum()
         total_pe_oi  = df['PE_OI'].sum()
@@ -234,6 +268,7 @@ class NiftyHTMLAnalyzer:
         return {
             'expiry':             oc_data['expiry'],
             'underlying_value':   oc_data['underlying'],
+            'atm_strike':         oc_data['atm_strike'],
             'pcr_oi':             round(pcr_oi, 3),
             'pcr_volume':         round(pcr_vol, 3),
             'total_ce_oi':        int(total_ce_oi),
@@ -407,11 +442,11 @@ class NiftyHTMLAnalyzer:
         if option_analysis:
             max_ce_strike = option_analysis['max_ce_oi_strike']
             max_pe_strike = option_analysis['max_pe_oi_strike']
+            atm_strike    = option_analysis['atm_strike']
         else:
-            max_ce_strike = int(current/50)*50 + 200
-            max_pe_strike = int(current/50)*50 - 200
-
-        atm_strike = int(current/50)*50
+            atm_strike    = int(current/50)*50
+            max_ce_strike = atm_strike + 200
+            max_pe_strike = atm_strike - 200
 
         if bias == "BULLISH":
             mid        = (support + resistance) / 2
@@ -487,6 +522,7 @@ class NiftyHTMLAnalyzer:
             'timestamp':      ist_now.strftime('%d-%b-%Y %H:%M IST'),
             'current_price':  current,
             'expiry':         option_analysis['expiry'] if option_analysis else 'N/A',
+            'atm_strike':     atm_strike,
             'bias':           bias,
             'bias_icon':      bias_icon,
             'bias_class':     bias_class,
@@ -656,6 +692,11 @@ class NiftyHTMLAnalyzer:
                 <div class="card-value">₹{data['current_price']:,.2f}</div>
             </div>
             <div class="card">
+                <span class="card-icon">🎯</span>
+                <div class="card-label">ATM STRIKE</div>
+                <div class="card-value">₹{data['atm_strike']:,}</div>
+            </div>
+            <div class="card">
                 <span class="card-icon">📅</span>
                 <div class="card-label">EXPIRY DATE</div>
                 <div class="card-value" style="font-size:20px;">{data['expiry']}</div>
@@ -675,7 +716,8 @@ class NiftyHTMLAnalyzer:
                 • <strong>BULLISH</strong>: Score diff ≥ +3 (Price above SMAs, RSI oversold, positive MACD, high PCR)<br>
                 • <strong>BEARISH</strong>: Score diff ≤ -3 (Price below SMAs, RSI overbought, negative MACD, low PCR)<br>
                 • <strong>SIDEWAYS</strong>: Score diff between -2 and +2 (Mixed signals, consolidation phase)<br>
-                • <strong>Confidence</strong>: HIGH when gap ≥ 4, MEDIUM otherwise
+                • <strong>Confidence</strong>: HIGH when gap ≥ 4, MEDIUM otherwise<br>
+                • <strong>OI Scope</strong>: All option signals computed from ATM ±10 strikes only
             </p>
         </div>
     </div>
@@ -720,7 +762,7 @@ class NiftyHTMLAnalyzer:
         if data['has_option_data']:
             html += f"""
     <div class="section">
-        <div class="section-title"><span>🎯</span> OPTION CHAIN ANALYSIS</div>
+        <div class="section-title"><span>🎯</span> OPTION CHAIN ANALYSIS <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
         <div class="card-grid">
             <div class="card {data['pcr_badge']}">
                 <span class="card-icon">{data['pcr_icon']}</span>
@@ -749,7 +791,7 @@ class NiftyHTMLAnalyzer:
     </div>
 
     <div class="section">
-        <div class="section-title"><span>📊</span> CHANGE IN OPEN INTEREST (Today's Direction)</div>
+        <div class="section-title"><span>📊</span> CHANGE IN OPEN INTEREST (Today's Direction) <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
         <div class="direction-box {data['oi_class']}" style="margin:15px 0;">
             <div class="direction-title" style="font-size:26px;">{data['oi_icon']} {data['oi_direction']}</div>
             <div class="direction-subtitle" style="font-size:13px;">{data['oi_signal']}</div>
@@ -832,7 +874,7 @@ class NiftyHTMLAnalyzer:
         if data['has_option_data'] and (data['top_ce_strikes'] or data['top_pe_strikes']):
             html += """
     <div class="section">
-        <div class="section-title"><span>📋</span> TOP 5 STRIKES (by Open Interest)</div>
+        <div class="section-title"><span>📋</span> TOP 5 STRIKES by Open Interest <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
             <div>
                 <h3 style="color:#00bcd4;margin-bottom:15px;font-size:16px;">📞 CALL OPTIONS (CE)</h3>
@@ -1025,7 +1067,7 @@ class NiftyHTMLAnalyzer:
     def generate_full_report(self):
         ist_now = datetime.now(pytz.timezone('Asia/Kolkata'))
         print("=" * 75)
-        print("NIFTY 50 DAILY REPORT — TUESDAY EXPIRY")
+        print("NIFTY 50 DAILY REPORT — TUESDAY EXPIRY + ATM±10 FILTER")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 75)
 
@@ -1045,7 +1087,7 @@ class NiftyHTMLAnalyzer:
 
 def main():
     try:
-        print("\n🚀 Starting Nifty 50 Analysis (Tuesday expiry + auto-fallback)...\n")
+        print("\n🚀 Starting Nifty 50 Analysis (Tuesday expiry + ATM±10 filter)...\n")
         analyzer = NiftyHTMLAnalyzer()
         analyzer.generate_full_report()
 

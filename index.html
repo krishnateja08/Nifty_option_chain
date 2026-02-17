@@ -94,7 +94,7 @@
 
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 02:39 IST</p>
+        <p>Generated: 18-Feb-2026 03:05 IST</p>
     </div>
 
     <div class="section">
@@ -106,6 +106,11 @@
                 <div class="card-value">₹25,725.40</div>
             </div>
             <div class="card">
+                <span class="card-icon">🎯</span>
+                <div class="card-label">ATM STRIKE</div>
+                <div class="card-value">₹25,750</div>
+            </div>
+            <div class="card">
                 <span class="card-icon">📅</span>
                 <div class="card-label">EXPIRY DATE</div>
                 <div class="card-value" style="font-size:20px;">24-Feb-2026</div>
@@ -115,9 +120,9 @@
 
     <div class="section">
         <div class="section-title"><span>🎯</span> MARKET DIRECTION (Algorithmic Analysis)</div>
-        <div class="direction-box bullish">
-            <div class="direction-title">📈 BULLISH</div>
-            <div class="direction-subtitle">Confidence: MEDIUM | Bullish: 4 vs Bearish: 1</div>
+        <div class="direction-box sideways">
+            <div class="direction-title">↔️ SIDEWAYS</div>
+            <div class="direction-subtitle">Confidence: MEDIUM | Bullish: 3 vs Bearish: 1</div>
         </div>
         <div class="logic-box">
             <p>
@@ -125,7 +130,8 @@
                 • <strong>BULLISH</strong>: Score diff ≥ +3 (Price above SMAs, RSI oversold, positive MACD, high PCR)<br>
                 • <strong>BEARISH</strong>: Score diff ≤ -3 (Price below SMAs, RSI overbought, negative MACD, low PCR)<br>
                 • <strong>SIDEWAYS</strong>: Score diff between -2 and +2 (Mixed signals, consolidation phase)<br>
-                • <strong>Confidence</strong>: HIGH when gap ≥ 4, MEDIUM otherwise
+                • <strong>Confidence</strong>: HIGH when gap ≥ 4, MEDIUM otherwise<br>
+                • <strong>OI Scope</strong>: All option signals computed from ATM ±10 strikes only
             </p>
         </div>
     </div>
@@ -167,36 +173,36 @@
     </div>
 
     <div class="section">
-        <div class="section-title"><span>🎯</span> OPTION CHAIN ANALYSIS</div>
+        <div class="section-title"><span>🎯</span> OPTION CHAIN ANALYSIS <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
         <div class="card-grid">
             <div class="card neutral">
                 <span class="card-icon">🟡</span>
                 <div class="card-label">PCR RATIO (OI)</div>
-                <div class="card-value">0.973</div>
+                <div class="card-value">0.820</div>
                 <span class="card-change neutral">Neutral</span>
             </div>
             <div class="card neutral">
                 <span class="card-icon">🎯</span>
                 <div class="card-label">MAX PAIN</div>
-                <div class="card-value">₹27,850</div>
+                <div class="card-value">₹25,700</div>
             </div>
             <div class="card bearish">
                 <span class="card-icon">🔴</span>
                 <div class="card-label">MAX CALL OI</div>
-                <div class="card-value">₹27,000</div>
+                <div class="card-value">₹26,000</div>
                 <span class="card-change negative">Resistance</span>
             </div>
             <div class="card bullish">
                 <span class="card-icon">🟢</span>
                 <div class="card-label">MAX PUT OI</div>
-                <div class="card-value">₹25,000</div>
+                <div class="card-value">₹25,500</div>
                 <span class="card-change positive">Support</span>
             </div>
         </div>
     </div>
 
     <div class="section">
-        <div class="section-title"><span>📊</span> CHANGE IN OPEN INTEREST (Today's Direction)</div>
+        <div class="section-title"><span>📊</span> CHANGE IN OPEN INTEREST (Today's Direction) <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
         <div class="direction-box neutral" style="margin:15px 0;">
             <div class="direction-title" style="font-size:26px;">🟡 Neutral (High Volatility)</div>
             <div class="direction-subtitle" style="font-size:13px;">Both Calls & Puts Building</div>
@@ -205,7 +211,7 @@
             <div class="card bearish">
                 <span class="card-icon">🔴</span>
                 <div class="card-label">CALL OI CHANGE</div>
-                <div class="card-value">+422,737</div>
+                <div class="card-value">+190,655</div>
                 <span class="card-change negative">
                     Bearish Signal
                 </span>
@@ -213,7 +219,7 @@
             <div class="card bullish">
                 <span class="card-icon">🟢</span>
                 <div class="card-label">PUT OI CHANGE</div>
-                <div class="card-value">+413,728</div>
+                <div class="card-value">+144,844</div>
                 <span class="card-change positive">
                     Bullish Signal
                 </span>
@@ -221,7 +227,7 @@
             <div class="card highlight">
                 <span class="card-icon">⚖️</span>
                 <div class="card-label">NET OI CHANGE</div>
-                <div class="card-value">-9,009</div>
+                <div class="card-value">-45,811</div>
                 <span class="card-change negative">
                     Bearish Net
                 </span>
@@ -255,7 +261,7 @@
 
             <div class="level-card support">
                 <span class="level-name">🟡 Max Pain</span>
-                <strong class="level-value">₹27,850</strong>
+                <strong class="level-value">₹25,700</strong>
             </div>
 
             <div class="level-card support">
@@ -275,27 +281,27 @@
             We provide <strong>TWO independent strategy recommendations</strong> based on different analysis methods:
         </p>
 
-        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));padding:25px;border-radius:14px;margin-bottom:20px;border:2px solid #00bcd4;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <div style="background:linear-gradient(135deg,rgba(15,32,39,0.8),rgba(32,58,67,0.6));padding:25px;border-radius:14px;margin-bottom:20px;border:2px solid #ffb74d;box-shadow:0 8px 20px rgba(0,0,0,0.3);">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
                 <h3 style="color:#4fc3f7;font-size:18px;margin:0;">1️⃣ TECHNICAL ANALYSIS STRATEGY</h3>
                 <span style="background:rgba(79,195,247,0.2);color:#4fc3f7;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;">Positional • 1-5 Days</span>
             </div>
-            <div style="background:rgba(79,195,247,0.08);padding:20px;border-radius:10px;border-left:4px solid #00bcd4;">
+            <div style="background:rgba(79,195,247,0.08);padding:20px;border-radius:10px;border-left:4px solid #ffb74d;">
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:15px;">
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div><div style="color:#fff;font-size:18px;font-weight:700;">Bull Call Spread</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div><span class="card-change positive" style="display:inline-block;">Bullish</span></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div><div style="color:#fff;font-size:16px;font-weight:600;">Debit</div></div>
-                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div><div style="color:#ffb74d;font-size:16px;font-weight:600;">Moderate</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Strategy</div><div style="color:#fff;font-size:18px;font-weight:700;">Iron Condor</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Market Bias</div><span class="card-change neutral" style="display:inline-block;">Neutral</span></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Type</div><div style="color:#fff;font-size:16px;font-weight:600;">Credit</div></div>
+                    <div><div style="color:#80deea;font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Risk Profile</div><div style="color:#ffb74d;font-size:16px;font-weight:600;">Low</div></div>
                 </div>
                 <div style="background:rgba(15,32,39,0.6);padding:15px;border-radius:8px;margin-bottom:12px;">
                     <div style="color:#4fc3f7;font-size:12px;font-weight:600;margin-bottom:8px;">📋 SETUP</div>
-                    <div style="color:#fff;font-size:15px;font-weight:500;">Buy 25700 CE, Sell 25900 CE</div>
+                    <div style="color:#fff;font-size:15px;font-weight:500;">Sell 25850 CE + Buy 25950 CE, Sell 25650 PE + Buy 25550 PE</div>
                 </div>
-                <div style="color:#80deea;font-size:13px;"><strong style="color:#4fc3f7;">💡 Why?</strong> Moderate upside with limited risk</div>
+                <div style="color:#80deea;font-size:13px;"><strong style="color:#4fc3f7;">💡 Why?</strong> Expect low volatility, range-bound market</div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:15px;">
-                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div><div style="color:#00bcd4;font-size:14px;font-weight:700;">Capped</div></div>
-                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div><div style="color:#f44336;font-size:14px;font-weight:700;">Premium Paid</div></div>
+                <div style="background:rgba(0,188,212,0.1);padding:12px;border-radius:8px;border-left:3px solid #00bcd4;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX PROFIT</div><div style="color:#00bcd4;font-size:14px;font-weight:700;">Premium Received</div></div>
+                <div style="background:rgba(244,67,54,0.1);padding:12px;border-radius:8px;border-left:3px solid #f44336;"><div style="color:#80deea;font-size:10px;margin-bottom:4px;">MAX LOSS</div><div style="color:#f44336;font-size:14px;font-weight:700;">Capped</div></div>
             </div>
         </div>
 
@@ -317,7 +323,7 @@
                 </div>
                 <div style="background:rgba(15,32,39,0.6);padding:15px;border-radius:8px;margin-bottom:12px;">
                     <div style="color:#ffb74d;font-size:12px;font-weight:600;margin-bottom:8px;">📋 SETUP</div>
-                    <div style="color:#fff;font-size:15px;font-weight:500;">Buy 25700 CE + 25700 PE</div>
+                    <div style="color:#fff;font-size:15px;font-weight:500;">Buy 25750 CE + 25750 PE</div>
                 </div>
                 <div style="color:#80deea;font-size:13px;"><strong style="color:#ffb74d;">💡 Why?</strong> Both Calls & Puts building</div>
             </div>
@@ -329,40 +335,37 @@
 
         <div class="risk-box" style="margin-top:20px;">
             <div style="grid-column:1/-1;margin-bottom:12px;"><h4 style="color:#ffb74d;font-size:15px;margin:0;">📍 KEY TRADING LEVELS</h4></div>
-            <div class="risk-item"><span class="risk-label">ENTRY ZONE</span><span class="risk-value">₹25,625 – ₹25,675</span></div>
+            <div class="risk-item"><span class="risk-label">ENTRY ZONE</span><span class="risk-value">₹25,171 – ₹26,275</span></div>
             <div class="risk-item"><span class="risk-label">TARGET 1</span><span class="risk-value">₹26,275</span></div>
-            <div class="risk-item"><span class="risk-label">TARGET 2</span><span class="risk-value">₹27,000</span></div>
+            <div class="risk-item"><span class="risk-label">TARGET 2</span><span class="risk-value">₹25,171</span></div>
 
-            <div class="risk-item"><span class="risk-label">STOP LOSS</span><span class="risk-value" style="color:#f44336;">₹25,575</span></div>
-            <div class="risk-item"><span class="risk-label">RISK</span><span class="risk-value">150 pts</span></div>
-            <div class="risk-item"><span class="risk-label">REWARD</span><span class="risk-value">549 pts</span></div>
-            <div class="risk-item"><span class="risk-label">R:R RATIO</span><span class="risk-value">1:3.65</span></div>
+            <div class="risk-item" style="grid-column:1/-1;"><span class="risk-label">STOP LOSS</span><span class="risk-value" style="color:#ffb74d;">Use option premium as max loss (credit strategy)</span></div>
 
         </div>
     </div>
 
     <div class="section">
-        <div class="section-title"><span>📋</span> TOP 5 STRIKES (by Open Interest)</div>
+        <div class="section-title"><span>📋</span> TOP 5 STRIKES by Open Interest <span style="font-size:13px;color:#80deea;font-weight:400;margin-left:8px;">(ATM ±10 Strikes Only)</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
             <div>
                 <h3 style="color:#00bcd4;margin-bottom:15px;font-size:16px;">📞 CALL OPTIONS (CE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹27,000</strong></td><td>148,052</td><td style='color:#00bcd4;font-weight:700;'>₹2.30</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹26,000</strong></td><td>137,457</td><td style='color:#00bcd4;font-weight:700;'>₹53.05</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹26,500</strong></td><td>93,806</td><td style='color:#00bcd4;font-weight:700;'>₹6.60</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹26,200</strong></td><td>73,242</td><td style='color:#00bcd4;font-weight:700;'>₹20.55</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,700</strong></td><td>67,721</td><td style='color:#00bcd4;font-weight:700;'>₹174.40</td></tr>
+<tr><td><strong>1</strong></td><td><strong>₹26,000</strong></td><td>137,457</td><td style='color:#00bcd4;font-weight:700;'>₹53.05</td></tr>
+<tr><td><strong>2</strong></td><td><strong>₹26,200</strong></td><td>73,242</td><td style='color:#00bcd4;font-weight:700;'>₹20.55</td></tr>
+<tr><td><strong>3</strong></td><td><strong>₹25,700</strong></td><td>67,721</td><td style='color:#00bcd4;font-weight:700;'>₹174.40</td></tr>
+<tr><td><strong>4</strong></td><td><strong>₹25,800</strong></td><td>66,928</td><td style='color:#00bcd4;font-weight:700;'>₹123.00</td></tr>
+<tr><td><strong>5</strong></td><td><strong>₹25,900</strong></td><td>54,588</td><td style='color:#00bcd4;font-weight:700;'>₹82.05</td></tr>
 </tbody></table></div>
             <div>
                 <h3 style="color:#f44336;margin-bottom:15px;font-size:16px;">📉 PUT OPTIONS (PE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹25,000</strong></td><td>113,590</td><td style='color:#f44336;font-weight:700;'>₹18.35</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹25,500</strong></td><td>109,380</td><td style='color:#f44336;font-weight:700;'>₹71.95</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹24,000</strong></td><td>103,581</td><td style='color:#f44336;font-weight:700;'>₹5.00</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹24,500</strong></td><td>87,022</td><td style='color:#f44336;font-weight:700;'>₹8.50</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,700</strong></td><td>71,796</td><td style='color:#f44336;font-weight:700;'>₹136.00</td></tr>
+<tr><td><strong>1</strong></td><td><strong>₹25,500</strong></td><td>109,380</td><td style='color:#f44336;font-weight:700;'>₹71.95</td></tr>
+<tr><td><strong>2</strong></td><td><strong>₹25,700</strong></td><td>71,796</td><td style='color:#f44336;font-weight:700;'>₹136.00</td></tr>
+<tr><td><strong>3</strong></td><td><strong>₹25,600</strong></td><td>64,914</td><td style='color:#f44336;font-weight:700;'>₹98.35</td></tr>
+<tr><td><strong>4</strong></td><td><strong>₹25,400</strong></td><td>51,834</td><td style='color:#f44336;font-weight:700;'>₹52.95</td></tr>
+<tr><td><strong>5</strong></td><td><strong>₹26,000</strong></td><td>43,867</td><td style='color:#f44336;font-weight:700;'>₹312.90</td></tr>
 </tbody></table></div></div></div>
 
     <div class="section">
