@@ -842,41 +842,115 @@ class NiftyHTMLAnalyzer:
     </div>
 """
 
+        # ── Calculate ruler positions (0–100%) ──────────────────────────
+        _ss  = data['strong_support']
+        _sr  = data['strong_resistance']
+        _rng = _sr - _ss if _sr != _ss else 1   # full range = strong_sup → strong_res
+
+        def _pct(val):
+            """Return left% for a value within [strong_support, strong_resistance]"""
+            return round(max(2, min(98, (val - _ss) / _rng * 100)), 2)
+
+        _pct_sr  = _pct(data['strong_resistance'])
+        _pct_r   = _pct(data['resistance'])
+        _pct_cp  = _pct(data['current_price'])
+        _pct_mp  = _pct(data['max_pain'])   if data['has_option_data'] else None
+        _pct_s   = _pct(data['support'])
+        _pct_ss  = _pct(data['strong_support'])
+
+        # Distance labels
+        _pts_to_res = int(data['resistance']      - data['current_price'])
+        _pts_to_sup = int(data['current_price']   - data['support'])
+
+        # Build max-pain node HTML conditionally
+        _mp_node = ""
+        if data['has_option_data']:
+            _mp_node = f"""
+              <div class="ruler-node" style="left:{_pct_mp}%;">
+                <div class="ruler-pin" style="background:#ffb74d;box-shadow:0 0 6px #ffb74d;"></div>
+                <div class="ruler-label" style="color:#ffb74d;">Max Pain</div>
+                <div class="ruler-val" style="color:#ffb74d;">₹{data['max_pain']:,}</div>
+              </div>"""
+
         html += f"""
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
-        <div class="levels-grid">
-            <div class="level-card resistance">
-                <span class="level-name">🔴 Strong Resistance</span>
-                <strong class="level-value">₹{data['strong_resistance']:,.0f}</strong>
+
+        <!-- ── Zone legend bar ── -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:11px;color:#f44336;font-weight:600;letter-spacing:1px;">◄ SELL / RESISTANCE ZONE</span>
+            <span style="font-size:11px;color:#00bcd4;font-weight:600;letter-spacing:1px;">SUPPORT / BUY ZONE ►</span>
+        </div>
+
+        <!-- ── Gradient track ── -->
+        <div style="position:relative;height:8px;border-radius:4px;margin-bottom:0;
+                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 18%,#4fc3f7 36%,#ffb74d 52%,#ff7043 68%,#f44336 100%);
+                    box-shadow:0 2px 10px rgba(0,0,0,0.4);">
+            <!-- Current price pointer -->
+            <div style="position:absolute;left:{_pct_cp}%;top:-6px;transform:translateX(-50%);
+                        width:4px;height:20px;background:#fff;border-radius:2px;
+                        box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:10;"></div>
+        </div>
+
+        <!-- ── Current price callout above track ── -->
+        <div style="position:relative;height:32px;margin-bottom:4px;">
+            <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);
+                        bottom:0;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
+                        padding:3px 10px;border-radius:5px;white-space:nowrap;z-index:10;">
+                ▼ NOW ₹{data['current_price']:,.0f}
             </div>
-            <div class="level-card resistance">
-                <span class="level-name">🟠 Resistance</span>
-                <strong class="level-value">₹{data['resistance']:,.0f}</strong>
+        </div>
+
+        <!-- ── Ruler nodes ── -->
+        <div style="position:relative;height:72px;margin-top:8px;">
+
+            <div class="ruler-node" style="left:{_pct_ss}%;">
+                <div class="ruler-pin" style="background:#26c6da;"></div>
+                <div class="ruler-label">Strong<br>Support</div>
+                <div class="ruler-val">₹{data['strong_support']:,.0f}</div>
             </div>
-            <div class="level-card current">
-                <span class="level-name">⚪ Current Price</span>
-                <strong class="level-value">₹{data['current_price']:,.0f}</strong>
+
+            <div class="ruler-node" style="left:{_pct_s}%;">
+                <div class="ruler-pin" style="background:#00bcd4;box-shadow:0 0 6px #00bcd4;"></div>
+                <div class="ruler-label">Support</div>
+                <div class="ruler-val">₹{data['support']:,.0f}</div>
             </div>
-"""
-        if data['has_option_data']:
-            html += f"""
-            <div class="level-card support">
-                <span class="level-name">🟡 Max Pain</span>
-                <strong class="level-value">₹{data['max_pain']:,}</strong>
+            {_mp_node}
+            <div class="ruler-node" style="left:{_pct_r}%;">
+                <div class="ruler-pin" style="background:#ff7043;box-shadow:0 0 6px #ff7043;"></div>
+                <div class="ruler-label">Resistance</div>
+                <div class="ruler-val">₹{data['resistance']:,.0f}</div>
             </div>
-"""
-        html += f"""
-            <div class="level-card support">
-                <span class="level-name">🟢 Support</span>
-                <strong class="level-value">₹{data['support']:,.0f}</strong>
+
+            <div class="ruler-node" style="left:{_pct_sr}%;">
+                <div class="ruler-pin" style="background:#f44336;"></div>
+                <div class="ruler-label">Strong<br>Resistance</div>
+                <div class="ruler-val">₹{data['strong_resistance']:,.0f}</div>
             </div>
-            <div class="level-card support">
-                <span class="level-name">🟢 Strong Support</span>
-                <strong class="level-value">₹{data['strong_support']:,.0f}</strong>
+
+        </div>
+
+        <!-- ── Distance info bar ── -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+            <div style="background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.3);
+                        border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:#b0bec5;">📍 Distance to Resistance</span>
+                <span style="font-size:15px;font-weight:700;color:#f44336;">+{_pts_to_res:,} pts</span>
+            </div>
+            <div style="background:rgba(0,188,212,0.1);border:1px solid rgba(0,188,212,0.3);
+                        border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:#b0bec5;">📍 Distance to Support</span>
+                <span style="font-size:15px;font-weight:700;color:#00bcd4;">-{_pts_to_sup:,} pts</span>
             </div>
         </div>
     </div>
+
+    <style>
+        .ruler-node{{position:absolute;transform:translateX(-50%);text-align:center;}}
+        .ruler-pin{{width:14px;height:14px;border-radius:50%;margin:0 auto 5px;border:2px solid #0a1628;}}
+        .ruler-label{{font-size:10px;color:#80deea;line-height:1.3;white-space:nowrap;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}}
+        .ruler-val{{font-size:13px;font-weight:700;color:#fff;margin-top:2px;white-space:nowrap;}}
+    </style>
 """
         html += self.generate_dual_recommendations_html(data)
 
