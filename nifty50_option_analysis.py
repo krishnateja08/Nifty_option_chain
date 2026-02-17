@@ -843,102 +843,125 @@ class NiftyHTMLAnalyzer:
 """
 
         # ── Calculate ruler positions (0–100%) ──────────────────────────
+        # Track goes LEFT=low prices (support) → RIGHT=high prices (resistance)
         _ss  = data['strong_support']
         _sr  = data['strong_resistance']
-        _rng = _sr - _ss if _sr != _ss else 1   # full range = strong_sup → strong_res
+        _rng = _sr - _ss if _sr != _ss else 1
 
         def _pct(val):
-            """Return left% for a value within [strong_support, strong_resistance]"""
-            return round(max(2, min(98, (val - _ss) / _rng * 100)), 2)
+            return round(max(3, min(97, (val - _ss) / _rng * 100)), 2)
 
-        _pct_sr  = _pct(data['strong_resistance'])
-        _pct_r   = _pct(data['resistance'])
-        _pct_cp  = _pct(data['current_price'])
-        _pct_mp  = _pct(data['max_pain'])   if data['has_option_data'] else None
-        _pct_s   = _pct(data['support'])
-        _pct_ss  = _pct(data['strong_support'])
+        _pct_ss = _pct(data['strong_support'])    # leftmost  (~3%)
+        _pct_s  = _pct(data['support'])            # near left (~18%)
+        _pct_cp = _pct(data['current_price'])      # middle
+        _pct_mp = _pct(data['max_pain']) if data['has_option_data'] else None
+        _pct_r  = _pct(data['resistance'])         # near right (~82%)
+        _pct_sr = _pct(data['strong_resistance'])  # rightmost (~97%)
 
         # Distance labels
-        _pts_to_res = int(data['resistance']      - data['current_price'])
-        _pts_to_sup = int(data['current_price']   - data['support'])
+        _pts_to_res = int(data['resistance']    - data['current_price'])
+        _pts_to_sup = int(data['current_price'] - data['support'])
 
-        # Build max-pain node HTML conditionally
-        _mp_node = ""
+        # ── Stagger rows: alternate TOP (row-a) and BOTTOM (row-b) for close nodes ──
+        # Strong Support & Support are ~100pts apart → stagger them
+        # Resistance & Strong Resistance are ~100pts apart → stagger them
+        # Max Pain sits near current price → place below track
+        #
+        #  ROW-A (above):  Strong Support | [Max Pain if present] | Strong Resistance
+        #  ROW-B (below):  Support                                  Resistance
+        #
+        # This guarantees no two adjacent labels share the same vertical row.
+
+        _mp_row_a = ""
+        _mp_row_b = ""
         if data['has_option_data']:
-            _mp_node = f"""
-              <div class="ruler-node" style="left:{_pct_mp}%;">
-                <div class="ruler-pin" style="background:#ffb74d;box-shadow:0 0 6px #ffb74d;"></div>
-                <div class="ruler-label" style="color:#ffb74d;">Max Pain</div>
-                <div class="ruler-val" style="color:#ffb74d;">₹{data['max_pain']:,}</div>
+            # Max Pain goes in row-b (below) near center
+            _mp_row_b = f"""
+              <div class="rl-node-b" style="left:{_pct_mp}%;">
+                <div class="rl-tick" style="background:#ffb74d;box-shadow:0 0 7px #ffb74d;"></div>
+                <div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>
+                <div class="rl-val" style="color:#ffb74d;">₹{data['max_pain']:,}</div>
               </div>"""
 
         html += f"""
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
 
-        <!-- ── Zone legend bar ── -->
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:11px;color:#f44336;font-weight:600;letter-spacing:1px;">◄ SELL / RESISTANCE ZONE</span>
-            <span style="font-size:11px;color:#00bcd4;font-weight:600;letter-spacing:1px;">SUPPORT / BUY ZONE ►</span>
+        <!-- ── Zone legend: LOW prices LEFT, HIGH prices RIGHT ── -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ LOW / SUPPORT ZONE</span>
+            <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
         </div>
 
-        <!-- ── Gradient track ── -->
-        <div style="position:relative;height:8px;border-radius:4px;margin-bottom:0;
-                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 18%,#4fc3f7 36%,#ffb74d 52%,#ff7043 68%,#f44336 100%);
-                    box-shadow:0 2px 10px rgba(0,0,0,0.4);">
-            <!-- Current price pointer -->
-            <div style="position:absolute;left:{_pct_cp}%;top:-6px;transform:translateX(-50%);
-                        width:4px;height:20px;background:#fff;border-radius:2px;
-                        box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:10;"></div>
-        </div>
+        <!-- ══ ROW A — nodes ABOVE the track (Strong Support | Strong Resistance) ══ -->
+        <div style="position:relative;height:56px;">
 
-        <!-- ── Current price callout above track ── -->
-        <div style="position:relative;height:32px;margin-bottom:4px;">
+            <!-- Strong Support — top row, far left -->
+            <div class="rl-node-a" style="left:{_pct_ss}%;">
+                <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
+                <div class="rl-val" style="color:#26c6da;">₹{data['strong_support']:,.0f}</div>
+                <div class="rl-tick" style="background:#26c6da;margin:4px auto 0;"></div>
+            </div>
+
+            <!-- Current price callout — top row, middle -->
             <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);
-                        bottom:0;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
-                        padding:3px 10px;border-radius:5px;white-space:nowrap;z-index:10;">
-                ▼ NOW ₹{data['current_price']:,.0f}
-            </div>
-        </div>
-
-        <!-- ── Ruler nodes ── -->
-        <div style="position:relative;height:72px;margin-top:8px;">
-
-            <div class="ruler-node" style="left:{_pct_ss}%;">
-                <div class="ruler-pin" style="background:#26c6da;"></div>
-                <div class="ruler-label">Strong<br>Support</div>
-                <div class="ruler-val">₹{data['strong_support']:,.0f}</div>
+                        bottom:2px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
+                        padding:4px 12px;border-radius:6px;white-space:nowrap;z-index:10;
+                        box-shadow:0 0 12px rgba(79,195,247,0.5);">
+                ▼ NOW &nbsp;₹{data['current_price']:,.0f}
             </div>
 
-            <div class="ruler-node" style="left:{_pct_s}%;">
-                <div class="ruler-pin" style="background:#00bcd4;box-shadow:0 0 6px #00bcd4;"></div>
-                <div class="ruler-label">Support</div>
-                <div class="ruler-val">₹{data['support']:,.0f}</div>
-            </div>
-            {_mp_node}
-            <div class="ruler-node" style="left:{_pct_r}%;">
-                <div class="ruler-pin" style="background:#ff7043;box-shadow:0 0 6px #ff7043;"></div>
-                <div class="ruler-label">Resistance</div>
-                <div class="ruler-val">₹{data['resistance']:,.0f}</div>
-            </div>
-
-            <div class="ruler-node" style="left:{_pct_sr}%;">
-                <div class="ruler-pin" style="background:#f44336;"></div>
-                <div class="ruler-label">Strong<br>Resistance</div>
-                <div class="ruler-val">₹{data['strong_resistance']:,.0f}</div>
+            <!-- Strong Resistance — top row, far right -->
+            <div class="rl-node-a" style="left:{_pct_sr}%;">
+                <div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div>
+                <div class="rl-val" style="color:#f44336;">₹{data['strong_resistance']:,.0f}</div>
+                <div class="rl-tick" style="background:#f44336;margin:4px auto 0;"></div>
             </div>
 
         </div>
 
-        <!-- ── Distance info bar ── -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <!-- ══ GRADIENT TRACK + current price pointer ══ -->
+        <div style="position:relative;height:8px;border-radius:4px;
+                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 42%,#ffb74d 58%,#ff7043 78%,#f44336 100%);
+                    box-shadow:0 2px 12px rgba(0,0,0,0.5);">
+            <!-- White pointer at current price -->
+            <div style="position:absolute;left:{_pct_cp}%;top:50%;transform:translate(-50%,-50%);
+                        width:4px;height:20px;background:#fff;border-radius:2px;
+                        box-shadow:0 0 12px rgba(255,255,255,1);z-index:10;"></div>
+        </div>
+
+        <!-- ══ ROW B — nodes BELOW the track (Support | Max Pain | Resistance) ══ -->
+        <div style="position:relative;height:62px;">
+
+            <!-- Support — bottom row, left -->
+            <div class="rl-node-b" style="left:{_pct_s}%;">
+                <div class="rl-tick" style="background:#00bcd4;box-shadow:0 0 7px #00bcd4;margin:0 auto 4px;"></div>
+                <div class="rl-lbl" style="color:#00bcd4;">Support</div>
+                <div class="rl-val" style="color:#00bcd4;">₹{data['support']:,.0f}</div>
+            </div>
+
+            {_mp_row_b}
+
+            <!-- Resistance — bottom row, right -->
+            <div class="rl-node-b" style="left:{_pct_r}%;">
+                <div class="rl-tick" style="background:#ff7043;box-shadow:0 0 7px #ff7043;margin:0 auto 4px;"></div>
+                <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
+                <div class="rl-val" style="color:#ff7043;">₹{data['resistance']:,.0f}</div>
+            </div>
+
+        </div>
+
+        <!-- ══ Distance info bar ══ -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;">
             <div style="background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.3);
-                        border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                        border-radius:8px;padding:10px 14px;
+                        display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:12px;color:#b0bec5;">📍 Distance to Resistance</span>
                 <span style="font-size:15px;font-weight:700;color:#f44336;">+{_pts_to_res:,} pts</span>
             </div>
             <div style="background:rgba(0,188,212,0.1);border:1px solid rgba(0,188,212,0.3);
-                        border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                        border-radius:8px;padding:10px 14px;
+                        display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:12px;color:#b0bec5;">📍 Distance to Support</span>
                 <span style="font-size:15px;font-weight:700;color:#00bcd4;">-{_pts_to_sup:,} pts</span>
             </div>
@@ -946,10 +969,14 @@ class NiftyHTMLAnalyzer:
     </div>
 
     <style>
-        .ruler-node{{position:absolute;transform:translateX(-50%);text-align:center;}}
-        .ruler-pin{{width:14px;height:14px;border-radius:50%;margin:0 auto 5px;border:2px solid #0a1628;}}
-        .ruler-label{{font-size:10px;color:#80deea;line-height:1.3;white-space:nowrap;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}}
-        .ruler-val{{font-size:13px;font-weight:700;color:#fff;margin-top:2px;white-space:nowrap;}}
+        /* Above-track nodes: label on top, tick pointing down to track */
+        .rl-node-a{{position:absolute;transform:translateX(-50%);text-align:center;bottom:0;}}
+        /* Below-track nodes: tick on top pointing up to track, label below */
+        .rl-node-b{{position:absolute;transform:translateX(-50%);text-align:center;top:0;}}
+        .rl-tick{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(15,32,39,0.8);}}
+        .rl-lbl{{font-size:10px;color:#80deea;line-height:1.35;white-space:nowrap;
+                 font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}}
+        .rl-val{{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;}}
     </style>
 """
         html += self.generate_dual_recommendations_html(data)

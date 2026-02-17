@@ -103,7 +103,7 @@
 
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 03:24 IST</p>
+        <p>Generated: 18-Feb-2026 03:31 IST</p>
     </div>
 
     <div class="section">
@@ -255,74 +255,86 @@
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
 
-        <!-- ── Zone legend bar ── -->
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:11px;color:#f44336;font-weight:600;letter-spacing:1px;">◄ SELL / RESISTANCE ZONE</span>
-            <span style="font-size:11px;color:#00bcd4;font-weight:600;letter-spacing:1px;">SUPPORT / BUY ZONE ►</span>
+        <!-- ── Zone legend: LOW prices LEFT, HIGH prices RIGHT ── -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ LOW / SUPPORT ZONE</span>
+            <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
         </div>
 
-        <!-- ── Gradient track ── -->
-        <div style="position:relative;height:8px;border-radius:4px;margin-bottom:0;
-                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 18%,#4fc3f7 36%,#ffb74d 52%,#ff7043 68%,#f44336 100%);
-                    box-shadow:0 2px 10px rgba(0,0,0,0.4);">
-            <!-- Current price pointer -->
-            <div style="position:absolute;left:50.2%;top:-6px;transform:translateX(-50%);
-                        width:4px;height:20px;background:#fff;border-radius:2px;
-                        box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:10;"></div>
-        </div>
+        <!-- ══ ROW A — nodes ABOVE the track (Strong Support | Strong Resistance) ══ -->
+        <div style="position:relative;height:56px;">
 
-        <!-- ── Current price callout above track ── -->
-        <div style="position:relative;height:32px;margin-bottom:4px;">
+            <!-- Strong Support — top row, far left -->
+            <div class="rl-node-a" style="left:3%;">
+                <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
+                <div class="rl-val" style="color:#26c6da;">₹25,071</div>
+                <div class="rl-tick" style="background:#26c6da;margin:4px auto 0;"></div>
+            </div>
+
+            <!-- Current price callout — top row, middle -->
             <div style="position:absolute;left:50.2%;transform:translateX(-50%);
-                        bottom:0;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
-                        padding:3px 10px;border-radius:5px;white-space:nowrap;z-index:10;">
-                ▼ NOW ₹25,725
+                        bottom:2px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
+                        padding:4px 12px;border-radius:6px;white-space:nowrap;z-index:10;
+                        box-shadow:0 0 12px rgba(79,195,247,0.5);">
+                ▼ NOW &nbsp;₹25,725
             </div>
+
+            <!-- Strong Resistance — top row, far right -->
+            <div class="rl-node-a" style="left:97%;">
+                <div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div>
+                <div class="rl-val" style="color:#f44336;">₹26,375</div>
+                <div class="rl-tick" style="background:#f44336;margin:4px auto 0;"></div>
+            </div>
+
         </div>
 
-        <!-- ── Ruler nodes ── -->
-        <div style="position:relative;height:72px;margin-top:8px;">
+        <!-- ══ GRADIENT TRACK + current price pointer ══ -->
+        <div style="position:relative;height:8px;border-radius:4px;
+                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 42%,#ffb74d 58%,#ff7043 78%,#f44336 100%);
+                    box-shadow:0 2px 12px rgba(0,0,0,0.5);">
+            <!-- White pointer at current price -->
+            <div style="position:absolute;left:50.2%;top:50%;transform:translate(-50%,-50%);
+                        width:4px;height:20px;background:#fff;border-radius:2px;
+                        box-shadow:0 0 12px rgba(255,255,255,1);z-index:10;"></div>
+        </div>
 
-            <div class="ruler-node" style="left:2%;">
-                <div class="ruler-pin" style="background:#26c6da;"></div>
-                <div class="ruler-label">Strong<br>Support</div>
-                <div class="ruler-val">₹25,071</div>
+        <!-- ══ ROW B — nodes BELOW the track (Support | Max Pain | Resistance) ══ -->
+        <div style="position:relative;height:62px;">
+
+            <!-- Support — bottom row, left -->
+            <div class="rl-node-b" style="left:7.67%;">
+                <div class="rl-tick" style="background:#00bcd4;box-shadow:0 0 7px #00bcd4;margin:0 auto 4px;"></div>
+                <div class="rl-lbl" style="color:#00bcd4;">Support</div>
+                <div class="rl-val" style="color:#00bcd4;">₹25,171</div>
             </div>
 
-            <div class="ruler-node" style="left:7.67%;">
-                <div class="ruler-pin" style="background:#00bcd4;box-shadow:0 0 6px #00bcd4;"></div>
-                <div class="ruler-label">Support</div>
-                <div class="ruler-val">₹25,171</div>
-            </div>
             
-              <div class="ruler-node" style="left:48.25%;">
-                <div class="ruler-pin" style="background:#ffb74d;box-shadow:0 0 6px #ffb74d;"></div>
-                <div class="ruler-label" style="color:#ffb74d;">Max Pain</div>
-                <div class="ruler-val" style="color:#ffb74d;">₹25,700</div>
+              <div class="rl-node-b" style="left:48.25%;">
+                <div class="rl-tick" style="background:#ffb74d;box-shadow:0 0 7px #ffb74d;"></div>
+                <div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>
+                <div class="rl-val" style="color:#ffb74d;">₹25,700</div>
               </div>
-            <div class="ruler-node" style="left:92.33%;">
-                <div class="ruler-pin" style="background:#ff7043;box-shadow:0 0 6px #ff7043;"></div>
-                <div class="ruler-label">Resistance</div>
-                <div class="ruler-val">₹26,275</div>
-            </div>
 
-            <div class="ruler-node" style="left:98%;">
-                <div class="ruler-pin" style="background:#f44336;"></div>
-                <div class="ruler-label">Strong<br>Resistance</div>
-                <div class="ruler-val">₹26,375</div>
+            <!-- Resistance — bottom row, right -->
+            <div class="rl-node-b" style="left:92.33%;">
+                <div class="rl-tick" style="background:#ff7043;box-shadow:0 0 7px #ff7043;margin:0 auto 4px;"></div>
+                <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
+                <div class="rl-val" style="color:#ff7043;">₹26,275</div>
             </div>
 
         </div>
 
-        <!-- ── Distance info bar ── -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <!-- ══ Distance info bar ══ -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;">
             <div style="background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.3);
-                        border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                        border-radius:8px;padding:10px 14px;
+                        display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:12px;color:#b0bec5;">📍 Distance to Resistance</span>
                 <span style="font-size:15px;font-weight:700;color:#f44336;">+549 pts</span>
             </div>
             <div style="background:rgba(0,188,212,0.1);border:1px solid rgba(0,188,212,0.3);
-                        border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+                        border-radius:8px;padding:10px 14px;
+                        display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:12px;color:#b0bec5;">📍 Distance to Support</span>
                 <span style="font-size:15px;font-weight:700;color:#00bcd4;">-554 pts</span>
             </div>
@@ -330,10 +342,14 @@
     </div>
 
     <style>
-        .ruler-node{position:absolute;transform:translateX(-50%);text-align:center;}
-        .ruler-pin{width:14px;height:14px;border-radius:50%;margin:0 auto 5px;border:2px solid #0a1628;}
-        .ruler-label{font-size:10px;color:#80deea;line-height:1.3;white-space:nowrap;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
-        .ruler-val{font-size:13px;font-weight:700;color:#fff;margin-top:2px;white-space:nowrap;}
+        /* Above-track nodes: label on top, tick pointing down to track */
+        .rl-node-a{position:absolute;transform:translateX(-50%);text-align:center;bottom:0;}
+        /* Below-track nodes: tick on top pointing up to track, label below */
+        .rl-node-b{position:absolute;transform:translateX(-50%);text-align:center;top:0;}
+        .rl-tick{width:12px;height:12px;border-radius:50%;border:2px solid rgba(15,32,39,0.8);}
+        .rl-lbl{font-size:10px;color:#80deea;line-height:1.35;white-space:nowrap;
+                 font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+        .rl-val{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;}
     </style>
 
     <div class="section">
