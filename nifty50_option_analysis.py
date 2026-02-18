@@ -635,7 +635,6 @@ class NiftyHTMLAnalyzer:
     def _fiidii_section_html(self):
         data  = self.html_data['fii_dii_data']
         summ  = self.html_data['fii_dii_summ']
-        max_a = summ['max_abs']
 
         # badge colour map
         badge_map = {
@@ -667,58 +666,6 @@ class NiftyHTMLAnalyzer:
                     kpi('DII 5D Avg', summ['dii_avg'], dii_col) +
                     kpi('Net Flow',   summ['net_avg'], net_col))
 
-        # ── day rows  (bidirectional bar, FII + DII)
-        def day_row(row):
-            fii_v  = row['fii']
-            dii_v  = row['dii']
-
-            def bar_seg(val, color, side):
-                """side: 'left'=negative FII, 'right'=positive"""
-                pct = min(50, abs(val) / max_a * 50)
-                glow_color = color
-                if side == 'left':
-                    return (f'<div style="flex:1;display:flex;justify-content:flex-end;">'
-                            f'<div style="width:{pct:.1f}%;height:6px;background:{color};'
-                            f'border-radius:3px 0 0 3px;opacity:0.8;'
-                            f'box-shadow:0 0 6px {glow_color}40;"></div></div>')
-                else:
-                    return (f'<div style="flex:1;">'
-                            f'<div style="width:{pct:.1f}%;height:6px;background:{color};'
-                            f'border-radius:0 3px 3px 0;'
-                            f'box-shadow:0 0 6px {glow_color}40;"></div></div>')
-
-            def make_bar(val, pos_color, neg_color):
-                center = '<div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div>'
-                if val >= 0:
-                    return f'<div style="display:flex;align-items:center;width:100%;">' \
-                           f'<div style="flex:1;"></div>{center}{bar_seg(val, pos_color, "right")}</div>'
-                else:
-                    return f'<div style="display:flex;align-items:center;width:100%;">' \
-                           f'{bar_seg(val, neg_color, "left")}{center}<div style="flex:1;"></div></div>'
-
-            fii_sign  = '+' if fii_v >= 0 else ''
-            dii_sign  = '+'
-            fii_clr   = '#00e676' if fii_v >= 0 else '#ff5252'
-
-            return f"""
-                <div style="padding:10px 6px;border-radius:8px;
-                            border:1px solid transparent;transition:all 0.15s;">
-                    <div style="display:flex;justify-content:space-between;
-                                align-items:center;margin-bottom:5px;">
-                        <span style="font-size:10px;color:#607d8b;letter-spacing:1px;">{row['day']}</span>
-                        <span style="font-size:12px;font-weight:600;color:#8090a8;">{row['date']}</span>
-                        <div style="display:flex;gap:14px;font-size:10px;">
-                            <span style="color:{fii_clr};">FII {fii_sign}{fii_v:.0f} Cr</span>
-                            <span style="color:#40c4ff;">DII {dii_sign}{dii_v:.0f} Cr</span>
-                        </div>
-                    </div>
-                    <div style="margin-bottom:3px;">{make_bar(fii_v, '#00e676', '#ff5252')}</div>
-                    <div>{make_bar(dii_v, '#40c4ff', '#ff5252')}</div>
-                </div>"""
-
-        rows_html = ''.join(day_row(r) for r in data)
-
-        # date range label
         date_range = f"{data[0]['date']} – {data[-1]['date']}, 2026"
 
         html = f"""
@@ -730,7 +677,7 @@ class NiftyHTMLAnalyzer:
             <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">5-Day Average</span>
         </div>
 
-        <!-- top strip: sentiment badge + KPI cards -->
+        <!-- sentiment badge + KPI cards -->
         <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;
                     align-items:stretch;margin-bottom:18px;">
 
@@ -748,30 +695,9 @@ class NiftyHTMLAnalyzer:
             {kpi_html}
         </div>
 
-        <!-- legend -->
-        <div style="display:flex;gap:18px;margin-bottom:10px;padding-left:4px;">
-            <div style="display:flex;align-items:center;gap:6px;">
-                <div style="width:8px;height:8px;border-radius:2px;background:#00e676;"></div>
-                <span style="font-size:10px;color:#546e7a;letter-spacing:1px;">FII</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-                <div style="width:8px;height:8px;border-radius:2px;background:#40c4ff;"></div>
-                <span style="font-size:10px;color:#546e7a;letter-spacing:1px;">DII</span>
-            </div>
-            <div style="margin-left:auto;font-size:9px;color:#263238;letter-spacing:1px;">
-                ← SELL &nbsp;|&nbsp; BUY →
-            </div>
-        </div>
-
-        <!-- day-by-day bars -->
-        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(79,195,247,0.08);
-                    border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:2px;">
-            {rows_html}
-        </div>
-
         <!-- insight box -->
-        <div style="margin-top:14px;background:{s_bg};
-                    border:1px solid {s_border};border-radius:10px;padding:14px 16px;">
+        <div style="background:{s_bg};border:1px solid {s_border};
+                    border-radius:10px;padding:14px 16px;">
             <div style="font-size:9px;color:{s_color};letter-spacing:2px;
                         font-weight:700;margin-bottom:6px;">5-DAY INSIGHT</div>
             <div style="font-size:12px;color:#78909c;line-height:1.7;">{summ['insight']}</div>
