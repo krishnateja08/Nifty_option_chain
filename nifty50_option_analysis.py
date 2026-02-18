@@ -972,27 +972,31 @@ class NiftyHTMLAnalyzer:
         .sb-val.red{{   color:#ff5252; }}
         .sb-val.small{{ font-size:11px; }}
         .sb-signal{{
-            padding:9px 16px;
+            padding:10px 16px;
             background:rgba(79,195,247,0.05);
             border-top:1px solid rgba(79,195,247,0.06);
             border-bottom:1px solid rgba(79,195,247,0.06);
-            font-size:12px; color:#80deea;
-            display:flex; align-items:center; gap:8px;
+            font-size:14px; color:#ffffff; font-weight:500;
+            display:flex; align-items:center; gap:10px;
         }}
         .sb-signal .sig-lbl{{
-            font-size:8px; letter-spacing:2px; color:#37474f;
+            font-size:9px; letter-spacing:2px; color:#37474f;
             text-transform:uppercase; flex-shrink:0;
         }}
         .sb-footer{{
-            padding:10px 16px;
+            padding:11px 16px;
             background:rgba(0,0,0,0.25);
             font-family:'JetBrains Mono',monospace;
-            font-size:11px; color:#80deea;
+            font-size:13px; color:#ffffff; font-weight:500;
             display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
         }}
         .sb-footer .sf-lbl{{
-            font-size:8px; letter-spacing:2px; color:#37474f;
+            font-size:9px; letter-spacing:2px; color:#37474f;
             text-transform:uppercase; flex-shrink:0; font-family:'Rajdhani',sans-serif;
+        }}
+        .sb-footer .sf-why{{
+            font-size:13px; color:#ffffff; font-style:italic;
+            font-family:'Rajdhani',sans-serif; font-weight:500; margin-left:auto;
         }}
         .fire-row{{
             background:rgba(12,6,0,0.75);
@@ -1341,7 +1345,7 @@ class NiftyHTMLAnalyzer:
             <div class="sb-footer">
                 <span class="sf-lbl">📋 Setup</span>
                 <span>{ts['description']}</span>
-                <span style="color:#37474f;margin-left:auto;">💡 {ts['best_for']}</span>
+                <span class="sf-why">💡 {ts['best_for']}</span>
             </div>
         </div>
 """
@@ -1363,7 +1367,7 @@ class NiftyHTMLAnalyzer:
             </div>
             <div class="sb-signal">
                 <span class="sig-lbl">📊 OI Signal</span>
-                <span style="color:#cfd8dc;">{signal_txt}</span>
+                <span style="color:#ffffff;font-weight:500;">{signal_txt}</span>
             </div>
             <div class="sb-body">
                 <div class="sb-cell">
@@ -1390,7 +1394,7 @@ class NiftyHTMLAnalyzer:
             <div class="sb-footer" style="border-top-color:rgba(255,183,77,0.08);">
                 <span class="sf-lbl">📋 Setup</span>
                 <span>{oi['description']}</span>
-                <span style="color:#37474f;margin-left:auto;">💡 {oi['best_for']}</span>
+                <span class="sf-why">💡 {oi['best_for']}</span>
             </div>
         </div>
 """

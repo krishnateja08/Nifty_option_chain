@@ -197,27 +197,31 @@
         .sb-val.red{   color:#ff5252; }
         .sb-val.small{ font-size:11px; }
         .sb-signal{
-            padding:9px 16px;
+            padding:10px 16px;
             background:rgba(79,195,247,0.05);
             border-top:1px solid rgba(79,195,247,0.06);
             border-bottom:1px solid rgba(79,195,247,0.06);
-            font-size:12px; color:#80deea;
-            display:flex; align-items:center; gap:8px;
+            font-size:14px; color:#ffffff; font-weight:500;
+            display:flex; align-items:center; gap:10px;
         }
         .sb-signal .sig-lbl{
-            font-size:8px; letter-spacing:2px; color:#37474f;
+            font-size:9px; letter-spacing:2px; color:#37474f;
             text-transform:uppercase; flex-shrink:0;
         }
         .sb-footer{
-            padding:10px 16px;
+            padding:11px 16px;
             background:rgba(0,0,0,0.25);
             font-family:'JetBrains Mono',monospace;
-            font-size:11px; color:#80deea;
+            font-size:13px; color:#ffffff; font-weight:500;
             display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
         }
         .sb-footer .sf-lbl{
-            font-size:8px; letter-spacing:2px; color:#37474f;
+            font-size:9px; letter-spacing:2px; color:#37474f;
             text-transform:uppercase; flex-shrink:0; font-family:'Rajdhani',sans-serif;
+        }
+        .sb-footer .sf-why{
+            font-size:13px; color:#ffffff; font-style:italic;
+            font-family:'Rajdhani',sans-serif; font-weight:500; margin-left:auto;
         }
         .fire-row{
             background:rgba(12,6,0,0.75);
@@ -281,7 +285,7 @@
 <div class="container">
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 07:09 IST</p>
+        <p>Generated: 18-Feb-2026 07:15 IST</p>
     </div>
 
     <!-- ── MARKET SNAPSHOT ── -->
@@ -665,7 +669,7 @@
             <div class="sb-footer">
                 <span class="sf-lbl">📋 Setup</span>
                 <span>Sell 25850 CE + Buy 25950 CE, Sell 25650 PE + Buy 25550 PE</span>
-                <span style="color:#37474f;margin-left:auto;">💡 Expect low volatility, range-bound market</span>
+                <span class="sf-why">💡 Expect low volatility, range-bound market</span>
             </div>
         </div>
 
@@ -676,7 +680,7 @@
             </div>
             <div class="sb-signal">
                 <span class="sig-lbl">📊 OI Signal</span>
-                <span style="color:#cfd8dc;">🟡 Big move expected, direction uncertain</span>
+                <span style="color:#ffffff;font-weight:500;">🟡 Big move expected, direction uncertain</span>
             </div>
             <div class="sb-body">
                 <div class="sb-cell">
@@ -703,7 +707,7 @@
             <div class="sb-footer" style="border-top-color:rgba(255,183,77,0.08);">
                 <span class="sf-lbl">📋 Setup</span>
                 <span>Buy 25750 CE + 25750 PE</span>
-                <span style="color:#37474f;margin-left:auto;">💡 Both Calls & Puts building</span>
+                <span class="sf-why">💡 Both Calls & Puts building</span>
             </div>
         </div>
 
