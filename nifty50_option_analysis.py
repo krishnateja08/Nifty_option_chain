@@ -635,6 +635,37 @@ class NiftyHTMLAnalyzer:
             </div>"""
 
     # ─────────────────────────────────────────────
+    #  KEY LEVELS FIRE ROW  (standalone)
+    # ─────────────────────────────────────────────
+    def _key_levels_fire_row(self, d):
+        if d['stop_loss']:
+            sl_html = f"""
+                <div class="fire-col-label">STOP LOSS</div>
+                <div class="fire-col-value stop-price">₹{d['stop_loss']:,.0f}</div>
+                <div class="fire-rr">Risk {d['risk_points']} pts &nbsp;·&nbsp; R:R 1:{d['risk_reward_ratio']}</div>"""
+        else:
+            sl_html = """
+                <div class="fire-col-label">STOP LOSS</div>
+                <div class="fire-col-value stop-text">Use option premium<br>as max loss</div>"""
+        return f"""
+        <div class="fire-row">
+            <div class="fire-col">
+                <div class="fire-heading">📍 KEY<br>LEVELS</div>
+            </div>
+            <div class="fire-col">
+                <div class="fire-col-label">ENTRY ZONE</div>
+                <div class="fire-col-value">₹{d['entry_low']:,.0f}–₹{d['entry_high']:,.0f}</div>
+            </div>
+            <div class="fire-col">
+                <div class="fire-col-label">TARGET 1 / 2</div>
+                <div class="fire-col-value">₹{d['target_1']:,.0f} &nbsp;/&nbsp; ₹{d['target_2']:,.0f}</div>
+            </div>
+            <div class="fire-col">
+                {sl_html}
+            </div>
+        </div>"""
+
+    # ─────────────────────────────────────────────
     #  FII / DII SECTION HTML
     # ─────────────────────────────────────────────
     def _fiidii_section_html(self):
@@ -1223,6 +1254,12 @@ class NiftyHTMLAnalyzer:
         </div>
     </div>
 
+    <!-- ── KEY LEVELS FIRE ROW ── -->
+    <div class="section">
+        <div class="section-title"><span>📍</span> KEY TRADING LEVELS</div>
+        {self._key_levels_fire_row(d)}
+    </div>
+
     <!-- ── FII / DII 5-DAY SENTIMENT (injected here) ── -->
     {self._fiidii_section_html()}
 
@@ -1538,36 +1575,6 @@ class NiftyHTMLAnalyzer:
                 <span class="sf-why">💡 {oi['best_for']}</span>
             </div>
         </div>
-"""
-        # ══ KEY LEVELS FIRE ROW (unchanged) ══
-        if d['stop_loss']:
-            sl_html = f"""
-                <div class="fire-col-label">STOP LOSS</div>
-                <div class="fire-col-value stop-price">₹{d['stop_loss']:,.0f}</div>
-                <div class="fire-rr">Risk {d['risk_points']} pts &nbsp;·&nbsp; R:R 1:{d['risk_reward_ratio']}</div>"""
-        else:
-            sl_html = """
-                <div class="fire-col-label">STOP LOSS</div>
-                <div class="fire-col-value stop-text">Use option premium<br>as max loss</div>"""
-
-        html += f"""
-        <div class="fire-row">
-            <div class="fire-col">
-                <div class="fire-heading">📍 KEY<br>LEVELS</div>
-            </div>
-            <div class="fire-col">
-                <div class="fire-col-label">ENTRY ZONE</div>
-                <div class="fire-col-value">₹{d['entry_low']:,.0f}–₹{d['entry_high']:,.0f}</div>
-            </div>
-            <div class="fire-col">
-                <div class="fire-col-label">TARGET 1 / 2</div>
-                <div class="fire-col-value">₹{d['target_1']:,.0f} &nbsp;/&nbsp; ₹{d['target_2']:,.0f}</div>
-            </div>
-            <div class="fire-col">
-                {sl_html}
-            </div>
-        </div>
-    </div>
 """
         return html
 
