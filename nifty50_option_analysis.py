@@ -52,30 +52,35 @@ def compute_fii_dii_summary(data):
     dii_avg  = sum(dii_vals) / len(dii_vals)
     net_avg  = fii_avg + dii_avg
 
+    fii_span = f'<span style="color:#ff5252;font-weight:700;">₹{fii_avg:.0f} Cr/day</span>'
+    dii_span = f'<span style="color:#40c4ff;font-weight:700;">₹{dii_avg:+.0f} Cr/day</span>'
+    net_span = f'<span style="color:#b388ff;font-weight:700;">₹{net_avg:+.0f} Cr/day</span>'
+
     if fii_avg > 0 and dii_avg > 0:
         label = 'STRONGLY BULLISH'; emoji = '🚀'; color = '#00e676'
         badge_cls = 'fii-bull'
-        insight = (f"Both FIIs (avg ₹{fii_avg:+.0f} Cr/day) and DIIs "
-                   f"(avg ₹{dii_avg:+.0f} Cr/day) are net buyers — "
-                   f"strong dual institutional confirmation.")
+        fii_span = f'<span style="color:#00e676;font-weight:700;">₹{fii_avg:+.0f} Cr/day</span>'
+        insight = (f"Both FIIs (avg {fii_span}) and DIIs (avg {dii_span}) are net buyers — "
+                   f"strong dual institutional confirmation. Net combined flow: {net_span}.")
     elif fii_avg < 0 and dii_avg > 0 and dii_avg > abs(fii_avg):
         label = 'CAUTIOUSLY BULLISH'; emoji = '📈'; color = '#69f0ae'
         badge_cls = 'fii-cbull'
-        insight = (f"FIIs are net sellers (avg ₹{fii_avg:.0f} Cr/day) but "
-                   f"DIIs are absorbing strongly (avg ₹{dii_avg:+.0f} Cr/day). "
-                   f"DII support is cushioning downside — FII return is key for breakout.")
+        insight = (f"FIIs are net sellers (avg {fii_span}) but DIIs are absorbing strongly (avg {dii_span}). "
+                   f"DII support is cushioning downside — FII return is key for breakout. "
+                   f"Net combined flow: {net_span}.")
     elif fii_avg < 0 and dii_avg > 0:
         label = 'MIXED / NEUTRAL'; emoji = '⚖️'; color = '#ffd740'
         badge_cls = 'fii-neu'
-        insight = (f"FII selling (avg ₹{fii_avg:.0f} Cr/day) partly offset by "
-                   f"DII buying (avg ₹{dii_avg:+.0f} Cr/day). "
-                   f"Watch for 3+ consecutive days of FII buying for trend confirmation.")
+        insight = (f"FII selling (avg {fii_span}) is partly offset by DII buying (avg {dii_span}). "
+                   f"Watch for 3+ consecutive days of FII buying for trend confirmation. "
+                   f"Net combined flow: {net_span}.")
     elif fii_avg < 0 and dii_avg < 0:
         label = 'BEARISH'; emoji = '📉'; color = '#ff5252'
         badge_cls = 'fii-bear'
-        insight = (f"Both FIIs (avg ₹{fii_avg:.0f} Cr/day) and DIIs "
-                   f"(avg ₹{dii_avg:.0f} Cr/day) are net sellers — "
-                   f"clear bearish institutional pressure. Exercise caution.")
+        dii_span = f'<span style="color:#ff5252;font-weight:700;">₹{dii_avg:.0f} Cr/day</span>'
+        insight = (f"Both FIIs (avg {fii_span}) and DIIs (avg {dii_span}) are net sellers — "
+                   f"clear bearish institutional pressure. Exercise caution. "
+                   f"Net combined flow: {net_span}.")
     else:
         label = 'NEUTRAL'; emoji = '🔄'; color = '#b0bec5'
         badge_cls = 'fii-neu'
@@ -700,7 +705,7 @@ class NiftyHTMLAnalyzer:
                     border-radius:10px;padding:14px 16px;">
             <div style="font-size:9px;color:{s_color};letter-spacing:2px;
                         font-weight:700;margin-bottom:6px;">5-DAY INSIGHT</div>
-            <div style="font-size:12px;color:#78909c;line-height:1.7;">{summ['insight']}</div>
+            <div style="font-size:13px;color:#cfd8dc;line-height:1.8;font-weight:500;">{summ['insight']}</div>
         </div>
     </div>
 """
