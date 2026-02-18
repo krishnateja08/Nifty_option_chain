@@ -273,20 +273,160 @@
             font-size:13px; color:#ffb74d; line-height:1.8;
         }
         .footer{text-align:center;padding:24px;color:#546e7a;font-size:12px;background:rgba(10,20,28,0.4);}
-        @media(max-width:900px){
-            .grid-5{grid-template-columns:repeat(2,1fr);}
-            .grid-4{grid-template-columns:repeat(2,1fr);}
-            .snap-grid{grid-template-columns:1fr;}
-            .oi-grid{grid-template-columns:1fr;}
+        /* ══════════════════════════════════════════
+           RESPONSIVE — TABLET (iPad ≤ 1024px)
+        ══════════════════════════════════════════ */
+        @media(max-width:1024px){
+            body{ padding:16px; }
+            .container{ border-radius:16px; }
+            .header{ padding:28px 20px; }
+            .header h1{ font-size:24px; letter-spacing:1.5px; }
+            .section{ padding:22px 18px; }
+
+            /* 5-col → 3-col */
+            .grid-5{ grid-template-columns:repeat(3,1fr); }
+            /* 4-col → 2-col */
+            .grid-4{ grid-template-columns:repeat(2,1fr); }
+            /* snap 3-col → 3-col (keep) */
+            .snap-grid{ grid-template-columns:repeat(3,1fr); }
+            /* OI grid 3-col → 3-col (keep) */
+            .oi-grid{ grid-template-columns:repeat(3,1fr); }
+
+            /* FII/DII KPI row: sentiment + 3 KPIs → 2-col on tablet */
+            .fii-kpi-grid{ grid-template-columns:1fr 1fr !important; }
+
+            /* Scoreboard body: 5-col → 3-col+2 wrap */
+            .sb-body{ grid-template-columns:repeat(3,1fr); }
+            .sb-cell:nth-child(4),.sb-cell:nth-child(5){
+                border-top:1px solid rgba(79,195,247,0.06);
+            }
+
+            /* Fire row: 4-col → 2-col grid */
+            .fire-row{
+                grid-template-columns:1fr 1fr;
+                gap:14px;
+                padding:16px;
+            }
+            .fire-col{ border-right:none; padding:8px 12px; }
+            .fire-col:nth-child(odd){ border-right:1px solid rgba(255,140,0,0.12); }
+            .fire-col-value{ font-size:16px; }
+
+            /* Key levels: hide max pain label overflow */
+            .rl-lbl{ font-size:9px; }
+            .rl-val{ font-size:11px; }
+
+            /* Strikes table side-by-side → stack */
+            .strikes-wrap{ grid-template-columns:1fr !important; }
+
+            /* Direction box */
+            .direction-title{ font-size:22px; }
+            .direction-subtitle{ font-size:12px; }
+
+            /* Val font size */
+            .val{ font-size:20px; }
         }
-        @media(max-width:480px){.grid-5,.grid-4{grid-template-columns:1fr;}}
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE — MOBILE (≤ 600px)
+        ══════════════════════════════════════════ */
+        @media(max-width:600px){
+            body{ padding:8px; }
+            .container{ border-radius:12px; }
+            .header{ padding:20px 14px; }
+            .header h1{ font-size:18px; letter-spacing:1px; }
+            .header p{ font-size:11px; }
+            .section{ padding:16px 12px; }
+            .section-title{ font-size:11px; letter-spacing:1.5px; gap:6px; }
+            .section-title span{ font-size:15px; }
+
+            /* All grids → single column */
+            .grid-5,.grid-4{ grid-template-columns:1fr; }
+            .snap-grid{ grid-template-columns:1fr; }
+            .oi-grid{ grid-template-columns:1fr; }
+
+            /* FII/DII: sentiment pill full width, then 3 KPI cards stacked */
+            div[style*="grid-template-columns:auto 1fr 1fr 1fr"]{
+                grid-template-columns:1fr 1fr !important;
+            }
+
+            /* Stat cards */
+            .val{ font-size:20px; }
+            .card-ico{ font-size:18px; }
+
+            /* Scoreboard: all 5 cells → single column */
+            .sb-body{ grid-template-columns:1fr 1fr; }
+            .sb-cell{ border-right:none !important; border-bottom:1px solid rgba(79,195,247,0.06); }
+            .sb-cell:last-child{ border-bottom:none; }
+            .sb-h-title{ font-size:11px; letter-spacing:0.5px; }
+            .sb-h-badge{ font-size:8px; padding:2px 8px; }
+            .sb-val{ font-size:13px; }
+            .sb-lbl{ font-size:8px; }
+            .sb-footer{ font-size:11px; flex-direction:column; gap:6px; }
+            .sb-footer .sf-why{ margin-left:0; }
+            .sb-signal{ font-size:12px; flex-wrap:wrap; gap:6px; }
+
+            /* Fire row → 1-col stack */
+            .fire-row{
+                grid-template-columns:1fr;
+                gap:12px;
+                padding:14px 12px;
+            }
+            .fire-col{ border-right:none !important; border-bottom:1px solid rgba(255,140,0,0.08); padding:8px 4px; }
+            .fire-col:last-child{ border-bottom:none; }
+            .fire-col-value{ font-size:15px; }
+            .fire-heading{ font-size:10px; }
+
+            /* Direction box */
+            .direction-box{ padding:18px 14px; }
+            .direction-title{ font-size:20px; }
+            .direction-subtitle{ font-size:11px; }
+
+            /* Logic box */
+            .logic-box p{ font-size:11px; line-height:1.7; }
+
+            /* Key levels: compact on mobile */
+            .rl-node-a,.rl-node-b{ font-size:9px; }
+            .rl-val{ font-size:10px; }
+            .rl-lbl{ font-size:8px; letter-spacing:0; }
+
+            /* Distance row → stack */
+            div[style*="grid-template-columns:1fr 1fr"]{
+                grid-template-columns:1fr !important;
+            }
+
+            /* FII KPI numbers */
+            div[style*="font-size:22px"]{ font-size:18px !important; }
+
+            /* Strikes table → stack */
+            .strikes-wrap{ grid-template-columns:1fr !important; }
+            .strikes-table th,.strikes-table td{ padding:10px 8px; font-size:11px; }
+
+            /* Disclaimer */
+            .disclaimer{ padding:14px; font-size:12px; }
+
+            /* OI direction box */
+            .oi-grid .g .val{ font-size:16px; }
+        }
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE — SMALL MOBILE (≤ 380px)
+        ══════════════════════════════════════════ */
+        @media(max-width:380px){
+            .header h1{ font-size:15px; }
+            .sb-body{ grid-template-columns:1fr; }
+            .section{ padding:12px 10px; }
+            .val{ font-size:17px; }
+            .sb-val{ font-size:12px; }
+            .fire-col-value{ font-size:13px; }
+            .direction-title{ font-size:17px; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 07:19 IST</p>
+        <p>Generated: 18-Feb-2026 07:28 IST</p>
     </div>
 
     <!-- ── MARKET SNAPSHOT ── -->
@@ -319,7 +459,7 @@
         </div>
 
         <!-- sentiment badge + KPI cards -->
-        <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;
+        <div class="fii-kpi-grid" style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;
                     align-items:stretch;margin-bottom:18px;">
 
             <!-- Sentiment pill -->
@@ -736,7 +876,7 @@
         <div class="section-title"><span>📋</span> TOP 5 STRIKES BY OPEN INTEREST
             <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Only)</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="strikes-wrap">
             <div>
                 <h3 style="color:#00bcd4;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📞 CALL OPTIONS (CE)</h3>
                 <table class="strikes-table">
