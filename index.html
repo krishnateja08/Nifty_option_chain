@@ -6,7 +6,6 @@
     <title>Nifty 50 Daily Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ── RESET & BASE ── */
         *{margin:0;padding:0;box-sizing:border-box;}
         body{
             font-family:'Rajdhani',sans-serif;
@@ -21,8 +20,6 @@
             box-shadow:0 20px 60px rgba(0,0,0,0.5);
             border:1px solid rgba(79,195,247,0.18);
         }
-
-        /* ── HEADER ── */
         .header{
             background:linear-gradient(135deg,#0f2027,#203a43);
             padding:40px 30px; text-align:center;
@@ -41,8 +38,6 @@
             letter-spacing:2px; position:relative; z-index:1;
         }
         .header p{color:#80deea;font-size:13px;margin-top:8px;position:relative;z-index:1;}
-
-        /* ── SECTIONS ── */
         .section{padding:28px 26px;border-bottom:1px solid rgba(79,195,247,0.08);}
         .section:last-child{border-bottom:none;}
         .section-title{
@@ -53,8 +48,6 @@
             border-bottom:1px solid rgba(79,195,247,0.18);
         }
         .section-title span{font-size:18px;}
-
-        /* ── GLASS CARD BASE ── */
         .g{
             background:rgba(255,255,255,0.04);
             backdrop-filter:blur(20px);
@@ -64,13 +57,11 @@
             position:relative; overflow:hidden;
             transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
         }
-        /* top shimmer line */
         .g::before{
             content:''; position:absolute; top:0; left:0; right:0; height:1px;
             background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
             z-index:1;
         }
-        /* sweep shimmer on hover */
         .g::after{
             content:''; position:absolute; top:-60%; left:-30%; width:50%; height:200%;
             background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);
@@ -86,15 +77,12 @@
         .g-hi{background:rgba(79,195,247,0.09);border-color:rgba(79,195,247,0.35);}
         .g-red{background:rgba(244,67,54,0.06);border-color:rgba(244,67,54,0.25);}
         .g-red:hover{background:rgba(244,67,54,0.1);border-color:rgba(244,67,54,0.45);}
-
-        /* ── STAT CARD + BAR (Layout 4) ── */
         .card-grid{display:grid;gap:14px;}
         .grid-5{grid-template-columns:repeat(5,1fr);}
         .grid-4{grid-template-columns:repeat(4,1fr);}
-
         .g .card-top-row{
             display:flex; align-items:center; gap:10px;
-            margin-bottom:10px; position:relative; z-index:2;
+            margin-bottom:10px; position:relative; z-index:2; padding:14px 16px 0;
         }
         .card-ico{font-size:22px;line-height:1;}
         .lbl{
@@ -106,8 +94,6 @@
             color:#fff; display:block; margin-bottom:10px; position:relative; z-index:2;
             padding:0 16px;
         }
-
-        /* progress bar */
         .bar-wrap{
             height:5px; background:rgba(0,0,0,0.35);
             border-radius:3px; margin:0 16px 12px; overflow:hidden;
@@ -118,15 +104,11 @@
         .bar-red {background:linear-gradient(90deg,#f44336,#ff5722);box-shadow:0 0 8px rgba(244,67,54,0.5);}
         .bar-gold{background:linear-gradient(90deg,#ffb74d,#ffd54f);box-shadow:0 0 8px rgba(255,183,77,0.5);}
         .bar-grn {background:linear-gradient(90deg,#00e676,#00bcd4);box-shadow:0 0 8px rgba(0,230,118,0.5);}
-
-        /* card footer: sub-text + badge */
         .card-foot{
             display:flex; justify-content:space-between; align-items:center;
             padding:0 16px 14px; position:relative; z-index:2;
         }
         .sub{font-size:10px;color:#455a64;font-family:'JetBrains Mono',monospace;}
-
-        /* badge pills */
         .tag{
             display:inline-flex; align-items:center;
             padding:3px 11px; border-radius:20px; font-size:11px; font-weight:700;
@@ -135,8 +117,6 @@
         .tag-neu {background:rgba(255,183,77,0.15); color:#ffb74d; border:1px solid rgba(255,183,77,0.35);}
         .tag-bull{background:rgba(0,229,255,0.12);  color:#00e5ff; border:1px solid rgba(0,229,255,0.35);}
         .tag-bear{background:rgba(255,82,82,0.12);  color:#ff5252; border:1px solid rgba(255,82,82,0.35);}
-
-        /* ── DIRECTION BOX ── */
         .direction-box{
             padding:28px; border-radius:14px; text-align:center; margin:20px 0;
             border:2px solid #4fc3f7;
@@ -155,8 +135,6 @@
         .direction-box.bullish .direction-subtitle,
         .direction-box.bearish .direction-subtitle,
         .direction-box.sideways .direction-subtitle{color:#000;}
-
-        /* ── LOGIC BOX ── */
         .logic-box{
             background:rgba(79,195,247,0.07);
             backdrop-filter:blur(8px);
@@ -165,18 +143,12 @@
         }
         .logic-box p{font-size:13px;line-height:1.9;color:#80deea;}
         .logic-box strong{color:#4fc3f7;}
-
-        /* ── OI CHANGE CARDS ── */
         .oi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
-
-        /* ── KEY LEVELS ── */
         .rl-node-a{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}
         .rl-node-b{position:absolute;top:0;transform:translateX(-50%);text-align:center;}
         .rl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}
         .rl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}
         .rl-val{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}
-
-        /* ── STRATEGY CARDS ── */
         .strat-card{
             background:rgba(255,255,255,0.03);
             backdrop-filter:blur(16px);
@@ -200,8 +172,6 @@
         .pl-profit .pl-val{color:#00bcd4;}
         .pl-loss{background:rgba(244,67,54,0.1);border-left:3px solid #f44336;}
         .pl-loss .pl-val{color:#f44336;}
-
-        /* ── FIRE ROW — KEY TRADING LEVELS ── */
         .fire-row{
             background:rgba(12,6,0,0.75);
             backdrop-filter:blur(14px);
@@ -218,13 +188,8 @@
             box-shadow:0 0 28px rgba(255,140,0,0.08), inset 0 1px 0 rgba(255,140,0,0.08);
             transition:box-shadow 0.3s ease;
         }
-        .fire-row:hover{
-            box-shadow:0 0 40px rgba(255,140,0,0.15), inset 0 1px 0 rgba(255,140,0,0.12);
-        }
-        .fire-col{
-            padding:4px 18px;
-            border-right:1px solid rgba(255,140,0,0.12);
-        }
+        .fire-row:hover{box-shadow:0 0 40px rgba(255,140,0,0.15), inset 0 1px 0 rgba(255,140,0,0.12);}
+        .fire-col{padding:4px 18px;border-right:1px solid rgba(255,140,0,0.12);}
         .fire-col:first-child{padding-left:6px;}
         .fire-col:last-child{border-right:none;}
         .fire-heading{
@@ -234,47 +199,20 @@
             color:#ff8c00; letter-spacing:2.5px;
             text-transform:uppercase; line-height:1.4;
         }
-        .fire-col-label{
-            font-size:9px; letter-spacing:2px; color:rgba(255,140,0,0.5);
-            text-transform:uppercase; font-weight:700;
-            margin-bottom:7px; font-family:'Rajdhani',sans-serif;
-        }
-        .fire-col-value{
-            font-family:'Oxanium',sans-serif;
-            font-size:20px; font-weight:800;
-            color:#ff8c00; letter-spacing:0.5px;
-            line-height:1.2;
-        }
-        .fire-col-value.stop-text{
-            font-size:13px; font-weight:700; color:#ff8c00;
-            line-height:1.5; opacity:0.85;
-        }
-        .fire-col-value.stop-price{
-            color:#f44336; font-size:20px;
-        }
-        .fire-rr{
-            margin-top:6px;
-            font-size:10px; color:rgba(255,140,0,0.45);
-            font-family:'JetBrains Mono',monospace; letter-spacing:1px;
-        }
-
-        /* ── STRIKES TABLE ── */
+        .fire-col-label{font-size:9px;letter-spacing:2px;color:rgba(255,140,0,0.5);text-transform:uppercase;font-weight:700;margin-bottom:7px;font-family:'Rajdhani',sans-serif;}
+        .fire-col-value{font-family:'Oxanium',sans-serif;font-size:20px;font-weight:800;color:#ff8c00;letter-spacing:0.5px;line-height:1.2;}
+        .fire-col-value.stop-text{font-size:13px;font-weight:700;color:#ff8c00;line-height:1.5;opacity:0.85;}
+        .fire-col-value.stop-price{color:#f44336;font-size:20px;}
+        .fire-rr{margin-top:6px;font-size:10px;color:rgba(255,140,0,0.45);font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
         .strikes-table{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}
-        .strikes-table th{
-            background:linear-gradient(135deg,#4fc3f7,#26c6da);
-            color:#000;padding:14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;
-        }
+        .strikes-table th{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;}
         .strikes-table td{padding:14px;border-bottom:1px solid rgba(79,195,247,0.08);color:#b0bec5;font-size:13px;}
         .strikes-table tr:hover{background:rgba(79,195,247,0.06);}
         .strikes-table tbody tr:last-child td{border-bottom:none;}
-
-        /* ── MARKET SNAPSHOT CARDS ── */
         .snap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
         .snap-card{padding:18px 16px;}
-        .snap-card .card-top-row{margin-bottom:8px;}
+        .snap-card .card-top-row{margin-bottom:8px;padding:0;}
         .snap-card .val{font-size:26px;padding:0;margin-bottom:0;}
-
-        /* ── DISCLAIMER / FOOTER ── */
         .disclaimer{
             background:rgba(255,183,77,0.1);
             backdrop-filter:blur(8px);
@@ -283,26 +221,20 @@
             font-size:13px; color:#ffb74d; line-height:1.8;
         }
         .footer{text-align:center;padding:24px;color:#546e7a;font-size:12px;background:rgba(10,20,28,0.4);}
-
-        /* ── RESPONSIVE ── */
         @media(max-width:900px){
             .grid-5{grid-template-columns:repeat(2,1fr);}
             .grid-4{grid-template-columns:repeat(2,1fr);}
             .snap-grid{grid-template-columns:1fr;}
             .oi-grid{grid-template-columns:1fr;}
         }
-        @media(max-width:480px){
-            .grid-5,.grid-4{grid-template-columns:1fr;}
-        }
+        @media(max-width:480px){.grid-5,.grid-4{grid-template-columns:1fr;}}
     </style>
 </head>
 <body>
 <div class="container">
-
-    <!-- ── HEADER ── -->
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 18-Feb-2026 04:28 IST</p>
+        <p>Generated: 18-Feb-2026 06:48 IST</p>
     </div>
 
     <!-- ── MARKET SNAPSHOT ── -->
@@ -324,6 +256,159 @@
         </div>
     </div>
 
+    <!-- ── FII / DII 5-DAY SENTIMENT (injected here) ── -->
+    
+    <!-- ══════════════════════════════════════════
+         FII / DII 5-DAY SENTIMENT
+         ══════════════════════════════════════════ -->
+    <div class="section">
+        <div class="section-title"><span>🏦</span> FII / DII INSTITUTIONAL FLOW
+            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">5-Day Average</span>
+        </div>
+
+        <!-- top strip: sentiment badge + KPI cards -->
+        <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;
+                    align-items:stretch;margin-bottom:18px;">
+
+            <!-- Sentiment pill -->
+            <div style="background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);border-radius:14px;
+                        padding:18px 20px;display:flex;flex-direction:column;
+                        align-items:center;justify-content:center;min-width:130px;">
+                <div style="font-size:28px;margin-bottom:6px;">📈</div>
+                <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;
+                            color:#69f0ae;text-align:center;line-height:1.4;">CAUTIOUSLY BULLISH</div>
+                <div style="font-size:8px;color:rgba(176,190,197,0.4);
+                            margin-top:5px;letter-spacing:1px;">Feb 11 – Feb 17, 2026</div>
+            </div>
+
+            
+                <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);
+                            border-radius:14px;padding:16px 14px;text-align:center;">
+                    <div style="font-size:9px;letter-spacing:2.5px;color:rgba(128,222,234,0.55);
+                                text-transform:uppercase;margin-bottom:8px;">FII 5D Avg</div>
+                    <div style="font-family:'Oxanium',sans-serif;font-size:22px;font-weight:700;
+                                color:#ff5252;">-406</div>
+                    <div style="font-size:9px;color:#37474f;margin-top:3px;">₹ Cr / day</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);
+                            border-radius:14px;padding:16px 14px;text-align:center;">
+                    <div style="font-size:9px;letter-spacing:2.5px;color:rgba(128,222,234,0.55);
+                                text-transform:uppercase;margin-bottom:8px;">DII 5D Avg</div>
+                    <div style="font-family:'Oxanium',sans-serif;font-size:22px;font-weight:700;
+                                color:#40c4ff;">+1463</div>
+                    <div style="font-size:9px;color:#37474f;margin-top:3px;">₹ Cr / day</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);
+                            border-radius:14px;padding:16px 14px;text-align:center;">
+                    <div style="font-size:9px;letter-spacing:2.5px;color:rgba(128,222,234,0.55);
+                                text-transform:uppercase;margin-bottom:8px;">Net Flow</div>
+                    <div style="font-family:'Oxanium',sans-serif;font-size:22px;font-weight:700;
+                                color:#b388ff;">+1057</div>
+                    <div style="font-size:9px;color:#37474f;margin-top:3px;">₹ Cr / day</div>
+                </div>
+        </div>
+
+        <!-- legend -->
+        <div style="display:flex;gap:18px;margin-bottom:10px;padding-left:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:8px;height:8px;border-radius:2px;background:#00e676;"></div>
+                <span style="font-size:10px;color:#546e7a;letter-spacing:1px;">FII</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:8px;height:8px;border-radius:2px;background:#40c4ff;"></div>
+                <span style="font-size:10px;color:#546e7a;letter-spacing:1px;">DII</span>
+            </div>
+            <div style="margin-left:auto;font-size:9px;color:#263238;letter-spacing:1px;">
+                ← SELL &nbsp;|&nbsp; BUY →
+            </div>
+        </div>
+
+        <!-- day-by-day bars -->
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(79,195,247,0.08);
+                    border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;gap:2px;">
+            
+                <div style="padding:10px 6px;border-radius:8px;
+                            border:1px solid transparent;transition:all 0.15s;">
+                    <div style="display:flex;justify-content:space-between;
+                                align-items:center;margin-bottom:5px;">
+                        <span style="font-size:10px;color:#607d8b;letter-spacing:1px;">Tue</span>
+                        <span style="font-size:12px;font-weight:600;color:#8090a8;">Feb 11</span>
+                        <div style="display:flex;gap:14px;font-size:10px;">
+                            <span style="color:#ff5252;">FII -1540 Cr</span>
+                            <span style="color:#40c4ff;">DII +2104 Cr</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:3px;"><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;display:flex;justify-content:flex-end;"><div style="width:36.6%;height:6px;background:#ff5252;border-radius:3px 0 0 3px;opacity:0.8;box-shadow:0 0 6px #ff525240;"></div></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"></div></div></div>
+                    <div><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;"></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"><div style="width:50.0%;height:6px;background:#40c4ff;border-radius:0 3px 3px 0;box-shadow:0 0 6px #40c4ff40;"></div></div></div></div>
+                </div>
+                <div style="padding:10px 6px;border-radius:8px;
+                            border:1px solid transparent;transition:all 0.15s;">
+                    <div style="display:flex;justify-content:space-between;
+                                align-items:center;margin-bottom:5px;">
+                        <span style="font-size:10px;color:#607d8b;letter-spacing:1px;">Wed</span>
+                        <span style="font-size:12px;font-weight:600;color:#8090a8;">Feb 12</span>
+                        <div style="display:flex;gap:14px;font-size:10px;">
+                            <span style="color:#00e676;">FII +824 Cr</span>
+                            <span style="color:#40c4ff;">DII +891 Cr</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:3px;"><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;"></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"><div style="width:19.6%;height:6px;background:#00e676;border-radius:0 3px 3px 0;box-shadow:0 0 6px #00e67640;"></div></div></div></div>
+                    <div><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;"></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"><div style="width:21.2%;height:6px;background:#40c4ff;border-radius:0 3px 3px 0;box-shadow:0 0 6px #40c4ff40;"></div></div></div></div>
+                </div>
+                <div style="padding:10px 6px;border-radius:8px;
+                            border:1px solid transparent;transition:all 0.15s;">
+                    <div style="display:flex;justify-content:space-between;
+                                align-items:center;margin-bottom:5px;">
+                        <span style="font-size:10px;color:#607d8b;letter-spacing:1px;">Thu</span>
+                        <span style="font-size:12px;font-weight:600;color:#8090a8;">Feb 13</span>
+                        <div style="display:flex;gap:14px;font-size:10px;">
+                            <span style="color:#ff5252;">FII -412 Cr</span>
+                            <span style="color:#40c4ff;">DII +1478 Cr</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:3px;"><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;display:flex;justify-content:flex-end;"><div style="width:9.8%;height:6px;background:#ff5252;border-radius:3px 0 0 3px;opacity:0.8;box-shadow:0 0 6px #ff525240;"></div></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"></div></div></div>
+                    <div><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;"></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"><div style="width:35.1%;height:6px;background:#40c4ff;border-radius:0 3px 3px 0;box-shadow:0 0 6px #40c4ff40;"></div></div></div></div>
+                </div>
+                <div style="padding:10px 6px;border-radius:8px;
+                            border:1px solid transparent;transition:all 0.15s;">
+                    <div style="display:flex;justify-content:space-between;
+                                align-items:center;margin-bottom:5px;">
+                        <span style="font-size:10px;color:#607d8b;letter-spacing:1px;">Fri</span>
+                        <span style="font-size:12px;font-weight:600;color:#8090a8;">Feb 14</span>
+                        <div style="display:flex;gap:14px;font-size:10px;">
+                            <span style="color:#00e676;">FII +69 Cr</span>
+                            <span style="color:#40c4ff;">DII +1174 Cr</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:3px;"><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;"></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"><div style="width:1.7%;height:6px;background:#00e676;border-radius:0 3px 3px 0;box-shadow:0 0 6px #00e67640;"></div></div></div></div>
+                    <div><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;"></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"><div style="width:27.9%;height:6px;background:#40c4ff;border-radius:0 3px 3px 0;box-shadow:0 0 6px #40c4ff40;"></div></div></div></div>
+                </div>
+                <div style="padding:10px 6px;border-radius:8px;
+                            border:1px solid transparent;transition:all 0.15s;">
+                    <div style="display:flex;justify-content:space-between;
+                                align-items:center;margin-bottom:5px;">
+                        <span style="font-size:10px;color:#607d8b;letter-spacing:1px;">Mon</span>
+                        <span style="font-size:12px;font-weight:600;color:#8090a8;">Feb 17</span>
+                        <div style="display:flex;gap:14px;font-size:10px;">
+                            <span style="color:#ff5252;">FII -972 Cr</span>
+                            <span style="color:#40c4ff;">DII +1667 Cr</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:3px;"><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;display:flex;justify-content:flex-end;"><div style="width:23.1%;height:6px;background:#ff5252;border-radius:3px 0 0 3px;opacity:0.8;box-shadow:0 0 6px #ff525240;"></div></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"></div></div></div>
+                    <div><div style="display:flex;align-items:center;width:100%;"><div style="flex:1;"></div><div style="width:2px;height:16px;background:rgba(255,255,255,0.1);flex-shrink:0;border-radius:1px;"></div><div style="flex:1;"><div style="width:39.6%;height:6px;background:#40c4ff;border-radius:0 3px 3px 0;box-shadow:0 0 6px #40c4ff40;"></div></div></div></div>
+                </div>
+        </div>
+
+        <!-- insight box -->
+        <div style="margin-top:14px;background:rgba(105,240,174,0.10);
+                    border:1px solid rgba(105,240,174,0.28);border-radius:10px;padding:14px 16px;">
+            <div style="font-size:9px;color:#69f0ae;letter-spacing:2px;
+                        font-weight:700;margin-bottom:6px;">5-DAY INSIGHT</div>
+            <div style="font-size:12px;color:#78909c;line-height:1.7;">FIIs are net sellers (avg ₹-406 Cr/day) but DIIs are absorbing strongly (avg ₹+1463 Cr/day). DII support is cushioning downside — FII return is key for breakout.</div>
+        </div>
+    </div>
+
+
     <!-- ── MARKET DIRECTION ── -->
     <div class="section">
         <div class="section-title"><span>🧭</span> MARKET DIRECTION (Algorithmic)</div>
@@ -342,7 +427,7 @@
         </div>
     </div>
 
-    <!-- ── TECHNICAL INDICATORS (Stat Card + Bar) ── -->
+    <!-- ── TECHNICAL INDICATORS ── -->
     <div class="section">
         <div class="section-title"><span>🔍</span> TECHNICAL INDICATORS</div>
         <div class="card-grid grid-5">
@@ -467,7 +552,6 @@
             </div>
         </div>
     </div>
-
     <div class="section">
         <div class="section-title">
             <span>📊</span> CHANGE IN OPEN INTEREST
@@ -532,7 +616,6 @@
             <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ SUPPORT ZONE</span>
             <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
         </div>
-        <!-- ROW A -->
         <div style="position:relative;height:62px;">
             <div class="rl-node-a" style="left:3%;">
                 <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
@@ -561,7 +644,6 @@
                 <div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div>
             </div>
         </div>
-        <!-- GRADIENT TRACK -->
         <div style="position:relative;height:8px;border-radius:4px;
                     background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);
                     box-shadow:0 2px 14px rgba(0,0,0,0.5);">
@@ -569,16 +651,12 @@
                         width:4px;height:22px;background:#fff;border-radius:2px;
                         box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
         </div>
-        <!-- ROW B -->
         <div style="position:relative;height:58px;">
-            
               <div class="rl-node-b" style="left:43%;">
                 <div class="rl-dot" style="background:#ffb74d;box-shadow:0 0 8px #ffb74d;margin:0 auto 5px;"></div>
                 <div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>
                 <div class="rl-val" style="color:#ffb74d;">₹25,700</div>
-              </div>
-        </div>
-        <!-- Distance bar -->
+              </div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
             <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);
                         border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
@@ -647,23 +725,18 @@
             </div>
         </div>
 
-        <!-- ── FIRE ROW — KEY TRADING LEVELS ── -->
         <div class="fire-row">
-            <!-- col 1: heading -->
             <div class="fire-col">
                 <div class="fire-heading">📍 KEY<br>LEVELS</div>
             </div>
-            <!-- col 2: entry zone -->
             <div class="fire-col">
                 <div class="fire-col-label">ENTRY ZONE</div>
                 <div class="fire-col-value">₹25,171–₹26,275</div>
             </div>
-            <!-- col 3: targets -->
             <div class="fire-col">
                 <div class="fire-col-label">TARGET 1 / 2</div>
                 <div class="fire-col-value">₹26,275 &nbsp;/&nbsp; ₹25,171</div>
             </div>
-            <!-- col 4: stop loss -->
             <div class="fire-col">
                 
                 <div class="fire-col-label">STOP LOSS</div>
