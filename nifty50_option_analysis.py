@@ -959,8 +959,8 @@ class NiftyHTMLAnalyzer:
         }}
         .sb-cell:last-child{{ border-right:none; }}
         .sb-lbl{{
-            font-size:8px; letter-spacing:1.5px; color:#37474f;
-            text-transform:uppercase; margin-bottom:5px;
+            font-size:9px; letter-spacing:1.5px; color:#80a0b8;
+            text-transform:uppercase; margin-bottom:5px; font-weight:600;
         }}
         .sb-val{{
             font-family:'Oxanium',sans-serif; font-size:14px;
@@ -980,8 +980,8 @@ class NiftyHTMLAnalyzer:
             display:flex; align-items:center; gap:10px;
         }}
         .sb-signal .sig-lbl{{
-            font-size:9px; letter-spacing:2px; color:#37474f;
-            text-transform:uppercase; flex-shrink:0;
+            font-size:10px; letter-spacing:2px; color:#4fc3f7;
+            text-transform:uppercase; flex-shrink:0; font-weight:700;
         }}
         .sb-footer{{
             padding:11px 16px;
@@ -991,8 +991,9 @@ class NiftyHTMLAnalyzer:
             display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
         }}
         .sb-footer .sf-lbl{{
-            font-size:9px; letter-spacing:2px; color:#37474f;
+            font-size:10px; letter-spacing:2px; color:#4fc3f7;
             text-transform:uppercase; flex-shrink:0; font-family:'Rajdhani',sans-serif;
+            font-weight:700;
         }}
         .sb-footer .sf-why{{
             font-size:13px; color:#ffffff; font-style:italic;
@@ -1307,7 +1308,7 @@ class NiftyHTMLAnalyzer:
         html = """
     <div class="section">
         <div class="section-title"><span>💡</span> TRADING RECOMMENDATIONS (Dual Strategy)</div>
-        <p style="color:#546e7a;font-size:12px;margin-bottom:16px;letter-spacing:0.5px;">
+        <p style="color:#90a4ae;font-size:13px;margin-bottom:16px;letter-spacing:0.5px;">
             Two independent strategy recommendations based on
             <strong style="color:#4fc3f7;">Technical Analysis</strong> and
             <strong style="color:#ffb74d;">OI Momentum</strong>.
