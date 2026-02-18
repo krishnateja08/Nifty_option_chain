@@ -924,29 +924,76 @@ class NiftyHTMLAnalyzer:
         .rl-dot{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}}
         .rl-lbl{{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}}
         .rl-val{{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}}
-        .strat-card{{
-            background:rgba(255,255,255,0.03);
-            backdrop-filter:blur(16px);
-            padding:24px; border-radius:14px; margin-bottom:18px;
-            border:1.5px solid rgba(79,195,247,0.2);
-            box-shadow:0 8px 20px rgba(0,0,0,0.25);
+        /* ── SCOREBOARD STRATEGY CARDS ── */
+        .sb-wrap{{
+            background:rgba(6,13,20,0.85);
+            border:1px solid rgba(79,195,247,0.15);
+            border-radius:12px; overflow:hidden;
+            margin-bottom:14px;
+            box-shadow:0 4px 24px rgba(0,0,0,0.3);
         }}
-        .strat-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px;}}
-        .strat-cell .cell-lbl{{font-size:9px;letter-spacing:2px;color:#80deea;text-transform:uppercase;margin-bottom:5px;}}
-        .strat-cell .cell-val{{font-size:17px;font-weight:700;color:#fff;}}
-        .setup-box{{background:rgba(15,32,39,0.6);padding:14px;border-radius:8px;margin-bottom:12px;}}
-        .setup-box .setup-lbl{{font-size:11px;color:#4fc3f7;font-weight:700;margin-bottom:6px;}}
-        .setup-box .setup-val{{font-size:14px;font-weight:600;color:#fff;}}
-        .why-text{{font-size:13px;color:#80deea;}}
-        .why-text strong{{color:#4fc3f7;}}
-        .profit-loss-row{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}}
-        .pl-box{{padding:12px;border-radius:8px;}}
-        .pl-box .pl-lbl{{font-size:9px;letter-spacing:2px;color:#80deea;text-transform:uppercase;margin-bottom:5px;}}
-        .pl-box .pl-val{{font-size:14px;font-weight:700;}}
-        .pl-profit{{background:rgba(0,188,212,0.1);border-left:3px solid #00bcd4;}}
-        .pl-profit .pl-val{{color:#00bcd4;}}
-        .pl-loss{{background:rgba(244,67,54,0.1);border-left:3px solid #f44336;}}
-        .pl-loss .pl-val{{color:#f44336;}}
+        .sb-header{{
+            padding:11px 18px;
+            display:flex; justify-content:space-between; align-items:center;
+            border-bottom:1px solid rgba(79,195,247,0.1);
+        }}
+        .sb-header.cyan{{ background:rgba(79,195,247,0.08); border-left:4px solid #4fc3f7; }}
+        .sb-header.gold{{ background:rgba(255,183,77,0.08);  border-left:4px solid #ffb74d; }}
+        .sb-h-title{{
+            font-family:'Oxanium',sans-serif; font-size:13px;
+            font-weight:700; color:#4fc3f7; letter-spacing:1px;
+        }}
+        .sb-h-title.gold{{ color:#ffb74d; }}
+        .sb-h-badge{{
+            font-size:9px; padding:3px 12px; border-radius:10px;
+            font-weight:700; letter-spacing:1px;
+        }}
+        .sb-h-badge.cyan{{ background:rgba(79,195,247,0.12); color:#4fc3f7; border:1px solid rgba(79,195,247,0.3); }}
+        .sb-h-badge.gold{{ background:rgba(255,183,77,0.12);  color:#ffb74d; border:1px solid rgba(255,183,77,0.3); }}
+        .sb-body{{
+            display:grid; grid-template-columns:repeat(5,1fr);
+        }}
+        .sb-cell{{
+            padding:12px 10px; text-align:center;
+            border-right:1px solid rgba(79,195,247,0.06);
+        }}
+        .sb-cell:last-child{{ border-right:none; }}
+        .sb-lbl{{
+            font-size:8px; letter-spacing:1.5px; color:#37474f;
+            text-transform:uppercase; margin-bottom:5px;
+        }}
+        .sb-val{{
+            font-family:'Oxanium',sans-serif; font-size:14px;
+            font-weight:700; color:#e0f7fa;
+        }}
+        .sb-val.green{{ color:#00e676; }}
+        .sb-val.cyan{{  color:#00bcd4; }}
+        .sb-val.gold{{  color:#ffb74d; }}
+        .sb-val.red{{   color:#ff5252; }}
+        .sb-val.small{{ font-size:11px; }}
+        .sb-signal{{
+            padding:9px 16px;
+            background:rgba(79,195,247,0.05);
+            border-top:1px solid rgba(79,195,247,0.06);
+            border-bottom:1px solid rgba(79,195,247,0.06);
+            font-size:12px; color:#80deea;
+            display:flex; align-items:center; gap:8px;
+        }}
+        .sb-signal .sig-lbl{{
+            font-size:8px; letter-spacing:2px; color:#37474f;
+            text-transform:uppercase; flex-shrink:0;
+        }}
+        .sb-footer{{
+            padding:10px 16px;
+            background:rgba(0,0,0,0.25);
+            font-family:'JetBrains Mono',monospace;
+            font-size:11px; color:#80deea;
+            display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
+        }}
+        .sb-footer .sf-lbl{{
+            font-size:8px; letter-spacing:2px; color:#37474f;
+            text-transform:uppercase; flex-shrink:0; font-family:'Rajdhani',sans-serif;
+        }}
         .fire-row{{
             background:rgba(12,6,0,0.75);
             backdrop-filter:blur(14px);
@@ -1218,84 +1265,146 @@ class NiftyHTMLAnalyzer:
         return html
 
     # ─────────────────────────────────────────────
-    #  DUAL RECOMMENDATIONS
+    #  DUAL RECOMMENDATIONS  — ⑧ SCOREBOARD STYLE
     # ─────────────────────────────────────────────
     def _generate_recommendations_html(self, d):
+        ts = d['recommended_technical_strategy']
+
+        # ── colour helpers
+        def bias_color(bias):
+            b = bias.lower()
+            if 'bull' in b:   return 'green'
+            if 'bear' in b:   return 'red'
+            if 'vol' in b:    return 'gold'
+            return 'gold'
+
+        def risk_color(risk):
+            r = risk.lower()
+            if 'low'  in r: return 'cyan'
+            if 'high' in r: return 'red'
+            if 'very' in r: return 'red'
+            return 'gold'
+
+        def profit_color(p):
+            p = p.lower()
+            if 'unlimited' in p or 'receiv' in p: return 'green'
+            return 'cyan'
+
+        def loss_color(l):
+            l = l.lower()
+            if 'unlimit' in l: return 'red'
+            return 'gold'
+
+        ts_bias_cls   = bias_color(ts['market_bias'])
+        ts_risk_cls   = risk_color(ts['risk'])
+        ts_profit_cls = profit_color(ts['max_profit'])
+        ts_loss_cls   = loss_color(ts['max_loss'])
+
         html = """
     <div class="section">
         <div class="section-title"><span>💡</span> TRADING RECOMMENDATIONS (Dual Strategy)</div>
-        <p style="color:#80deea;font-size:13px;margin-bottom:20px;line-height:1.7;">
-            Two independent strategy recommendations based on <strong>Technical Analysis</strong> and <strong>OI Momentum</strong>.
+        <p style="color:#546e7a;font-size:12px;margin-bottom:16px;letter-spacing:0.5px;">
+            Two independent strategy recommendations based on
+            <strong style="color:#4fc3f7;">Technical Analysis</strong> and
+            <strong style="color:#ffb74d;">OI Momentum</strong>.
         </p>
 """
-        ts     = d['recommended_technical_strategy']
-        ts_cls = 'positive' if 'Bull' in ts['name'] else ('negative' if 'Bear' in ts['name'] else 'neutral')
-        ts_bdr = '#00bcd4' if ts_cls == 'positive' else ('#f44336' if ts_cls == 'negative' else '#ffb74d')
-        tag_cls = 'tag-bull' if ts_cls == 'positive' else ('tag-bear' if ts_cls == 'negative' else 'tag-neu')
+        # ══ CARD 1 — TECHNICAL STRATEGY ══
         html += f"""
-        <div class="strat-card" style="border-color:{ts_bdr};">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-                <h3 style="color:#4fc3f7;font-family:'Oxanium',sans-serif;font-size:17px;margin:0;">1️⃣ TECHNICAL ANALYSIS STRATEGY</h3>
-                <span style="background:rgba(79,195,247,0.15);color:#4fc3f7;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;">Positional · 1–5 Days</span>
+        <div class="sb-wrap">
+            <div class="sb-header cyan">
+                <span class="sb-h-title">1️⃣ TECHNICAL ANALYSIS STRATEGY &nbsp;·&nbsp; {ts['name']}</span>
+                <span class="sb-h-badge cyan">Positional · 1–5 Days</span>
             </div>
-            <div class="strat-grid">
-                <div class="strat-cell"><div class="cell-lbl">Strategy</div><div class="cell-val">{ts['name']}</div></div>
-                <div class="strat-cell"><div class="cell-lbl">Market Bias</div><span class="tag {tag_cls}">{ts['market_bias']}</span></div>
-                <div class="strat-cell"><div class="cell-lbl">Type</div><div class="cell-val">{ts['type']}</div></div>
-                <div class="strat-cell"><div class="cell-lbl">Risk</div><div class="cell-val" style="color:#ffb74d;">{ts['risk']}</div></div>
+            <div class="sb-body">
+                <div class="sb-cell">
+                    <div class="sb-lbl">Market Bias</div>
+                    <div class="sb-val {ts_bias_cls}">{ts['market_bias']}</div>
+                </div>
+                <div class="sb-cell">
+                    <div class="sb-lbl">Type</div>
+                    <div class="sb-val cyan">{ts['type']}</div>
+                </div>
+                <div class="sb-cell">
+                    <div class="sb-lbl">Risk</div>
+                    <div class="sb-val {ts_risk_cls}">{ts['risk']}</div>
+                </div>
+                <div class="sb-cell">
+                    <div class="sb-lbl">Max Profit</div>
+                    <div class="sb-val {ts_profit_cls} small">{ts['max_profit']}</div>
+                </div>
+                <div class="sb-cell">
+                    <div class="sb-lbl">Max Loss</div>
+                    <div class="sb-val {ts_loss_cls} small">{ts['max_loss']}</div>
+                </div>
             </div>
-            <div class="setup-box">
-                <div class="setup-lbl">📋 SETUP</div>
-                <div class="setup-val">{ts['description']}</div>
-            </div>
-            <div class="why-text"><strong>💡 Why?</strong> {ts['best_for']}</div>
-            <div class="profit-loss-row">
-                <div class="pl-box pl-profit"><div class="pl-lbl">MAX PROFIT</div><div class="pl-val">{ts['max_profit']}</div></div>
-                <div class="pl-box pl-loss"><div class="pl-lbl">MAX LOSS</div><div class="pl-val">{ts['max_loss']}</div></div>
+            <div class="sb-footer">
+                <span class="sf-lbl">📋 Setup</span>
+                <span>{ts['description']}</span>
+                <span style="color:#37474f;margin-left:auto;">💡 {ts['best_for']}</span>
             </div>
         </div>
 """
+        # ══ CARD 2 — OI STRATEGY ══
         if d['recommended_oi_strategy']:
-            oi     = d['recommended_oi_strategy']
-            oi_cls = 'positive' if oi['market_bias'] == 'Bullish' else ('negative' if oi['market_bias'] == 'Bearish' else 'neutral')
-            oi_bdr = '#00bcd4' if oi_cls == 'positive' else ('#f44336' if oi_cls == 'negative' else '#ffb74d')
-            oi_tag = 'tag-bull' if oi_cls == 'positive' else ('tag-bear' if oi_cls == 'negative' else 'tag-neu')
+            oi = d['recommended_oi_strategy']
+            oi_bias_cls   = bias_color(oi['market_bias'])
+            oi_risk_cls   = risk_color(oi['risk'])
+            oi_profit_cls = profit_color(oi['max_profit'])
+            oi_loss_cls   = loss_color(oi['max_loss'])
+            signal_txt    = oi.get('signal', 'Market signal detected')
+            horizon       = oi.get('time_horizon', 'Intraday')
+
             html += f"""
-        <div class="strat-card" style="border-color:{oi_bdr};">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
-                <h3 style="color:#4fc3f7;font-family:'Oxanium',sans-serif;font-size:17px;margin:0;">2️⃣ OI MOMENTUM STRATEGY</h3>
-                <span style="background:rgba(255,183,77,0.15);color:#ffb74d;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;">{oi.get('time_horizon','Intraday')}</span>
+        <div class="sb-wrap">
+            <div class="sb-header gold">
+                <span class="sb-h-title gold">2️⃣ OI MOMENTUM STRATEGY &nbsp;·&nbsp; {oi['name']}</span>
+                <span class="sb-h-badge gold">{horizon}</span>
             </div>
-            <div style="background:rgba(79,195,247,0.07);padding:12px;border-radius:8px;margin-bottom:14px;border-left:3px solid #4fc3f7;">
-                <div style="color:#4fc3f7;font-size:11px;font-weight:700;letter-spacing:1px;margin-bottom:5px;">📊 OI SIGNAL</div>
-                <div style="color:#fff;font-size:13px;">{oi.get('signal','Market signal detected')}</div>
+            <div class="sb-signal">
+                <span class="sig-lbl">📊 OI Signal</span>
+                <span style="color:#cfd8dc;">{signal_txt}</span>
             </div>
-            <div class="strat-grid">
-                <div class="strat-cell"><div class="cell-lbl">Strategy</div><div class="cell-val">{oi['name']}</div></div>
-                <div class="strat-cell"><div class="cell-lbl">Market Bias</div><span class="tag {oi_tag}">{oi['market_bias']}</span></div>
-                <div class="strat-cell"><div class="cell-lbl">Type</div><div class="cell-val">{oi['type']}</div></div>
-                <div class="strat-cell"><div class="cell-lbl">Risk</div><div class="cell-val" style="color:#ffb74d;">{oi['risk']}</div></div>
+            <div class="sb-body">
+                <div class="sb-cell">
+                    <div class="sb-lbl">Market Bias</div>
+                    <div class="sb-val {oi_bias_cls}">{oi['market_bias']}</div>
+                </div>
+                <div class="sb-cell">
+                    <div class="sb-lbl">Type</div>
+                    <div class="sb-val cyan">{oi['type']}</div>
+                </div>
+                <div class="sb-cell">
+                    <div class="sb-lbl">Risk</div>
+                    <div class="sb-val {oi_risk_cls}">{oi['risk']}</div>
+                </div>
+                <div class="sb-cell">
+                    <div class="sb-lbl">Max Profit</div>
+                    <div class="sb-val {oi_profit_cls} small">{oi['max_profit']}</div>
+                </div>
+                <div class="sb-cell">
+                    <div class="sb-lbl">Max Loss</div>
+                    <div class="sb-val {oi_loss_cls} small">{oi['max_loss']}</div>
+                </div>
             </div>
-            <div class="setup-box">
-                <div class="setup-lbl" style="color:#ffb74d;">📋 SETUP</div>
-                <div class="setup-val">{oi['description']}</div>
-            </div>
-            <div class="why-text"><strong style="color:#ffb74d;">💡 Why?</strong> {oi['best_for']}</div>
-            <div class="profit-loss-row">
-                <div class="pl-box pl-profit"><div class="pl-lbl">MAX PROFIT</div><div class="pl-val">{oi['max_profit']}</div></div>
-                <div class="pl-box pl-loss"><div class="pl-lbl">MAX LOSS</div><div class="pl-val">{oi['max_loss']}</div></div>
+            <div class="sb-footer" style="border-top-color:rgba(255,183,77,0.08);">
+                <span class="sf-lbl">📋 Setup</span>
+                <span>{oi['description']}</span>
+                <span style="color:#37474f;margin-left:auto;">💡 {oi['best_for']}</span>
             </div>
         </div>
 """
+        # ══ KEY LEVELS FIRE ROW (unchanged) ══
         if d['stop_loss']:
             sl_html = f"""
                 <div class="fire-col-label">STOP LOSS</div>
                 <div class="fire-col-value stop-price">₹{d['stop_loss']:,.0f}</div>
                 <div class="fire-rr">Risk {d['risk_points']} pts &nbsp;·&nbsp; R:R 1:{d['risk_reward_ratio']}</div>"""
         else:
-            sl_html = f"""
+            sl_html = """
                 <div class="fire-col-label">STOP LOSS</div>
                 <div class="fire-col-value stop-text">Use option premium<br>as max loss</div>"""
+
         html += f"""
         <div class="fire-row">
             <div class="fire-col">
