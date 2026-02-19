@@ -909,6 +909,69 @@ class NiftyHTMLAnalyzer:
 """
 
     # ─────────────────────────────────────────────
+    #  KEY LEVELS VISUAL SECTION  (gradient bar)
+    # ─────────────────────────────────────────────
+    def _key_levels_visual_section(self, d, _pct_cp, _pts_to_res, _pts_to_sup, _mp_node):
+        return f"""
+    <!-- ── KEY LEVELS VISUAL ── -->
+    <div class="section">
+        <div class="section-title"><span>📊</span> KEY LEVELS</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ SUPPORT ZONE</span>
+            <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
+        </div>
+        <div style="position:relative;height:62px;">
+            <div class="rl-node-a" style="left:3%;">
+                <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
+                <div class="rl-val" style="color:#26c6da;">₹{d['strong_support']:,.0f}</div>
+                <div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div>
+            </div>
+            <div class="rl-node-a" style="left:22%;">
+                <div class="rl-lbl" style="color:#00bcd4;">Support</div>
+                <div class="rl-val" style="color:#00bcd4;">₹{d['support']:,.0f}</div>
+                <div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div>
+            </div>
+            <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);
+                        bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
+                        padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;
+                        box-shadow:0 0 16px rgba(79,195,247,0.7);">
+                ▼ NOW &nbsp;₹{d['current_price']:,.0f}
+            </div>
+            <div class="rl-node-a" style="left:75%;">
+                <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
+                <div class="rl-val" style="color:#ff7043;">₹{d['resistance']:,.0f}</div>
+                <div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div>
+            </div>
+            <div class="rl-node-a" style="left:95%;">
+                <div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div>
+                <div class="rl-val" style="color:#f44336;">₹{d['strong_resistance']:,.0f}</div>
+                <div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div>
+            </div>
+        </div>
+        <div style="position:relative;height:8px;border-radius:4px;
+                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);
+                    box-shadow:0 2px 14px rgba(0,0,0,0.5);">
+            <div style="position:absolute;left:{_pct_cp}%;top:50%;transform:translate(-50%,-50%);
+                        width:4px;height:22px;background:#fff;border-radius:2px;
+                        box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
+        </div>
+        <div style="position:relative;height:58px;">{_mp_node}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
+            <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);
+                        border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:#b0bec5;">📍 Distance to Resistance</span>
+                <span style="font-size:15px;font-weight:700;color:#f44336;">+{_pts_to_res:,} pts</span>
+            </div>
+            <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);
+                        border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:#b0bec5;">📍 Distance to Support</span>
+                <span style="font-size:15px;font-weight:700;color:#00bcd4;">−{_pts_to_sup:,} pts</span>
+            </div>
+        </div>
+    </div>
+"""
+
+    # ─────────────────────────────────────────────
     #  MAIN HTML GENERATION
     # ─────────────────────────────────────────────
     def generate_html_email(self):
@@ -1433,6 +1496,9 @@ class NiftyHTMLAnalyzer:
         if d['has_option_data']:
             html += self._oi_navy_command_section(d)
 
+        # ── KEY LEVELS VISUAL (position 3: between OI and Key Trading Levels)
+        html += self._key_levels_visual_section(d, _pct_cp, _pts_to_res, _pts_to_sup, _mp_node)
+
         html += f"""
     <!-- ── KEY TRADING LEVELS ── -->
     <div class="section">
@@ -1479,65 +1545,6 @@ class NiftyHTMLAnalyzer:
         </div>
         <div class="card-grid grid-4">
             {oc_cards}
-        </div>
-    </div>
-"""
-
-        # ── KEY LEVELS
-        html += f"""
-    <div class="section">
-        <div class="section-title"><span>📊</span> KEY LEVELS</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ SUPPORT ZONE</span>
-            <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
-        </div>
-        <div style="position:relative;height:62px;">
-            <div class="rl-node-a" style="left:3%;">
-                <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
-                <div class="rl-val" style="color:#26c6da;">₹{d['strong_support']:,.0f}</div>
-                <div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div>
-            </div>
-            <div class="rl-node-a" style="left:22%;">
-                <div class="rl-lbl" style="color:#00bcd4;">Support</div>
-                <div class="rl-val" style="color:#00bcd4;">₹{d['support']:,.0f}</div>
-                <div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div>
-            </div>
-            <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);
-                        bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
-                        padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;
-                        box-shadow:0 0 16px rgba(79,195,247,0.7);">
-                ▼ NOW &nbsp;₹{d['current_price']:,.0f}
-            </div>
-            <div class="rl-node-a" style="left:75%;">
-                <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
-                <div class="rl-val" style="color:#ff7043;">₹{d['resistance']:,.0f}</div>
-                <div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div>
-            </div>
-            <div class="rl-node-a" style="left:95%;">
-                <div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div>
-                <div class="rl-val" style="color:#f44336;">₹{d['strong_resistance']:,.0f}</div>
-                <div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div>
-            </div>
-        </div>
-        <div style="position:relative;height:8px;border-radius:4px;
-                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);
-                    box-shadow:0 2px 14px rgba(0,0,0,0.5);">
-            <div style="position:absolute;left:{_pct_cp}%;top:50%;transform:translate(-50%,-50%);
-                        width:4px;height:22px;background:#fff;border-radius:2px;
-                        box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
-        </div>
-        <div style="position:relative;height:58px;">{_mp_node}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
-            <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);
-                        border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:12px;color:#b0bec5;">📍 Distance to Resistance</span>
-                <span style="font-size:15px;font-weight:700;color:#f44336;">+{_pts_to_res:,} pts</span>
-            </div>
-            <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);
-                        border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:12px;color:#b0bec5;">📍 Distance to Support</span>
-                <span style="font-size:15px;font-weight:700;color:#00bcd4;">−{_pts_to_sup:,} pts</span>
-            </div>
         </div>
     </div>
 """
