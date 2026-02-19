@@ -1,6 +1,7 @@
 """
 NIFTY 50 COMPLETE ANALYSIS - DEEP OCEAN THEME
 CARD STYLE: Glassmorphism Frosted — Stat Card + Progress Bar (Layout 4)
+CHANGE IN OPEN INTEREST: Navy Command Theme (v3)
 FIXES:
   1. Expiry: TUESDAY weekly - always picks NEXT Tuesday (never today)
   2. Auto-fallback: if NSE returns empty, fetches real expiry list
@@ -9,6 +10,7 @@ FIXES:
   5. Option chain filtered to ATM ±10 strikes only
   6. [NEW] Glassmorphism Stat Card + Progress Bar layout for all indicator cards
   7. [NEW] FII / DII 5-Day Sentiment section below Market Snapshot
+  8. [NEW] Navy Command theme for Change in Open Interest section
 """
 from curl_cffi import requests
 import pandas as pd
@@ -26,14 +28,9 @@ import pytz
 warnings.filterwarnings('ignore')
 
 # ─────────────────────────────────────────────
-#  FII / DII HELPER  (fetches from NSE or falls back to hardcoded)
+#  FII / DII HELPER
 # ─────────────────────────────────────────────
 def fetch_fii_dii_data():
-    """
-    Returns list of dicts:
-      [{'date':'Feb 11','day':'Tue','fii':-1540.2,'dii':2103.5}, ...]
-    Tries to pull from NSE provisional data; falls back to recent hardcoded values.
-    """
     hardcoded = [
         {'date': 'Feb 11', 'day': 'Tue', 'fii': -1540.20, 'dii': 2103.50},
         {'date': 'Feb 12', 'day': 'Wed', 'fii':   823.60, 'dii':  891.40},
@@ -45,7 +42,6 @@ def fetch_fii_dii_data():
 
 
 def compute_fii_dii_summary(data):
-    """Compute avg, sentiment label, colour, insight text."""
     fii_vals = [d['fii'] for d in data]
     dii_vals = [d['dii'] for d in data]
     fii_avg  = sum(fii_vals) / len(fii_vals)
@@ -528,7 +524,6 @@ class NiftyHTMLAnalyzer:
         else:
             mp_pct = ce_oi_pct = pe_oi_pct = 50
 
-        # ── FII / DII data
         fii_dii_raw  = fetch_fii_dii_data()
         fii_dii_summ = compute_fii_dii_summary(fii_dii_raw)
 
@@ -600,13 +595,12 @@ class NiftyHTMLAnalyzer:
             'top_ce_strikes':  option_analysis['top_ce_strikes'] if option_analysis else [],
             'top_pe_strikes':  option_analysis['top_pe_strikes'] if option_analysis else [],
             'has_option_data': option_analysis is not None,
-            # FII/DII
             'fii_dii_data':  fii_dii_raw,
             'fii_dii_summ':  fii_dii_summ,
         }
 
     # ─────────────────────────────────────────────
-    #  HTML GENERATION
+    #  HTML HELPERS
     # ─────────────────────────────────────────────
     def _bar_color_class(self, badge):
         return {'bullish':'bar-teal','bearish':'bar-red','neutral':'bar-gold'}.get(badge,'bar-teal')
@@ -635,7 +629,7 @@ class NiftyHTMLAnalyzer:
             </div>"""
 
     # ─────────────────────────────────────────────
-    #  KEY LEVELS FIRE ROW  (standalone)
+    #  KEY LEVELS FIRE ROW
     # ─────────────────────────────────────────────
     def _key_levels_fire_row(self, d):
         if d['stop_loss']:
@@ -666,13 +660,11 @@ class NiftyHTMLAnalyzer:
         </div>"""
 
     # ─────────────────────────────────────────────
-    #  FII / DII SECTION HTML
+    #  FII / DII SECTION
     # ─────────────────────────────────────────────
     def _fiidii_section_html(self):
         data  = self.html_data['fii_dii_data']
         summ  = self.html_data['fii_dii_summ']
-
-        # badge colour map
         badge_map = {
             'fii-bull':  ('#00e676', 'rgba(0,230,118,0.12)',  'rgba(0,230,118,0.3)'),
             'fii-cbull': ('#69f0ae', 'rgba(105,240,174,0.10)', 'rgba(105,240,174,0.28)'),
@@ -681,7 +673,6 @@ class NiftyHTMLAnalyzer:
         }
         s_color, s_bg, s_border = badge_map.get(summ['badge_cls'], badge_map['fii-neu'])
 
-        # ── KPI cards
         def kpi(label, value, color):
             sign = '+' if value >= 0 else ''
             return f"""
@@ -697,27 +688,18 @@ class NiftyHTMLAnalyzer:
         fii_col = '#00e676' if summ['fii_avg'] >= 0 else '#ff5252'
         dii_col = '#40c4ff' if summ['dii_avg'] >= 0 else '#ff5252'
         net_col = '#b388ff' if summ['net_avg'] >= 0 else '#ff5252'
-
         kpi_html = (kpi('FII 5D Avg', summ['fii_avg'], fii_col) +
                     kpi('DII 5D Avg', summ['dii_avg'], dii_col) +
                     kpi('Net Flow',   summ['net_avg'], net_col))
-
         date_range = f"{data[0]['date']} – {data[-1]['date']}, 2026"
 
-        html = f"""
-    <!-- ══════════════════════════════════════════
-         FII / DII 5-DAY SENTIMENT
-         ══════════════════════════════════════════ -->
+        return f"""
     <div class="section">
         <div class="section-title"><span>🏦</span> FII / DII INSTITUTIONAL FLOW
             <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">5-Day Average</span>
         </div>
-
-        <!-- sentiment badge + KPI cards -->
         <div class="fii-kpi-grid" style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;
                     align-items:stretch;margin-bottom:18px;">
-
-            <!-- Sentiment pill -->
             <div style="background:{s_bg};border:1px solid {s_border};border-radius:14px;
                         padding:18px 20px;display:flex;flex-direction:column;
                         align-items:center;justify-content:center;min-width:130px;">
@@ -727,11 +709,8 @@ class NiftyHTMLAnalyzer:
                 <div style="font-size:8px;color:rgba(176,190,197,0.4);
                             margin-top:5px;letter-spacing:1px;">{date_range}</div>
             </div>
-
             {kpi_html}
         </div>
-
-        <!-- insight box -->
         <div style="background:{s_bg};border:1px solid {s_border};
                     border-radius:10px;padding:14px 16px;">
             <div style="font-size:9px;color:{s_color};letter-spacing:2px;
@@ -740,8 +719,198 @@ class NiftyHTMLAnalyzer:
         </div>
     </div>
 """
-        return html
 
+    # ─────────────────────────────────────────────
+    #  ★ NAVY COMMAND — CHANGE IN OI SECTION ★
+    # ─────────────────────────────────────────────
+    def _oi_navy_command_section(self, d):
+        """
+        Renders the 'Change in Open Interest' block in the Navy Command theme
+        that exactly matches the user-selected design:
+          • Header bar: icon + title + ATM±10 badge
+          • Direction box: label, big direction name, signal text, bear/bull strength meter
+          • 3 stat cards: CALL OI CHANGE | PUT OI CHANGE | NET OI CHANGE
+            each with icon top-right, value, sub-label, full-width badge button
+          • Logic/how-to-read box
+        """
+        oi_cls    = d['oi_class']   # 'bearish' | 'bullish' | 'neutral'
+        direction = d['oi_direction']
+        signal    = d['oi_signal']
+
+        # ── strength meter: what % of total OI change does the dominant side hold?
+        total_abs = abs(d['total_ce_oi_change']) + abs(d['total_pe_oi_change'])
+        if total_abs > 0:
+            if oi_cls == 'bearish':
+                strength_pct = round(abs(d['total_ce_oi_change']) / total_abs * 100)
+            elif oi_cls == 'bullish':
+                strength_pct = round(abs(d['total_pe_oi_change']) / total_abs * 100)
+            else:
+                strength_pct = 50
+        else:
+            strength_pct = 50
+
+        # ── direction box colour scheme
+        if oi_cls == 'bearish':
+            dir_bg        = 'rgba(30,10,14,0.92)'
+            dir_border    = 'rgba(239,68,68,0.35)'
+            dir_left_bar  = 'linear-gradient(180deg,#ef4444,#b91c1c)'
+            dir_name_col  = '#fb7185'
+            dir_desc_col  = 'rgba(251,113,133,0.5)'
+            meter_label   = 'BEAR STRENGTH'
+            meter_fill    = 'linear-gradient(90deg,#ef4444,#f97316)'
+            meter_col     = '#fb7185'
+            dir_tag_txt   = 'BEARISH SIGNAL'
+            dir_tag_bg    = 'rgba(239,68,68,0.12)'
+            dir_tag_bdr   = 'rgba(239,68,68,0.3)'
+        elif oi_cls == 'bullish':
+            dir_bg        = 'rgba(10,30,20,0.92)'
+            dir_border    = 'rgba(16,185,129,0.35)'
+            dir_left_bar  = 'linear-gradient(180deg,#10b981,#047857)'
+            dir_name_col  = '#34d399'
+            dir_desc_col  = 'rgba(52,211,153,0.5)'
+            meter_label   = 'BULL STRENGTH'
+            meter_fill    = 'linear-gradient(90deg,#10b981,#34d399)'
+            meter_col     = '#34d399'
+            dir_tag_txt   = 'BULLISH SIGNAL'
+            dir_tag_bg    = 'rgba(16,185,129,0.12)'
+            dir_tag_bdr   = 'rgba(16,185,129,0.3)'
+        else:
+            dir_bg        = 'rgba(20,20,10,0.92)'
+            dir_border    = 'rgba(251,191,36,0.3)'
+            dir_left_bar  = 'linear-gradient(180deg,#f59e0b,#d97706)'
+            dir_name_col  = '#fbbf24'
+            dir_desc_col  = 'rgba(251,191,36,0.5)'
+            meter_label   = 'NEUTRAL ZONE'
+            meter_fill    = 'linear-gradient(90deg,#f59e0b,#fbbf24)'
+            meter_col     = '#fbbf24'
+            dir_tag_txt   = 'NEUTRAL'
+            dir_tag_bg    = 'rgba(251,191,36,0.12)'
+            dir_tag_bdr   = 'rgba(251,191,36,0.3)'
+
+        # ── 3 stat cards config
+        # CALL OI
+        ce_val     = d['total_ce_oi_change']
+        ce_is_bear = ce_val > 0
+        ce_col     = '#fb7185' if ce_is_bear else '#34d399'
+        ce_dot_col = '#ef4444' if ce_is_bear else '#10b981'
+        ce_lbl     = 'Bearish Signal' if ce_is_bear else 'Bullish Signal'
+        ce_btn_col = '#ef4444' if ce_is_bear else '#10b981'
+        ce_btn_bg  = 'rgba(239,68,68,0.12)' if ce_is_bear else 'rgba(16,185,129,0.12)'
+        ce_btn_bdr = 'rgba(239,68,68,0.4)' if ce_is_bear else 'rgba(16,185,129,0.4)'
+        ce_sub     = 'CE open interest Δ'
+
+        # PUT OI
+        pe_val     = d['total_pe_oi_change']
+        pe_is_bull = pe_val > 0
+        pe_col     = '#34d399' if pe_is_bull else '#fb7185'
+        pe_dot_col = '#10b981' if pe_is_bull else '#ef4444'
+        pe_lbl     = 'Bullish Signal' if pe_is_bull else 'Bearish Signal'
+        pe_btn_col = '#10b981' if pe_is_bull else '#ef4444'
+        pe_btn_bg  = 'rgba(16,185,129,0.12)' if pe_is_bull else 'rgba(239,68,68,0.12)'
+        pe_btn_bdr = 'rgba(16,185,129,0.4)' if pe_is_bull else 'rgba(239,68,68,0.4)'
+        pe_sub     = 'PE open interest Δ'
+
+        # NET OI
+        net_val    = d['net_oi_change']
+        if net_val > 0:
+            net_col = '#34d399'; net_dot_col = '#10b981'
+            net_lbl = 'Bullish Net'; net_btn_col = '#10b981'
+            net_btn_bg = 'rgba(16,185,129,0.12)'; net_btn_bdr = 'rgba(16,185,129,0.4)'
+        elif net_val < 0:
+            net_col = '#fb7185'; net_dot_col = '#ef4444'
+            net_lbl = 'Bearish Net'; net_btn_col = '#ef4444'
+            net_btn_bg = 'rgba(239,68,68,0.12)'; net_btn_bdr = 'rgba(239,68,68,0.4)'
+        else:
+            net_col = '#fbbf24'; net_dot_col = '#f59e0b'
+            net_lbl = 'Balanced'; net_btn_col = '#f59e0b'
+            net_btn_bg = 'rgba(245,158,11,0.12)'; net_btn_bdr = 'rgba(245,158,11,0.4)'
+        net_sub = 'PE Δ − CE Δ'
+
+        def nc_card(label, icon_dot_col, value, val_col, sub, btn_lbl, btn_col, btn_bg, btn_bdr, icon_char):
+            return f"""
+            <div class="nc-card">
+                <div class="nc-card-header">
+                    <span class="nc-card-label">{label}</span>
+                    <span style="font-size:18px;line-height:1;color:{icon_dot_col};">{icon_char}</span>
+                </div>
+                <div class="nc-card-value" style="color:{val_col};">{value:+,}</div>
+                <div class="nc-card-sub">{sub}</div>
+                <div class="nc-card-btn" style="color:{btn_col};background:{btn_bg};border:1px solid {btn_bdr};">
+                    {btn_lbl}
+                </div>
+            </div>"""
+
+        cards_html = (
+            nc_card('CALL OI CHANGE', ce_dot_col, ce_val, ce_col, ce_sub,
+                    ce_lbl, ce_btn_col, ce_btn_bg, ce_btn_bdr,
+                    '🔴' if ce_is_bear else '🟢') +
+            nc_card('PUT OI CHANGE',  pe_dot_col, pe_val, pe_col, pe_sub,
+                    pe_lbl, pe_btn_col, pe_btn_bg, pe_btn_bdr,
+                    '🟢' if pe_is_bull else '🔴') +
+            nc_card('NET OI CHANGE',  net_dot_col, net_val, net_col, net_sub,
+                    net_lbl, net_btn_col, net_btn_bg, net_btn_bdr, '⚖️')
+        )
+
+        return f"""
+    <!-- ══════════════════════════════════════════
+         CHANGE IN OPEN INTEREST — NAVY COMMAND THEME
+         ══════════════════════════════════════════ -->
+    <div class="section">
+
+        <!-- ── Section header bar ── -->
+        <div class="nc-section-header">
+            <div class="nc-header-left">
+                <div class="nc-header-icon">📊</div>
+                <div>
+                    <div class="nc-header-title">Change in Open Interest</div>
+                    <div class="nc-header-sub">Today's Direction Analysis</div>
+                </div>
+            </div>
+            <div class="nc-atm-badge">ATM ±10</div>
+        </div>
+
+        <!-- ── Direction box ── -->
+        <div class="nc-dir-box" style="background:{dir_bg};border:1px solid {dir_border};">
+            <div style="display:flex;align-items:stretch;gap:18px;">
+                <div class="nc-dir-bar" style="background:{dir_left_bar};"></div>
+                <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <div class="nc-dir-tag">MARKET DIRECTION</div>
+                        <div class="nc-dir-name" style="color:{dir_name_col};">{direction}</div>
+                        <div class="nc-dir-signal" style="color:{dir_desc_col};">{signal}</div>
+                    </div>
+                    <div class="nc-meter-wrap">
+                        <div class="nc-meter-label">{meter_label}</div>
+                        <div class="nc-meter-track">
+                            <div class="nc-meter-fill" style="width:{strength_pct}%;background:{meter_fill};"></div>
+                            <div class="nc-meter-head" style="left:{strength_pct}%;background:{meter_col};box-shadow:0 0 8px {meter_col};"></div>
+                        </div>
+                        <div class="nc-meter-pct" style="color:{meter_col};">{strength_pct}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 3 stat cards ── -->
+        <div class="nc-cards-grid">
+            {cards_html}
+        </div>
+
+        <!-- ── How to read logic box ── -->
+        <div class="logic-box" style="margin-top:16px;">
+            <p>
+                <strong>📖 How to Read:</strong><br>
+                • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
+                • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
+                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)
+            </p>
+        </div>
+    </div>
+"""
+
+    # ─────────────────────────────────────────────
+    #  MAIN HTML GENERATION
+    # ─────────────────────────────────────────────
     def generate_html_email(self):
         d = self.html_data
         sma20_bar  = 'bar-teal' if d['sma_20_above']  else 'bar-red'
@@ -787,6 +956,7 @@ class NiftyHTMLAnalyzer:
             )
         else:
             oc_cards = '<div style="color:#80deea;padding:20px;">Option chain data unavailable</div>'
+
         _ss  = d['strong_support']
         _sr  = d['strong_resistance']
         _rng = _sr - _ss if _sr != _ss else 1
@@ -810,7 +980,7 @@ class NiftyHTMLAnalyzer:
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nifty 50 Daily Report</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *{{margin:0;padding:0;box-sizing:border-box;}}
         body{{
@@ -949,282 +1119,287 @@ class NiftyHTMLAnalyzer:
         }}
         .logic-box p{{font-size:13px;line-height:1.9;color:#80deea;}}
         .logic-box strong{{color:#4fc3f7;}}
-        .oi-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}}
         .rl-node-a{{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}}
         .rl-node-b{{position:absolute;top:0;transform:translateX(-50%);text-align:center;}}
         .rl-dot{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}}
         .rl-lbl{{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}}
         .rl-val{{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}}
-        /* ── SCOREBOARD STRATEGY CARDS ── */
-        .sb-wrap{{
-            background:rgba(6,13,20,0.85);
-            border:1px solid rgba(79,195,247,0.15);
-            border-radius:12px; overflow:hidden;
-            margin-bottom:14px;
-            box-shadow:0 4px 24px rgba(0,0,0,0.3);
-        }}
-        .sb-header{{
-            padding:11px 18px;
-            display:flex; justify-content:space-between; align-items:center;
-            border-bottom:1px solid rgba(79,195,247,0.1);
-        }}
-        .sb-header.cyan{{ background:rgba(79,195,247,0.08); border-left:4px solid #4fc3f7; }}
-        .sb-header.gold{{ background:rgba(255,183,77,0.08);  border-left:4px solid #ffb74d; }}
-        .sb-h-title{{
-            font-family:'Oxanium',sans-serif; font-size:13px;
-            font-weight:700; color:#4fc3f7; letter-spacing:1px;
-        }}
-        .sb-h-title.gold{{ color:#ffb74d; }}
-        .sb-h-badge{{
-            font-size:9px; padding:3px 12px; border-radius:10px;
-            font-weight:700; letter-spacing:1px;
-        }}
-        .sb-h-badge.cyan{{ background:rgba(79,195,247,0.12); color:#4fc3f7; border:1px solid rgba(79,195,247,0.3); }}
-        .sb-h-badge.gold{{ background:rgba(255,183,77,0.12);  color:#ffb74d; border:1px solid rgba(255,183,77,0.3); }}
-        .sb-body{{
-            display:grid; grid-template-columns:repeat(5,1fr);
-        }}
-        .sb-cell{{
-            padding:12px 10px; text-align:center;
-            border-right:1px solid rgba(79,195,247,0.06);
-        }}
-        .sb-cell:last-child{{ border-right:none; }}
-        .sb-lbl{{
-            font-size:9px; letter-spacing:1.5px; color:#80a0b8;
-            text-transform:uppercase; margin-bottom:5px; font-weight:600;
-        }}
-        .sb-val{{
-            font-family:'Oxanium',sans-serif; font-size:14px;
-            font-weight:700; color:#e0f7fa;
-        }}
-        .sb-val.green{{ color:#00e676; }}
-        .sb-val.cyan{{  color:#00bcd4; }}
-        .sb-val.gold{{  color:#ffb74d; }}
-        .sb-val.red{{   color:#ff5252; }}
-        .sb-val.small{{ font-size:11px; }}
-        .sb-signal{{
-            padding:10px 16px;
-            background:rgba(79,195,247,0.05);
-            border-top:1px solid rgba(79,195,247,0.06);
-            border-bottom:1px solid rgba(79,195,247,0.06);
-            font-size:14px; color:#ffffff; font-weight:500;
-            display:flex; align-items:center; gap:10px;
-        }}
-        .sb-signal .sig-lbl{{
-            font-size:10px; letter-spacing:2px; color:#4fc3f7;
-            text-transform:uppercase; flex-shrink:0; font-weight:700;
-        }}
-        .sb-footer{{
-            padding:11px 16px;
-            background:rgba(0,0,0,0.25);
-            font-family:'JetBrains Mono',monospace;
-            font-size:13px; color:#ffffff; font-weight:500;
-            display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
-        }}
-        .sb-footer .sf-lbl{{
-            font-size:10px; letter-spacing:2px; color:#4fc3f7;
-            text-transform:uppercase; flex-shrink:0; font-family:'Rajdhani',sans-serif;
-            font-weight:700;
-        }}
-        .sb-footer .sf-why{{
-            font-size:13px; color:#ffffff; font-style:italic;
-            font-family:'Rajdhani',sans-serif; font-weight:500; margin-left:auto;
-        }}
-        .fire-row{{
-            background:rgba(12,6,0,0.75);
-            backdrop-filter:blur(14px);
-            -webkit-backdrop-filter:blur(14px);
-            border:1px solid rgba(255,140,0,0.25);
-            border-left:4px solid #ff8c00;
-            border-radius:10px;
-            margin-top:18px;
-            padding:18px 22px;
-            display:grid;
-            grid-template-columns:1.4fr 1.6fr 1.6fr 1.8fr;
-            gap:0;
-            align-items:center;
-            box-shadow:0 0 28px rgba(255,140,0,0.08), inset 0 1px 0 rgba(255,140,0,0.08);
-            transition:box-shadow 0.3s ease;
-        }}
-        .fire-row:hover{{box-shadow:0 0 40px rgba(255,140,0,0.15), inset 0 1px 0 rgba(255,140,0,0.12);}}
+        /* ── SCOREBOARD ── */
+        .sb-wrap{{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.15);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.3);}}
+        .sb-header{{padding:11px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.1);}}
+        .sb-header.cyan{{background:rgba(79,195,247,0.08);border-left:4px solid #4fc3f7;}}
+        .sb-header.gold{{background:rgba(255,183,77,0.08);border-left:4px solid #ffb74d;}}
+        .sb-h-title{{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;color:#4fc3f7;letter-spacing:1px;}}
+        .sb-h-title.gold{{color:#ffb74d;}}
+        .sb-h-badge{{font-size:9px;padding:3px 12px;border-radius:10px;font-weight:700;letter-spacing:1px;}}
+        .sb-h-badge.cyan{{background:rgba(79,195,247,0.12);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3);}}
+        .sb-h-badge.gold{{background:rgba(255,183,77,0.12);color:#ffb74d;border:1px solid rgba(255,183,77,0.3);}}
+        .sb-body{{display:grid;grid-template-columns:repeat(5,1fr);}}
+        .sb-cell{{padding:12px 10px;text-align:center;border-right:1px solid rgba(79,195,247,0.06);}}
+        .sb-cell:last-child{{border-right:none;}}
+        .sb-lbl{{font-size:9px;letter-spacing:1.5px;color:#80a0b8;text-transform:uppercase;margin-bottom:5px;font-weight:600;}}
+        .sb-val{{font-family:'Oxanium',sans-serif;font-size:14px;font-weight:700;color:#e0f7fa;}}
+        .sb-val.green{{color:#00e676;}} .sb-val.cyan{{color:#00bcd4;}} .sb-val.gold{{color:#ffb74d;}} .sb-val.red{{color:#ff5252;}} .sb-val.small{{font-size:11px;}}
+        .sb-signal{{padding:10px 16px;background:rgba(79,195,247,0.05);border-top:1px solid rgba(79,195,247,0.06);border-bottom:1px solid rgba(79,195,247,0.06);font-size:14px;color:#ffffff;font-weight:500;display:flex;align-items:center;gap:10px;}}
+        .sb-signal .sig-lbl{{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-weight:700;}}
+        .sb-footer{{padding:11px 16px;background:rgba(0,0,0,0.25);font-family:'JetBrains Mono',monospace;font-size:13px;color:#ffffff;font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}}
+        .sb-footer .sf-lbl{{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;}}
+        .sb-footer .sf-why{{font-size:13px;color:#ffffff;font-style:italic;font-family:'Rajdhani',sans-serif;font-weight:500;margin-left:auto;}}
+        /* ── FIRE ROW ── */
+        .fire-row{{background:rgba(12,6,0,0.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,140,0,0.25);border-left:4px solid #ff8c00;border-radius:10px;margin-top:18px;padding:18px 22px;display:grid;grid-template-columns:1.4fr 1.6fr 1.6fr 1.8fr;gap:0;align-items:center;box-shadow:0 0 28px rgba(255,140,0,0.08),inset 0 1px 0 rgba(255,140,0,0.08);transition:box-shadow 0.3s ease;}}
+        .fire-row:hover{{box-shadow:0 0 40px rgba(255,140,0,0.15),inset 0 1px 0 rgba(255,140,0,0.12);}}
         .fire-col{{padding:4px 18px;border-right:1px solid rgba(255,140,0,0.12);}}
         .fire-col:first-child{{padding-left:6px;}}
         .fire-col:last-child{{border-right:none;}}
-        .fire-heading{{
-            display:flex; align-items:center; gap:8px;
-            font-family:'Oxanium',sans-serif;
-            font-size:11px; font-weight:800;
-            color:#ff8c00; letter-spacing:2.5px;
-            text-transform:uppercase; line-height:1.4;
-        }}
+        .fire-heading{{display:flex;align-items:center;gap:8px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;color:#ff8c00;letter-spacing:2.5px;text-transform:uppercase;line-height:1.4;}}
         .fire-col-label{{font-size:9px;letter-spacing:2px;color:rgba(255,140,0,0.5);text-transform:uppercase;font-weight:700;margin-bottom:7px;font-family:'Rajdhani',sans-serif;}}
         .fire-col-value{{font-family:'Oxanium',sans-serif;font-size:20px;font-weight:800;color:#ff8c00;letter-spacing:0.5px;line-height:1.2;}}
         .fire-col-value.stop-text{{font-size:13px;font-weight:700;color:#ff8c00;line-height:1.5;opacity:0.85;}}
         .fire-col-value.stop-price{{color:#f44336;font-size:20px;}}
         .fire-rr{{margin-top:6px;font-size:10px;color:rgba(255,140,0,0.45);font-family:'JetBrains Mono',monospace;letter-spacing:1px;}}
+        /* ── STRIKES TABLE ── */
         .strikes-table{{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}}
         .strikes-table th{{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;}}
         .strikes-table td{{padding:14px;border-bottom:1px solid rgba(79,195,247,0.08);color:#b0bec5;font-size:13px;}}
         .strikes-table tr:hover{{background:rgba(79,195,247,0.06);}}
         .strikes-table tbody tr:last-child td{{border-bottom:none;}}
+        /* ── SNAP GRID ── */
         .snap-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}}
         .snap-card{{padding:18px 16px;}}
         .snap-card .card-top-row{{margin-bottom:8px;padding:0;}}
         .snap-card .val{{font-size:26px;padding:0;margin-bottom:0;}}
-        .disclaimer{{
-            background:rgba(255,183,77,0.1);
-            backdrop-filter:blur(8px);
-            padding:22px; border-radius:12px;
-            border-left:4px solid #ffb74d;
-            font-size:13px; color:#ffb74d; line-height:1.8;
-        }}
+        .disclaimer{{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:13px;color:#ffb74d;line-height:1.8;}}
         .footer{{text-align:center;padding:24px;color:#546e7a;font-size:12px;background:rgba(10,20,28,0.4);}}
+
         /* ══════════════════════════════════════════
-           RESPONSIVE — TABLET (iPad ≤ 1024px)
+           NAVY COMMAND — OI SECTION STYLES
+        ══════════════════════════════════════════ */
+        .nc-section-header{{
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:18px; padding-bottom:14px;
+            border-bottom:1px solid rgba(79,195,247,0.14);
+        }}
+        .nc-header-left{{display:flex;align-items:center;gap:14px;}}
+        .nc-header-icon{{
+            width:44px;height:44px;border-radius:10px;
+            background:linear-gradient(135deg,#1e3a5f,#1a3052);
+            border:1px solid rgba(79,195,247,0.3);
+            display:flex;align-items:center;justify-content:center;
+            font-size:20px;flex-shrink:0;
+            box-shadow:0 4px 14px rgba(79,195,247,0.15);
+        }}
+        .nc-header-title{{
+            font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;
+            color:#93c5fd;letter-spacing:0.3px;
+        }}
+        .nc-header-sub{{
+            font-family:'Outfit',sans-serif;font-size:11px;font-weight:400;
+            color:rgba(79,195,247,0.45);margin-top:2px;letter-spacing:0.5px;
+        }}
+        .nc-atm-badge{{
+            background:#1f2a42;color:#60a5fa;
+            font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;
+            padding:6px 16px;border-radius:20px;letter-spacing:1.5px;
+            border:1px solid rgba(96,165,250,0.25);
+            box-shadow:0 2px 10px rgba(96,165,250,0.1);
+        }}
+        /* Direction box */
+        .nc-dir-box{{
+            border-radius:14px;padding:20px 22px;margin-bottom:18px;
+            box-shadow:0 4px 24px rgba(0,0,0,0.3);
+            transition:box-shadow 0.3s;
+        }}
+        .nc-dir-box:hover{{box-shadow:0 8px 36px rgba(0,0,0,0.4);}}
+        .nc-dir-bar{{
+            width:4px;border-radius:2px;flex-shrink:0;min-height:60px;
+        }}
+        .nc-dir-tag{{
+            font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
+            letter-spacing:2.5px;color:rgba(148,163,184,0.5);
+            text-transform:uppercase;margin-bottom:6px;
+        }}
+        .nc-dir-name{{
+            font-family:'Outfit',sans-serif;font-size:28px;font-weight:700;
+            line-height:1;margin-bottom:6px;letter-spacing:-0.5px;
+        }}
+        .nc-dir-signal{{
+            font-family:'Outfit',sans-serif;font-size:12px;font-weight:400;
+        }}
+        /* Strength meter */
+        .nc-meter-wrap{{
+            text-align:right;min-width:160px;
+        }}
+        .nc-meter-label{{
+            font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
+            letter-spacing:2px;color:rgba(148,163,184,0.45);
+            text-transform:uppercase;margin-bottom:8px;
+        }}
+        .nc-meter-track{{
+            position:relative;height:8px;background:rgba(0,0,0,0.4);
+            border-radius:4px;overflow:visible;width:180px;margin-left:auto;
+        }}
+        .nc-meter-fill{{
+            height:100%;border-radius:4px;
+            transition:width 1.2s cubic-bezier(0.4,0,0.2,1);
+        }}
+        .nc-meter-head{{
+            position:absolute;top:50%;transform:translateY(-50%);
+            width:14px;height:14px;border-radius:50%;
+            margin-left:-7px;
+            border:2px solid rgba(10,18,30,0.8);
+            transition:left 1.2s cubic-bezier(0.4,0,0.2,1);
+        }}
+        .nc-meter-pct{{
+            font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;
+            margin-top:8px;letter-spacing:0.5px;
+        }}
+        /* 3 OI cards */
+        .nc-cards-grid{{
+            display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+        }}
+        .nc-card{{
+            background:rgba(20,28,45,0.85);
+            border:1px solid rgba(79,195,247,0.12);
+            border-radius:14px;padding:18px 18px 14px;
+            transition:all 0.3s ease;
+            position:relative;overflow:hidden;
+        }}
+        .nc-card::before{{
+            content:'';position:absolute;top:0;left:0;right:0;height:1px;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+        }}
+        .nc-card:hover{{
+            border-color:rgba(79,195,247,0.3);
+            background:rgba(25,35,55,0.9);
+            transform:translateY(-3px);
+            box-shadow:0 10px 30px rgba(0,0,0,0.3);
+        }}
+        .nc-card-header{{
+            display:flex;align-items:center;justify-content:space-between;
+            margin-bottom:12px;
+        }}
+        .nc-card-label{{
+            font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;
+            letter-spacing:2px;color:rgba(148,163,184,0.6);text-transform:uppercase;
+        }}
+        .nc-card-value{{
+            font-family:'Oxanium',sans-serif;font-size:30px;font-weight:700;
+            line-height:1;margin-bottom:6px;letter-spacing:-0.5px;
+        }}
+        .nc-card-sub{{
+            font-family:'JetBrains Mono',monospace;font-size:10px;
+            color:rgba(100,116,139,0.7);margin-bottom:14px;
+        }}
+        .nc-card-btn{{
+            display:block;width:100%;padding:9px 14px;border-radius:7px;
+            text-align:center;font-family:'Outfit',sans-serif;
+            font-size:13px;font-weight:700;letter-spacing:0.5px;
+            transition:all 0.2s;cursor:default;
+        }}
+        .nc-card:hover .nc-card-btn{{
+            filter:brightness(1.1);
+        }}
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE — TABLET (≤ 1024px)
         ══════════════════════════════════════════ */
         @media(max-width:1024px){{
-            body{{ padding:16px; }}
-            .container{{ border-radius:16px; }}
-            .header{{ padding:28px 20px; }}
-            .header h1{{ font-size:24px; letter-spacing:1.5px; }}
-            .section{{ padding:22px 18px; }}
-
-            /* 5-col → 3-col */
-            .grid-5{{ grid-template-columns:repeat(3,1fr); }}
-            /* 4-col → 2-col */
-            .grid-4{{ grid-template-columns:repeat(2,1fr); }}
-            /* snap 3-col → 3-col (keep) */
-            .snap-grid{{ grid-template-columns:repeat(3,1fr); }}
-            /* OI grid 3-col → 3-col (keep) */
-            .oi-grid{{ grid-template-columns:repeat(3,1fr); }}
-
-            /* FII/DII KPI row: sentiment + 3 KPIs → 2-col on tablet */
-            .fii-kpi-grid{{ grid-template-columns:1fr 1fr !important; }}
-
-            /* Scoreboard body: 5-col → 3-col+2 wrap */
-            .sb-body{{ grid-template-columns:repeat(3,1fr); }}
-            .sb-cell:nth-child(4),.sb-cell:nth-child(5){{
-                border-top:1px solid rgba(79,195,247,0.06);
-            }}
-
-            /* Fire row: 4-col → 2-col grid */
-            .fire-row{{
-                grid-template-columns:1fr 1fr;
-                gap:14px;
-                padding:16px;
-            }}
-            .fire-col{{ border-right:none; padding:8px 12px; }}
-            .fire-col:nth-child(odd){{ border-right:1px solid rgba(255,140,0,0.12); }}
-            .fire-col-value{{ font-size:16px; }}
-
-            /* Key levels: hide max pain label overflow */
-            .rl-lbl{{ font-size:9px; }}
-            .rl-val{{ font-size:11px; }}
-
-            /* Strikes table side-by-side → stack */
-            .strikes-wrap{{ grid-template-columns:1fr !important; }}
-
-            /* Direction box */
-            .direction-title{{ font-size:22px; }}
-            .direction-subtitle{{ font-size:12px; }}
-
-            /* Val font size */
-            .val{{ font-size:20px; }}
+            body{{padding:16px;}}
+            .container{{border-radius:16px;}}
+            .header{{padding:28px 20px;}}
+            .header h1{{font-size:24px;letter-spacing:1.5px;}}
+            .section{{padding:22px 18px;}}
+            .grid-5{{grid-template-columns:repeat(3,1fr);}}
+            .grid-4{{grid-template-columns:repeat(2,1fr);}}
+            .snap-grid{{grid-template-columns:repeat(3,1fr);}}
+            .fii-kpi-grid{{grid-template-columns:1fr 1fr !important;}}
+            .sb-body{{grid-template-columns:repeat(3,1fr);}}
+            .sb-cell:nth-child(4),.sb-cell:nth-child(5){{border-top:1px solid rgba(79,195,247,0.06);}}
+            .fire-row{{grid-template-columns:1fr 1fr;gap:14px;padding:16px;}}
+            .fire-col{{border-right:none;padding:8px 12px;}}
+            .fire-col:nth-child(odd){{border-right:1px solid rgba(255,140,0,0.12);}}
+            .fire-col-value{{font-size:16px;}}
+            .rl-lbl{{font-size:9px;}}
+            .rl-val{{font-size:11px;}}
+            .strikes-wrap{{grid-template-columns:1fr !important;}}
+            .direction-title{{font-size:22px;}}
+            .val{{font-size:20px;}}
+            /* NC responsive */
+            .nc-cards-grid{{grid-template-columns:repeat(3,1fr);}}
+            .nc-dir-name{{font-size:22px;}}
+            .nc-meter-track{{width:140px;}}
+            .nc-card-value{{font-size:24px;}}
         }}
 
         /* ══════════════════════════════════════════
            RESPONSIVE — MOBILE (≤ 600px)
         ══════════════════════════════════════════ */
         @media(max-width:600px){{
-            body{{ padding:8px; }}
-            .container{{ border-radius:12px; }}
-            .header{{ padding:20px 14px; }}
-            .header h1{{ font-size:18px; letter-spacing:1px; }}
-            .header p{{ font-size:11px; }}
-            .section{{ padding:16px 12px; }}
-            .section-title{{ font-size:11px; letter-spacing:1.5px; gap:6px; }}
-            .section-title span{{ font-size:15px; }}
-
-            /* All grids → single column */
-            .grid-5,.grid-4{{ grid-template-columns:1fr; }}
-            .snap-grid{{ grid-template-columns:1fr; }}
-            .oi-grid{{ grid-template-columns:1fr; }}
-
-            /* FII/DII: sentiment pill full width, then 3 KPI cards stacked */
-            div[style*="grid-template-columns:auto 1fr 1fr 1fr"]{{
-                grid-template-columns:1fr 1fr !important;
-            }}
-
-            /* Stat cards */
-            .val{{ font-size:20px; }}
-            .card-ico{{ font-size:18px; }}
-
-            /* Scoreboard: all 5 cells → single column */
-            .sb-body{{ grid-template-columns:1fr 1fr; }}
-            .sb-cell{{ border-right:none !important; border-bottom:1px solid rgba(79,195,247,0.06); }}
-            .sb-cell:last-child{{ border-bottom:none; }}
-            .sb-h-title{{ font-size:11px; letter-spacing:0.5px; }}
-            .sb-h-badge{{ font-size:8px; padding:2px 8px; }}
-            .sb-val{{ font-size:13px; }}
-            .sb-lbl{{ font-size:8px; }}
-            .sb-footer{{ font-size:11px; flex-direction:column; gap:6px; }}
-            .sb-footer .sf-why{{ margin-left:0; }}
-            .sb-signal{{ font-size:12px; flex-wrap:wrap; gap:6px; }}
-
-            /* Fire row → 1-col stack */
-            .fire-row{{
-                grid-template-columns:1fr;
-                gap:12px;
-                padding:14px 12px;
-            }}
-            .fire-col{{ border-right:none !important; border-bottom:1px solid rgba(255,140,0,0.08); padding:8px 4px; }}
-            .fire-col:last-child{{ border-bottom:none; }}
-            .fire-col-value{{ font-size:15px; }}
-            .fire-heading{{ font-size:10px; }}
-
-            /* Direction box */
-            .direction-box{{ padding:18px 14px; }}
-            .direction-title{{ font-size:20px; }}
-            .direction-subtitle{{ font-size:11px; }}
-
-            /* Logic box */
-            .logic-box p{{ font-size:11px; line-height:1.7; }}
-
-            /* Key levels: compact on mobile */
-            .rl-node-a,.rl-node-b{{ font-size:9px; }}
-            .rl-val{{ font-size:10px; }}
-            .rl-lbl{{ font-size:8px; letter-spacing:0; }}
-
-            /* Distance row → stack */
-            div[style*="grid-template-columns:1fr 1fr"]{{
-                grid-template-columns:1fr !important;
-            }}
-
-            /* FII KPI numbers */
-            div[style*="font-size:22px"]{{ font-size:18px !important; }}
-
-            /* Strikes table → stack */
-            .strikes-wrap{{ grid-template-columns:1fr !important; }}
-            .strikes-table th,.strikes-table td{{ padding:10px 8px; font-size:11px; }}
-
-            /* Disclaimer */
-            .disclaimer{{ padding:14px; font-size:12px; }}
-
-            /* OI direction box */
-            .oi-grid .g .val{{ font-size:16px; }}
+            body{{padding:8px;}}
+            .container{{border-radius:12px;}}
+            .header{{padding:20px 14px;}}
+            .header h1{{font-size:18px;letter-spacing:1px;}}
+            .header p{{font-size:11px;}}
+            .section{{padding:16px 12px;}}
+            .section-title{{font-size:11px;letter-spacing:1.5px;gap:6px;}}
+            .section-title span{{font-size:15px;}}
+            .grid-5,.grid-4{{grid-template-columns:1fr;}}
+            .snap-grid{{grid-template-columns:1fr;}}
+            div[style*="grid-template-columns:auto 1fr 1fr 1fr"]{{grid-template-columns:1fr 1fr !important;}}
+            .val{{font-size:20px;}}
+            .card-ico{{font-size:18px;}}
+            .sb-body{{grid-template-columns:1fr 1fr;}}
+            .sb-cell{{border-right:none !important;border-bottom:1px solid rgba(79,195,247,0.06);}}
+            .sb-cell:last-child{{border-bottom:none;}}
+            .sb-h-title{{font-size:11px;letter-spacing:0.5px;}}
+            .sb-h-badge{{font-size:8px;padding:2px 8px;}}
+            .sb-val{{font-size:13px;}}
+            .sb-lbl{{font-size:8px;}}
+            .sb-footer{{font-size:11px;flex-direction:column;gap:6px;}}
+            .sb-footer .sf-why{{margin-left:0;}}
+            .sb-signal{{font-size:12px;flex-wrap:wrap;gap:6px;}}
+            .fire-row{{grid-template-columns:1fr;gap:12px;padding:14px 12px;}}
+            .fire-col{{border-right:none !important;border-bottom:1px solid rgba(255,140,0,0.08);padding:8px 4px;}}
+            .fire-col:last-child{{border-bottom:none;}}
+            .fire-col-value{{font-size:15px;}}
+            .fire-heading{{font-size:10px;}}
+            .direction-box{{padding:18px 14px;}}
+            .direction-title{{font-size:20px;}}
+            .direction-subtitle{{font-size:11px;}}
+            .logic-box p{{font-size:11px;line-height:1.7;}}
+            .rl-node-a,.rl-node-b{{font-size:9px;}}
+            .rl-val{{font-size:10px;}}
+            .rl-lbl{{font-size:8px;letter-spacing:0;}}
+            div[style*="grid-template-columns:1fr 1fr"]{{grid-template-columns:1fr !important;}}
+            div[style*="font-size:22px"]{{font-size:18px !important;}}
+            .strikes-wrap{{grid-template-columns:1fr !important;}}
+            .strikes-table th,.strikes-table td{{padding:10px 8px;font-size:11px;}}
+            .disclaimer{{padding:14px;font-size:12px;}}
+            /* NC mobile */
+            .nc-section-header{{flex-direction:column;align-items:flex-start;gap:10px;}}
+            .nc-atm-badge{{align-self:flex-end;}}
+            .nc-cards-grid{{grid-template-columns:1fr;}}
+            .nc-dir-name{{font-size:20px;}}
+            .nc-meter-wrap{{text-align:left;min-width:unset;}}
+            .nc-meter-track{{width:100%;margin-left:0;}}
+            .nc-card-value{{font-size:26px;}}
+            .nc-meter-pct{{font-size:13px;}}
+            .nc-header-title{{font-size:15px;}}
         }}
 
         /* ══════════════════════════════════════════
            RESPONSIVE — SMALL MOBILE (≤ 380px)
         ══════════════════════════════════════════ */
         @media(max-width:380px){{
-            .header h1{{ font-size:15px; }}
-            .sb-body{{ grid-template-columns:1fr; }}
-            .section{{ padding:12px 10px; }}
-            .val{{ font-size:17px; }}
-            .sb-val{{ font-size:12px; }}
-            .fire-col-value{{ font-size:13px; }}
-            .direction-title{{ font-size:17px; }}
+            .header h1{{font-size:15px;}}
+            .sb-body{{grid-template-columns:1fr;}}
+            .section{{padding:12px 10px;}}
+            .val{{font-size:17px;}}
+            .sb-val{{font-size:12px;}}
+            .fire-col-value{{font-size:13px;}}
+            .direction-title{{font-size:17px;}}
+            .nc-dir-name{{font-size:17px;}}
+            .nc-card-value{{font-size:22px;}}
         }}
     </style>
 </head>
@@ -1260,7 +1435,7 @@ class NiftyHTMLAnalyzer:
         {self._key_levels_fire_row(d)}
     </div>
 
-    <!-- ── FII / DII 5-DAY SENTIMENT (injected here) ── -->
+    <!-- ── FII / DII 5-DAY SENTIMENT ── -->
     {self._fiidii_section_html()}
 
     <!-- ── MARKET DIRECTION ── -->
@@ -1289,6 +1464,7 @@ class NiftyHTMLAnalyzer:
         </div>
     </div>
 """
+        # ── OPTION CHAIN ANALYSIS (unchanged)
         if d['has_option_data']:
             html += f"""
     <div class="section">
@@ -1300,51 +1476,11 @@ class NiftyHTMLAnalyzer:
             {oc_cards}
         </div>
     </div>
-    <div class="section">
-        <div class="section-title">
-            <span>📊</span> CHANGE IN OPEN INTEREST
-            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(Today's Direction · ATM ±10 Only)</span>
-        </div>
-        <div class="direction-box {d['oi_class']}" style="margin:0 0 18px;">
-            <div class="direction-title" style="font-size:24px;">{d['oi_icon']} {d['oi_direction']}</div>
-            <div class="direction-subtitle">{d['oi_signal']}</div>
-        </div>
-        <div class="oi-grid">
 """
-            ce_chg_badge  = 'bearish' if d['total_ce_oi_change'] > 0 else 'bullish'
-            ce_chg_lbl    = 'Bearish Signal' if d['total_ce_oi_change'] > 0 else 'Bullish Signal'
-            ce_chg_ico    = '🔴' if d['total_ce_oi_change'] > 0 else '🟢'
-            ce_chg_bar    = 'bar-red' if d['total_ce_oi_change'] > 0 else 'bar-teal'
-            ce_chg_pct    = min(100, abs(d['total_ce_oi_change']) / 50000 * 100) if d['total_ce_oi_change'] != 0 else 5
-            pe_chg_badge  = 'bullish' if d['total_pe_oi_change'] > 0 else 'bearish'
-            pe_chg_lbl    = 'Bullish Signal' if d['total_pe_oi_change'] > 0 else 'Bearish Signal'
-            pe_chg_ico    = '🟢' if d['total_pe_oi_change'] > 0 else '🔴'
-            pe_chg_bar    = 'bar-teal' if d['total_pe_oi_change'] > 0 else 'bar-red'
-            pe_chg_pct    = min(100, abs(d['total_pe_oi_change']) / 50000 * 100) if d['total_pe_oi_change'] != 0 else 5
-            net_badge     = 'bullish' if d['net_oi_change'] > 0 else ('bearish' if d['net_oi_change'] < 0 else 'neutral')
-            net_lbl       = 'Bullish Net' if d['net_oi_change'] > 0 else ('Bearish Net' if d['net_oi_change'] < 0 else 'Balanced')
-            net_bar       = 'bar-teal' if d['net_oi_change'] > 0 else ('bar-red' if d['net_oi_change'] < 0 else 'bar-gold')
-            net_pct       = min(100, abs(d['net_oi_change']) / 50000 * 100) if d['net_oi_change'] != 0 else 5
-            html += (
-                self._stat_card(ce_chg_ico, 'CALL OI CHANGE', f"{d['total_ce_oi_change']:+,}",
-                                ce_chg_lbl, ce_chg_badge, ce_chg_pct, ce_chg_bar, 'CE open interest Δ') +
-                self._stat_card(pe_chg_ico, 'PUT OI CHANGE',  f"{d['total_pe_oi_change']:+,}",
-                                pe_chg_lbl, pe_chg_badge, pe_chg_pct, pe_chg_bar, 'PE open interest Δ') +
-                self._stat_card('⚖️', 'NET OI CHANGE', f"{d['net_oi_change']:+,}",
-                                net_lbl, net_badge, net_pct, net_bar, 'PE Δ − CE Δ')
-            )
-            html += f"""
-        </div>
-        <div class="logic-box">
-            <p>
-                <strong>📖 How to Read:</strong><br>
-                • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
-                • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
-                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)
-            </p>
-        </div>
-    </div>
-"""
+            # ── CHANGE IN OI — NAVY COMMAND THEME ──
+            html += self._oi_navy_command_section(d)
+
+        # ── KEY LEVELS
         html += f"""
     <div class="section">
         <div class="section-title"><span>📊</span> KEY LEVELS</div>
@@ -1403,6 +1539,7 @@ class NiftyHTMLAnalyzer:
     </div>
 """
         html += self._generate_recommendations_html(d)
+
         if d['has_option_data'] and (d['top_ce_strikes'] or d['top_pe_strikes']):
             html += """
     <div class="section">
@@ -1438,7 +1575,7 @@ class NiftyHTMLAnalyzer:
     </div>
     <div class="footer">
         <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
-        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · For Educational Purposes Only</p>
+        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · Navy Command OI · For Educational Purposes Only</p>
     </div>
 </div>
 </body>
@@ -1447,17 +1584,16 @@ class NiftyHTMLAnalyzer:
         return html
 
     # ─────────────────────────────────────────────
-    #  DUAL RECOMMENDATIONS  — ⑧ SCOREBOARD STYLE
+    #  DUAL RECOMMENDATIONS — SCOREBOARD STYLE
     # ─────────────────────────────────────────────
     def _generate_recommendations_html(self, d):
         ts = d['recommended_technical_strategy']
 
-        # ── colour helpers
         def bias_color(bias):
             b = bias.lower()
-            if 'bull' in b:   return 'green'
-            if 'bear' in b:   return 'red'
-            if 'vol' in b:    return 'gold'
+            if 'bull' in b: return 'green'
+            if 'bear' in b: return 'red'
+            if 'vol'  in b: return 'gold'
             return 'gold'
 
         def risk_color(risk):
@@ -1491,7 +1627,6 @@ class NiftyHTMLAnalyzer:
             <strong style="color:#ffb74d;">OI Momentum</strong>.
         </p>
 """
-        # ══ CARD 1 — TECHNICAL STRATEGY ══
         html += f"""
         <div class="sb-wrap">
             <div class="sb-header cyan">
@@ -1499,26 +1634,11 @@ class NiftyHTMLAnalyzer:
                 <span class="sb-h-badge cyan">Positional · 1–5 Days</span>
             </div>
             <div class="sb-body">
-                <div class="sb-cell">
-                    <div class="sb-lbl">Market Bias</div>
-                    <div class="sb-val {ts_bias_cls}">{ts['market_bias']}</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Type</div>
-                    <div class="sb-val cyan">{ts['type']}</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Risk</div>
-                    <div class="sb-val {ts_risk_cls}">{ts['risk']}</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Max Profit</div>
-                    <div class="sb-val {ts_profit_cls} small">{ts['max_profit']}</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Max Loss</div>
-                    <div class="sb-val {ts_loss_cls} small">{ts['max_loss']}</div>
-                </div>
+                <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val {ts_bias_cls}">{ts['market_bias']}</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">{ts['type']}</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Risk</div><div class="sb-val {ts_risk_cls}">{ts['risk']}</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val {ts_profit_cls} small">{ts['max_profit']}</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val {ts_loss_cls} small">{ts['max_loss']}</div></div>
             </div>
             <div class="sb-footer">
                 <span class="sf-lbl">📋 Setup</span>
@@ -1527,7 +1647,6 @@ class NiftyHTMLAnalyzer:
             </div>
         </div>
 """
-        # ══ CARD 2 — OI STRATEGY ══
         if d['recommended_oi_strategy']:
             oi = d['recommended_oi_strategy']
             oi_bias_cls   = bias_color(oi['market_bias'])
@@ -1536,7 +1655,6 @@ class NiftyHTMLAnalyzer:
             oi_loss_cls   = loss_color(oi['max_loss'])
             signal_txt    = oi.get('signal', 'Market signal detected')
             horizon       = oi.get('time_horizon', 'Intraday')
-
             html += f"""
         <div class="sb-wrap">
             <div class="sb-header gold">
@@ -1548,26 +1666,11 @@ class NiftyHTMLAnalyzer:
                 <span style="color:#ffffff;font-weight:500;">{signal_txt}</span>
             </div>
             <div class="sb-body">
-                <div class="sb-cell">
-                    <div class="sb-lbl">Market Bias</div>
-                    <div class="sb-val {oi_bias_cls}">{oi['market_bias']}</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Type</div>
-                    <div class="sb-val cyan">{oi['type']}</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Risk</div>
-                    <div class="sb-val {oi_risk_cls}">{oi['risk']}</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Max Profit</div>
-                    <div class="sb-val {oi_profit_cls} small">{oi['max_profit']}</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Max Loss</div>
-                    <div class="sb-val {oi_loss_cls} small">{oi['max_loss']}</div>
-                </div>
+                <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val {oi_bias_cls}">{oi['market_bias']}</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">{oi['type']}</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Risk</div><div class="sb-val {oi_risk_cls}">{oi['risk']}</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val {oi_profit_cls} small">{oi['max_profit']}</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val {oi_loss_cls} small">{oi['max_loss']}</div></div>
             </div>
             <div class="sb-footer" style="border-top-color:rgba(255,183,77,0.08);">
                 <span class="sf-lbl">📋 Setup</span>
@@ -1635,7 +1738,7 @@ class NiftyHTMLAnalyzer:
     def generate_full_report(self):
         ist_now = datetime.now(pytz.timezone('Asia/Kolkata'))
         print("=" * 70)
-        print("NIFTY 50 DAILY REPORT — GLASSMORPHISM UI · STAT CARD + BAR LAYOUT")
+        print("NIFTY 50 DAILY REPORT — GLASSMORPHISM UI · NAVY COMMAND OI THEME")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 70)
         oc_data         = self.fetch_nse_option_chain_silent()

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nifty 50 Daily Report</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
         body{
@@ -143,282 +143,287 @@
         }
         .logic-box p{font-size:13px;line-height:1.9;color:#80deea;}
         .logic-box strong{color:#4fc3f7;}
-        .oi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px;}
         .rl-node-a{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}
         .rl-node-b{position:absolute;top:0;transform:translateX(-50%);text-align:center;}
         .rl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}
         .rl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}
         .rl-val{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}
-        /* ── SCOREBOARD STRATEGY CARDS ── */
-        .sb-wrap{
-            background:rgba(6,13,20,0.85);
-            border:1px solid rgba(79,195,247,0.15);
-            border-radius:12px; overflow:hidden;
-            margin-bottom:14px;
-            box-shadow:0 4px 24px rgba(0,0,0,0.3);
-        }
-        .sb-header{
-            padding:11px 18px;
-            display:flex; justify-content:space-between; align-items:center;
-            border-bottom:1px solid rgba(79,195,247,0.1);
-        }
-        .sb-header.cyan{ background:rgba(79,195,247,0.08); border-left:4px solid #4fc3f7; }
-        .sb-header.gold{ background:rgba(255,183,77,0.08);  border-left:4px solid #ffb74d; }
-        .sb-h-title{
-            font-family:'Oxanium',sans-serif; font-size:13px;
-            font-weight:700; color:#4fc3f7; letter-spacing:1px;
-        }
-        .sb-h-title.gold{ color:#ffb74d; }
-        .sb-h-badge{
-            font-size:9px; padding:3px 12px; border-radius:10px;
-            font-weight:700; letter-spacing:1px;
-        }
-        .sb-h-badge.cyan{ background:rgba(79,195,247,0.12); color:#4fc3f7; border:1px solid rgba(79,195,247,0.3); }
-        .sb-h-badge.gold{ background:rgba(255,183,77,0.12);  color:#ffb74d; border:1px solid rgba(255,183,77,0.3); }
-        .sb-body{
-            display:grid; grid-template-columns:repeat(5,1fr);
-        }
-        .sb-cell{
-            padding:12px 10px; text-align:center;
-            border-right:1px solid rgba(79,195,247,0.06);
-        }
-        .sb-cell:last-child{ border-right:none; }
-        .sb-lbl{
-            font-size:9px; letter-spacing:1.5px; color:#80a0b8;
-            text-transform:uppercase; margin-bottom:5px; font-weight:600;
-        }
-        .sb-val{
-            font-family:'Oxanium',sans-serif; font-size:14px;
-            font-weight:700; color:#e0f7fa;
-        }
-        .sb-val.green{ color:#00e676; }
-        .sb-val.cyan{  color:#00bcd4; }
-        .sb-val.gold{  color:#ffb74d; }
-        .sb-val.red{   color:#ff5252; }
-        .sb-val.small{ font-size:11px; }
-        .sb-signal{
-            padding:10px 16px;
-            background:rgba(79,195,247,0.05);
-            border-top:1px solid rgba(79,195,247,0.06);
-            border-bottom:1px solid rgba(79,195,247,0.06);
-            font-size:14px; color:#ffffff; font-weight:500;
-            display:flex; align-items:center; gap:10px;
-        }
-        .sb-signal .sig-lbl{
-            font-size:10px; letter-spacing:2px; color:#4fc3f7;
-            text-transform:uppercase; flex-shrink:0; font-weight:700;
-        }
-        .sb-footer{
-            padding:11px 16px;
-            background:rgba(0,0,0,0.25);
-            font-family:'JetBrains Mono',monospace;
-            font-size:13px; color:#ffffff; font-weight:500;
-            display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;
-        }
-        .sb-footer .sf-lbl{
-            font-size:10px; letter-spacing:2px; color:#4fc3f7;
-            text-transform:uppercase; flex-shrink:0; font-family:'Rajdhani',sans-serif;
-            font-weight:700;
-        }
-        .sb-footer .sf-why{
-            font-size:13px; color:#ffffff; font-style:italic;
-            font-family:'Rajdhani',sans-serif; font-weight:500; margin-left:auto;
-        }
-        .fire-row{
-            background:rgba(12,6,0,0.75);
-            backdrop-filter:blur(14px);
-            -webkit-backdrop-filter:blur(14px);
-            border:1px solid rgba(255,140,0,0.25);
-            border-left:4px solid #ff8c00;
-            border-radius:10px;
-            margin-top:18px;
-            padding:18px 22px;
-            display:grid;
-            grid-template-columns:1.4fr 1.6fr 1.6fr 1.8fr;
-            gap:0;
-            align-items:center;
-            box-shadow:0 0 28px rgba(255,140,0,0.08), inset 0 1px 0 rgba(255,140,0,0.08);
-            transition:box-shadow 0.3s ease;
-        }
-        .fire-row:hover{box-shadow:0 0 40px rgba(255,140,0,0.15), inset 0 1px 0 rgba(255,140,0,0.12);}
+        /* ── SCOREBOARD ── */
+        .sb-wrap{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.15);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.3);}
+        .sb-header{padding:11px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.1);}
+        .sb-header.cyan{background:rgba(79,195,247,0.08);border-left:4px solid #4fc3f7;}
+        .sb-header.gold{background:rgba(255,183,77,0.08);border-left:4px solid #ffb74d;}
+        .sb-h-title{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;color:#4fc3f7;letter-spacing:1px;}
+        .sb-h-title.gold{color:#ffb74d;}
+        .sb-h-badge{font-size:9px;padding:3px 12px;border-radius:10px;font-weight:700;letter-spacing:1px;}
+        .sb-h-badge.cyan{background:rgba(79,195,247,0.12);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3);}
+        .sb-h-badge.gold{background:rgba(255,183,77,0.12);color:#ffb74d;border:1px solid rgba(255,183,77,0.3);}
+        .sb-body{display:grid;grid-template-columns:repeat(5,1fr);}
+        .sb-cell{padding:12px 10px;text-align:center;border-right:1px solid rgba(79,195,247,0.06);}
+        .sb-cell:last-child{border-right:none;}
+        .sb-lbl{font-size:9px;letter-spacing:1.5px;color:#80a0b8;text-transform:uppercase;margin-bottom:5px;font-weight:600;}
+        .sb-val{font-family:'Oxanium',sans-serif;font-size:14px;font-weight:700;color:#e0f7fa;}
+        .sb-val.green{color:#00e676;} .sb-val.cyan{color:#00bcd4;} .sb-val.gold{color:#ffb74d;} .sb-val.red{color:#ff5252;} .sb-val.small{font-size:11px;}
+        .sb-signal{padding:10px 16px;background:rgba(79,195,247,0.05);border-top:1px solid rgba(79,195,247,0.06);border-bottom:1px solid rgba(79,195,247,0.06);font-size:14px;color:#ffffff;font-weight:500;display:flex;align-items:center;gap:10px;}
+        .sb-signal .sig-lbl{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-weight:700;}
+        .sb-footer{padding:11px 16px;background:rgba(0,0,0,0.25);font-family:'JetBrains Mono',monospace;font-size:13px;color:#ffffff;font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+        .sb-footer .sf-lbl{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;}
+        .sb-footer .sf-why{font-size:13px;color:#ffffff;font-style:italic;font-family:'Rajdhani',sans-serif;font-weight:500;margin-left:auto;}
+        /* ── FIRE ROW ── */
+        .fire-row{background:rgba(12,6,0,0.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,140,0,0.25);border-left:4px solid #ff8c00;border-radius:10px;margin-top:18px;padding:18px 22px;display:grid;grid-template-columns:1.4fr 1.6fr 1.6fr 1.8fr;gap:0;align-items:center;box-shadow:0 0 28px rgba(255,140,0,0.08),inset 0 1px 0 rgba(255,140,0,0.08);transition:box-shadow 0.3s ease;}
+        .fire-row:hover{box-shadow:0 0 40px rgba(255,140,0,0.15),inset 0 1px 0 rgba(255,140,0,0.12);}
         .fire-col{padding:4px 18px;border-right:1px solid rgba(255,140,0,0.12);}
         .fire-col:first-child{padding-left:6px;}
         .fire-col:last-child{border-right:none;}
-        .fire-heading{
-            display:flex; align-items:center; gap:8px;
-            font-family:'Oxanium',sans-serif;
-            font-size:11px; font-weight:800;
-            color:#ff8c00; letter-spacing:2.5px;
-            text-transform:uppercase; line-height:1.4;
-        }
+        .fire-heading{display:flex;align-items:center;gap:8px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;color:#ff8c00;letter-spacing:2.5px;text-transform:uppercase;line-height:1.4;}
         .fire-col-label{font-size:9px;letter-spacing:2px;color:rgba(255,140,0,0.5);text-transform:uppercase;font-weight:700;margin-bottom:7px;font-family:'Rajdhani',sans-serif;}
         .fire-col-value{font-family:'Oxanium',sans-serif;font-size:20px;font-weight:800;color:#ff8c00;letter-spacing:0.5px;line-height:1.2;}
         .fire-col-value.stop-text{font-size:13px;font-weight:700;color:#ff8c00;line-height:1.5;opacity:0.85;}
         .fire-col-value.stop-price{color:#f44336;font-size:20px;}
         .fire-rr{margin-top:6px;font-size:10px;color:rgba(255,140,0,0.45);font-family:'JetBrains Mono',monospace;letter-spacing:1px;}
+        /* ── STRIKES TABLE ── */
         .strikes-table{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}
         .strikes-table th{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;}
         .strikes-table td{padding:14px;border-bottom:1px solid rgba(79,195,247,0.08);color:#b0bec5;font-size:13px;}
         .strikes-table tr:hover{background:rgba(79,195,247,0.06);}
         .strikes-table tbody tr:last-child td{border-bottom:none;}
+        /* ── SNAP GRID ── */
         .snap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
         .snap-card{padding:18px 16px;}
         .snap-card .card-top-row{margin-bottom:8px;padding:0;}
         .snap-card .val{font-size:26px;padding:0;margin-bottom:0;}
-        .disclaimer{
-            background:rgba(255,183,77,0.1);
-            backdrop-filter:blur(8px);
-            padding:22px; border-radius:12px;
-            border-left:4px solid #ffb74d;
-            font-size:13px; color:#ffb74d; line-height:1.8;
-        }
+        .disclaimer{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:13px;color:#ffb74d;line-height:1.8;}
         .footer{text-align:center;padding:24px;color:#546e7a;font-size:12px;background:rgba(10,20,28,0.4);}
+
         /* ══════════════════════════════════════════
-           RESPONSIVE — TABLET (iPad ≤ 1024px)
+           NAVY COMMAND — OI SECTION STYLES
+        ══════════════════════════════════════════ */
+        .nc-section-header{
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:18px; padding-bottom:14px;
+            border-bottom:1px solid rgba(79,195,247,0.14);
+        }
+        .nc-header-left{display:flex;align-items:center;gap:14px;}
+        .nc-header-icon{
+            width:44px;height:44px;border-radius:10px;
+            background:linear-gradient(135deg,#1e3a5f,#1a3052);
+            border:1px solid rgba(79,195,247,0.3);
+            display:flex;align-items:center;justify-content:center;
+            font-size:20px;flex-shrink:0;
+            box-shadow:0 4px 14px rgba(79,195,247,0.15);
+        }
+        .nc-header-title{
+            font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;
+            color:#93c5fd;letter-spacing:0.3px;
+        }
+        .nc-header-sub{
+            font-family:'Outfit',sans-serif;font-size:11px;font-weight:400;
+            color:rgba(79,195,247,0.45);margin-top:2px;letter-spacing:0.5px;
+        }
+        .nc-atm-badge{
+            background:#1f2a42;color:#60a5fa;
+            font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;
+            padding:6px 16px;border-radius:20px;letter-spacing:1.5px;
+            border:1px solid rgba(96,165,250,0.25);
+            box-shadow:0 2px 10px rgba(96,165,250,0.1);
+        }
+        /* Direction box */
+        .nc-dir-box{
+            border-radius:14px;padding:20px 22px;margin-bottom:18px;
+            box-shadow:0 4px 24px rgba(0,0,0,0.3);
+            transition:box-shadow 0.3s;
+        }
+        .nc-dir-box:hover{box-shadow:0 8px 36px rgba(0,0,0,0.4);}
+        .nc-dir-bar{
+            width:4px;border-radius:2px;flex-shrink:0;min-height:60px;
+        }
+        .nc-dir-tag{
+            font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
+            letter-spacing:2.5px;color:rgba(148,163,184,0.5);
+            text-transform:uppercase;margin-bottom:6px;
+        }
+        .nc-dir-name{
+            font-family:'Outfit',sans-serif;font-size:28px;font-weight:700;
+            line-height:1;margin-bottom:6px;letter-spacing:-0.5px;
+        }
+        .nc-dir-signal{
+            font-family:'Outfit',sans-serif;font-size:12px;font-weight:400;
+        }
+        /* Strength meter */
+        .nc-meter-wrap{
+            text-align:right;min-width:160px;
+        }
+        .nc-meter-label{
+            font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
+            letter-spacing:2px;color:rgba(148,163,184,0.45);
+            text-transform:uppercase;margin-bottom:8px;
+        }
+        .nc-meter-track{
+            position:relative;height:8px;background:rgba(0,0,0,0.4);
+            border-radius:4px;overflow:visible;width:180px;margin-left:auto;
+        }
+        .nc-meter-fill{
+            height:100%;border-radius:4px;
+            transition:width 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nc-meter-head{
+            position:absolute;top:50%;transform:translateY(-50%);
+            width:14px;height:14px;border-radius:50%;
+            margin-left:-7px;
+            border:2px solid rgba(10,18,30,0.8);
+            transition:left 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        .nc-meter-pct{
+            font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;
+            margin-top:8px;letter-spacing:0.5px;
+        }
+        /* 3 OI cards */
+        .nc-cards-grid{
+            display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+        }
+        .nc-card{
+            background:rgba(20,28,45,0.85);
+            border:1px solid rgba(79,195,247,0.12);
+            border-radius:14px;padding:18px 18px 14px;
+            transition:all 0.3s ease;
+            position:relative;overflow:hidden;
+        }
+        .nc-card::before{
+            content:'';position:absolute;top:0;left:0;right:0;height:1px;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+        }
+        .nc-card:hover{
+            border-color:rgba(79,195,247,0.3);
+            background:rgba(25,35,55,0.9);
+            transform:translateY(-3px);
+            box-shadow:0 10px 30px rgba(0,0,0,0.3);
+        }
+        .nc-card-header{
+            display:flex;align-items:center;justify-content:space-between;
+            margin-bottom:12px;
+        }
+        .nc-card-label{
+            font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;
+            letter-spacing:2px;color:rgba(148,163,184,0.6);text-transform:uppercase;
+        }
+        .nc-card-value{
+            font-family:'Oxanium',sans-serif;font-size:30px;font-weight:700;
+            line-height:1;margin-bottom:6px;letter-spacing:-0.5px;
+        }
+        .nc-card-sub{
+            font-family:'JetBrains Mono',monospace;font-size:10px;
+            color:rgba(100,116,139,0.7);margin-bottom:14px;
+        }
+        .nc-card-btn{
+            display:block;width:100%;padding:9px 14px;border-radius:7px;
+            text-align:center;font-family:'Outfit',sans-serif;
+            font-size:13px;font-weight:700;letter-spacing:0.5px;
+            transition:all 0.2s;cursor:default;
+        }
+        .nc-card:hover .nc-card-btn{
+            filter:brightness(1.1);
+        }
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE — TABLET (≤ 1024px)
         ══════════════════════════════════════════ */
         @media(max-width:1024px){
-            body{ padding:16px; }
-            .container{ border-radius:16px; }
-            .header{ padding:28px 20px; }
-            .header h1{ font-size:24px; letter-spacing:1.5px; }
-            .section{ padding:22px 18px; }
-
-            /* 5-col → 3-col */
-            .grid-5{ grid-template-columns:repeat(3,1fr); }
-            /* 4-col → 2-col */
-            .grid-4{ grid-template-columns:repeat(2,1fr); }
-            /* snap 3-col → 3-col (keep) */
-            .snap-grid{ grid-template-columns:repeat(3,1fr); }
-            /* OI grid 3-col → 3-col (keep) */
-            .oi-grid{ grid-template-columns:repeat(3,1fr); }
-
-            /* FII/DII KPI row: sentiment + 3 KPIs → 2-col on tablet */
-            .fii-kpi-grid{ grid-template-columns:1fr 1fr !important; }
-
-            /* Scoreboard body: 5-col → 3-col+2 wrap */
-            .sb-body{ grid-template-columns:repeat(3,1fr); }
-            .sb-cell:nth-child(4),.sb-cell:nth-child(5){
-                border-top:1px solid rgba(79,195,247,0.06);
-            }
-
-            /* Fire row: 4-col → 2-col grid */
-            .fire-row{
-                grid-template-columns:1fr 1fr;
-                gap:14px;
-                padding:16px;
-            }
-            .fire-col{ border-right:none; padding:8px 12px; }
-            .fire-col:nth-child(odd){ border-right:1px solid rgba(255,140,0,0.12); }
-            .fire-col-value{ font-size:16px; }
-
-            /* Key levels: hide max pain label overflow */
-            .rl-lbl{ font-size:9px; }
-            .rl-val{ font-size:11px; }
-
-            /* Strikes table side-by-side → stack */
-            .strikes-wrap{ grid-template-columns:1fr !important; }
-
-            /* Direction box */
-            .direction-title{ font-size:22px; }
-            .direction-subtitle{ font-size:12px; }
-
-            /* Val font size */
-            .val{ font-size:20px; }
+            body{padding:16px;}
+            .container{border-radius:16px;}
+            .header{padding:28px 20px;}
+            .header h1{font-size:24px;letter-spacing:1.5px;}
+            .section{padding:22px 18px;}
+            .grid-5{grid-template-columns:repeat(3,1fr);}
+            .grid-4{grid-template-columns:repeat(2,1fr);}
+            .snap-grid{grid-template-columns:repeat(3,1fr);}
+            .fii-kpi-grid{grid-template-columns:1fr 1fr !important;}
+            .sb-body{grid-template-columns:repeat(3,1fr);}
+            .sb-cell:nth-child(4),.sb-cell:nth-child(5){border-top:1px solid rgba(79,195,247,0.06);}
+            .fire-row{grid-template-columns:1fr 1fr;gap:14px;padding:16px;}
+            .fire-col{border-right:none;padding:8px 12px;}
+            .fire-col:nth-child(odd){border-right:1px solid rgba(255,140,0,0.12);}
+            .fire-col-value{font-size:16px;}
+            .rl-lbl{font-size:9px;}
+            .rl-val{font-size:11px;}
+            .strikes-wrap{grid-template-columns:1fr !important;}
+            .direction-title{font-size:22px;}
+            .val{font-size:20px;}
+            /* NC responsive */
+            .nc-cards-grid{grid-template-columns:repeat(3,1fr);}
+            .nc-dir-name{font-size:22px;}
+            .nc-meter-track{width:140px;}
+            .nc-card-value{font-size:24px;}
         }
 
         /* ══════════════════════════════════════════
            RESPONSIVE — MOBILE (≤ 600px)
         ══════════════════════════════════════════ */
         @media(max-width:600px){
-            body{ padding:8px; }
-            .container{ border-radius:12px; }
-            .header{ padding:20px 14px; }
-            .header h1{ font-size:18px; letter-spacing:1px; }
-            .header p{ font-size:11px; }
-            .section{ padding:16px 12px; }
-            .section-title{ font-size:11px; letter-spacing:1.5px; gap:6px; }
-            .section-title span{ font-size:15px; }
-
-            /* All grids → single column */
-            .grid-5,.grid-4{ grid-template-columns:1fr; }
-            .snap-grid{ grid-template-columns:1fr; }
-            .oi-grid{ grid-template-columns:1fr; }
-
-            /* FII/DII: sentiment pill full width, then 3 KPI cards stacked */
-            div[style*="grid-template-columns:auto 1fr 1fr 1fr"]{
-                grid-template-columns:1fr 1fr !important;
-            }
-
-            /* Stat cards */
-            .val{ font-size:20px; }
-            .card-ico{ font-size:18px; }
-
-            /* Scoreboard: all 5 cells → single column */
-            .sb-body{ grid-template-columns:1fr 1fr; }
-            .sb-cell{ border-right:none !important; border-bottom:1px solid rgba(79,195,247,0.06); }
-            .sb-cell:last-child{ border-bottom:none; }
-            .sb-h-title{ font-size:11px; letter-spacing:0.5px; }
-            .sb-h-badge{ font-size:8px; padding:2px 8px; }
-            .sb-val{ font-size:13px; }
-            .sb-lbl{ font-size:8px; }
-            .sb-footer{ font-size:11px; flex-direction:column; gap:6px; }
-            .sb-footer .sf-why{ margin-left:0; }
-            .sb-signal{ font-size:12px; flex-wrap:wrap; gap:6px; }
-
-            /* Fire row → 1-col stack */
-            .fire-row{
-                grid-template-columns:1fr;
-                gap:12px;
-                padding:14px 12px;
-            }
-            .fire-col{ border-right:none !important; border-bottom:1px solid rgba(255,140,0,0.08); padding:8px 4px; }
-            .fire-col:last-child{ border-bottom:none; }
-            .fire-col-value{ font-size:15px; }
-            .fire-heading{ font-size:10px; }
-
-            /* Direction box */
-            .direction-box{ padding:18px 14px; }
-            .direction-title{ font-size:20px; }
-            .direction-subtitle{ font-size:11px; }
-
-            /* Logic box */
-            .logic-box p{ font-size:11px; line-height:1.7; }
-
-            /* Key levels: compact on mobile */
-            .rl-node-a,.rl-node-b{ font-size:9px; }
-            .rl-val{ font-size:10px; }
-            .rl-lbl{ font-size:8px; letter-spacing:0; }
-
-            /* Distance row → stack */
-            div[style*="grid-template-columns:1fr 1fr"]{
-                grid-template-columns:1fr !important;
-            }
-
-            /* FII KPI numbers */
-            div[style*="font-size:22px"]{ font-size:18px !important; }
-
-            /* Strikes table → stack */
-            .strikes-wrap{ grid-template-columns:1fr !important; }
-            .strikes-table th,.strikes-table td{ padding:10px 8px; font-size:11px; }
-
-            /* Disclaimer */
-            .disclaimer{ padding:14px; font-size:12px; }
-
-            /* OI direction box */
-            .oi-grid .g .val{ font-size:16px; }
+            body{padding:8px;}
+            .container{border-radius:12px;}
+            .header{padding:20px 14px;}
+            .header h1{font-size:18px;letter-spacing:1px;}
+            .header p{font-size:11px;}
+            .section{padding:16px 12px;}
+            .section-title{font-size:11px;letter-spacing:1.5px;gap:6px;}
+            .section-title span{font-size:15px;}
+            .grid-5,.grid-4{grid-template-columns:1fr;}
+            .snap-grid{grid-template-columns:1fr;}
+            div[style*="grid-template-columns:auto 1fr 1fr 1fr"]{grid-template-columns:1fr 1fr !important;}
+            .val{font-size:20px;}
+            .card-ico{font-size:18px;}
+            .sb-body{grid-template-columns:1fr 1fr;}
+            .sb-cell{border-right:none !important;border-bottom:1px solid rgba(79,195,247,0.06);}
+            .sb-cell:last-child{border-bottom:none;}
+            .sb-h-title{font-size:11px;letter-spacing:0.5px;}
+            .sb-h-badge{font-size:8px;padding:2px 8px;}
+            .sb-val{font-size:13px;}
+            .sb-lbl{font-size:8px;}
+            .sb-footer{font-size:11px;flex-direction:column;gap:6px;}
+            .sb-footer .sf-why{margin-left:0;}
+            .sb-signal{font-size:12px;flex-wrap:wrap;gap:6px;}
+            .fire-row{grid-template-columns:1fr;gap:12px;padding:14px 12px;}
+            .fire-col{border-right:none !important;border-bottom:1px solid rgba(255,140,0,0.08);padding:8px 4px;}
+            .fire-col:last-child{border-bottom:none;}
+            .fire-col-value{font-size:15px;}
+            .fire-heading{font-size:10px;}
+            .direction-box{padding:18px 14px;}
+            .direction-title{font-size:20px;}
+            .direction-subtitle{font-size:11px;}
+            .logic-box p{font-size:11px;line-height:1.7;}
+            .rl-node-a,.rl-node-b{font-size:9px;}
+            .rl-val{font-size:10px;}
+            .rl-lbl{font-size:8px;letter-spacing:0;}
+            div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}
+            div[style*="font-size:22px"]{font-size:18px !important;}
+            .strikes-wrap{grid-template-columns:1fr !important;}
+            .strikes-table th,.strikes-table td{padding:10px 8px;font-size:11px;}
+            .disclaimer{padding:14px;font-size:12px;}
+            /* NC mobile */
+            .nc-section-header{flex-direction:column;align-items:flex-start;gap:10px;}
+            .nc-atm-badge{align-self:flex-end;}
+            .nc-cards-grid{grid-template-columns:1fr;}
+            .nc-dir-name{font-size:20px;}
+            .nc-meter-wrap{text-align:left;min-width:unset;}
+            .nc-meter-track{width:100%;margin-left:0;}
+            .nc-card-value{font-size:26px;}
+            .nc-meter-pct{font-size:13px;}
+            .nc-header-title{font-size:15px;}
         }
 
         /* ══════════════════════════════════════════
            RESPONSIVE — SMALL MOBILE (≤ 380px)
         ══════════════════════════════════════════ */
         @media(max-width:380px){
-            .header h1{ font-size:15px; }
-            .sb-body{ grid-template-columns:1fr; }
-            .section{ padding:12px 10px; }
-            .val{ font-size:17px; }
-            .sb-val{ font-size:12px; }
-            .fire-col-value{ font-size:13px; }
-            .direction-title{ font-size:17px; }
+            .header h1{font-size:15px;}
+            .sb-body{grid-template-columns:1fr;}
+            .section{padding:12px 10px;}
+            .val{font-size:17px;}
+            .sb-val{font-size:12px;}
+            .fire-col-value{font-size:13px;}
+            .direction-title{font-size:17px;}
+            .nc-dir-name{font-size:17px;}
+            .nc-card-value{font-size:22px;}
         }
     </style>
 </head>
@@ -426,7 +431,7 @@
 <div class="container">
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 19-Feb-2026 16:41 IST</p>
+        <p>Generated: 19-Feb-2026 22:24 IST</p>
     </div>
 
     <!-- ── MARKET SNAPSHOT ── -->
@@ -472,21 +477,14 @@
         </div>
     </div>
 
-    <!-- ── FII / DII 5-DAY SENTIMENT (injected here) ── -->
+    <!-- ── FII / DII 5-DAY SENTIMENT ── -->
     
-    <!-- ══════════════════════════════════════════
-         FII / DII 5-DAY SENTIMENT
-         ══════════════════════════════════════════ -->
     <div class="section">
         <div class="section-title"><span>🏦</span> FII / DII INSTITUTIONAL FLOW
             <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">5-Day Average</span>
         </div>
-
-        <!-- sentiment badge + KPI cards -->
         <div class="fii-kpi-grid" style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;
                     align-items:stretch;margin-bottom:18px;">
-
-            <!-- Sentiment pill -->
             <div style="background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);border-radius:14px;
                         padding:18px 20px;display:flex;flex-direction:column;
                         align-items:center;justify-content:center;min-width:130px;">
@@ -496,7 +494,6 @@
                 <div style="font-size:8px;color:rgba(176,190,197,0.4);
                             margin-top:5px;letter-spacing:1px;">Feb 11 – Feb 17, 2026</div>
             </div>
-
             
                 <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);
                             border-radius:14px;padding:16px 14px;text-align:center;">
@@ -523,8 +520,6 @@
                     <div style="font-size:9px;color:#37474f;margin-top:3px;">₹ Cr / day</div>
                 </div>
         </div>
-
-        <!-- insight box -->
         <div style="background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);
                     border-radius:10px;padding:14px 16px;">
             <div style="font-size:9px;color:#69f0ae;letter-spacing:2px;
@@ -632,8 +627,8 @@
                     <span class="card-ico">🔴</span>
                     <div class="lbl">PCR Ratio (OI)</div>
                 </div>
-                <span class="val">0.693</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:34.6%"></div></div>
+                <span class="val">0.670</span>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:33.5%"></div></div>
                 <div class="card-foot">
                     <div class="sub">Put/Call OI ratio</div>
                     <span class="tag tag-bear">Bearish</span>
@@ -657,7 +652,7 @@
                     <div class="lbl">Max Call OI</div>
                 </div>
                 <span class="val">₹25,800</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:59.1%"></div></div>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:59.9%"></div></div>
                 <div class="card-foot">
                     <div class="sub">CE wall</div>
                     <span class="tag tag-bear">Resistance</span>
@@ -669,7 +664,7 @@
                     <div class="lbl">Max Put OI</div>
                 </div>
                 <span class="val">₹25,000</span>
-                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:40.9%"></div></div>
+                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:40.1%"></div></div>
                 <div class="card-foot">
                     <div class="sub">PE floor</div>
                     <span class="tag tag-bull">Support</span>
@@ -677,55 +672,86 @@
             </div>
         </div>
     </div>
-    <div class="section">
-        <div class="section-title">
-            <span>📊</span> CHANGE IN OPEN INTEREST
-            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(Today's Direction · ATM ±10 Only)</span>
-        </div>
-        <div class="direction-box bearish" style="margin:0 0 18px;">
-            <div class="direction-title" style="font-size:24px;">🔴 Strong Bearish</div>
-            <div class="direction-subtitle">Call Build-up + Put Unwinding</div>
-        </div>
-        <div class="oi-grid">
 
-            <div class="g g-red">
-                <div class="card-top-row">
-                    <span class="card-ico">🔴</span>
-                    <div class="lbl">CALL OI CHANGE</div>
-                </div>
-                <span class="val">+852,225</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:100.0%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">CE open interest Δ</div>
-                    <span class="tag tag-bear">Bearish Signal</span>
-                </div>
-            </div>
-            <div class="g g-red">
-                <div class="card-top-row">
-                    <span class="card-ico">🔴</span>
-                    <div class="lbl">PUT OI CHANGE</div>
-                </div>
-                <span class="val">-239,433</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:100.0%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">PE open interest Δ</div>
-                    <span class="tag tag-bear">Bearish Signal</span>
+    <!-- ══════════════════════════════════════════
+         CHANGE IN OPEN INTEREST — NAVY COMMAND THEME
+         ══════════════════════════════════════════ -->
+    <div class="section">
+
+        <!-- ── Section header bar ── -->
+        <div class="nc-section-header">
+            <div class="nc-header-left">
+                <div class="nc-header-icon">📊</div>
+                <div>
+                    <div class="nc-header-title">Change in Open Interest</div>
+                    <div class="nc-header-sub">Today's Direction Analysis</div>
                 </div>
             </div>
-            <div class="g g-red">
-                <div class="card-top-row">
-                    <span class="card-ico">⚖️</span>
-                    <div class="lbl">NET OI CHANGE</div>
-                </div>
-                <span class="val">-1,091,658</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:100.0%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">PE Δ − CE Δ</div>
-                    <span class="tag tag-bear">Bearish Net</span>
+            <div class="nc-atm-badge">ATM ±10</div>
+        </div>
+
+        <!-- ── Direction box ── -->
+        <div class="nc-dir-box" style="background:rgba(30,10,14,0.92);border:1px solid rgba(239,68,68,0.35);">
+            <div style="display:flex;align-items:stretch;gap:18px;">
+                <div class="nc-dir-bar" style="background:linear-gradient(180deg,#ef4444,#b91c1c);"></div>
+                <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <div class="nc-dir-tag">MARKET DIRECTION</div>
+                        <div class="nc-dir-name" style="color:#fb7185;">Strong Bearish</div>
+                        <div class="nc-dir-signal" style="color:rgba(251,113,133,0.5);">Call Build-up + Put Unwinding</div>
+                    </div>
+                    <div class="nc-meter-wrap">
+                        <div class="nc-meter-label">BEAR STRENGTH</div>
+                        <div class="nc-meter-track">
+                            <div class="nc-meter-fill" style="width:75%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>
+                            <div class="nc-meter-head" style="left:75%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div>
+                        </div>
+                        <div class="nc-meter-pct" style="color:#fb7185;">75%</div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="logic-box">
+
+        <!-- ── 3 stat cards ── -->
+        <div class="nc-cards-grid">
+            
+            <div class="nc-card">
+                <div class="nc-card-header">
+                    <span class="nc-card-label">CALL OI CHANGE</span>
+                    <span style="font-size:18px;line-height:1;color:#ef4444;">🔴</span>
+                </div>
+                <div class="nc-card-value" style="color:#fb7185;">+837,991</div>
+                <div class="nc-card-sub">CE open interest Δ</div>
+                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
+                    Bearish Signal
+                </div>
+            </div>
+            <div class="nc-card">
+                <div class="nc-card-header">
+                    <span class="nc-card-label">PUT OI CHANGE</span>
+                    <span style="font-size:18px;line-height:1;color:#ef4444;">🔴</span>
+                </div>
+                <div class="nc-card-value" style="color:#fb7185;">-280,369</div>
+                <div class="nc-card-sub">PE open interest Δ</div>
+                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
+                    Bearish Signal
+                </div>
+            </div>
+            <div class="nc-card">
+                <div class="nc-card-header">
+                    <span class="nc-card-label">NET OI CHANGE</span>
+                    <span style="font-size:18px;line-height:1;color:#ef4444;">⚖️</span>
+                </div>
+                <div class="nc-card-value" style="color:#fb7185;">-1,118,360</div>
+                <div class="nc-card-sub">PE Δ − CE Δ</div>
+                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
+                    Bearish Net
+                </div>
+            </div>
+        </div>
+
+        <!-- ── How to read logic box ── -->
+        <div class="logic-box" style="margin-top:16px;">
             <p>
                 <strong>📖 How to Read:</strong><br>
                 • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
@@ -810,26 +836,11 @@
                 <span class="sb-h-badge cyan">Positional · 1–5 Days</span>
             </div>
             <div class="sb-body">
-                <div class="sb-cell">
-                    <div class="sb-lbl">Market Bias</div>
-                    <div class="sb-val gold">Neutral</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Type</div>
-                    <div class="sb-val cyan">Credit</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Risk</div>
-                    <div class="sb-val cyan">Low</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Max Profit</div>
-                    <div class="sb-val green small">Premium Received</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Max Loss</div>
-                    <div class="sb-val gold small">Capped</div>
-                </div>
+                <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val gold">Neutral</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">Credit</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Risk</div><div class="sb-val cyan">Low</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val green small">Premium Received</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val gold small">Capped</div></div>
             </div>
             <div class="sb-footer">
                 <span class="sf-lbl">📋 Setup</span>
@@ -848,26 +859,11 @@
                 <span style="color:#ffffff;font-weight:500;">🔴 Institutional selling interest detected</span>
             </div>
             <div class="sb-body">
-                <div class="sb-cell">
-                    <div class="sb-lbl">Market Bias</div>
-                    <div class="sb-val red">Bearish</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Type</div>
-                    <div class="sb-val cyan">Debit</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Risk</div>
-                    <div class="sb-val red">High</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Max Profit</div>
-                    <div class="sb-val cyan small">Huge (to ₹0)</div>
-                </div>
-                <div class="sb-cell">
-                    <div class="sb-lbl">Max Loss</div>
-                    <div class="sb-val gold small">Premium Paid</div>
-                </div>
+                <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val red">Bearish</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">Debit</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Risk</div><div class="sb-val red">High</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val cyan small">Huge (to ₹0)</div></div>
+                <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val gold small">Premium Paid</div></div>
             </div>
             <div class="sb-footer" style="border-top-color:rgba(255,183,77,0.08);">
                 <span class="sf-lbl">📋 Setup</span>
@@ -885,21 +881,21 @@
                 <h3 style="color:#00bcd4;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📞 CALL OPTIONS (CE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹25,800</strong></td><td>226,890</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹31.20</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹25,700</strong></td><td>190,201</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹45.45</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹25,600</strong></td><td>177,031</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹69.15</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹25,900</strong></td><td>147,919</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹21.45</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,500</strong></td><td>119,207</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹105.10</td></tr>
+<tr><td><strong>1</strong></td><td><strong>₹25,800</strong></td><td>226,148</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹31.20</td></tr>
+<tr><td><strong>2</strong></td><td><strong>₹25,700</strong></td><td>189,370</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹45.45</td></tr>
+<tr><td><strong>3</strong></td><td><strong>₹25,600</strong></td><td>175,371</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹69.15</td></tr>
+<tr><td><strong>4</strong></td><td><strong>₹25,900</strong></td><td>145,389</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹21.45</td></tr>
+<tr><td><strong>5</strong></td><td><strong>₹25,500</strong></td><td>118,003</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹105.10</td></tr>
 </tbody></table></div>
             <div>
                 <h3 style="color:#f44336;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📉 PUT OPTIONS (PE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹25,000</strong></td><td>153,934</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹41.20</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹25,500</strong></td><td>106,261</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹193.90</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹25,400</strong></td><td>92,995</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹143.10</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹25,200</strong></td><td>73,840</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹75.30</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,300</strong></td><td>65,991</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹103.50</td></tr>
+<tr><td><strong>1</strong></td><td><strong>₹25,000</strong></td><td>158,124</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹41.20</td></tr>
+<tr><td><strong>2</strong></td><td><strong>₹25,400</strong></td><td>93,245</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹143.10</td></tr>
+<tr><td><strong>3</strong></td><td><strong>₹25,500</strong></td><td>86,610</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹193.90</td></tr>
+<tr><td><strong>4</strong></td><td><strong>₹25,200</strong></td><td>72,900</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹75.30</td></tr>
+<tr><td><strong>5</strong></td><td><strong>₹25,100</strong></td><td>66,959</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹54.35</td></tr>
 </tbody></table></div></div></div>
 
     <div class="section">
@@ -912,7 +908,7 @@
     </div>
     <div class="footer">
         <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
-        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · For Educational Purposes Only</p>
+        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · Navy Command OI · For Educational Purposes Only</p>
     </div>
 </div>
 </body>
