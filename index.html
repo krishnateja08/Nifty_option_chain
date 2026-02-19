@@ -431,7 +431,7 @@
 <div class="container">
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 19-Feb-2026 22:24 IST</p>
+        <p>Generated: 19-Feb-2026 22:34 IST</p>
     </div>
 
     <!-- ── MARKET SNAPSHOT ── -->
@@ -453,7 +453,95 @@
         </div>
     </div>
 
-    <!-- ── KEY LEVELS FIRE ROW ── -->
+    <!-- ══════════════════════════════════════════
+         CHANGE IN OPEN INTEREST — NAVY COMMAND THEME
+         ══════════════════════════════════════════ -->
+    <div class="section">
+
+        <!-- ── Section header bar ── -->
+        <div class="nc-section-header">
+            <div class="nc-header-left">
+                <div class="nc-header-icon">📊</div>
+                <div>
+                    <div class="nc-header-title">Change in Open Interest</div>
+                    <div class="nc-header-sub">Today's Direction Analysis</div>
+                </div>
+            </div>
+            <div class="nc-atm-badge">ATM ±10</div>
+        </div>
+
+        <!-- ── Direction box ── -->
+        <div class="nc-dir-box" style="background:rgba(30,10,14,0.92);border:1px solid rgba(239,68,68,0.35);">
+            <div style="display:flex;align-items:stretch;gap:18px;">
+                <div class="nc-dir-bar" style="background:linear-gradient(180deg,#ef4444,#b91c1c);"></div>
+                <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                    <div>
+                        <div class="nc-dir-tag">MARKET DIRECTION</div>
+                        <div class="nc-dir-name" style="color:#fb7185;">Strong Bearish</div>
+                        <div class="nc-dir-signal" style="color:rgba(251,113,133,0.5);">Call Build-up + Put Unwinding</div>
+                    </div>
+                    <div class="nc-meter-wrap">
+                        <div class="nc-meter-label">BEAR STRENGTH</div>
+                        <div class="nc-meter-track">
+                            <div class="nc-meter-fill" style="width:75%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>
+                            <div class="nc-meter-head" style="left:75%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div>
+                        </div>
+                        <div class="nc-meter-pct" style="color:#fb7185;">75%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── 3 stat cards ── -->
+        <div class="nc-cards-grid">
+            
+            <div class="nc-card">
+                <div class="nc-card-header">
+                    <span class="nc-card-label">CALL OI CHANGE</span>
+                    <span style="font-size:18px;line-height:1;color:#ef4444;">🔴</span>
+                </div>
+                <div class="nc-card-value" style="color:#fb7185;">+837,991</div>
+                <div class="nc-card-sub">CE open interest Δ</div>
+                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
+                    Bearish Signal
+                </div>
+            </div>
+            <div class="nc-card">
+                <div class="nc-card-header">
+                    <span class="nc-card-label">PUT OI CHANGE</span>
+                    <span style="font-size:18px;line-height:1;color:#ef4444;">🔴</span>
+                </div>
+                <div class="nc-card-value" style="color:#fb7185;">-280,369</div>
+                <div class="nc-card-sub">PE open interest Δ</div>
+                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
+                    Bearish Signal
+                </div>
+            </div>
+            <div class="nc-card">
+                <div class="nc-card-header">
+                    <span class="nc-card-label">NET OI CHANGE</span>
+                    <span style="font-size:18px;line-height:1;color:#ef4444;">⚖️</span>
+                </div>
+                <div class="nc-card-value" style="color:#fb7185;">-1,118,360</div>
+                <div class="nc-card-sub">PE Δ − CE Δ</div>
+                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
+                    Bearish Net
+                </div>
+            </div>
+        </div>
+
+        <!-- ── How to read logic box ── -->
+        <div class="logic-box" style="margin-top:16px;">
+            <p>
+                <strong>📖 How to Read:</strong><br>
+                • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
+                • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
+                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)
+            </p>
+        </div>
+    </div>
+
+    <!-- ── KEY TRADING LEVELS ── -->
     <div class="section">
         <div class="section-title"><span>📍</span> KEY TRADING LEVELS</div>
         
@@ -670,94 +758,6 @@
                     <span class="tag tag-bull">Support</span>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         CHANGE IN OPEN INTEREST — NAVY COMMAND THEME
-         ══════════════════════════════════════════ -->
-    <div class="section">
-
-        <!-- ── Section header bar ── -->
-        <div class="nc-section-header">
-            <div class="nc-header-left">
-                <div class="nc-header-icon">📊</div>
-                <div>
-                    <div class="nc-header-title">Change in Open Interest</div>
-                    <div class="nc-header-sub">Today's Direction Analysis</div>
-                </div>
-            </div>
-            <div class="nc-atm-badge">ATM ±10</div>
-        </div>
-
-        <!-- ── Direction box ── -->
-        <div class="nc-dir-box" style="background:rgba(30,10,14,0.92);border:1px solid rgba(239,68,68,0.35);">
-            <div style="display:flex;align-items:stretch;gap:18px;">
-                <div class="nc-dir-bar" style="background:linear-gradient(180deg,#ef4444,#b91c1c);"></div>
-                <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-                    <div>
-                        <div class="nc-dir-tag">MARKET DIRECTION</div>
-                        <div class="nc-dir-name" style="color:#fb7185;">Strong Bearish</div>
-                        <div class="nc-dir-signal" style="color:rgba(251,113,133,0.5);">Call Build-up + Put Unwinding</div>
-                    </div>
-                    <div class="nc-meter-wrap">
-                        <div class="nc-meter-label">BEAR STRENGTH</div>
-                        <div class="nc-meter-track">
-                            <div class="nc-meter-fill" style="width:75%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>
-                            <div class="nc-meter-head" style="left:75%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div>
-                        </div>
-                        <div class="nc-meter-pct" style="color:#fb7185;">75%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── 3 stat cards ── -->
-        <div class="nc-cards-grid">
-            
-            <div class="nc-card">
-                <div class="nc-card-header">
-                    <span class="nc-card-label">CALL OI CHANGE</span>
-                    <span style="font-size:18px;line-height:1;color:#ef4444;">🔴</span>
-                </div>
-                <div class="nc-card-value" style="color:#fb7185;">+837,991</div>
-                <div class="nc-card-sub">CE open interest Δ</div>
-                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
-                    Bearish Signal
-                </div>
-            </div>
-            <div class="nc-card">
-                <div class="nc-card-header">
-                    <span class="nc-card-label">PUT OI CHANGE</span>
-                    <span style="font-size:18px;line-height:1;color:#ef4444;">🔴</span>
-                </div>
-                <div class="nc-card-value" style="color:#fb7185;">-280,369</div>
-                <div class="nc-card-sub">PE open interest Δ</div>
-                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
-                    Bearish Signal
-                </div>
-            </div>
-            <div class="nc-card">
-                <div class="nc-card-header">
-                    <span class="nc-card-label">NET OI CHANGE</span>
-                    <span style="font-size:18px;line-height:1;color:#ef4444;">⚖️</span>
-                </div>
-                <div class="nc-card-value" style="color:#fb7185;">-1,118,360</div>
-                <div class="nc-card-sub">PE Δ − CE Δ</div>
-                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
-                    Bearish Net
-                </div>
-            </div>
-        </div>
-
-        <!-- ── How to read logic box ── -->
-        <div class="logic-box" style="margin-top:16px;">
-            <p>
-                <strong>📖 How to Read:</strong><br>
-                • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
-                • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
-                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)
-            </p>
         </div>
     </div>
 

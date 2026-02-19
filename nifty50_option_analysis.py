@@ -1428,8 +1428,13 @@ class NiftyHTMLAnalyzer:
             </div>
         </div>
     </div>
+"""
+        # ── CHANGE IN OI — NAVY COMMAND (position 2: right after Market Snapshot)
+        if d['has_option_data']:
+            html += self._oi_navy_command_section(d)
 
-    <!-- ── KEY LEVELS FIRE ROW ── -->
+        html += f"""
+    <!-- ── KEY TRADING LEVELS ── -->
     <div class="section">
         <div class="section-title"><span>📍</span> KEY TRADING LEVELS</div>
         {self._key_levels_fire_row(d)}
@@ -1464,7 +1469,7 @@ class NiftyHTMLAnalyzer:
         </div>
     </div>
 """
-        # ── OPTION CHAIN ANALYSIS (unchanged)
+        # ── OPTION CHAIN ANALYSIS
         if d['has_option_data']:
             html += f"""
     <div class="section">
@@ -1477,8 +1482,6 @@ class NiftyHTMLAnalyzer:
         </div>
     </div>
 """
-            # ── CHANGE IN OI — NAVY COMMAND THEME ──
-            html += self._oi_navy_command_section(d)
 
         # ── KEY LEVELS
         html += f"""
