@@ -7,140 +7,51 @@
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
-        body{
-            font-family:'Rajdhani',sans-serif;
-            background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);
-            min-height:100vh; padding:20px; color:#b0bec5;
-        }
-        .container{
-            max-width:1200px; margin:0 auto;
-            background:rgba(15,32,39,0.85);
-            backdrop-filter:blur(20px);
-            border-radius:20px; overflow:hidden;
-            box-shadow:0 20px 60px rgba(0,0,0,0.5);
-            border:1px solid rgba(79,195,247,0.18);
-        }
-        .header{
-            background:linear-gradient(135deg,#0f2027,#203a43);
-            padding:40px 30px; text-align:center;
-            border-bottom:2px solid rgba(79,195,247,0.3);
-            position:relative; overflow:hidden;
-        }
-        .header::before{
-            content:''; position:absolute; inset:0;
-            background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);
-            pointer-events:none;
-        }
-        .header h1{
-            font-family:'Oxanium',sans-serif;
-            font-size:30px; font-weight:800; color:#4fc3f7;
-            text-shadow:0 0 30px rgba(79,195,247,0.5);
-            letter-spacing:2px; position:relative; z-index:1;
-        }
+        body{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:20px;color:#b0bec5;}
+        .container{max-width:1200px;margin:0 auto;background:rgba(15,32,39,0.85);backdrop-filter:blur(20px);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(79,195,247,0.18);}
+        .header{background:linear-gradient(135deg,#0f2027,#203a43);padding:40px 30px;text-align:center;border-bottom:2px solid rgba(79,195,247,0.3);position:relative;overflow:hidden;}
+        .header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}
+        .header h1{font-family:'Oxanium',sans-serif;font-size:30px;font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:2px;position:relative;z-index:1;}
         .header p{color:#80deea;font-size:13px;margin-top:8px;position:relative;z-index:1;}
         .section{padding:28px 26px;border-bottom:1px solid rgba(79,195,247,0.08);}
         .section:last-child{border-bottom:none;}
-        .section-title{
-            font-family:'Oxanium',sans-serif;
-            font-size:13px; font-weight:700; letter-spacing:2.5px; color:#4fc3f7;
-            text-transform:uppercase; display:flex; align-items:center; gap:10px;
-            margin-bottom:20px; padding-bottom:12px;
-            border-bottom:1px solid rgba(79,195,247,0.18);
-        }
+        .section-title{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}
         .section-title span{font-size:18px;}
-        .g{
-            background:rgba(255,255,255,0.04);
-            backdrop-filter:blur(20px);
-            -webkit-backdrop-filter:blur(20px);
-            border:1px solid rgba(79,195,247,0.18);
-            border-radius:16px;
-            position:relative; overflow:hidden;
-            transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
-        }
-        .g::before{
-            content:''; position:absolute; top:0; left:0; right:0; height:1px;
-            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
-            z-index:1;
-        }
-        .g::after{
-            content:''; position:absolute; top:-60%; left:-30%; width:50%; height:200%;
-            background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);
-            transform:skewX(-15deg); transition:left 0.6s ease; z-index:0;
-        }
+        .g{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(79,195,247,0.18);border-radius:16px;position:relative;overflow:hidden;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);}
+        .g::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);z-index:1;}
+        .g::after{content:'';position:absolute;top:-60%;left:-30%;width:50%;height:200%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);transform:skewX(-15deg);transition:left 0.6s ease;z-index:0;}
         .g:hover::after{left:130%;}
-        .g:hover{
-            background:rgba(79,195,247,0.09);
-            border-color:rgba(79,195,247,0.45);
-            box-shadow:0 12px 40px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.1);
-            transform:translateY(-4px);
-        }
+        .g:hover{background:rgba(79,195,247,0.09);border-color:rgba(79,195,247,0.45);box-shadow:0 12px 40px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.1);transform:translateY(-4px);}
         .g-hi{background:rgba(79,195,247,0.09);border-color:rgba(79,195,247,0.35);}
         .g-red{background:rgba(244,67,54,0.06);border-color:rgba(244,67,54,0.25);}
         .g-red:hover{background:rgba(244,67,54,0.1);border-color:rgba(244,67,54,0.45);}
         .card-grid{display:grid;gap:14px;}
         .grid-5{grid-template-columns:repeat(5,1fr);}
         .grid-4{grid-template-columns:repeat(4,1fr);}
-        .g .card-top-row{
-            display:flex; align-items:center; gap:10px;
-            margin-bottom:10px; position:relative; z-index:2; padding:14px 16px 0;
-        }
+        .g .card-top-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;position:relative;z-index:2;padding:14px 16px 0;}
         .card-ico{font-size:22px;line-height:1;}
-        .lbl{
-            font-size:9px; letter-spacing:2.5px; color:rgba(128,222,234,0.65);
-            text-transform:uppercase; font-weight:600; line-height:1.3;
-        }
-        .val{
-            font-family:'Oxanium',sans-serif; font-size:24px; font-weight:700;
-            color:#fff; display:block; margin-bottom:10px; position:relative; z-index:2;
-            padding:0 16px;
-        }
-        .bar-wrap{
-            height:5px; background:rgba(0,0,0,0.35);
-            border-radius:3px; margin:0 16px 12px; overflow:hidden;
-            position:relative; z-index:2;
-        }
+        .lbl{font-size:9px;letter-spacing:2.5px;color:rgba(128,222,234,0.65);text-transform:uppercase;font-weight:600;line-height:1.3;}
+        .val{font-family:'Oxanium',sans-serif;font-size:24px;font-weight:700;color:#fff;display:block;margin-bottom:10px;position:relative;z-index:2;padding:0 16px;}
+        .bar-wrap{height:5px;background:rgba(0,0,0,0.35);border-radius:3px;margin:0 16px 12px;overflow:hidden;position:relative;z-index:2;}
         .bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
         .bar-teal{background:linear-gradient(90deg,#00bcd4,#4fc3f7);box-shadow:0 0 8px rgba(79,195,247,0.6);}
-        .bar-red {background:linear-gradient(90deg,#f44336,#ff5722);box-shadow:0 0 8px rgba(244,67,54,0.5);}
+        .bar-red{background:linear-gradient(90deg,#f44336,#ff5722);box-shadow:0 0 8px rgba(244,67,54,0.5);}
         .bar-gold{background:linear-gradient(90deg,#ffb74d,#ffd54f);box-shadow:0 0 8px rgba(255,183,77,0.5);}
-        .bar-grn {background:linear-gradient(90deg,#00e676,#00bcd4);box-shadow:0 0 8px rgba(0,230,118,0.5);}
-        .card-foot{
-            display:flex; justify-content:space-between; align-items:center;
-            padding:0 16px 14px; position:relative; z-index:2;
-        }
+        .card-foot{display:flex;justify-content:space-between;align-items:center;padding:0 16px 14px;position:relative;z-index:2;}
         .sub{font-size:10px;color:#455a64;font-family:'JetBrains Mono',monospace;}
-        .tag{
-            display:inline-flex; align-items:center;
-            padding:3px 11px; border-radius:20px; font-size:11px; font-weight:700;
-            letter-spacing:0.5px; font-family:'Rajdhani',sans-serif;
-        }
-        .tag-neu {background:rgba(255,183,77,0.15); color:#ffb74d; border:1px solid rgba(255,183,77,0.35);}
-        .tag-bull{background:rgba(0,229,255,0.12);  color:#00e5ff; border:1px solid rgba(0,229,255,0.35);}
-        .tag-bear{background:rgba(255,82,82,0.12);  color:#ff5252; border:1px solid rgba(255,82,82,0.35);}
-        .direction-box{
-            padding:28px; border-radius:14px; text-align:center; margin:20px 0;
-            border:2px solid #4fc3f7;
-            background:rgba(79,195,247,0.06);
-            backdrop-filter:blur(10px);
-        }
-        .direction-box.bullish {background:linear-gradient(135deg,#00bcd4,#26c6da);border-color:#00bcd4;box-shadow:0 0 30px rgba(0,188,212,0.35);}
-        .direction-box.bearish {background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.35);}
+        .tag{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;font-family:'Rajdhani',sans-serif;}
+        .tag-neu{background:rgba(255,183,77,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}
+        .tag-bull{background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.35);}
+        .tag-bear{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.35);}
+        .direction-box{padding:28px;border-radius:14px;text-align:center;margin:20px 0;border:2px solid #4fc3f7;background:rgba(79,195,247,0.06);backdrop-filter:blur(10px);}
+        .direction-box.bullish{background:linear-gradient(135deg,#00bcd4,#26c6da);border-color:#00bcd4;box-shadow:0 0 30px rgba(0,188,212,0.35);}
+        .direction-box.bearish{background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.35);}
         .direction-box.sideways{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.35);}
-        .direction-box.neutral {background:rgba(79,195,247,0.08);border-color:#4fc3f7;}
         .direction-title{font-family:'Oxanium',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;color:#fff;}
-        .direction-box.bullish .direction-title,
-        .direction-box.bearish .direction-title,
-        .direction-box.sideways .direction-title{color:#000;}
+        .direction-box.bullish .direction-title,.direction-box.bearish .direction-title,.direction-box.sideways .direction-title{color:#000;}
         .direction-subtitle{font-size:13px;opacity:0.9;color:#e0f7fa;font-weight:600;}
-        .direction-box.bullish .direction-subtitle,
-        .direction-box.bearish .direction-subtitle,
-        .direction-box.sideways .direction-subtitle{color:#000;}
-        .logic-box{
-            background:rgba(79,195,247,0.07);
-            backdrop-filter:blur(8px);
-            padding:16px 18px; border-radius:10px; margin-top:18px;
-            border-left:4px solid #4fc3f7;
-        }
+        .direction-box.bullish .direction-subtitle,.direction-box.bearish .direction-subtitle,.direction-box.sideways .direction-subtitle{color:#000;}
+        .logic-box{background:rgba(79,195,247,0.07);backdrop-filter:blur(8px);padding:16px 18px;border-radius:10px;margin-top:18px;border-left:4px solid #4fc3f7;}
         .logic-box p{font-size:13px;line-height:1.9;color:#80deea;}
         .logic-box strong{color:#4fc3f7;}
         .rl-node-a{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}
@@ -148,7 +59,42 @@
         .rl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}
         .rl-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}
         .rl-val{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}
-        /* ── SCOREBOARD ── */
+        /* ══ PULSE FLOW FII/DII ══ */
+        .pf-live-badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:1px;}
+        .pf-live{background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.3);}
+        .pf-estimated{background:rgba(255,138,101,0.1);color:#ff8a65;border:1px solid rgba(255,138,101,0.3);}
+        .pf-date-range{font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;}
+        .pf-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px;}
+        .pf-card{background:rgba(255,255,255,0.03);border:1px solid rgba(0,212,255,0.18);border-radius:16px;padding:16px 14px 14px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);}
+        .pf-card:hover{background:rgba(255,255,255,0.06);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.35);}
+        .pf-card-topline{position:absolute;top:0;left:0;right:0;height:1px;}
+        .pf-card-head{display:flex;justify-content:space-between;align-items:baseline;}
+        .pf-card-date{font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;color:#e0f7fa;letter-spacing:1px;}
+        .pf-card-day{font-size:9px;letter-spacing:1.5px;color:rgba(128,222,234,0.3);text-transform:uppercase;}
+        .pf-block{display:flex;flex-direction:column;gap:5px;}
+        .pf-block-header{display:flex;justify-content:space-between;align-items:baseline;}
+        .pf-block-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+        .pf-fii-lbl{color:rgba(0,212,255,0.5);}
+        .pf-dii-lbl{color:rgba(255,179,0,0.5);}
+        .pf-block-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;line-height:1;}
+        .pf-bar-track{height:4px;background:rgba(0,0,0,0.35);border-radius:2px;overflow:hidden;}
+        .pf-bar-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+        .pf-divider{height:1px;background:rgba(255,255,255,0.04);margin:0 -2px;}
+        .pf-card-net{display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);margin-top:auto;}
+        .pf-net-lbl{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-transform:uppercase;font-weight:700;}
+        .pf-net-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;}
+        .pf-avg-strip{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.1);border-radius:14px;padding:18px 24px;margin-bottom:16px;}
+        .pf-avg-cell{text-align:center;}
+        .pf-avg-eyebrow{font-size:8px;letter-spacing:2.5px;color:rgba(0,229,255,0.4);text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+        .pf-avg-val{font-family:'Oxanium',sans-serif;font-size:26px;font-weight:800;line-height:1;letter-spacing:-0.5px;}
+        .pf-avg-unit{font-size:9px;color:#37474f;margin-top:3px;letter-spacing:1px;}
+        .pf-avg-sep{width:1px;height:48px;background:linear-gradient(180deg,transparent,rgba(79,195,247,0.2),transparent);margin:0 16px;}
+        .pf-insight-box{border-radius:12px;padding:16px 18px;}
+        .pf-insight-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+        .pf-insight-lbl{font-size:9px;letter-spacing:2px;font-weight:700;text-transform:uppercase;}
+        .pf-verdict-badge{display:inline-block;padding:3px 14px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1px;}
+        .pf-insight-text{font-size:13px;color:#cfd8dc;line-height:1.85;font-weight:500;}
+        /* ══ SCOREBOARD ══ */
         .sb-wrap{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.15);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.3);}
         .sb-header{padding:11px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.1);}
         .sb-header.cyan{background:rgba(79,195,247,0.08);border-left:4px solid #4fc3f7;}
@@ -163,601 +109,283 @@
         .sb-cell:last-child{border-right:none;}
         .sb-lbl{font-size:9px;letter-spacing:1.5px;color:#80a0b8;text-transform:uppercase;margin-bottom:5px;font-weight:600;}
         .sb-val{font-family:'Oxanium',sans-serif;font-size:14px;font-weight:700;color:#e0f7fa;}
-        .sb-val.green{color:#00e676;} .sb-val.cyan{color:#00bcd4;} .sb-val.gold{color:#ffb74d;} .sb-val.red{color:#ff5252;} .sb-val.small{font-size:11px;}
+        .sb-val.green{color:#00e676;}.sb-val.cyan{color:#00bcd4;}.sb-val.gold{color:#ffb74d;}.sb-val.red{color:#ff5252;}.sb-val.small{font-size:11px;}
         .sb-signal{padding:10px 16px;background:rgba(79,195,247,0.05);border-top:1px solid rgba(79,195,247,0.06);border-bottom:1px solid rgba(79,195,247,0.06);font-size:14px;color:#ffffff;font-weight:500;display:flex;align-items:center;gap:10px;}
         .sb-signal .sig-lbl{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-weight:700;}
         .sb-footer{padding:11px 16px;background:rgba(0,0,0,0.25);font-family:'JetBrains Mono',monospace;font-size:13px;color:#ffffff;font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
         .sb-footer .sf-lbl{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;}
         .sb-footer .sf-why{font-size:13px;color:#ffffff;font-style:italic;font-family:'Rajdhani',sans-serif;font-weight:500;margin-left:auto;}
-        /* ── STRIKES TABLE ── */
+        /* ══ STRIKES TABLE ══ */
         .strikes-table{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}
         .strikes-table th{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;}
         .strikes-table td{padding:14px;border-bottom:1px solid rgba(79,195,247,0.08);color:#b0bec5;font-size:13px;}
         .strikes-table tr:hover{background:rgba(79,195,247,0.06);}
         .strikes-table tbody tr:last-child td{border-bottom:none;}
-        /* ── SNAP GRID ── */
+        /* ══ SNAP GRID ══ */
         .snap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
         .snap-card{padding:18px 16px;}
         .snap-card .card-top-row{margin-bottom:8px;padding:0;}
         .snap-card .val{font-size:26px;padding:0;margin-bottom:0;}
         .disclaimer{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:13px;color:#ffb74d;line-height:1.8;}
         .footer{text-align:center;padding:24px;color:#546e7a;font-size:12px;background:rgba(10,20,28,0.4);}
-
-        /* ══════════════════════════════════════════
-           NAVY COMMAND — OI SECTION STYLES
-        ══════════════════════════════════════════ */
-        .nc-section-header{
-            display:flex; align-items:center; justify-content:space-between;
-            margin-bottom:18px; padding-bottom:14px;
-            border-bottom:1px solid rgba(79,195,247,0.14);
-        }
+        /* ══ NAVY COMMAND OI ══ */
+        .nc-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(79,195,247,0.14);}
         .nc-header-left{display:flex;align-items:center;gap:14px;}
-        .nc-header-icon{
-            width:44px;height:44px;border-radius:10px;
-            background:linear-gradient(135deg,#1e3a5f,#1a3052);
-            border:1px solid rgba(79,195,247,0.3);
-            display:flex;align-items:center;justify-content:center;
-            font-size:20px;flex-shrink:0;
-            box-shadow:0 4px 14px rgba(79,195,247,0.15);
-        }
-        .nc-header-title{
-            font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;
-            color:#93c5fd;letter-spacing:0.3px;
-        }
-        .nc-header-sub{
-            font-family:'Outfit',sans-serif;font-size:11px;font-weight:400;
-            color:rgba(79,195,247,0.45);margin-top:2px;letter-spacing:0.5px;
-        }
-        .nc-atm-badge{
-            background:#1f2a42;color:#60a5fa;
-            font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;
-            padding:6px 16px;border-radius:20px;letter-spacing:1.5px;
-            border:1px solid rgba(96,165,250,0.25);
-            box-shadow:0 2px 10px rgba(96,165,250,0.1);
-        }
-        /* Direction box */
-        .nc-dir-box{
-            border-radius:14px;padding:20px 22px;margin-bottom:18px;
-            box-shadow:0 4px 24px rgba(0,0,0,0.3);
-            transition:box-shadow 0.3s;
-        }
-        .nc-dir-box:hover{box-shadow:0 8px 36px rgba(0,0,0,0.4);}
-        .nc-dir-bar{
-            width:4px;border-radius:2px;flex-shrink:0;min-height:60px;
-        }
-        .nc-dir-tag{
-            font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
-            letter-spacing:2.5px;color:rgba(148,163,184,0.5);
-            text-transform:uppercase;margin-bottom:6px;
-        }
-        .nc-dir-name{
-            font-family:'Outfit',sans-serif;font-size:28px;font-weight:700;
-            line-height:1;margin-bottom:6px;letter-spacing:-0.5px;
-        }
-        .nc-dir-signal{
-            font-family:'Outfit',sans-serif;font-size:12px;font-weight:400;
-        }
-        /* ── DUAL strength meters ── */
-        .nc-meters-panel{
-            display:flex;flex-direction:column;gap:14px;
-            min-width:200px;justify-content:center;
-        }
-        .nc-meter-row{
-            display:flex;flex-direction:column;gap:5px;
-        }
-        .nc-meter-head-row{
-            display:flex;justify-content:space-between;align-items:center;
-        }
-        .nc-meter-label{
-            font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
-            letter-spacing:2px;color:rgba(148,163,184,0.45);text-transform:uppercase;
-        }
-        .nc-meter-track{
-            position:relative;height:8px;background:rgba(0,0,0,0.4);
-            border-radius:4px;overflow:visible;width:200px;
-        }
-        .nc-meter-fill{
-            height:100%;border-radius:4px;
-            transition:width 1.4s cubic-bezier(0.4,0,0.2,1);
-        }
-        .nc-meter-head{
-            position:absolute;top:50%;transform:translate(-50%,-50%);
-            width:14px;height:14px;border-radius:50%;
-            border:2px solid rgba(10,18,30,0.85);
-            transition:left 1.4s cubic-bezier(0.4,0,0.2,1);
-        }
-        .nc-meter-pct{
-            font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;
-            letter-spacing:0.5px;
-        }
-        /* 3 OI cards */
-        .nc-cards-grid{
-            display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
-        }
-        .nc-card{
-            background:rgba(20,28,45,0.85);
-            border:1px solid rgba(79,195,247,0.12);
-            border-radius:14px;padding:18px 18px 14px;
-            transition:all 0.3s ease;
-            position:relative;overflow:hidden;
-        }
-        .nc-card::before{
-            content:'';position:absolute;top:0;left:0;right:0;height:1px;
-            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
-        }
-        .nc-card:hover{
-            border-color:rgba(79,195,247,0.3);
-            background:rgba(25,35,55,0.9);
-            transform:translateY(-3px);
-            box-shadow:0 10px 30px rgba(0,0,0,0.3);
-        }
-        .nc-card-header{
-            display:flex;align-items:center;justify-content:space-between;
-            margin-bottom:12px;
-        }
-        .nc-card-label{
-            font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;
-            letter-spacing:2px;color:rgba(148,163,184,0.6);text-transform:uppercase;
-        }
-        .nc-card-value{
-            font-family:'Oxanium',sans-serif;font-size:30px;font-weight:700;
-            line-height:1;margin-bottom:6px;letter-spacing:-0.5px;
-        }
-        .nc-card-sub{
-            font-family:'JetBrains Mono',monospace;font-size:10px;
-            color:rgba(100,116,139,0.7);margin-bottom:14px;
-        }
-        .nc-card-btn{
-            display:block;width:100%;padding:9px 14px;border-radius:7px;
-            text-align:center;font-family:'Outfit',sans-serif;
-            font-size:13px;font-weight:700;letter-spacing:0.5px;
-            transition:all 0.2s;cursor:default;
-        }
-        .nc-card:hover .nc-card-btn{
-            filter:brightness(1.1);
-        }
-
-        /* ══════════════════════════════════════════
-           RESPONSIVE — TABLET (≤ 1024px)
-        ══════════════════════════════════════════ */
+        .nc-header-icon{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1e3a5f,#1a3052);border:1px solid rgba(79,195,247,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px rgba(79,195,247,0.15);}
+        .nc-header-title{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:#93c5fd;letter-spacing:0.3px;}
+        .nc-header-sub{font-family:'Outfit',sans-serif;font-size:11px;font-weight:400;color:rgba(79,195,247,0.45);margin-top:2px;letter-spacing:0.5px;}
+        .nc-atm-badge{background:#1f2a42;color:#60a5fa;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;padding:6px 16px;border-radius:20px;letter-spacing:1.5px;border:1px solid rgba(96,165,250,0.25);box-shadow:0 2px 10px rgba(96,165,250,0.1);}
+        .nc-dir-box{border-radius:14px;padding:20px 22px;margin-bottom:18px;box-shadow:0 4px 24px rgba(0,0,0,0.3);}
+        .nc-dir-bar{width:4px;border-radius:2px;flex-shrink:0;min-height:60px;}
+        .nc-dir-tag{font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;color:rgba(148,163,184,0.5);text-transform:uppercase;margin-bottom:6px;}
+        .nc-dir-name{font-family:'Outfit',sans-serif;font-size:28px;font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-0.5px;}
+        .nc-dir-signal{font-family:'Outfit',sans-serif;font-size:12px;font-weight:400;}
+        .nc-meters-panel{display:flex;flex-direction:column;gap:14px;min-width:200px;justify-content:center;}
+        .nc-meter-row{display:flex;flex-direction:column;gap:5px;}
+        .nc-meter-head-row{display:flex;justify-content:space-between;align-items:center;}
+        .nc-meter-label{font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(148,163,184,0.45);text-transform:uppercase;}
+        .nc-meter-track{position:relative;height:8px;background:rgba(0,0,0,0.4);border-radius:4px;overflow:visible;width:200px;}
+        .nc-meter-fill{height:100%;border-radius:4px;}
+        .nc-meter-head{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;border:2px solid rgba(10,18,30,0.85);}
+        .nc-meter-pct{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.5px;}
+        .nc-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+        .nc-card{background:rgba(20,28,45,0.85);border:1px solid rgba(79,195,247,0.12);border-radius:14px;padding:18px 18px 14px;transition:all 0.3s ease;position:relative;overflow:hidden;}
+        .nc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);}
+        .nc-card:hover{border-color:rgba(79,195,247,0.3);background:rgba(25,35,55,0.9);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,0.3);}
+        .nc-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+        .nc-card-label{font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(148,163,184,0.6);text-transform:uppercase;}
+        .nc-card-value{font-family:'Oxanium',sans-serif;font-size:30px;font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-0.5px;}
+        .nc-card-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(100,116,139,0.7);margin-bottom:14px;}
+        .nc-card-btn{display:block;width:100%;padding:9px 14px;border-radius:7px;text-align:center;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.5px;cursor:default;}
+        /* ══ RESPONSIVE TABLET ≤1024px ══ */
         @media(max-width:1024px){
-            body{padding:16px;}
-            .container{border-radius:16px;}
-            .header{padding:28px 20px;}
-            .header h1{font-size:24px;letter-spacing:1.5px;}
-            .section{padding:22px 18px;}
-            .grid-5{grid-template-columns:repeat(3,1fr);}
-            .grid-4{grid-template-columns:repeat(2,1fr);}
-            .snap-grid{grid-template-columns:repeat(3,1fr);}
-            .fii-kpi-grid{grid-template-columns:1fr 1fr !important;}
-            .sb-body{grid-template-columns:repeat(3,1fr);}
-            .sb-cell:nth-child(4),.sb-cell:nth-child(5){border-top:1px solid rgba(79,195,247,0.06);}
-            .rl-lbl{font-size:9px;}
-            .rl-val{font-size:11px;}
+            body{padding:16px;}.container{border-radius:16px;}.header{padding:28px 20px;}.header h1{font-size:24px;}
+            .section{padding:22px 18px;}.grid-5{grid-template-columns:repeat(3,1fr);}.grid-4{grid-template-columns:repeat(2,1fr);}
+            .snap-grid{grid-template-columns:repeat(3,1fr);}.sb-body{grid-template-columns:repeat(3,1fr);}
+            .sb-cell:nth-child(4),.sb-cell:nth-child(5){border-top:1px solid rgba(79,195,247,0.06);}.val{font-size:20px;}
+            .pf-grid{grid-template-columns:repeat(3,1fr);gap:10px;}.pf-block-val{font-size:13px;}.pf-avg-val{font-size:22px;}
+            .nc-cards-grid{grid-template-columns:repeat(3,1fr);}.nc-dir-name{font-size:22px;}.nc-meter-track{width:140px;}.nc-card-value{font-size:24px;}
             .strikes-wrap{grid-template-columns:1fr !important;}
-            .direction-title{font-size:22px;}
-            .val{font-size:20px;}
-            /* NC responsive */
-            .nc-cards-grid{grid-template-columns:repeat(3,1fr);}
-            .nc-dir-name{font-size:22px;}
-            .nc-meter-track{width:140px;}
-            .nc-card-value{font-size:24px;}
         }
-
-        /* ══════════════════════════════════════════
-           RESPONSIVE — MOBILE (≤ 600px)
-        ══════════════════════════════════════════ */
+        /* ══ RESPONSIVE MOBILE ≤600px ══ */
         @media(max-width:600px){
-            body{padding:8px;}
-            .container{border-radius:12px;}
-            .header{padding:20px 14px;}
-            .header h1{font-size:18px;letter-spacing:1px;}
-            .header p{font-size:11px;}
-            .section{padding:16px 12px;}
-            .section-title{font-size:11px;letter-spacing:1.5px;gap:6px;}
-            .section-title span{font-size:15px;}
-            .grid-5,.grid-4{grid-template-columns:1fr;}
-            .snap-grid{grid-template-columns:1fr;}
-            div[style*="grid-template-columns:auto 1fr 1fr 1fr"]{grid-template-columns:1fr 1fr !important;}
-            .val{font-size:20px;}
-            .card-ico{font-size:18px;}
-            .sb-body{grid-template-columns:1fr 1fr;}
-            .sb-cell{border-right:none !important;border-bottom:1px solid rgba(79,195,247,0.06);}
-            .sb-cell:last-child{border-bottom:none;}
-            .sb-h-title{font-size:11px;letter-spacing:0.5px;}
-            .sb-h-badge{font-size:8px;padding:2px 8px;}
-            .sb-val{font-size:13px;}
-            .sb-lbl{font-size:8px;}
-            .sb-footer{font-size:11px;flex-direction:column;gap:6px;}
-            .sb-footer .sf-why{margin-left:0;}
-            .sb-signal{font-size:12px;flex-wrap:wrap;gap:6px;}
-            .direction-box{padding:18px 14px;}
-            .direction-title{font-size:20px;}
-            .direction-subtitle{font-size:11px;}
+            body{padding:8px;}.container{border-radius:12px;}.header{padding:20px 14px;}.header h1{font-size:18px;}.header p{font-size:11px;}
+            .section{padding:16px 12px;}.section-title{font-size:11px;letter-spacing:1.5px;gap:6px;}.grid-5,.grid-4{grid-template-columns:1fr;}
+            .snap-grid{grid-template-columns:1fr;}.val{font-size:20px;}.sb-body{grid-template-columns:1fr 1fr;}
+            .sb-cell{border-right:none !important;border-bottom:1px solid rgba(79,195,247,0.06);}.sb-cell:last-child{border-bottom:none;}
+            .sb-footer{font-size:11px;flex-direction:column;gap:6px;}.sb-footer .sf-why{margin-left:0;}
+            .direction-box{padding:18px 14px;}.direction-title{font-size:20px;}
             .logic-box p{font-size:11px;line-height:1.7;}
-            .rl-node-a,.rl-node-b{font-size:9px;}
-            .rl-val{font-size:10px;}
-            .rl-lbl{font-size:8px;letter-spacing:0;}
             div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}
-            div[style*="font-size:22px"]{font-size:18px !important;}
-            .strikes-wrap{grid-template-columns:1fr !important;}
-            .strikes-table th,.strikes-table td{padding:10px 8px;font-size:11px;}
-            .disclaimer{padding:14px;font-size:12px;}
+            .strikes-wrap{grid-template-columns:1fr !important;}.strikes-table th,.strikes-table td{padding:10px 8px;font-size:11px;}
+            /* PF mobile */
+            .pf-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+            .pf-avg-strip{grid-template-columns:1fr;gap:12px;padding:14px;}
+            .pf-avg-sep{display:none;}
+            .pf-avg-cell{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+            .pf-avg-eyebrow{margin-bottom:0;}.pf-avg-val{font-size:20px;}.pf-insight-text{font-size:12px;}.pf-date-range{display:none;}
             /* NC mobile */
-            .nc-section-header{flex-direction:column;align-items:flex-start;gap:10px;}
-            .nc-atm-badge{align-self:flex-end;}
-            .nc-cards-grid{grid-template-columns:1fr;}
-            .nc-dir-name{font-size:20px;}
-            .nc-meters-panel{min-width:unset;width:100%;}
-            .nc-meter-track{width:100%;}
-            .nc-card-value{font-size:26px;}
-            .nc-meter-pct{font-size:13px;}
-            .nc-header-title{font-size:15px;}
+            .nc-section-header{flex-direction:column;align-items:flex-start;gap:10px;}.nc-atm-badge{align-self:flex-end;}
+            .nc-cards-grid{grid-template-columns:1fr;}.nc-dir-name{font-size:20px;}
+            .nc-meters-panel{min-width:unset;width:100%;}.nc-meter-track{width:100%;}.nc-card-value{font-size:26px;}
         }
-
-        /* ══════════════════════════════════════════
-           RESPONSIVE — SMALL MOBILE (≤ 380px)
-        ══════════════════════════════════════════ */
+        /* ══ SMALL MOBILE ≤380px ══ */
         @media(max-width:380px){
-            .header h1{font-size:15px;}
-            .sb-body{grid-template-columns:1fr;}
-            .section{padding:12px 10px;}
-            .val{font-size:17px;}
-            .sb-val{font-size:12px;}
-            .direction-title{font-size:17px;}
-            .nc-dir-name{font-size:17px;}
-            .nc-card-value{font-size:22px;}
+            .header h1{font-size:15px;}.sb-body{grid-template-columns:1fr;}.section{padding:12px 10px;}.val{font-size:17px;}
+            .pf-grid{grid-template-columns:1fr;}.pf-block-val{font-size:16px;}
+            .nc-dir-name{font-size:17px;}.nc-card-value{font-size:22px;}
         }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 20-Feb-2026 22:27 IST</p>
+        <h1>&#128202; NIFTY 50 DAILY REPORT</h1>
+        <p>Generated: 20-Feb-2026 22:56 IST</p>
     </div>
-
-    <!-- ── MARKET SNAPSHOT ── -->
     <div class="section">
-        <div class="section-title"><span>📈</span> MARKET SNAPSHOT</div>
+        <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
         <div class="snap-grid">
-            <div class="g snap-card g-hi">
-                <div class="card-top-row"><span class="card-ico">💹</span><div class="lbl">NIFTY 50 SPOT</div></div>
-                <span class="val">₹25,571.25</span>
-            </div>
-            <div class="g snap-card">
-                <div class="card-top-row"><span class="card-ico">🎯</span><div class="lbl">ATM STRIKE</div></div>
-                <span class="val">₹25,550</span>
-            </div>
-            <div class="g snap-card">
-                <div class="card-top-row"><span class="card-ico">📅</span><div class="lbl">EXPIRY DATE</div></div>
-                <span class="val" style="font-size:20px">24-Feb-2026</span>
-            </div>
+            <div class="g snap-card g-hi"><div class="card-top-row"><span class="card-ico">&#128185;</span><div class="lbl">NIFTY 50 SPOT</div></div><span class="val">&#8377;25,571.25</span></div>
+            <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#127919;</span><div class="lbl">ATM STRIKE</div></div><span class="val">&#8377;25,550</span></div>
+            <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#128197;</span><div class="lbl">EXPIRY DATE</div></div><span class="val" style="font-size:20px">24-Feb-2026</span></div>
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════════
-         CHANGE IN OPEN INTEREST — NAVY COMMAND THEME
-         ══════════════════════════════════════════ -->
-    <div class="section">
-
-        <!-- ── Section header bar ── -->
-        <div class="nc-section-header">
-            <div class="nc-header-left">
-                <div class="nc-header-icon">📊</div>
+<div class="section">
+    <div class="nc-section-header">
+        <div class="nc-header-left"><div class="nc-header-icon">📊</div>
+        <div><div class="nc-header-title">Change in Open Interest</div>
+        <div class="nc-header-sub">Today's Direction Analysis</div></div></div>
+        <div class="nc-atm-badge">ATM ±10</div>
+    </div>
+    <div class="nc-dir-box" style="background:rgba(10,30,20,0.92);border:1px solid rgba(16,185,129,0.35);">
+        <div style="display:flex;align-items:stretch;gap:18px;">
+            <div class="nc-dir-bar" style="background:linear-gradient(180deg,#10b981,#047857);"></div>
+            <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                 <div>
-                    <div class="nc-header-title">Change in Open Interest</div>
-                    <div class="nc-header-sub">Today's Direction Analysis</div>
+                    <div class="nc-dir-tag">MARKET DIRECTION</div>
+                    <div class="nc-dir-name" style="color:#34d399;">Strong Bullish</div>
+                    <div class="nc-dir-signal" style="color:rgba(52,211,153,0.5);">Put Build-up + Call Unwinding</div>
                 </div>
+                <div class="nc-meters-panel"><div class="nc-meter-row"><div class="nc-meter-head-row"><span class="nc-meter-label">🟢 Bull Strength</span><span class="nc-meter-pct" style="color:#34d399;">100%</span></div><div class="nc-meter-track"><div class="nc-meter-fill" style="width:100%;background:linear-gradient(90deg,#10b981,#34d399);"></div><div class="nc-meter-head" style="left:100%;background:#34d399;box-shadow:0 0 8px #34d399;"></div></div></div><div class="nc-meter-row"><div class="nc-meter-head-row"><span class="nc-meter-label">🔴 Bear Strength</span><span class="nc-meter-pct" style="color:#fb7185;">0%</span></div><div class="nc-meter-track"><div class="nc-meter-fill" style="width:0%;background:linear-gradient(90deg,#ef4444,#f97316);"></div><div class="nc-meter-head" style="left:0%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div></div></div></div>
             </div>
-            <div class="nc-atm-badge">ATM ±10</div>
-        </div>
-
-        <!-- ── Direction box with DUAL strength meters ── -->
-        <div class="nc-dir-box" style="background:rgba(10,30,20,0.92);border:1px solid rgba(16,185,129,0.35);">
-            <div style="display:flex;align-items:stretch;gap:18px;">
-                <div class="nc-dir-bar" style="background:linear-gradient(180deg,#10b981,#047857);"></div>
-                <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-                    <div>
-                        <div class="nc-dir-tag">MARKET DIRECTION</div>
-                        <div class="nc-dir-name" style="color:#34d399;">Strong Bullish</div>
-                        <div class="nc-dir-signal" style="color:rgba(52,211,153,0.5);">Put Build-up + Call Unwinding</div>
-                    </div>
-                    
-                    <div class="nc-meters-panel">
-                        <!-- Bull Strength -->
-                        <div class="nc-meter-row">
-                            <div class="nc-meter-head-row">
-                                <span class="nc-meter-label">🟢 Bull Strength</span>
-                                <span class="nc-meter-pct" style="color:#34d399;">100%</span>
-                            </div>
-                            <div class="nc-meter-track">
-                                <div class="nc-meter-fill"
-                                     style="width:100%;background:linear-gradient(90deg,#10b981,#34d399);"></div>
-                                <div class="nc-meter-head"
-                                     style="left:100%;background:#34d399;box-shadow:0 0 8px #34d399;"></div>
-                            </div>
-                        </div>
-                        <!-- Bear Strength -->
-                        <div class="nc-meter-row">
-                            <div class="nc-meter-head-row">
-                                <span class="nc-meter-label">🔴 Bear Strength</span>
-                                <span class="nc-meter-pct" style="color:#fb7185;">0%</span>
-                            </div>
-                            <div class="nc-meter-track">
-                                <div class="nc-meter-fill"
-                                     style="width:0%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>
-                                <div class="nc-meter-head"
-                                     style="left:0%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── 3 stat cards ── -->
-        <div class="nc-cards-grid">
-            
-            <div class="nc-card">
-                <div class="nc-card-header">
-                    <span class="nc-card-label">CALL OI CHANGE</span>
-                    <span style="font-size:18px;line-height:1;color:#10b981;">🟢</span>
-                </div>
-                <div class="nc-card-value" style="color:#34d399;">-337,700</div>
-                <div class="nc-card-sub">CE open interest Δ</div>
-                <div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">
-                    Bullish Signal
-                </div>
-            </div>
-            <div class="nc-card">
-                <div class="nc-card-header">
-                    <span class="nc-card-label">PUT OI CHANGE</span>
-                    <span style="font-size:18px;line-height:1;color:#10b981;">🟢</span>
-                </div>
-                <div class="nc-card-value" style="color:#34d399;">+242,591</div>
-                <div class="nc-card-sub">PE open interest Δ</div>
-                <div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">
-                    Bullish Signal
-                </div>
-            </div>
-            <div class="nc-card">
-                <div class="nc-card-header">
-                    <span class="nc-card-label">NET OI CHANGE</span>
-                    <span style="font-size:18px;line-height:1;color:#ef4444;">⚖️</span>
-                </div>
-                <div class="nc-card-value" style="color:#fb7185;">-95,109</div>
-                <div class="nc-card-sub">PE Δ − CE Δ</div>
-                <div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">
-                    Bearish Net
-                </div>
-            </div>
-        </div>
-
-        <!-- ── How to read logic box ── -->
-        <div class="logic-box" style="margin-top:16px;">
-            <p>
-                <strong>📖 How to Read:</strong><br>
-                • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
-                • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
-                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)<br>
-                • <strong>Bull % + Bear %</strong> = 100% &nbsp;(relative dominance of each side's OI change)
-            </p>
         </div>
     </div>
+    <div class="nc-cards-grid"><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">CALL OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">🟢</span></div><div class="nc-card-value" style="color:#34d399;">-337,700</div><div class="nc-card-sub">CE open interest Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">PUT OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">🟢</span></div><div class="nc-card-value" style="color:#34d399;">+242,591</div><div class="nc-card-sub">PE open interest Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">NET OI CHANGE</span><span style="font-size:18px;line-height:1;color:#ef4444;">⚖️</span></div><div class="nc-card-value" style="color:#fb7185;">-95,109</div><div class="nc-card-sub">PE Δ − CE Δ</div><div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">Bearish Net</div></div></div>
+    <div class="logic-box" style="margin-top:16px;">
+        <p><strong>📖 How to Read:</strong><br>
+        • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
+        • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
+        • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)<br>
+        • <strong>Bull % + Bear %</strong> = 100% &nbsp;(relative dominance)</p>
+    </div>
+</div>
 
-    <!-- ── KEY LEVELS VISUAL ── -->
     <div class="section">
-        <div class="section-title"><span>📊</span> KEY LEVELS</div>
+        <div class="section-title"><span>&#128202;</span> KEY LEVELS</div>
         <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">◄ SUPPORT ZONE</span>
-            <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE ►</span>
+            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">&#9668; SUPPORT ZONE</span>
+            <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE &#9658;</span>
         </div>
         <div style="position:relative;height:62px;">
-            <div class="rl-node-a" style="left:3%;">
-                <div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div>
-                <div class="rl-val" style="color:#26c6da;">₹25,071</div>
-                <div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div>
-            </div>
-            <div class="rl-node-a" style="left:22%;">
-                <div class="rl-lbl" style="color:#00bcd4;">Support</div>
-                <div class="rl-val" style="color:#00bcd4;">₹25,171</div>
-                <div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div>
-            </div>
-            <div style="position:absolute;left:38.37%;transform:translateX(-50%);
-                        bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;
-                        padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;
-                        box-shadow:0 0 16px rgba(79,195,247,0.7);">
-                ▼ NOW &nbsp;₹25,571
-            </div>
-            <div class="rl-node-a" style="left:75%;">
-                <div class="rl-lbl" style="color:#ff7043;">Resistance</div>
-                <div class="rl-val" style="color:#ff7043;">₹26,275</div>
-                <div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div>
-            </div>
-            <div class="rl-node-a" style="left:95%;">
-                <div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div>
-                <div class="rl-val" style="color:#f44336;">₹26,375</div>
-                <div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div>
-            </div>
+            <div class="rl-node-a" style="left:3%;"><div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div><div class="rl-val" style="color:#26c6da;">&#8377;25,071</div><div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div></div>
+            <div class="rl-node-a" style="left:22%;"><div class="rl-lbl" style="color:#00bcd4;">Support</div><div class="rl-val" style="color:#00bcd4;">&#8377;25,171</div><div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div></div>
+            <div style="position:absolute;left:38.37%;transform:translateX(-50%);bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;box-shadow:0 0 16px rgba(79,195,247,0.7);">&#9660; NOW &nbsp;&#8377;25,571</div>
+            <div class="rl-node-a" style="left:75%;"><div class="rl-lbl" style="color:#ff7043;">Resistance</div><div class="rl-val" style="color:#ff7043;">&#8377;26,275</div><div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div></div>
+            <div class="rl-node-a" style="left:95%;"><div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div><div class="rl-val" style="color:#f44336;">&#8377;26,375</div><div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div></div>
         </div>
-        <div style="position:relative;height:8px;border-radius:4px;
-                    background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);
-                    box-shadow:0 2px 14px rgba(0,0,0,0.5);">
-            <div style="position:absolute;left:38.37%;top:50%;transform:translate(-50%,-50%);
-                        width:4px;height:22px;background:#fff;border-radius:2px;
-                        box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
+        <div style="position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);box-shadow:0 2px 14px rgba(0,0,0,0.5);">
+            <div style="position:absolute;left:38.37%;top:50%;transform:translate(-50%,-50%);width:4px;height:22px;background:#fff;border-radius:2px;box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
         </div>
-        <div style="position:relative;height:58px;">
-              <div class="rl-node-b" style="left:43%;">
-                <div class="rl-dot" style="background:#ffb74d;box-shadow:0 0 8px #ffb74d;margin:0 auto 5px;"></div>
-                <div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>
-                <div class="rl-val" style="color:#ffb74d;">₹25,600</div>
-              </div></div>
+        <div style="position:relative;height:58px;"><div class="rl-node-b" style="left:43%;"><div class="rl-dot" style="background:#ffb74d;box-shadow:0 0 8px #ffb74d;margin:0 auto 5px;"></div><div class="rl-lbl" style="color:#ffb74d;">Max Pain</div><div class="rl-val" style="color:#ffb74d;">₹25,600</div></div></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
-            <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);
-                        border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:12px;color:#b0bec5;">📍 Distance to Resistance</span>
+            <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:#b0bec5;">&#128205; Distance to Resistance</span>
                 <span style="font-size:15px;font-weight:700;color:#f44336;">+703 pts</span>
             </div>
-            <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);
-                        border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:12px;color:#b0bec5;">📍 Distance to Support</span>
+            <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:12px;color:#b0bec5;">&#128205; Distance to Support</span>
                 <span style="font-size:15px;font-weight:700;color:#00bcd4;">−400 pts</span>
             </div>
         </div>
     </div>
 
-    <!-- ── FII / DII 5-DAY SENTIMENT ── -->
-    <div class="section"><div class="section-title"><span>🏦</span> FII / DII INSTITUTIONAL FLOW<span style="font-size:10px;color:#00e676;font-weight:700;letter-spacing:1px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);border-radius:10px;padding:2px 10px;margin-left:8px;">● LIVE DATA</span><span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">Last 5 Trading Days &nbsp;·&nbsp; Feb 13 – Feb 19</span></div><div style="background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.1);border-radius:14px;padding:20px 18px 14px;margin-bottom:16px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;"><div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:#00e5ff;"></div><span style="font-size:11px;color:#80deea;font-weight:600;">FII (&#8377; Cr)</span></div><div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:#ffb74d;"></div><span style="font-size:11px;color:#80deea;font-weight:600;">DII (&#8377; Cr)</span></div><div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:3px;background:#00e676;"></div><span style="font-size:10px;color:rgba(128,222,234,0.5);">Positive</span></div><div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:3px;background:#ff5252;"></div><span style="font-size:10px;color:rgba(128,222,234,0.5);">Negative</span></div></div><div style="font-size:10px;color:rgba(128,222,234,0.3);font-family:'JetBrains Mono',monospace;">Bar height = relative magnitude</div></div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:end;justify-items:center;"><div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;"><div style="font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(176,190,197,0.55);text-transform:uppercase;">Feb 13</div><div style="font-size:8px;color:rgba(128,222,234,0.3);">Fri</div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#ff5252;">-7,395</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:100%;background:linear-gradient(180deg,#ff5252cc,#ff525244);border-radius:3px;box-shadow:0 0 8px #ff525244;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#00e5ff;">FII</div></div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#40c4ff;">+5,554</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:75%;background:linear-gradient(180deg,#40c4ffcc,#40c4ff44);border-radius:3px;box-shadow:0 0 8px #40c4ff44;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#ffb74d;">DII</div></div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;"><div style="font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(176,190,197,0.55);text-transform:uppercase;">Feb 16</div><div style="font-size:8px;color:rgba(128,222,234,0.3);">Mon</div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#ff5252;">-972</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:13%;background:linear-gradient(180deg,#ff5252cc,#ff525244);border-radius:3px;box-shadow:0 0 8px #ff525244;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#00e5ff;">FII</div></div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#40c4ff;">+1,667</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:23%;background:linear-gradient(180deg,#40c4ffcc,#40c4ff44);border-radius:3px;box-shadow:0 0 8px #40c4ff44;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#ffb74d;">DII</div></div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;"><div style="font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(176,190,197,0.55);text-transform:uppercase;">Feb 17</div><div style="font-size:8px;color:rgba(128,222,234,0.3);">Tue</div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#00e676;">+995</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:13%;background:linear-gradient(180deg,#00e676cc,#00e67644);border-radius:3px;box-shadow:0 0 8px #00e67644;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#00e5ff;">FII</div></div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#40c4ff;">+187</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:3%;background:linear-gradient(180deg,#40c4ffcc,#40c4ff44);border-radius:3px;box-shadow:0 0 8px #40c4ff44;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#ffb74d;">DII</div></div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;"><div style="font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(176,190,197,0.55);text-transform:uppercase;">Feb 18</div><div style="font-size:8px;color:rgba(128,222,234,0.3);">Wed</div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#00e676;">+1,154</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:16%;background:linear-gradient(180deg,#00e676cc,#00e67644);border-radius:3px;box-shadow:0 0 8px #00e67644;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#00e5ff;">FII</div></div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#40c4ff;">+440</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:6%;background:linear-gradient(180deg,#40c4ffcc,#40c4ff44);border-radius:3px;box-shadow:0 0 8px #40c4ff44;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#ffb74d;">DII</div></div></div><div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;"><div style="font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(176,190,197,0.55);text-transform:uppercase;">Feb 19</div><div style="font-size:8px;color:rgba(128,222,234,0.3);">Thu</div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#ff5252;">-880</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:12%;background:linear-gradient(180deg,#ff5252cc,#ff525244);border-radius:3px;box-shadow:0 0 8px #ff525244;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#00e5ff;">FII</div></div><div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:10px;font-weight:700;color:#ef4444;">-596</div><div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);"><div style="width:100%;height:8%;background:linear-gradient(180deg,#ef4444cc,#ef444444);border-radius:3px;box-shadow:0 0 8px #ef444444;"></div></div><div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#ffb74d;">DII</div></div></div></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;"><div style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.15);border-radius:10px;padding:12px 14px;text-align:center;"><div style="font-size:8px;letter-spacing:2px;color:rgba(0,229,255,0.45);text-transform:uppercase;margin-bottom:4px;">FII 5D Avg</div><div style="font-family:'Oxanium',sans-serif;font-size:20px;font-weight:700;color:#ff5252;">-1,420</div><div style="font-size:9px;color:#37474f;margin-top:2px;">&#8377; Cr / day</div></div><div style="background:rgba(64,196,255,0.06);border:1px solid rgba(64,196,255,0.15);border-radius:10px;padding:12px 14px;text-align:center;"><div style="font-size:8px;letter-spacing:2px;color:rgba(0,229,255,0.45);text-transform:uppercase;margin-bottom:4px;">DII 5D Avg</div><div style="font-family:'Oxanium',sans-serif;font-size:20px;font-weight:700;color:#40c4ff;">+1,450</div><div style="font-size:9px;color:#37474f;margin-top:2px;">&#8377; Cr / day</div></div><div style="background:rgba(179,136,255,0.06);border:1px solid rgba(179,136,255,0.15);border-radius:10px;padding:12px 14px;text-align:center;"><div style="font-size:8px;letter-spacing:2px;color:rgba(0,229,255,0.45);text-transform:uppercase;margin-bottom:4px;">Net Combined</div><div style="font-family:'Oxanium',sans-serif;font-size:20px;font-weight:700;color:#b388ff;">+31</div><div style="font-size:9px;color:#37474f;margin-top:2px;">&#8377; Cr / day</div></div></div><div style="background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);border-radius:10px;padding:14px 16px;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;"><div style="font-size:9px;color:#69f0ae;letter-spacing:2px;font-weight:700;">&#128202; 5-DAY INSIGHT &amp; DIRECTION</div><span style="display:inline-block;margin-left:8px;padding:2px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1px;background:rgba(105,240,174,0.10);color:#69f0ae;border:1px solid rgba(105,240,174,0.28);">📈 CAUTIOUSLY BULLISH</span></div><div style="font-size:13px;color:#cfd8dc;line-height:1.85;font-weight:500;">FIIs are net sellers (avg <span style="color:#ff5252;font-weight:700;">₹-1420 Cr/day</span>) but DIIs are absorbing strongly (avg <span style="color:#40c4ff;font-weight:700;">₹+1450 Cr/day</span>). DII support is cushioning downside — FII return is key for breakout. Net combined flow: <span style="color:#b388ff;font-weight:700;">₹+31 Cr/day</span>.</div></div></div>
+<div class="section">
+    <div class="section-title">
+        <span>🏦</span> FII / DII INSTITUTIONAL FLOW
+        <span class="pf-live-badge pf-live">● LIVE</span>
+        <span class="pf-date-range">Last 5 Trading Days &nbsp;·&nbsp; Feb 13 – Feb 19</span>
+    </div>
+    <div class="pf-grid"><div class="pf-card" style="border-color:rgba(255,68,68,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#ff4444,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Feb 13</span><span class="pf-card-day">Fri</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-7,395</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:100%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+5,554</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:75.1%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#f87171;">-1,841</span></div></div><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Feb 16</span><span class="pf-card-day">Mon</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-972</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:13.1%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+1,667</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:22.5%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+695</span></div></div><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Feb 17</span><span class="pf-card-day">Tue</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#00d4ff;">+995</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:13.5%;background:linear-gradient(90deg,#00d4ff,#0090ff);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+187</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:2.5%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+1,182</span></div></div><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Feb 18</span><span class="pf-card-day">Wed</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#00d4ff;">+1,154</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:15.6%;background:linear-gradient(90deg,#00d4ff,#0090ff);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+440</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:6.0%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+1,595</span></div></div><div class="pf-card" style="border-color:rgba(255,68,68,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#ff4444,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Feb 19</span><span class="pf-card-day">Thu</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-880</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:11.9%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ff4444;">-596</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:8.1%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#f87171;">-1,477</span></div></div></div>
+    <div class="pf-avg-strip">
+        <div class="pf-avg-cell">
+            <div class="pf-avg-eyebrow">FII 5D Avg</div>
+            <div class="pf-avg-val" style="color:#ff4444;">-1,420</div>
+            <div class="pf-avg-unit">&#8377; Cr / day</div>
+        </div>
+        <div class="pf-avg-sep"></div>
+        <div class="pf-avg-cell">
+            <div class="pf-avg-eyebrow">DII 5D Avg</div>
+            <div class="pf-avg-val" style="color:#ffb300;">+1,450</div>
+            <div class="pf-avg-unit">&#8377; Cr / day</div>
+        </div>
+        <div class="pf-avg-sep"></div>
+        <div class="pf-avg-cell">
+            <div class="pf-avg-eyebrow">Net Combined</div>
+            <div class="pf-avg-val" style="color:#c084fc;">+31</div>
+            <div class="pf-avg-unit">&#8377; Cr / day</div>
+        </div>
+    </div>
+    <div class="pf-insight-box" style="background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);">
+        <div class="pf-insight-header">
+            <span class="pf-insight-lbl" style="color:#69f0ae;">&#128202; 5-DAY INSIGHT &amp; DIRECTION</span>
+            <span class="pf-verdict-badge" style="color:#69f0ae;background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);">📈 CAUTIOUSLY BULLISH</span>
+        </div>
+        <div class="pf-insight-text">FIIs are net sellers (avg <span style="color:#ff5252;font-weight:700;">₹-1420 Cr/day</span>) but DIIs are absorbing strongly (avg <span style="color:#40c4ff;font-weight:700;">₹+1450 Cr/day</span>). DII support is cushioning downside — FII return is key for breakout. Net combined flow: <span style="color:#b388ff;font-weight:700;">₹+31 Cr/day</span>.</div>
+    </div>
+</div>
 
-
-    <!-- ── MARKET DIRECTION ── -->
     <div class="section">
-        <div class="section-title"><span>🧭</span> MARKET DIRECTION (Algorithmic)</div>
+        <div class="section-title"><span>&#129517;</span> MARKET DIRECTION (Algorithmic)</div>
         <div class="direction-box sideways">
             <div class="direction-title">↔️ SIDEWAYS</div>
             <div class="direction-subtitle">Confidence: MEDIUM &nbsp;|&nbsp; Bullish: 2 vs Bearish: 2</div>
         </div>
-        <div class="logic-box">
-            <p>
-                <strong>📊 Scoring Logic:</strong><br>
-                • <strong>BULLISH</strong>: Diff ≥ +3 · Price above SMAs, oversold RSI, +MACD, PCR &gt; 1.2<br>
-                • <strong>BEARISH</strong>: Diff ≤ −3 · Price below SMAs, overbought RSI, −MACD, PCR &lt; 0.7<br>
-                • <strong>SIDEWAYS</strong>: Diff −2 to +2 · Mixed signals, consolidation<br>
-                • <strong>Confidence</strong>: HIGH when gap ≥ 4 | OI scope: ATM ±10 strikes only
-            </p>
-        </div>
+        <div class="logic-box"><p>
+            <strong>&#128202; Scoring Logic:</strong><br>
+            • <strong>BULLISH</strong>: Diff ≥ +3 · Price above SMAs, oversold RSI, +MACD, PCR &gt; 1.2<br>
+            • <strong>BEARISH</strong>: Diff ≤ −3 · Price below SMAs, overbought RSI, −MACD, PCR &lt; 0.7<br>
+            • <strong>SIDEWAYS</strong>: Diff −2 to +2 · Mixed signals, consolidation<br>
+            • <strong>Confidence</strong>: HIGH when gap ≥ 4 | OI scope: ATM ±10 strikes only
+        </p></div>
     </div>
-
-    <!-- ── TECHNICAL INDICATORS ── -->
     <div class="section">
-        <div class="section-title"><span>🔍</span> TECHNICAL INDICATORS</div>
+        <div class="section-title"><span>&#128269;</span> TECHNICAL INDICATORS</div>
         <div class="card-grid grid-5">
-            
             <div class="g ">
-                <div class="card-top-row">
-                    <span class="card-ico">🟡</span>
-                    <div class="lbl">RSI (14)</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">🟡</span><div class="lbl">RSI (14)</div></div>
                 <span class="val">59.9</span>
                 <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:59.9%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">14-period momentum</div>
-                    <span class="tag tag-neu">Neutral</span>
-                </div>
+                <div class="card-foot"><div class="sub">14-period momentum</div><span class="tag tag-neu">Neutral</span></div>
             </div>
             <div class="g g-red">
-                <div class="card-top-row">
-                    <span class="card-ico">❌</span>
-                    <div class="lbl">SMA 20</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">❌</span><div class="lbl">SMA 20</div></div>
                 <span class="val">₹25,576</span>
                 <div class="bar-wrap"><div class="bar-fill bar-red" style="width:49.8%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">20-day average</div>
-                    <span class="tag tag-bear">Below</span>
-                </div>
+                <div class="card-foot"><div class="sub">20-day average</div><span class="tag tag-bear">Below</span></div>
             </div>
             <div class="g g-red">
-                <div class="card-top-row">
-                    <span class="card-ico">❌</span>
-                    <div class="lbl">SMA 50</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">❌</span><div class="lbl">SMA 50</div></div>
                 <span class="val">₹25,760</span>
                 <div class="bar-wrap"><div class="bar-fill bar-red" style="width:42.7%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">50-day average</div>
-                    <span class="tag tag-bear">Below</span>
-                </div>
+                <div class="card-foot"><div class="sub">50-day average</div><span class="tag tag-bear">Below</span></div>
             </div>
             <div class="g g-hi">
-                <div class="card-top-row">
-                    <span class="card-ico">✅</span>
-                    <div class="lbl">SMA 200</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">✅</span><div class="lbl">SMA 200</div></div>
                 <span class="val">₹25,322</span>
                 <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:59.8%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">200-day average</div>
-                    <span class="tag tag-bull">Above</span>
-                </div>
+                <div class="card-foot"><div class="sub">200-day average</div><span class="tag tag-bull">Above</span></div>
             </div>
             <div class="g g-hi">
-                <div class="card-top-row">
-                    <span class="card-ico">🟢</span>
-                    <div class="lbl">MACD</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">🟢</span><div class="lbl">MACD</div></div>
                 <span class="val">-10.05</span>
                 <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:29.9%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">Signal: -12.97</div>
-                    <span class="tag tag-bull">Bullish</span>
-                </div>
-            </div>
-        </div>
+                <div class="card-foot"><div class="sub">Signal: -12.97</div><span class="tag tag-bull">Bullish</span></div>
+            </div></div>
     </div>
 
     <div class="section">
-        <div class="section-title">
-            <span>🎯</span> OPTION CHAIN ANALYSIS
-            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Strikes Only)</span>
-        </div>
+        <div class="section-title"><span>&#127919;</span> OPTION CHAIN ANALYSIS <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Strikes Only)</span></div>
         <div class="card-grid grid-4">
-            
             <div class="g ">
-                <div class="card-top-row">
-                    <span class="card-ico">🟡</span>
-                    <div class="lbl">PCR Ratio (OI)</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">🟡</span><div class="lbl">PCR Ratio (OI)</div></div>
                 <span class="val">0.816</span>
                 <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:40.8%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">Put/Call OI ratio</div>
-                    <span class="tag tag-neu">Neutral</span>
-                </div>
+                <div class="card-foot"><div class="sub">Put/Call OI ratio</div><span class="tag tag-neu">Neutral</span></div>
             </div>
             <div class="g ">
-                <div class="card-top-row">
-                    <span class="card-ico">🎯</span>
-                    <div class="lbl">Max Pain</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">🎯</span><div class="lbl">Max Pain</div></div>
                 <span class="val">₹25,600</span>
                 <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:38.9%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">Price gravity level</div>
-                    <span class="tag tag-neu">Expiry Magnet</span>
-                </div>
+                <div class="card-foot"><div class="sub">Price gravity level</div><span class="tag tag-neu">Expiry Magnet</span></div>
             </div>
             <div class="g g-red">
-                <div class="card-top-row">
-                    <span class="card-ico">🔴</span>
-                    <div class="lbl">Max Call OI</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">🔴</span><div class="lbl">Max Call OI</div></div>
                 <span class="val">₹26,000</span>
                 <div class="bar-wrap"><div class="bar-fill bar-red" style="width:55.1%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">CE wall</div>
-                    <span class="tag tag-bear">Resistance</span>
-                </div>
+                <div class="card-foot"><div class="sub">CE wall</div><span class="tag tag-bear">Resistance</span></div>
             </div>
             <div class="g g-hi">
-                <div class="card-top-row">
-                    <span class="card-ico">🟢</span>
-                    <div class="lbl">Max Put OI</div>
-                </div>
+                <div class="card-top-row"><span class="card-ico">🟢</span><div class="lbl">Max Put OI</div></div>
                 <span class="val">₹25,500</span>
                 <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:44.9%"></div></div>
-                <div class="card-foot">
-                    <div class="sub">PE floor</div>
-                    <span class="tag tag-bull">Support</span>
-                </div>
-            </div>
-        </div>
+                <div class="card-foot"><div class="sub">PE floor</div><span class="tag tag-bull">Support</span></div>
+            </div></div>
     </div>
 
     <div class="section">
-        <div class="section-title"><span>💡</span> TRADING RECOMMENDATIONS (Dual Strategy)</div>
+        <div class="section-title"><span>&#128161;</span> TRADING RECOMMENDATIONS (Dual Strategy)</div>
         <p style="color:#90a4ae;font-size:13px;margin-bottom:16px;letter-spacing:0.5px;">
             Two independent strategy recommendations based on
             <strong style="color:#4fc3f7;">Technical Analysis</strong> and
@@ -765,10 +393,7 @@
         </p>
 
         <div class="sb-wrap">
-            <div class="sb-header cyan">
-                <span class="sb-h-title">1️⃣ TECHNICAL ANALYSIS STRATEGY &nbsp;·&nbsp; Iron Condor</span>
-                <span class="sb-h-badge cyan">Positional · 1–5 Days</span>
-            </div>
+            <div class="sb-header cyan"><span class="sb-h-title">1️⃣ TECHNICAL ANALYSIS STRATEGY &nbsp;·&nbsp; Iron Condor</span><span class="sb-h-badge cyan">Positional · 1–5 Days</span></div>
             <div class="sb-body">
                 <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val gold">Neutral</div></div>
                 <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">Credit</div></div>
@@ -776,22 +401,12 @@
                 <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val green small">Premium Received</div></div>
                 <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val gold small">Capped</div></div>
             </div>
-            <div class="sb-footer">
-                <span class="sf-lbl">📋 Setup</span>
-                <span>Sell 25650 CE + Buy 25750 CE, Sell 25450 PE + Buy 25350 PE</span>
-                <span class="sf-why">💡 Expect low volatility, range-bound market</span>
-            </div>
+            <div class="sb-footer"><span class="sf-lbl">&#128203; Setup</span><span>Sell 25650 CE + Buy 25750 CE, Sell 25450 PE + Buy 25350 PE</span><span class="sf-why">&#128161; Expect low volatility, range-bound market</span></div>
         </div>
 
         <div class="sb-wrap">
-            <div class="sb-header gold">
-                <span class="sb-h-title gold">2️⃣ OI MOMENTUM STRATEGY &nbsp;·&nbsp; Long Call</span>
-                <span class="sb-h-badge gold">Intraday to 1-2 days</span>
-            </div>
-            <div class="sb-signal">
-                <span class="sig-lbl">📊 OI Signal</span>
-                <span style="color:#ffffff;font-weight:500;">🟢 Institutional buying interest detected</span>
-            </div>
+            <div class="sb-header gold"><span class="sb-h-title gold">2️⃣ OI MOMENTUM STRATEGY &nbsp;·&nbsp; Long Call</span><span class="sb-h-badge gold">Intraday to 1-2 days</span></div>
+            <div class="sb-signal"><span class="sig-lbl">&#128202; OI Signal</span><span style="color:#ffffff;font-weight:500;">🟢 Institutional buying interest detected</span></div>
             <div class="sb-body">
                 <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val green">Bullish</div></div>
                 <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">Debit</div></div>
@@ -799,51 +414,37 @@
                 <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val green small">Unlimited</div></div>
                 <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val gold small">Premium Paid</div></div>
             </div>
-            <div class="sb-footer" style="border-top-color:rgba(255,183,77,0.08);">
-                <span class="sf-lbl">📋 Setup</span>
-                <span>Buy 25550 CE</span>
-                <span class="sf-why">💡 Put build-up indicates bullish momentum</span>
-            </div>
+            <div class="sb-footer"><span class="sf-lbl">&#128203; Setup</span><span>Buy 25550 CE</span><span class="sf-why">&#128161; Put build-up indicates bullish momentum</span></div>
         </div>
 
     <div class="section">
-        <div class="section-title"><span>📋</span> TOP 5 STRIKES BY OPEN INTEREST
-            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Only)</span>
-        </div>
+        <div class="section-title"><span>&#128203;</span> TOP 5 STRIKES BY OPEN INTEREST <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Only)</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="strikes-wrap">
-            <div>
-                <h3 style="color:#00bcd4;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📞 CALL OPTIONS (CE)</h3>
-                <table class="strikes-table">
-                    <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹26,000</strong></td><td>217,495</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹13.30</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹25,800</strong></td><td>165,418</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹36.10</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹25,700</strong></td><td>136,461</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹63.20</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹25,900</strong></td><td>126,988</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹21.20</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,600</strong></td><td>118,035</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹106.90</td></tr>
+            <div><h3 style="color:#00bcd4;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">&#128222; CALL OPTIONS (CE)</h3>
+            <table class="strikes-table"><thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>&#8377;26,000</strong></td><td>217,495</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;13.30</td></tr>
+<tr><td><strong>2</strong></td><td><strong>&#8377;25,800</strong></td><td>165,418</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;36.10</td></tr>
+<tr><td><strong>3</strong></td><td><strong>&#8377;25,700</strong></td><td>136,461</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;63.20</td></tr>
+<tr><td><strong>4</strong></td><td><strong>&#8377;25,900</strong></td><td>126,988</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;21.20</td></tr>
+<tr><td><strong>5</strong></td><td><strong>&#8377;25,600</strong></td><td>118,035</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;106.90</td></tr>
 </tbody></table></div>
-            <div>
-                <h3 style="color:#f44336;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📉 PUT OPTIONS (PE)</h3>
-                <table class="strikes-table">
-                    <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹25,500</strong></td><td>140,922</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹85.60</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹25,400</strong></td><td>122,134</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹59.70</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹25,600</strong></td><td>98,538</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹124.80</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹25,300</strong></td><td>89,610</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹43.10</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,200</strong></td><td>73,996</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹33.20</td></tr>
+            <div><h3 style="color:#f44336;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">&#128201; PUT OPTIONS (PE)</h3>
+            <table class="strikes-table"><thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
+<tr><td><strong>1</strong></td><td><strong>&#8377;25,500</strong></td><td>140,922</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;85.60</td></tr>
+<tr><td><strong>2</strong></td><td><strong>&#8377;25,400</strong></td><td>122,134</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;59.70</td></tr>
+<tr><td><strong>3</strong></td><td><strong>&#8377;25,600</strong></td><td>98,538</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;124.80</td></tr>
+<tr><td><strong>4</strong></td><td><strong>&#8377;25,300</strong></td><td>89,610</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;43.10</td></tr>
+<tr><td><strong>5</strong></td><td><strong>&#8377;25,200</strong></td><td>73,996</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;33.20</td></tr>
 </tbody></table></div></div></div>
 
     <div class="section">
-        <div class="disclaimer">
-            <strong>⚠️ DISCLAIMER</strong><br><br>
-            This report is for <strong>EDUCATIONAL purposes only</strong> — NOT financial advice.<br>
-            Always use stop losses and consult a SEBI registered investment advisor.<br>
-            Past performance does not guarantee future results.
-        </div>
+        <div class="disclaimer"><strong>⚠️ DISCLAIMER</strong><br><br>
+        This report is for <strong>EDUCATIONAL purposes only</strong> — NOT financial advice.<br>
+        Always use stop losses and consult a SEBI registered investment advisor.<br>
+        Past performance does not guarantee future results.</div>
     </div>
     <div class="footer">
         <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
-        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · Navy Command OI · Dual Strength Meter · For Educational Purposes Only</p>
+        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · For Educational Purposes Only</p>
     </div>
-</div>
-</body>
-</html>
+</div></body></html>
