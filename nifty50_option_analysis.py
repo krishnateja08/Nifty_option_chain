@@ -11,6 +11,7 @@ FIXES:
   6. [NEW] Glassmorphism Stat Card + Progress Bar layout for all indicator cards
   7. [NEW] FII / DII 5-Day Sentiment section below Market Snapshot
   8. [NEW] Navy Command theme for Change in Open Interest section
+  9. [NEW] DUAL Strength Meter — Bull Strength + Bear Strength shown simultaneously
 """
 from curl_cffi import requests
 import pandas as pd
@@ -722,72 +723,46 @@ class NiftyHTMLAnalyzer:
 
     # ─────────────────────────────────────────────
     #  ★ NAVY COMMAND — CHANGE IN OI SECTION ★
+    #  [UPDATED] Dual Bull + Bear Strength Meters
     # ─────────────────────────────────────────────
     def _oi_navy_command_section(self, d):
-        """
-        Renders the 'Change in Open Interest' block in the Navy Command theme
-        that exactly matches the user-selected design:
-          • Header bar: icon + title + ATM±10 badge
-          • Direction box: label, big direction name, signal text, bear/bull strength meter
-          • 3 stat cards: CALL OI CHANGE | PUT OI CHANGE | NET OI CHANGE
-            each with icon top-right, value, sub-label, full-width badge button
-          • Logic/how-to-read box
-        """
         oi_cls    = d['oi_class']   # 'bearish' | 'bullish' | 'neutral'
         direction = d['oi_direction']
         signal    = d['oi_signal']
 
-        # ── strength meter: what % of total OI change does the dominant side hold?
+        # ── Compute BOTH bull and bear strength percentages ──────────────────
         total_abs = abs(d['total_ce_oi_change']) + abs(d['total_pe_oi_change'])
         if total_abs > 0:
-            if oi_cls == 'bearish':
-                strength_pct = round(abs(d['total_ce_oi_change']) / total_abs * 100)
-            elif oi_cls == 'bullish':
-                strength_pct = round(abs(d['total_pe_oi_change']) / total_abs * 100)
-            else:
-                strength_pct = 50
+            bull_pct = round(abs(d['total_pe_oi_change']) / total_abs * 100)
+            bear_pct = round(abs(d['total_ce_oi_change']) / total_abs * 100)
+            # Ensure they sum to exactly 100 (handle rounding)
+            if bull_pct + bear_pct != 100:
+                bear_pct = 100 - bull_pct
         else:
-            strength_pct = 50
+            bull_pct = 50
+            bear_pct = 50
 
-        # ── direction box colour scheme
+        # ── Direction box colour scheme ──────────────────────────────────────
         if oi_cls == 'bearish':
             dir_bg        = 'rgba(30,10,14,0.92)'
             dir_border    = 'rgba(239,68,68,0.35)'
             dir_left_bar  = 'linear-gradient(180deg,#ef4444,#b91c1c)'
             dir_name_col  = '#fb7185'
             dir_desc_col  = 'rgba(251,113,133,0.5)'
-            meter_label   = 'BEAR STRENGTH'
-            meter_fill    = 'linear-gradient(90deg,#ef4444,#f97316)'
-            meter_col     = '#fb7185'
-            dir_tag_txt   = 'BEARISH SIGNAL'
-            dir_tag_bg    = 'rgba(239,68,68,0.12)'
-            dir_tag_bdr   = 'rgba(239,68,68,0.3)'
         elif oi_cls == 'bullish':
             dir_bg        = 'rgba(10,30,20,0.92)'
             dir_border    = 'rgba(16,185,129,0.35)'
             dir_left_bar  = 'linear-gradient(180deg,#10b981,#047857)'
             dir_name_col  = '#34d399'
             dir_desc_col  = 'rgba(52,211,153,0.5)'
-            meter_label   = 'BULL STRENGTH'
-            meter_fill    = 'linear-gradient(90deg,#10b981,#34d399)'
-            meter_col     = '#34d399'
-            dir_tag_txt   = 'BULLISH SIGNAL'
-            dir_tag_bg    = 'rgba(16,185,129,0.12)'
-            dir_tag_bdr   = 'rgba(16,185,129,0.3)'
         else:
             dir_bg        = 'rgba(20,20,10,0.92)'
             dir_border    = 'rgba(251,191,36,0.3)'
             dir_left_bar  = 'linear-gradient(180deg,#f59e0b,#d97706)'
             dir_name_col  = '#fbbf24'
             dir_desc_col  = 'rgba(251,191,36,0.5)'
-            meter_label   = 'NEUTRAL ZONE'
-            meter_fill    = 'linear-gradient(90deg,#f59e0b,#fbbf24)'
-            meter_col     = '#fbbf24'
-            dir_tag_txt   = 'NEUTRAL'
-            dir_tag_bg    = 'rgba(251,191,36,0.12)'
-            dir_tag_bdr   = 'rgba(251,191,36,0.3)'
 
-        # ── 3 stat cards config
+        # ── 3 stat cards config ──────────────────────────────────────────────
         # CALL OI
         ce_val     = d['total_ce_oi_change']
         ce_is_bear = ce_val > 0
@@ -851,6 +826,37 @@ class NiftyHTMLAnalyzer:
                     net_lbl, net_btn_col, net_btn_bg, net_btn_bdr, '⚖️')
         )
 
+        # ── DUAL strength meter HTML ─────────────────────────────────────────
+        dual_meters_html = f"""
+                    <div class="nc-meters-panel">
+                        <!-- Bull Strength -->
+                        <div class="nc-meter-row">
+                            <div class="nc-meter-head-row">
+                                <span class="nc-meter-label">🟢 Bull Strength</span>
+                                <span class="nc-meter-pct" style="color:#34d399;">{bull_pct}%</span>
+                            </div>
+                            <div class="nc-meter-track">
+                                <div class="nc-meter-fill"
+                                     style="width:{bull_pct}%;background:linear-gradient(90deg,#10b981,#34d399);"></div>
+                                <div class="nc-meter-head"
+                                     style="left:{bull_pct}%;background:#34d399;box-shadow:0 0 8px #34d399;"></div>
+                            </div>
+                        </div>
+                        <!-- Bear Strength -->
+                        <div class="nc-meter-row">
+                            <div class="nc-meter-head-row">
+                                <span class="nc-meter-label">🔴 Bear Strength</span>
+                                <span class="nc-meter-pct" style="color:#fb7185;">{bear_pct}%</span>
+                            </div>
+                            <div class="nc-meter-track">
+                                <div class="nc-meter-fill"
+                                     style="width:{bear_pct}%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>
+                                <div class="nc-meter-head"
+                                     style="left:{bear_pct}%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div>
+                            </div>
+                        </div>
+                    </div>"""
+
         return f"""
     <!-- ══════════════════════════════════════════
          CHANGE IN OPEN INTEREST — NAVY COMMAND THEME
@@ -869,7 +875,7 @@ class NiftyHTMLAnalyzer:
             <div class="nc-atm-badge">ATM ±10</div>
         </div>
 
-        <!-- ── Direction box ── -->
+        <!-- ── Direction box with DUAL strength meters ── -->
         <div class="nc-dir-box" style="background:{dir_bg};border:1px solid {dir_border};">
             <div style="display:flex;align-items:stretch;gap:18px;">
                 <div class="nc-dir-bar" style="background:{dir_left_bar};"></div>
@@ -879,14 +885,7 @@ class NiftyHTMLAnalyzer:
                         <div class="nc-dir-name" style="color:{dir_name_col};">{direction}</div>
                         <div class="nc-dir-signal" style="color:{dir_desc_col};">{signal}</div>
                     </div>
-                    <div class="nc-meter-wrap">
-                        <div class="nc-meter-label">{meter_label}</div>
-                        <div class="nc-meter-track">
-                            <div class="nc-meter-fill" style="width:{strength_pct}%;background:{meter_fill};"></div>
-                            <div class="nc-meter-head" style="left:{strength_pct}%;background:{meter_col};box-shadow:0 0 8px {meter_col};"></div>
-                        </div>
-                        <div class="nc-meter-pct" style="color:{meter_col};">{strength_pct}%</div>
-                    </div>
+                    {dual_meters_html}
                 </div>
             </div>
         </div>
@@ -902,7 +901,8 @@ class NiftyHTMLAnalyzer:
                 <strong>📖 How to Read:</strong><br>
                 • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
                 • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
-                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)
+                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)<br>
+                • <strong>Bull % + Bear %</strong> = 100% &nbsp;(relative dominance of each side's OI change)
             </p>
         </div>
     </div>
@@ -1288,33 +1288,38 @@ class NiftyHTMLAnalyzer:
         .nc-dir-signal{{
             font-family:'Outfit',sans-serif;font-size:12px;font-weight:400;
         }}
-        /* Strength meter */
-        .nc-meter-wrap{{
-            text-align:right;min-width:160px;
+        /* ── DUAL strength meters ── */
+        .nc-meters-panel{{
+            display:flex;flex-direction:column;gap:14px;
+            min-width:200px;justify-content:center;
+        }}
+        .nc-meter-row{{
+            display:flex;flex-direction:column;gap:5px;
+        }}
+        .nc-meter-head-row{{
+            display:flex;justify-content:space-between;align-items:center;
         }}
         .nc-meter-label{{
             font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
-            letter-spacing:2px;color:rgba(148,163,184,0.45);
-            text-transform:uppercase;margin-bottom:8px;
+            letter-spacing:2px;color:rgba(148,163,184,0.45);text-transform:uppercase;
         }}
         .nc-meter-track{{
             position:relative;height:8px;background:rgba(0,0,0,0.4);
-            border-radius:4px;overflow:visible;width:180px;margin-left:auto;
+            border-radius:4px;overflow:visible;width:200px;
         }}
         .nc-meter-fill{{
             height:100%;border-radius:4px;
-            transition:width 1.2s cubic-bezier(0.4,0,0.2,1);
+            transition:width 1.4s cubic-bezier(0.4,0,0.2,1);
         }}
         .nc-meter-head{{
-            position:absolute;top:50%;transform:translateY(-50%);
+            position:absolute;top:50%;transform:translate(-50%,-50%);
             width:14px;height:14px;border-radius:50%;
-            margin-left:-7px;
-            border:2px solid rgba(10,18,30,0.8);
-            transition:left 1.2s cubic-bezier(0.4,0,0.2,1);
+            border:2px solid rgba(10,18,30,0.85);
+            transition:left 1.4s cubic-bezier(0.4,0,0.2,1);
         }}
         .nc-meter-pct{{
-            font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;
-            margin-top:8px;letter-spacing:0.5px;
+            font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;
+            letter-spacing:0.5px;
         }}
         /* 3 OI cards */
         .nc-cards-grid{{
@@ -1443,8 +1448,8 @@ class NiftyHTMLAnalyzer:
             .nc-atm-badge{{align-self:flex-end;}}
             .nc-cards-grid{{grid-template-columns:1fr;}}
             .nc-dir-name{{font-size:20px;}}
-            .nc-meter-wrap{{text-align:left;min-width:unset;}}
-            .nc-meter-track{{width:100%;margin-left:0;}}
+            .nc-meters-panel{{min-width:unset;width:100%;}}
+            .nc-meter-track{{width:100%;}}
             .nc-card-value{{font-size:26px;}}
             .nc-meter-pct{{font-size:13px;}}
             .nc-header-title{{font-size:15px;}}
@@ -1492,11 +1497,11 @@ class NiftyHTMLAnalyzer:
         </div>
     </div>
 """
-        # ── CHANGE IN OI — NAVY COMMAND (position 2: right after Market Snapshot)
+        # ── CHANGE IN OI — NAVY COMMAND (position 2)
         if d['has_option_data']:
             html += self._oi_navy_command_section(d)
 
-        # ── KEY LEVELS VISUAL (position 3: between OI and Key Trading Levels)
+        # ── KEY LEVELS VISUAL (position 3)
         html += self._key_levels_visual_section(d, _pct_cp, _pts_to_res, _pts_to_sup, _mp_node)
 
         html += f"""
@@ -1585,7 +1590,7 @@ class NiftyHTMLAnalyzer:
     </div>
     <div class="footer">
         <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
-        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · Navy Command OI · For Educational Purposes Only</p>
+        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · Navy Command OI · Dual Strength Meter · For Educational Purposes Only</p>
     </div>
 </div>
 </body>
@@ -1748,7 +1753,7 @@ class NiftyHTMLAnalyzer:
     def generate_full_report(self):
         ist_now = datetime.now(pytz.timezone('Asia/Kolkata'))
         print("=" * 70)
-        print("NIFTY 50 DAILY REPORT — GLASSMORPHISM UI · NAVY COMMAND OI THEME")
+        print("NIFTY 50 DAILY REPORT — GLASSMORPHISM UI · NAVY COMMAND OI · DUAL STRENGTH METER")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 70)
         oc_data         = self.fetch_nse_option_chain_silent()

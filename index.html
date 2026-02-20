@@ -249,33 +249,38 @@
         .nc-dir-signal{
             font-family:'Outfit',sans-serif;font-size:12px;font-weight:400;
         }
-        /* Strength meter */
-        .nc-meter-wrap{
-            text-align:right;min-width:160px;
+        /* ── DUAL strength meters ── */
+        .nc-meters-panel{
+            display:flex;flex-direction:column;gap:14px;
+            min-width:200px;justify-content:center;
+        }
+        .nc-meter-row{
+            display:flex;flex-direction:column;gap:5px;
+        }
+        .nc-meter-head-row{
+            display:flex;justify-content:space-between;align-items:center;
         }
         .nc-meter-label{
             font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
-            letter-spacing:2px;color:rgba(148,163,184,0.45);
-            text-transform:uppercase;margin-bottom:8px;
+            letter-spacing:2px;color:rgba(148,163,184,0.45);text-transform:uppercase;
         }
         .nc-meter-track{
             position:relative;height:8px;background:rgba(0,0,0,0.4);
-            border-radius:4px;overflow:visible;width:180px;margin-left:auto;
+            border-radius:4px;overflow:visible;width:200px;
         }
         .nc-meter-fill{
             height:100%;border-radius:4px;
-            transition:width 1.2s cubic-bezier(0.4,0,0.2,1);
+            transition:width 1.4s cubic-bezier(0.4,0,0.2,1);
         }
         .nc-meter-head{
-            position:absolute;top:50%;transform:translateY(-50%);
+            position:absolute;top:50%;transform:translate(-50%,-50%);
             width:14px;height:14px;border-radius:50%;
-            margin-left:-7px;
-            border:2px solid rgba(10,18,30,0.8);
-            transition:left 1.2s cubic-bezier(0.4,0,0.2,1);
+            border:2px solid rgba(10,18,30,0.85);
+            transition:left 1.4s cubic-bezier(0.4,0,0.2,1);
         }
         .nc-meter-pct{
-            font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;
-            margin-top:8px;letter-spacing:0.5px;
+            font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;
+            letter-spacing:0.5px;
         }
         /* 3 OI cards */
         .nc-cards-grid{
@@ -404,8 +409,8 @@
             .nc-atm-badge{align-self:flex-end;}
             .nc-cards-grid{grid-template-columns:1fr;}
             .nc-dir-name{font-size:20px;}
-            .nc-meter-wrap{text-align:left;min-width:unset;}
-            .nc-meter-track{width:100%;margin-left:0;}
+            .nc-meters-panel{min-width:unset;width:100%;}
+            .nc-meter-track{width:100%;}
             .nc-card-value{font-size:26px;}
             .nc-meter-pct{font-size:13px;}
             .nc-header-title{font-size:15px;}
@@ -431,7 +436,7 @@
 <div class="container">
     <div class="header">
         <h1>📊 NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: 20-Feb-2026 16:33 IST</p>
+        <p>Generated: 20-Feb-2026 21:52 IST</p>
     </div>
 
     <!-- ── MARKET SNAPSHOT ── -->
@@ -470,7 +475,7 @@
             <div class="nc-atm-badge">ATM ±10</div>
         </div>
 
-        <!-- ── Direction box ── -->
+        <!-- ── Direction box with DUAL strength meters ── -->
         <div class="nc-dir-box" style="background:rgba(10,30,20,0.92);border:1px solid rgba(16,185,129,0.35);">
             <div style="display:flex;align-items:stretch;gap:18px;">
                 <div class="nc-dir-bar" style="background:linear-gradient(180deg,#10b981,#047857);"></div>
@@ -480,13 +485,34 @@
                         <div class="nc-dir-name" style="color:#34d399;">Strong Bullish</div>
                         <div class="nc-dir-signal" style="color:rgba(52,211,153,0.5);">Put Build-up + Call Unwinding</div>
                     </div>
-                    <div class="nc-meter-wrap">
-                        <div class="nc-meter-label">BULL STRENGTH</div>
-                        <div class="nc-meter-track">
-                            <div class="nc-meter-fill" style="width:52%;background:linear-gradient(90deg,#10b981,#34d399);"></div>
-                            <div class="nc-meter-head" style="left:52%;background:#34d399;box-shadow:0 0 8px #34d399;"></div>
+                    
+                    <div class="nc-meters-panel">
+                        <!-- Bull Strength -->
+                        <div class="nc-meter-row">
+                            <div class="nc-meter-head-row">
+                                <span class="nc-meter-label">🟢 Bull Strength</span>
+                                <span class="nc-meter-pct" style="color:#34d399;">42%</span>
+                            </div>
+                            <div class="nc-meter-track">
+                                <div class="nc-meter-fill"
+                                     style="width:42%;background:linear-gradient(90deg,#10b981,#34d399);"></div>
+                                <div class="nc-meter-head"
+                                     style="left:42%;background:#34d399;box-shadow:0 0 8px #34d399;"></div>
+                            </div>
                         </div>
-                        <div class="nc-meter-pct" style="color:#34d399;">52%</div>
+                        <!-- Bear Strength -->
+                        <div class="nc-meter-row">
+                            <div class="nc-meter-head-row">
+                                <span class="nc-meter-label">🔴 Bear Strength</span>
+                                <span class="nc-meter-pct" style="color:#fb7185;">58%</span>
+                            </div>
+                            <div class="nc-meter-track">
+                                <div class="nc-meter-fill"
+                                     style="width:58%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>
+                                <div class="nc-meter-head"
+                                     style="left:58%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -500,7 +526,7 @@
                     <span class="nc-card-label">CALL OI CHANGE</span>
                     <span style="font-size:18px;line-height:1;color:#10b981;">🟢</span>
                 </div>
-                <div class="nc-card-value" style="color:#34d399;">-275,436</div>
+                <div class="nc-card-value" style="color:#34d399;">-337,700</div>
                 <div class="nc-card-sub">CE open interest Δ</div>
                 <div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">
                     Bullish Signal
@@ -511,7 +537,7 @@
                     <span class="nc-card-label">PUT OI CHANGE</span>
                     <span style="font-size:18px;line-height:1;color:#10b981;">🟢</span>
                 </div>
-                <div class="nc-card-value" style="color:#34d399;">+300,815</div>
+                <div class="nc-card-value" style="color:#34d399;">+242,591</div>
                 <div class="nc-card-sub">PE open interest Δ</div>
                 <div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">
                     Bullish Signal
@@ -522,7 +548,7 @@
                     <span class="nc-card-label">NET OI CHANGE</span>
                     <span style="font-size:18px;line-height:1;color:#10b981;">⚖️</span>
                 </div>
-                <div class="nc-card-value" style="color:#34d399;">+576,251</div>
+                <div class="nc-card-value" style="color:#34d399;">+580,291</div>
                 <div class="nc-card-sub">PE Δ − CE Δ</div>
                 <div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">
                     Bullish Net
@@ -536,7 +562,8 @@
                 <strong>📖 How to Read:</strong><br>
                 • <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI −</strong> = Unwinding (Bullish)<br>
                 • <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI −</strong> = Unwinding (Bearish)<br>
-                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)
+                • <strong>Net OI</strong> = Put Δ − Call Δ &nbsp;(Positive = Bullish, Negative = Bearish)<br>
+                • <strong>Bull % + Bear %</strong> = 100% &nbsp;(relative dominance of each side's OI change)
             </p>
         </div>
     </div>
@@ -777,8 +804,8 @@
                     <span class="card-ico">🟡</span>
                     <div class="lbl">PCR Ratio (OI)</div>
                 </div>
-                <span class="val">0.822</span>
-                <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:41.1%"></div></div>
+                <span class="val">0.816</span>
+                <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:40.8%"></div></div>
                 <div class="card-foot">
                     <div class="sub">Put/Call OI ratio</div>
                     <span class="tag tag-neu">Neutral</span>
@@ -802,7 +829,7 @@
                     <div class="lbl">Max Call OI</div>
                 </div>
                 <span class="val">₹26,000</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:54.9%"></div></div>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:55.1%"></div></div>
                 <div class="card-foot">
                     <div class="sub">CE wall</div>
                     <span class="tag tag-bear">Resistance</span>
@@ -814,7 +841,7 @@
                     <div class="lbl">Max Put OI</div>
                 </div>
                 <span class="val">₹25,500</span>
-                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:45.1%"></div></div>
+                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:44.9%"></div></div>
                 <div class="card-foot">
                     <div class="sub">PE floor</div>
                     <span class="tag tag-bull">Support</span>
@@ -882,21 +909,21 @@
                 <h3 style="color:#00bcd4;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📞 CALL OPTIONS (CE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹26,000</strong></td><td>226,741</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹13.30</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹25,800</strong></td><td>173,691</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹36.10</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹25,700</strong></td><td>141,954</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹63.20</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹25,900</strong></td><td>132,948</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹21.20</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,600</strong></td><td>126,018</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹106.90</td></tr>
+<tr><td><strong>1</strong></td><td><strong>₹26,000</strong></td><td>217,495</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹13.30</td></tr>
+<tr><td><strong>2</strong></td><td><strong>₹25,800</strong></td><td>165,418</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹36.10</td></tr>
+<tr><td><strong>3</strong></td><td><strong>₹25,700</strong></td><td>136,461</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹63.20</td></tr>
+<tr><td><strong>4</strong></td><td><strong>₹25,900</strong></td><td>126,988</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹21.20</td></tr>
+<tr><td><strong>5</strong></td><td><strong>₹25,600</strong></td><td>118,035</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>₹106.90</td></tr>
 </tbody></table></div>
             <div>
                 <h3 style="color:#f44336;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">📉 PUT OPTIONS (PE)</h3>
                 <table class="strikes-table">
                     <thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>₹25,500</strong></td><td>153,673</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹85.60</td></tr>
-<tr><td><strong>2</strong></td><td><strong>₹25,400</strong></td><td>131,746</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹59.70</td></tr>
-<tr><td><strong>3</strong></td><td><strong>₹25,600</strong></td><td>108,366</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹124.80</td></tr>
-<tr><td><strong>4</strong></td><td><strong>₹25,300</strong></td><td>93,136</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹43.10</td></tr>
-<tr><td><strong>5</strong></td><td><strong>₹25,200</strong></td><td>75,436</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹33.20</td></tr>
+<tr><td><strong>1</strong></td><td><strong>₹25,500</strong></td><td>140,922</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹85.60</td></tr>
+<tr><td><strong>2</strong></td><td><strong>₹25,400</strong></td><td>122,134</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹59.70</td></tr>
+<tr><td><strong>3</strong></td><td><strong>₹25,600</strong></td><td>98,538</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹124.80</td></tr>
+<tr><td><strong>4</strong></td><td><strong>₹25,300</strong></td><td>89,610</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹43.10</td></tr>
+<tr><td><strong>5</strong></td><td><strong>₹25,200</strong></td><td>73,996</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>₹33.20</td></tr>
 </tbody></table></div></div></div>
 
     <div class="section">
@@ -909,7 +936,7 @@
     </div>
     <div class="footer">
         <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
-        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · Navy Command OI · For Educational Purposes Only</p>
+        <p style="margin-top:6px;">© 2026 · Glassmorphism UI · Deep Ocean Theme · Navy Command OI · Dual Strength Meter · For Educational Purposes Only</p>
     </div>
 </div>
 </body>
