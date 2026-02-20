@@ -12,6 +12,7 @@ FIXES:
   7. [NEW] FII / DII 5-Day Sentiment section below Market Snapshot
   8. [NEW] Navy Command theme for Change in Open Interest section
   9. [NEW] DUAL Strength Meter — Bull Strength + Bear Strength shown simultaneously
+  10. [REMOVED] KEY TRADING LEVELS fire-row section (Entry Zone / Target / Stop Loss)
 """
 from curl_cffi import requests
 import pandas as pd
@@ -251,7 +252,7 @@ class NiftyHTMLAnalyzer:
         pcr_vol = total_pe_vol / total_ce_vol if total_ce_vol > 0 else 0
         total_ce_oi_change = int(df['CE_OI_Change'].sum())
         total_pe_oi_change = int(df['PE_OI_Change'].sum())
-        net_oi_change      = total_pe_oi_change - total_ce_oi_change
+        net_oi_change      = total_pe_oi_change + total_ce_oi_change
         if   total_ce_oi_change > 0 and total_pe_oi_change < 0:
             oi_direction, oi_signal, oi_icon, oi_class = "Strong Bearish",        "Call Build-up + Put Unwinding",   "🔴", "bearish"
         elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
@@ -628,37 +629,6 @@ class NiftyHTMLAnalyzer:
                     <span class="tag {tag_cls}">{badge_text}</span>
                 </div>
             </div>"""
-
-    # ─────────────────────────────────────────────
-    #  KEY LEVELS FIRE ROW
-    # ─────────────────────────────────────────────
-    def _key_levels_fire_row(self, d):
-        if d['stop_loss']:
-            sl_html = f"""
-                <div class="fire-col-label">STOP LOSS</div>
-                <div class="fire-col-value stop-price">₹{d['stop_loss']:,.0f}</div>
-                <div class="fire-rr">Risk {d['risk_points']} pts &nbsp;·&nbsp; R:R 1:{d['risk_reward_ratio']}</div>"""
-        else:
-            sl_html = """
-                <div class="fire-col-label">STOP LOSS</div>
-                <div class="fire-col-value stop-text">Use option premium<br>as max loss</div>"""
-        return f"""
-        <div class="fire-row">
-            <div class="fire-col">
-                <div class="fire-heading">📍 KEY<br>LEVELS</div>
-            </div>
-            <div class="fire-col">
-                <div class="fire-col-label">ENTRY ZONE</div>
-                <div class="fire-col-value">₹{d['entry_low']:,.0f}–₹{d['entry_high']:,.0f}</div>
-            </div>
-            <div class="fire-col">
-                <div class="fire-col-label">TARGET 1 / 2</div>
-                <div class="fire-col-value">₹{d['target_1']:,.0f} &nbsp;/&nbsp; ₹{d['target_2']:,.0f}</div>
-            </div>
-            <div class="fire-col">
-                {sl_html}
-            </div>
-        </div>"""
 
     # ─────────────────────────────────────────────
     #  FII / DII SECTION
@@ -1208,18 +1178,6 @@ class NiftyHTMLAnalyzer:
         .sb-footer{{padding:11px 16px;background:rgba(0,0,0,0.25);font-family:'JetBrains Mono',monospace;font-size:13px;color:#ffffff;font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}}
         .sb-footer .sf-lbl{{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;}}
         .sb-footer .sf-why{{font-size:13px;color:#ffffff;font-style:italic;font-family:'Rajdhani',sans-serif;font-weight:500;margin-left:auto;}}
-        /* ── FIRE ROW ── */
-        .fire-row{{background:rgba(12,6,0,0.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,140,0,0.25);border-left:4px solid #ff8c00;border-radius:10px;margin-top:18px;padding:18px 22px;display:grid;grid-template-columns:1.4fr 1.6fr 1.6fr 1.8fr;gap:0;align-items:center;box-shadow:0 0 28px rgba(255,140,0,0.08),inset 0 1px 0 rgba(255,140,0,0.08);transition:box-shadow 0.3s ease;}}
-        .fire-row:hover{{box-shadow:0 0 40px rgba(255,140,0,0.15),inset 0 1px 0 rgba(255,140,0,0.12);}}
-        .fire-col{{padding:4px 18px;border-right:1px solid rgba(255,140,0,0.12);}}
-        .fire-col:first-child{{padding-left:6px;}}
-        .fire-col:last-child{{border-right:none;}}
-        .fire-heading{{display:flex;align-items:center;gap:8px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;color:#ff8c00;letter-spacing:2.5px;text-transform:uppercase;line-height:1.4;}}
-        .fire-col-label{{font-size:9px;letter-spacing:2px;color:rgba(255,140,0,0.5);text-transform:uppercase;font-weight:700;margin-bottom:7px;font-family:'Rajdhani',sans-serif;}}
-        .fire-col-value{{font-family:'Oxanium',sans-serif;font-size:20px;font-weight:800;color:#ff8c00;letter-spacing:0.5px;line-height:1.2;}}
-        .fire-col-value.stop-text{{font-size:13px;font-weight:700;color:#ff8c00;line-height:1.5;opacity:0.85;}}
-        .fire-col-value.stop-price{{color:#f44336;font-size:20px;}}
-        .fire-rr{{margin-top:6px;font-size:10px;color:rgba(255,140,0,0.45);font-family:'JetBrains Mono',monospace;letter-spacing:1px;}}
         /* ── STRIKES TABLE ── */
         .strikes-table{{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}}
         .strikes-table th{{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;}}
@@ -1383,10 +1341,6 @@ class NiftyHTMLAnalyzer:
             .fii-kpi-grid{{grid-template-columns:1fr 1fr !important;}}
             .sb-body{{grid-template-columns:repeat(3,1fr);}}
             .sb-cell:nth-child(4),.sb-cell:nth-child(5){{border-top:1px solid rgba(79,195,247,0.06);}}
-            .fire-row{{grid-template-columns:1fr 1fr;gap:14px;padding:16px;}}
-            .fire-col{{border-right:none;padding:8px 12px;}}
-            .fire-col:nth-child(odd){{border-right:1px solid rgba(255,140,0,0.12);}}
-            .fire-col-value{{font-size:16px;}}
             .rl-lbl{{font-size:9px;}}
             .rl-val{{font-size:11px;}}
             .strikes-wrap{{grid-template-columns:1fr !important;}}
@@ -1426,11 +1380,6 @@ class NiftyHTMLAnalyzer:
             .sb-footer{{font-size:11px;flex-direction:column;gap:6px;}}
             .sb-footer .sf-why{{margin-left:0;}}
             .sb-signal{{font-size:12px;flex-wrap:wrap;gap:6px;}}
-            .fire-row{{grid-template-columns:1fr;gap:12px;padding:14px 12px;}}
-            .fire-col{{border-right:none !important;border-bottom:1px solid rgba(255,140,0,0.08);padding:8px 4px;}}
-            .fire-col:last-child{{border-bottom:none;}}
-            .fire-col-value{{font-size:15px;}}
-            .fire-heading{{font-size:10px;}}
             .direction-box{{padding:18px 14px;}}
             .direction-title{{font-size:20px;}}
             .direction-subtitle{{font-size:11px;}}
@@ -1464,7 +1413,6 @@ class NiftyHTMLAnalyzer:
             .section{{padding:12px 10px;}}
             .val{{font-size:17px;}}
             .sb-val{{font-size:12px;}}
-            .fire-col-value{{font-size:13px;}}
             .direction-title{{font-size:17px;}}
             .nc-dir-name{{font-size:17px;}}
             .nc-card-value{{font-size:22px;}}
@@ -1505,12 +1453,6 @@ class NiftyHTMLAnalyzer:
         html += self._key_levels_visual_section(d, _pct_cp, _pts_to_res, _pts_to_sup, _mp_node)
 
         html += f"""
-    <!-- ── KEY TRADING LEVELS ── -->
-    <div class="section">
-        <div class="section-title"><span>📍</span> KEY TRADING LEVELS</div>
-        {self._key_levels_fire_row(d)}
-    </div>
-
     <!-- ── FII / DII 5-DAY SENTIMENT ── -->
     {self._fiidii_section_html()}
 
