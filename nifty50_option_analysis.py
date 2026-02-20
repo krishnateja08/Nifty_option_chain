@@ -2,7 +2,8 @@
 NIFTY 50 COMPLETE ANALYSIS - DEEP OCEAN THEME
 CARD STYLE: Glassmorphism Frosted — Stat Card + Progress Bar (Layout 4)
 CHANGE IN OPEN INTEREST: Navy Command Theme (v3)
-FII/DII SECTION: Theme 3 · Pulse Flow  ← UPDATED (fully responsive)
+FII/DII SECTION: Theme 3 · Pulse Flow
+MARKET DIRECTION: Holographic Glass Widget (Compact)
 """
 from curl_cffi import requests
 import pandas as pd
@@ -541,10 +542,77 @@ class NiftyHTMLAnalyzer:
             </div>"""
 
     # ─────────────────────────────────────────────
+    #  MARKET DIRECTION — HOLOGRAPHIC GLASS WIDGET
+    # ─────────────────────────────────────────────
+    def _market_direction_widget_html(self):
+        d = self.html_data
+        bias       = d['bias']           # BULLISH / BEARISH / SIDEWAYS
+        confidence = d['confidence']     # HIGH / MEDIUM / LOW
+        bull_score = d['bullish_score']
+        bear_score = d['bearish_score']
+
+        # ── Direction text gradient ──
+        if bias == 'BULLISH':
+            dir_gradient = 'linear-gradient(135deg, #4ecdc4, #2ecc8a)'
+        elif bias == 'BEARISH':
+            dir_gradient = 'linear-gradient(135deg, #ff6b6b, #cc3333)'
+        else:  # SIDEWAYS
+            dir_gradient = 'linear-gradient(135deg, #ffcd3c, #f7931e)'
+
+        # ── Bull pill ──
+        bull_pill = (
+            f'<span class="md-pill md-pill-bull">BULL {bull_score}</span>'
+        )
+        # ── Bear pill ──
+        bear_pill = (
+            f'<span class="md-pill md-pill-bear">BEAR {bear_score}</span>'
+        )
+        # ── Confidence pill ──
+        if confidence == 'HIGH':
+            conf_cls = 'md-pill-conf-high'
+        elif confidence == 'MEDIUM':
+            conf_cls = 'md-pill-conf-med'
+        else:
+            conf_cls = 'md-pill-conf-low'
+        conf_pill = (
+            f'<span class="md-pill {conf_cls}">{confidence} CONFIDENCE</span>'
+        )
+
+        return f"""
+    <div class="section">
+        <div class="section-title"><span>&#129517;</span> MARKET DIRECTION (Algorithmic)</div>
+        <div class="md-widget">
+            <!-- rotating conic glow -->
+            <div class="md-glow"></div>
+            <!-- Row 1: label + bull/bear pills -->
+            <div class="md-row-top">
+                <div class="md-label">
+                    <div class="md-live-dot"></div>
+                    MARKET DIRECTION &nbsp;·&nbsp; ALGORITHMIC
+                </div>
+                <div class="md-pills-top">
+                    {bull_pill}
+                    {bear_pill}
+                </div>
+            </div>
+            <!-- Row 2: direction text + confidence pill -->
+            <div class="md-row-bottom">
+                <div class="md-direction" style="background:{dir_gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{bias}</div>
+                {conf_pill}
+            </div>
+        </div>
+        <div class="logic-box" style="margin-top:14px;"><p>
+            <strong>&#128202; Scoring Logic:</strong><br>
+            &bull; <strong>BULLISH</strong>: Diff &ge; +3 &middot; Price above SMAs, oversold RSI, +MACD, PCR &gt; 1.2<br>
+            &bull; <strong>BEARISH</strong>: Diff &le; &minus;3 &middot; Price below SMAs, overbought RSI, &minus;MACD, PCR &lt; 0.7<br>
+            &bull; <strong>SIDEWAYS</strong>: Diff &minus;2 to +2 &middot; Mixed signals, consolidation<br>
+            &bull; <strong>Confidence</strong>: HIGH when gap &ge; 4 | OI scope: ATM &plusmn;10 strikes only
+        </p></div>
+    </div>
+"""
+
+    # ─────────────────────────────────────────────
     #  FII / DII SECTION — THEME 3 · PULSE FLOW
-    #  5-day card layout: each card shows FII + DII
-    #  with inline gradient bars + net footer.
-    #  Responsive: 5col → 3col → 2col → 1col
     # ─────────────────────────────────────────────
     def _fiidii_section_html(self):
         data = self.html_data['fii_dii_data']
@@ -838,14 +906,13 @@ class NiftyHTMLAnalyzer:
                       f'<div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>'
                       f'<div class="rl-val" style="color:#ffb74d;">\u20b9{d["max_pain"]:,}</div></div>')
 
-        # ── full HTML ──────────────────────────────────────────────────
         html = f"""<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nifty 50 Daily Report</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <style>
         *{{margin:0;padding:0;box-sizing:border-box;}}
         body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:20px;color:#b0bec5;}}
@@ -884,14 +951,56 @@ class NiftyHTMLAnalyzer:
         .tag-neu{{background:rgba(255,183,77,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
         .tag-bull{{background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.35);}}
         .tag-bear{{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.35);}}
-        .direction-box{{padding:28px;border-radius:14px;text-align:center;margin:20px 0;border:2px solid #4fc3f7;background:rgba(79,195,247,0.06);backdrop-filter:blur(10px);}}
-        .direction-box.bullish{{background:linear-gradient(135deg,#00bcd4,#26c6da);border-color:#00bcd4;box-shadow:0 0 30px rgba(0,188,212,0.35);}}
-        .direction-box.bearish{{background:linear-gradient(135deg,#d32f2f,#f44336);border-color:#f44336;box-shadow:0 0 30px rgba(244,67,54,0.35);}}
-        .direction-box.sideways{{background:linear-gradient(135deg,#ffa726,#ffb74d);border-color:#ffb74d;box-shadow:0 0 30px rgba(255,183,77,0.35);}}
-        .direction-title{{font-family:'Oxanium',sans-serif;font-size:28px;font-weight:800;margin-bottom:8px;color:#fff;}}
-        .direction-box.bullish .direction-title,.direction-box.bearish .direction-title,.direction-box.sideways .direction-title{{color:#000;}}
-        .direction-subtitle{{font-size:13px;opacity:0.9;color:#e0f7fa;font-weight:600;}}
-        .direction-box.bullish .direction-subtitle,.direction-box.bearish .direction-subtitle,.direction-box.sideways .direction-subtitle{{color:#000;}}
+
+        /* ══ HOLOGRAPHIC GLASS MARKET DIRECTION WIDGET ══ */
+        .md-widget{{
+            position:relative;overflow:hidden;
+            background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));
+            border:1px solid rgba(255,255,255,0.1);
+            border-radius:16px;
+            padding:16px 20px;
+            backdrop-filter:blur(20px);
+            display:flex;flex-direction:column;gap:12px;
+        }}
+        .md-glow{{
+            position:absolute;top:-80%;left:-80%;
+            width:260%;height:260%;
+            background:conic-gradient(from 180deg,#ff6b35 0deg,#ffcd3c 120deg,#4ecdc4 240deg,#ff6b35 360deg);
+            opacity:0.05;
+            animation:md-rotate 8s linear infinite;
+            border-radius:50%;
+            pointer-events:none;
+        }}
+        @keyframes md-rotate{{to{{transform:rotate(360deg);}}}}
+        .md-row-top{{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}}
+        .md-label{{
+            display:flex;align-items:center;gap:7px;
+            font-family:'Space Mono',monospace;
+            font-size:8px;letter-spacing:3px;
+            color:rgba(255,255,255,0.3);text-transform:uppercase;
+        }}
+        .md-live-dot{{
+            width:6px;height:6px;border-radius:50%;
+            background:#4ecdc4;box-shadow:0 0 8px #4ecdc4;
+            animation:md-pulse 2s ease-in-out infinite;flex-shrink:0;
+        }}
+        @keyframes md-pulse{{50%{{opacity:0.25;}}}}
+        .md-pills-top{{display:flex;gap:8px;}}
+        .md-pill{{
+            font-family:'Space Mono',monospace;font-size:10px;font-weight:700;
+            padding:4px 14px;border-radius:20px;letter-spacing:1px;
+        }}
+        .md-pill-bull{{background:rgba(78,205,196,0.12);border:1px solid rgba(78,205,196,0.4);color:#4ecdc4;}}
+        .md-pill-bear{{background:rgba(255,100,100,0.12);border:1px solid rgba(255,100,100,0.4);color:#ff6b6b;}}
+        .md-pill-conf-high{{background:rgba(78,205,196,0.12);border:1px solid rgba(78,205,196,0.35);color:#4ecdc4;}}
+        .md-pill-conf-med{{background:rgba(255,205,60,0.12);border:1px solid rgba(255,205,60,0.35);color:#ffcd3c;}}
+        .md-pill-conf-low{{background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.35);color:#ff6b6b;}}
+        .md-row-bottom{{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}}
+        .md-direction{{
+            font-family:'Orbitron',monospace;font-weight:900;font-size:36px;
+            letter-spacing:3px;line-height:1;
+        }}
+
         .logic-box{{background:rgba(79,195,247,0.07);backdrop-filter:blur(8px);padding:16px 18px;border-radius:10px;margin-top:18px;border-left:4px solid #4fc3f7;}}
         .logic-box p{{font-size:13px;line-height:1.9;color:#80deea;}}
         .logic-box strong{{color:#4fc3f7;}}
@@ -1015,7 +1124,6 @@ class NiftyHTMLAnalyzer:
             .snap-grid{{grid-template-columns:1fr;}}.val{{font-size:20px;}}.sb-body{{grid-template-columns:1fr 1fr;}}
             .sb-cell{{border-right:none !important;border-bottom:1px solid rgba(79,195,247,0.06);}}.sb-cell:last-child{{border-bottom:none;}}
             .sb-footer{{font-size:11px;flex-direction:column;gap:6px;}}.sb-footer .sf-why{{margin-left:0;}}
-            .direction-box{{padding:18px 14px;}}.direction-title{{font-size:20px;}}
             .logic-box p{{font-size:11px;line-height:1.7;}}
             div[style*="grid-template-columns:1fr 1fr"]{{grid-template-columns:1fr !important;}}
             .strikes-wrap{{grid-template-columns:1fr !important;}}.strikes-table th,.strikes-table td{{padding:10px 8px;font-size:11px;}}
@@ -1025,6 +1133,9 @@ class NiftyHTMLAnalyzer:
             .pf-avg-sep{{display:none;}}
             .pf-avg-cell{{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;}}
             .pf-avg-eyebrow{{margin-bottom:0;}}.pf-avg-val{{font-size:20px;}}.pf-insight-text{{font-size:12px;}}.pf-date-range{{display:none;}}
+            /* MD widget mobile */
+            .md-direction{{font-size:24px;letter-spacing:1px;}}
+            .md-label{{font-size:7px;letter-spacing:2px;}}
             /* NC mobile */
             .nc-section-header{{flex-direction:column;align-items:flex-start;gap:10px;}}.nc-atm-badge{{align-self:flex-end;}}
             .nc-cards-grid{{grid-template-columns:1fr;}}.nc-dir-name{{font-size:20px;}}
@@ -1035,6 +1146,7 @@ class NiftyHTMLAnalyzer:
             .header h1{{font-size:15px;}}.sb-body{{grid-template-columns:1fr;}}.section{{padding:12px 10px;}}.val{{font-size:17px;}}
             .pf-grid{{grid-template-columns:1fr;}}.pf-block-val{{font-size:16px;}}
             .nc-dir-name{{font-size:17px;}}.nc-card-value{{font-size:22px;}}
+            .md-direction{{font-size:20px;}}
         }}
     </style>
 </head>
@@ -1057,21 +1169,9 @@ class NiftyHTMLAnalyzer:
             html += self._oi_navy_command_section(d)
         html += self._key_levels_visual_section(d,_pct_cp,_pts_to_res,_pts_to_sup,_mp_node)
         html += self._fiidii_section_html()
+        # ── NEW: Holographic Glass Market Direction Widget ──
+        html += self._market_direction_widget_html()
         html += f"""
-    <div class="section">
-        <div class="section-title"><span>&#129517;</span> MARKET DIRECTION (Algorithmic)</div>
-        <div class="direction-box {d['bias_class']}">
-            <div class="direction-title">{d['bias_icon']} {d['bias']}</div>
-            <div class="direction-subtitle">Confidence: {d['confidence']} &nbsp;|&nbsp; Bullish: {d['bullish_score']} vs Bearish: {d['bearish_score']}</div>
-        </div>
-        <div class="logic-box"><p>
-            <strong>&#128202; Scoring Logic:</strong><br>
-            \u2022 <strong>BULLISH</strong>: Diff \u2265 +3 \u00b7 Price above SMAs, oversold RSI, +MACD, PCR &gt; 1.2<br>
-            \u2022 <strong>BEARISH</strong>: Diff \u2264 \u22123 \u00b7 Price below SMAs, overbought RSI, \u2212MACD, PCR &lt; 0.7<br>
-            \u2022 <strong>SIDEWAYS</strong>: Diff \u22122 to +2 \u00b7 Mixed signals, consolidation<br>
-            \u2022 <strong>Confidence</strong>: HIGH when gap \u2265 4 | OI scope: ATM \u00b110 strikes only
-        </p></div>
-    </div>
     <div class="section">
         <div class="section-title"><span>&#128269;</span> TECHNICAL INDICATORS</div>
         <div class="card-grid grid-5">{tech_cards}</div>
@@ -1111,7 +1211,7 @@ class NiftyHTMLAnalyzer:
     </div>
     <div class="footer">
         <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
-        <p style="margin-top:6px;">\u00a9 2026 \u00b7 Glassmorphism UI \u00b7 Deep Ocean Theme \u00b7 Navy Command OI \u00b7 Pulse Flow FII/DII \u00b7 For Educational Purposes Only</p>
+        <p style="margin-top:6px;">\u00a9 2026 \u00b7 Glassmorphism UI \u00b7 Deep Ocean Theme \u00b7 Navy Command OI \u00b7 Pulse Flow FII/DII \u00b7 Holographic Glass Market Direction \u00b7 For Educational Purposes Only</p>
     </div>
 </div></body></html>"""
         return html
@@ -1175,10 +1275,10 @@ class NiftyHTMLAnalyzer:
 
     def save_html_to_file(self, filename='index.html'):
         try:
-            print(f"\n&#128196; Saving HTML to {filename}...")
+            print(f"\n📄 Saving HTML to {filename}...")
             with open(filename,'w',encoding='utf-8') as f:
                 f.write(self.generate_html_email())
-            print(f"   \u2705 Saved {filename}")
+            print(f"   ✅ Saved {filename}")
             metadata = {
                 'timestamp': self.html_data['timestamp'],
                 'current_price': float(self.html_data['current_price']),
@@ -1191,40 +1291,40 @@ class NiftyHTMLAnalyzer:
             }
             with open('latest_report.json','w') as f:
                 json.dump(metadata,f,indent=2)
-            print("   \u2705 Saved latest_report.json")
+            print("   ✅ Saved latest_report.json")
             return True
         except Exception as e:
-            print(f"\n\u274c Save failed: {e}"); return False
+            print(f"\n❌ Save failed: {e}"); return False
 
     def send_html_email_report(self):
         gmail_user=os.getenv('GMAIL_USER'); gmail_password=os.getenv('GMAIL_APP_PASSWORD')
         recipient1=os.getenv('RECIPIENT_EMAIL_1'); recipient2=os.getenv('RECIPIENT_EMAIL_2')
         if not all([gmail_user,gmail_password,recipient1,recipient2]):
-            print("\n\u26a0\ufe0f  Email credentials not set. Skipping."); return False
+            print("\n⚠️  Email credentials not set. Skipping."); return False
         try:
             ist_now=datetime.now(pytz.timezone('Asia/Kolkata'))
             msg=MIMEMultipart('alternative')
             msg['From']=gmail_user; msg['To']=f"{recipient1}, {recipient2}"
-            msg['Subject']=f"\U0001f4ca Nifty 50 OI & Technical Report \u2014 {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
+            msg['Subject']=f"📊 Nifty 50 OI & Technical Report — {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
             msg.attach(MIMEText(self.generate_html_email(),'html'))
             with smtplib.SMTP_SSL('smtp.gmail.com',465) as server:
                 server.login(gmail_user,gmail_password); server.send_message(msg)
-            print("   \u2705 Email sent!"); return True
+            print("   ✅ Email sent!"); return True
         except Exception as e:
-            print(f"\n\u274c Email failed: {e}"); return False
+            print(f"\n❌ Email failed: {e}"); return False
 
     def generate_full_report(self):
         ist_now=datetime.now(pytz.timezone('Asia/Kolkata'))
         print("="*70)
-        print("NIFTY 50 DAILY REPORT \u2014 GLASSMORPHISM UI \u00b7 NAVY COMMAND OI \u00b7 PULSE FLOW FII/DII")
+        print("NIFTY 50 DAILY REPORT — GLASSMORPHISM UI · NAVY COMMAND OI · PULSE FLOW FII/DII · HOLOGRAPHIC MARKET DIRECTION")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("="*70)
         oc_data=self.fetch_nse_option_chain_silent()
         option_analysis=self.analyze_option_chain_data(oc_data) if oc_data else None
         if option_analysis:
-            print(f"\u2705 Option data | Expiry: {option_analysis['expiry']} | Spot: {option_analysis['underlying_value']}")
+            print(f"✅ Option data | Expiry: {option_analysis['expiry']} | Spot: {option_analysis['underlying_value']}")
         else:
-            print("\u26a0\ufe0f  No option data \u2014 technical-only mode")
+            print("⚠️  No option data — technical-only mode")
         print("\nFetching technical data...")
         technical=self.get_technical_data()
         self.generate_analysis_data(technical,option_analysis)
@@ -1233,7 +1333,7 @@ class NiftyHTMLAnalyzer:
 
 def main():
     try:
-        print("\n\U0001f680 Starting Nifty 50 Analysis...\n")
+        print("\n🚀 Starting Nifty 50 Analysis...\n")
         analyzer=NiftyHTMLAnalyzer()
         analyzer.generate_full_report()
         print("\n"+"="*70)
@@ -1241,10 +1341,10 @@ def main():
         if save_ok:
             analyzer.send_html_email_report()
         else:
-            print("\n\u26a0\ufe0f  Skipping email due to save failure")
-        print("\n\u2705 Done! Open index.html in your browser.\n")
+            print("\n⚠️  Skipping email due to save failure")
+        print("\n✅ Done! Open index.html in your browser.\n")
     except Exception as e:
-        print(f"\n\u274c Critical Error: {e}")
+        print(f"\n❌ Critical Error: {e}")
         import traceback; traceback.print_exc()
 
 
