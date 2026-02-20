@@ -30,17 +30,74 @@ import pytz
 warnings.filterwarnings('ignore')
 
 # ─────────────────────────────────────────────
-#  FII / DII HELPER
+#  FII / DII HELPER  — live NSE fetch + fallback
 # ─────────────────────────────────────────────
 def fetch_fii_dii_data():
-    hardcoded = [
-        {'date': 'Feb 11', 'day': 'Tue', 'fii': -1540.20, 'dii': 2103.50},
-        {'date': 'Feb 12', 'day': 'Wed', 'fii':   823.60, 'dii':  891.40},
-        {'date': 'Feb 13', 'day': 'Thu', 'fii':  -411.80, 'dii': 1478.30},
-        {'date': 'Feb 14', 'day': 'Fri', 'fii':    69.45, 'dii': 1174.21},
-        {'date': 'Feb 17', 'day': 'Mon', 'fii':  -972.13, 'dii': 1666.98},
+    """
+    Fetch last 5 trading days of FII / DII cash-market data from NSE.
+    Endpoint: /api/fiidiiTradeReact
+    Falls back to hardcoded data if fetch fails.
+    """
+    try:
+        import requests as _req
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+            "Referer": "https://www.nseindia.com/",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9",
+        }
+        s = _req.Session()
+        s.get("https://www.nseindia.com/", headers=headers, timeout=12)
+        time.sleep(1)
+        resp = s.get(
+            "https://www.nseindia.com/api/fiidiiTradeReact",
+            headers=headers, timeout=15
+        )
+        if resp.status_code == 200:
+            raw = resp.json()
+            # NSE returns newest-first; keep last 5 trading days, reverse to oldest-first
+            days = []
+            for row in raw[:5]:
+                try:
+                    # NSE keys: date, buyValue, sellValue for FII & DII sections
+                    dt_str = row.get("date", "")
+                    dt_obj = datetime.strptime(dt_str, "%d-%b-%Y")
+                    fii_buy  = float(row.get("fiiBuyValue",  0) or 0)
+                    fii_sell = float(row.get("fiiSellValue", 0) or 0)
+                    dii_buy  = float(row.get("diiBuyValue",  0) or 0)
+                    dii_sell = float(row.get("diiSellValue", 0) or 0)
+                    fii_net  = fii_buy - fii_sell
+                    dii_net  = dii_buy - dii_sell
+                    days.append({
+                        'date': dt_obj.strftime("%b %d"),
+                        'day':  dt_obj.strftime("%a"),
+                        'fii':  round(fii_net, 2),
+                        'dii':  round(dii_net, 2),
+                    })
+                except Exception:
+                    continue
+            if len(days) >= 3:
+                days.reverse()          # oldest → newest
+                print(f"  ✅ FII/DII live data fetched: {days[0]['date']} → {days[-1]['date']}")
+                return days
+        print(f"  ⚠️  FII/DII fetch HTTP {resp.status_code} — using fallback")
+    except Exception as e:
+        print(f"  ⚠️  FII/DII live fetch failed ({e}) — using fallback")
+
+    # ── Fallback: last known hardcoded values ────────────────────────
+    ist_now = datetime.now(pytz.timezone("Asia/Kolkata"))
+    print(f"  📌 Using hardcoded FII/DII fallback data")
+    return [
+        {"date": "Feb 11", "day": "Tue", "fii": -1540.20, "dii": 2103.50},
+        {"date": "Feb 12", "day": "Wed", "fii":   823.60, "dii":  891.40},
+        {"date": "Feb 13", "day": "Thu", "fii":  -411.80, "dii": 1478.30},
+        {"date": "Feb 14", "day": "Fri", "fii":    69.45, "dii": 1174.21},
+        {"date": "Feb 17", "day": "Mon", "fii":  -972.13, "dii": 1666.98},
     ]
-    return hardcoded
 
 
 def compute_fii_dii_summary(data):
@@ -633,65 +690,121 @@ class NiftyHTMLAnalyzer:
     # ─────────────────────────────────────────────
     #  FII / DII SECTION
     # ─────────────────────────────────────────────
+    # ─────────────────────────────────────────────
+    #  FII / DII SECTION  — 5-Day Bar Chart Widget
+    # ─────────────────────────────────────────────
     def _fiidii_section_html(self):
-        data  = self.html_data['fii_dii_data']
-        summ  = self.html_data['fii_dii_summ']
+        data = self.html_data['fii_dii_data']
+        summ = self.html_data['fii_dii_summ']
+
         badge_map = {
-            'fii-bull':  ('#00e676', 'rgba(0,230,118,0.12)',  'rgba(0,230,118,0.3)'),
+            'fii-bull':  ('#00e676', 'rgba(0,230,118,0.12)',   'rgba(0,230,118,0.3)'),
             'fii-cbull': ('#69f0ae', 'rgba(105,240,174,0.10)', 'rgba(105,240,174,0.28)'),
             'fii-neu':   ('#ffd740', 'rgba(255,215,64,0.10)',  'rgba(255,215,64,0.28)'),
             'fii-bear':  ('#ff5252', 'rgba(255,82,82,0.10)',   'rgba(255,82,82,0.28)'),
         }
         s_color, s_bg, s_border = badge_map.get(summ['badge_cls'], badge_map['fii-neu'])
 
-        def kpi(label, value, color):
-            sign = '+' if value >= 0 else ''
-            return f"""
-                <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);
-                            border-radius:14px;padding:16px 14px;text-align:center;">
-                    <div style="font-size:9px;letter-spacing:2.5px;color:rgba(128,222,234,0.55);
-                                text-transform:uppercase;margin-bottom:8px;">{label}</div>
-                    <div style="font-family:'Oxanium',sans-serif;font-size:22px;font-weight:700;
-                                color:{color};">{sign}{value:.0f}</div>
-                    <div style="font-size:9px;color:#37474f;margin-top:3px;">₹ Cr / day</div>
-                </div>"""
+        all_vals = [abs(r['fii']) for r in data] + [abs(r['dii']) for r in data]
+        max_val  = max(all_vals) if all_vals else 1
 
-        fii_col = '#00e676' if summ['fii_avg'] >= 0 else '#ff5252'
-        dii_col = '#40c4ff' if summ['dii_avg'] >= 0 else '#ff5252'
-        net_col = '#b388ff' if summ['net_avg'] >= 0 else '#ff5252'
-        kpi_html = (kpi('FII 5D Avg', summ['fii_avg'], fii_col) +
-                    kpi('DII 5D Avg', summ['dii_avg'], dii_col) +
-                    kpi('Net Flow',   summ['net_avg'], net_col))
-        date_range = f"{data[0]['date']} – {data[-1]['date']}, 2026"
+        def bar_pair(row):
+            fii_v  = row['fii']
+            dii_v  = row['dii']
+            fp     = round(abs(fii_v) / max_val * 100)
+            dp     = round(abs(dii_v) / max_val * 100)
+            fc     = '#00e676' if fii_v >= 0 else '#ff5252'
+            dc     = '#40c4ff' if dii_v >= 0 else '#ef4444'
+            fs     = '+' if fii_v >= 0 else ''
+            ds     = '+' if dii_v >= 0 else ''
+            html   = '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;">'
+            html  += '<div style="font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(176,190,197,0.55);text-transform:uppercase;">' + row['date'] + '</div>'
+            html  += '<div style="font-size:8px;color:rgba(128,222,234,0.3);">' + row['day'] + '</div>'
+            # FII bar
+            html  += '<div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;">'
+            html  += '<div style="font-size:10px;font-weight:700;color:' + fc + ';">' + fs + f'{fii_v:,.0f}' + '</div>'
+            html  += '<div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);">'
+            html  += '<div style="width:100%;height:' + str(fp) + '%;background:linear-gradient(180deg,' + fc + 'cc,' + fc + '44);border-radius:3px;box-shadow:0 0 8px ' + fc + '44;"></div>'
+            html  += '</div>'
+            html  += '<div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#00e5ff;">FII</div>'
+            html  += '</div>'
+            # DII bar
+            html  += '<div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;">'
+            html  += '<div style="font-size:10px;font-weight:700;color:' + dc + ';">' + ds + f'{dii_v:,.0f}' + '</div>'
+            html  += '<div style="width:32px;height:90px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:flex-end;overflow:hidden;border:1px solid rgba(255,255,255,0.05);">'
+            html  += '<div style="width:100%;height:' + str(dp) + '%;background:linear-gradient(180deg,' + dc + 'cc,' + dc + '44);border-radius:3px;box-shadow:0 0 8px ' + dc + '44;"></div>'
+            html  += '</div>'
+            html  += '<div style="font-size:8px;font-weight:700;letter-spacing:1px;color:#ffb74d;">DII</div>'
+            html  += '</div>'
+            html  += '</div>'
+            return html
 
-        return f"""
-    <div class="section">
-        <div class="section-title"><span>🏦</span> FII / DII INSTITUTIONAL FLOW
-            <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">5-Day Average</span>
-        </div>
-        <div class="fii-kpi-grid" style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:12px;
-                    align-items:stretch;margin-bottom:18px;">
-            <div style="background:{s_bg};border:1px solid {s_border};border-radius:14px;
-                        padding:18px 20px;display:flex;flex-direction:column;
-                        align-items:center;justify-content:center;min-width:130px;">
-                <div style="font-size:28px;margin-bottom:6px;">{summ['emoji']}</div>
-                <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;
-                            color:{s_color};text-align:center;line-height:1.4;">{summ['label']}</div>
-                <div style="font-size:8px;color:rgba(176,190,197,0.4);
-                            margin-top:5px;letter-spacing:1px;">{date_range}</div>
-            </div>
-            {kpi_html}
-        </div>
-        <div style="background:{s_bg};border:1px solid {s_border};
-                    border-radius:10px;padding:14px 16px;">
-            <div style="font-size:9px;color:{s_color};letter-spacing:2px;
-                        font-weight:700;margin-bottom:6px;">5-DAY INSIGHT</div>
-            <div style="font-size:13px;color:#cfd8dc;line-height:1.8;font-weight:500;">{summ['insight']}</div>
-        </div>
-    </div>
-"""
+        bars_html  = ''.join(bar_pair(r) for r in data)
+        ncols      = len(data)
 
-    # ─────────────────────────────────────────────
+        fii_avg    = summ['fii_avg']
+        dii_avg    = summ['dii_avg']
+        net_avg    = summ['net_avg']
+        fii_sign   = '+' if fii_avg >= 0 else ''
+        dii_sign   = '+' if dii_avg >= 0 else ''
+        net_sign   = '+' if net_avg >= 0 else ''
+        fii_col    = '#00e676' if fii_avg >= 0 else '#ff5252'
+        dii_col    = '#40c4ff' if dii_avg >= 0 else '#ef4444'
+        net_col    = '#b388ff' if net_avg >= 0 else '#ff5252'
+        date_range = data[0]['date'] + ' – ' + data[-1]['date']
+
+        out  = '<div class="section">'
+        out += '<div class="section-title"><span>🏦</span> FII / DII INSTITUTIONAL FLOW'
+        out += '<span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">Last 5 Trading Days &nbsp;·&nbsp; ' + date_range + '</span></div>'
+
+        # Chart box
+        out += '<div style="background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.1);border-radius:14px;padding:20px 18px 14px;margin-bottom:16px;">'
+        # Legend
+        out += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">'
+        out += '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">'
+        out += '<div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:#00e5ff;"></div><span style="font-size:11px;color:#80deea;font-weight:600;">FII (&#8377; Cr)</span></div>'
+        out += '<div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:50%;background:#ffb74d;"></div><span style="font-size:11px;color:#80deea;font-weight:600;">DII (&#8377; Cr)</span></div>'
+        out += '<div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:3px;background:#00e676;"></div><span style="font-size:10px;color:rgba(128,222,234,0.5);">Positive</span></div>'
+        out += '<div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;border-radius:3px;background:#ff5252;"></div><span style="font-size:10px;color:rgba(128,222,234,0.5);">Negative</span></div>'
+        out += '</div>'
+        out += '<div style="font-size:10px;color:rgba(128,222,234,0.3);font-family:\'JetBrains Mono\',monospace;">Bar height = relative magnitude</div>'
+        out += '</div>'
+        # Bars grid
+        out += '<div style="display:grid;grid-template-columns:repeat(' + str(ncols) + ',1fr);gap:8px;align-items:end;justify-items:center;">'
+        out += bars_html
+        out += '</div>'
+        out += '</div>'  # end chart box
+
+        # Avg summary row
+        out += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">'
+        out += '<div style="background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.15);border-radius:10px;padding:12px 14px;text-align:center;">'
+        out += '<div style="font-size:8px;letter-spacing:2px;color:rgba(0,229,255,0.45);text-transform:uppercase;margin-bottom:4px;">FII 5D Avg</div>'
+        out += '<div style="font-family:\'Oxanium\',sans-serif;font-size:20px;font-weight:700;color:' + fii_col + ';">' + fii_sign + f'{fii_avg:,.0f}' + '</div>'
+        out += '<div style="font-size:9px;color:#37474f;margin-top:2px;">&#8377; Cr / day</div></div>'
+        out += '<div style="background:rgba(64,196,255,0.06);border:1px solid rgba(64,196,255,0.15);border-radius:10px;padding:12px 14px;text-align:center;">'
+        out += '<div style="font-size:8px;letter-spacing:2px;color:rgba(0,229,255,0.45);text-transform:uppercase;margin-bottom:4px;">DII 5D Avg</div>'
+        out += '<div style="font-family:\'Oxanium\',sans-serif;font-size:20px;font-weight:700;color:' + dii_col + ';">' + dii_sign + f'{dii_avg:,.0f}' + '</div>'
+        out += '<div style="font-size:9px;color:#37474f;margin-top:2px;">&#8377; Cr / day</div></div>'
+        out += '<div style="background:rgba(179,136,255,0.06);border:1px solid rgba(179,136,255,0.15);border-radius:10px;padding:12px 14px;text-align:center;">'
+        out += '<div style="font-size:8px;letter-spacing:2px;color:rgba(0,229,255,0.45);text-transform:uppercase;margin-bottom:4px;">Net Combined</div>'
+        out += '<div style="font-family:\'Oxanium\',sans-serif;font-size:20px;font-weight:700;color:' + net_col + ';">' + net_sign + f'{net_avg:,.0f}' + '</div>'
+        out += '<div style="font-size:9px;color:#37474f;margin-top:2px;">&#8377; Cr / day</div></div>'
+        out += '</div>'
+
+        # Insight + direction badge
+        dir_badge = '<span style="display:inline-block;margin-left:8px;padding:2px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1px;background:' + s_bg + ';color:' + s_color + ';border:1px solid ' + s_border + ';">' + summ['emoji'] + ' ' + summ['label'] + '</span>'
+        out += '<div style="background:' + s_bg + ';border:1px solid ' + s_border + ';border-radius:10px;padding:14px 16px;">'
+        out += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">'
+        out += '<div style="font-size:9px;color:' + s_color + ';letter-spacing:2px;font-weight:700;">&#128202; 5-DAY INSIGHT &amp; DIRECTION</div>'
+        out += dir_badge
+        out += '</div>'
+        out += '<div style="font-size:13px;color:#cfd8dc;line-height:1.85;font-weight:500;">' + summ['insight'] + '</div>'
+        out += '</div>'
+        out += '</div>\n'
+        return out
+
+
+        # ─────────────────────────────────────────────
     #  ★ NAVY COMMAND — CHANGE IN OI SECTION ★
     #  [UPDATED] Dual Bull + Bear Strength Meters
     # ─────────────────────────────────────────────
