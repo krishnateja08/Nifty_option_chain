@@ -601,13 +601,15 @@ class NiftyHTMLAnalyzer:
                 {conf_pill}
             </div>
         </div>
-        <div class="logic-box" style="margin-top:14px;"><p>
-            <strong>&#128202; Scoring Logic:</strong><br>
-            &bull; <strong>BULLISH</strong>: Diff &ge; +3 &middot; Price above SMAs, oversold RSI, +MACD, PCR &gt; 1.2<br>
-            &bull; <strong>BEARISH</strong>: Diff &le; &minus;3 &middot; Price below SMAs, overbought RSI, &minus;MACD, PCR &lt; 0.7<br>
-            &bull; <strong>SIDEWAYS</strong>: Diff &minus;2 to +2 &middot; Mixed signals, consolidation<br>
-            &bull; <strong>Confidence</strong>: HIGH when gap &ge; 4 | OI scope: ATM &plusmn;10 strikes only
-        </p></div>
+        <div class="logic-box" style="margin-top:14px;">
+            <div class="logic-box-head">&#128202; SCORING LOGIC</div>
+            <div class="logic-grid">
+                <div class="logic-item"><span class="lc-bull">BULLISH</span><span class="lv">Diff &ge; +3</span> &middot; Above SMAs, oversold RSI, +MACD, PCR &gt; 1.2</div>
+                <div class="logic-item"><span class="lc-bear">BEARISH</span><span class="lv">Diff &le; &minus;3</span> &middot; Below SMAs, overbought RSI, &minus;MACD, PCR &lt; 0.7</div>
+                <div class="logic-item"><span class="lc-side">SIDEWAYS</span><span class="lv">Diff &minus;2 to +2</span> &middot; Mixed signals, consolidation</div>
+                <div class="logic-item"><span class="lc-info">CONFIDENCE</span> HIGH when gap &ge; 4 &nbsp;&middot;&nbsp; OI scope: ATM &plusmn;10 only</div>
+            </div>
+        </div>
     </div>
 """
 
@@ -817,11 +819,13 @@ class NiftyHTMLAnalyzer:
             '    </div>\n'
             f'    <div class="nc-cards-grid">{cards_html}</div>\n'
             '    <div class="logic-box" style="margin-top:16px;">\n'
-            '        <p><strong>\U0001f4d6 How to Read:</strong><br>\n'
-            '        \u2022 <strong>Call OI +</strong> = Writers selling calls (Bearish) &nbsp;|&nbsp; <strong>Call OI \u2212</strong> = Unwinding (Bullish)<br>\n'
-            '        \u2022 <strong>Put OI +</strong>  = Writers selling puts (Bullish) &nbsp;|&nbsp; <strong>Put OI \u2212</strong> = Unwinding (Bearish)<br>\n'
-            '        \u2022 <strong>Net OI</strong> = Put \u0394 \u2212 Call \u0394 &nbsp;(Positive = Bullish, Negative = Bearish)<br>\n'
-            '        \u2022 <strong>Bull % + Bear %</strong> = 100% &nbsp;(relative dominance)</p>\n'
+            '        <div class="logic-box-head">\U0001f4d6 HOW TO READ</div>\n'
+            '        <div class="logic-grid">\n'
+            '            <div class="logic-item"><span class="lc-info">Call OI +</span> Writers selling calls <span class="lc-bear">Bearish</span>&nbsp;&nbsp;<span class="lc-info">Call OI \u2212</span> Unwinding <span class="lc-bull">Bullish</span></div>\n'
+            '            <div class="logic-item"><span class="lc-info">Put OI +</span> Writers selling puts <span class="lc-bull">Bullish</span>&nbsp;&nbsp;<span class="lc-info">Put OI \u2212</span> Unwinding <span class="lc-bear">Bearish</span></div>\n'
+            '            <div class="logic-item"><span class="lc-info">Net OI</span> = Put \u0394 \u2212 Call \u0394 &nbsp;\u00b7&nbsp; <span class="lc-bull">Positive = Bullish</span> &nbsp;<span class="lc-bear">Negative = Bearish</span></div>\n'
+            '            <div class="logic-item"><span class="lc-info">Bull % + Bear %</span> = 100% &nbsp;\u00b7&nbsp; relative dominance</div>\n'
+            '        </div>\n'
             '    </div>\n'
             '</div>\n'
         )
@@ -1001,9 +1005,15 @@ class NiftyHTMLAnalyzer:
             letter-spacing:3px;line-height:1;
         }}
 
-        .logic-box{{background:rgba(79,195,247,0.07);backdrop-filter:blur(8px);padding:16px 18px;border-radius:10px;margin-top:18px;border-left:4px solid #4fc3f7;}}
-        .logic-box p{{font-size:13px;line-height:1.9;color:#80deea;}}
-        .logic-box strong{{color:#4fc3f7;}}
+        .logic-box{{background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.14);border-left:3px solid #4fc3f7;border-radius:10px;padding:10px 16px;margin-top:12px;}}
+        .logic-box-head{{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;color:#4fc3f7;letter-spacing:2px;margin-bottom:7px;}}
+        .logic-grid{{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;}}
+        .logic-item{{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(176,190,197,0.6);flex-wrap:wrap;}}
+        .logic-item .lv{{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(176,190,197,0.4);}}
+        .lc-bull{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.28);}}
+        .lc-bear{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(255,82,82,0.1);color:#ff5252;border:1px solid rgba(255,82,82,0.28);}}
+        .lc-side{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.28);}}
+        .lc-info{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(79,195,247,0.08);color:#4fc3f7;border:1px solid rgba(79,195,247,0.22);}}
         .rl-node-a{{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}}
         .rl-node-b{{position:absolute;top:0;transform:translateX(-50%);text-align:center;}}
         .rl-dot{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}}
@@ -1122,6 +1132,7 @@ class NiftyHTMLAnalyzer:
             body{{padding:8px;}}.container{{border-radius:12px;}}.header{{padding:20px 14px;}}.header h1{{font-size:18px;}}.header p{{font-size:11px;}}
             .section{{padding:16px 12px;}}.section-title{{font-size:11px;letter-spacing:1.5px;gap:6px;}}.grid-5,.grid-4{{grid-template-columns:1fr;}}
             .snap-grid{{grid-template-columns:1fr;}}.val{{font-size:20px;}}.sb-body{{grid-template-columns:1fr 1fr;}}
+            .logic-grid{{grid-template-columns:1fr;}}
             .sb-cell{{border-right:none !important;border-bottom:1px solid rgba(79,195,247,0.06);}}.sb-cell:last-child{{border-bottom:none;}}
             .sb-footer{{font-size:11px;flex-direction:column;gap:6px;}}.sb-footer .sf-why{{margin-left:0;}}
             .logic-box p{{font-size:11px;line-height:1.7;}}
