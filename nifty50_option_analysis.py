@@ -4,9 +4,11 @@ CARD STYLE: Glassmorphism Frosted — Stat Card + Progress Bar (Layout 4)
 CHANGE IN OPEN INTEREST: Navy Command Theme (v3)
 FII/DII SECTION: Theme 3 · Pulse Flow
 MARKET DIRECTION: Holographic Glass Widget (Compact)
+KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
 """
 from curl_cffi import requests
 import pandas as pd
+import numpy as np
 import time
 from datetime import datetime, timedelta, date
 import calendar
@@ -330,7 +332,9 @@ class NiftyHTMLAnalyzer:
         try:
             print("Calculating technical indicators...")
             nifty = yf.Ticker(self.yf_symbol)
-            df    = nifty.history(period="1y")
+
+            # ── Daily data: SMAs, RSI, MACD (unchanged) ──
+            df = nifty.history(period="1y")
             if df.empty: print("Warning: Failed to fetch historical data"); return None
             df['SMA_20']  = df['Close'].rolling(20).mean()
             df['SMA_50']  = df['Close'].rolling(50).mean()
@@ -343,12 +347,53 @@ class NiftyHTMLAnalyzer:
             df['EMA_26'] = df['Close'].ewm(span=26, adjust=False).mean()
             df['MACD']   = df['EMA_12'] - df['EMA_26']
             df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
-            latest = df.iloc[-1]; recent = df.tail(60)
+            latest = df.iloc[-1]
+            current_price = latest['Close']
+
+            # ── 1H data: Support & Resistance for Key Levels ──
+            print("  Fetching 1H candles for Key Levels...")
+            df_1h = nifty.history(interval="1h", period="60d")
+            s1 = s2 = r1 = r2 = None
+            if not df_1h.empty:
+                recent_1h = df_1h.tail(120)   # ~17 trading days @ 7 candles/day
+                highs = sorted(recent_1h['High'].values)
+                lows  = sorted(recent_1h['Low'].values)
+                res_c = [h for h in highs if current_price < h <= current_price + 200]
+                sup_c = [l for l in lows  if current_price - 200 <= l < current_price]
+                if len(res_c) >= 4:
+                    r1 = round(float(np.percentile(res_c, 40)) / 25) * 25  # near resistance
+                    r2 = round(float(np.percentile(res_c, 80)) / 25) * 25  # strong resistance
+                if len(sup_c) >= 4:
+                    s1 = round(float(np.percentile(sup_c, 70)) / 25) * 25  # near support
+                    s2 = round(float(np.percentile(sup_c, 20)) / 25) * 25  # deep support
+                # Safety checks — prevent overlap with current price
+                if r1 and r1 <= current_price: r1 = round((current_price + 50) / 25) * 25
+                if r2 and r1 and r2 <= r1:     r2 = r1 + 75
+                if s1 and s1 >= current_price: s1 = round((current_price - 50) / 25) * 25
+                if s2 and s1 and s2 >= s1:     s2 = s1 - 75
+                print(f"  ✓ 1H Levels | S2={s2} S1={s1} | Price={current_price:.0f} | R1={r1} R2={r2}")
+            else:
+                print("  ⚠️  1H data unavailable — falling back to daily levels")
+
+            # ── Fallback to daily if 1H failed ──
+            recent_d = df.tail(60)
+            resistance = r1 if r1 else recent_d['High'].quantile(0.90)
+            support    = s1 if s1 else recent_d['Low'].quantile(0.10)
+            strong_resistance = r2 if r2 else resistance + 100
+            strong_support    = s2 if s2 else support - 100
+
             technical = {
-                'current_price': latest['Close'], 'sma_20': latest['SMA_20'],
-                'sma_50': latest['SMA_50'], 'sma_200': latest['SMA_200'],
-                'rsi': latest['RSI'], 'macd': latest['MACD'], 'signal': latest['Signal'],
-                'resistance': recent['High'].quantile(0.90), 'support': recent['Low'].quantile(0.10),
+                'current_price':    current_price,
+                'sma_20':           latest['SMA_20'],
+                'sma_50':           latest['SMA_50'],
+                'sma_200':          latest['SMA_200'],
+                'rsi':              latest['RSI'],
+                'macd':             latest['MACD'],
+                'signal':           latest['Signal'],
+                'resistance':       resistance,
+                'support':          support,
+                'strong_resistance':strong_resistance,
+                'strong_support':   strong_support,
             }
             print(f"✓ Technical | Price: {technical['current_price']:.2f} | RSI: {technical['rsi']:.1f}")
             return technical
@@ -509,7 +554,7 @@ class NiftyHTMLAnalyzer:
             'oi_icon': option_analysis['oi_icon'] if option_analysis else '🟡',
             'oi_class': option_analysis['oi_class'] if option_analysis else 'neutral',
             'support': support, 'resistance': resistance,
-            'strong_support': support-100, 'strong_resistance': resistance+100,
+            'strong_support': technical['strong_support'], 'strong_resistance': technical['strong_resistance'],
             'strategy_type': bias, 'entry_low': entry_low, 'entry_high': entry_high,
             'target_1': target_1, 'target_2': target_2, 'stop_loss': stop_loss,
             'risk_points': int(risk_points), 'reward_points': int(reward_points),
