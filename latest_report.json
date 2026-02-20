@@ -1,10 +1,10 @@
 {
-  "timestamp": "20-Feb-2026 14:37 IST",
-  "current_price": 25612.75,
+  "timestamp": "20-Feb-2026 14:42 IST",
+  "current_price": 25610.599609375,
   "bias": "SIDEWAYS",
   "confidence": "MEDIUM",
-  "rsi": 60.544997914308325,
-  "pcr": 0.851,
+  "rsi": 60.510843191614164,
+  "pcr": 0.835,
   "stop_loss": null,
   "risk_reward_ratio": 0
 }
