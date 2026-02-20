@@ -701,13 +701,27 @@ class NiftyHTMLAnalyzer:
         signal    = d['oi_signal']
 
         # ── Compute BOTH bull and bear strength percentages ──────────────────
-        total_abs = abs(d['total_ce_oi_change']) + abs(d['total_pe_oi_change'])
-        if total_abs > 0:
-            bull_pct = round(abs(d['total_pe_oi_change']) / total_abs * 100)
-            bear_pct = round(abs(d['total_ce_oi_change']) / total_abs * 100)
-            # Ensure they sum to exactly 100 (handle rounding)
-            if bull_pct + bear_pct != 100:
-                bear_pct = 100 - bull_pct
+        # Classify each side by its SIGNAL direction, not raw magnitude:
+        #   CE < 0 = Call Unwinding  → BULLISH force
+        #   CE > 0 = Call Build-up   → BEARISH force
+        #   PE > 0 = Put Build-up    → BULLISH force
+        #   PE < 0 = Put Unwinding   → BEARISH force
+        ce_raw = d['total_ce_oi_change']
+        pe_raw = d['total_pe_oi_change']
+        bull_force = 0
+        bear_force = 0
+        if ce_raw < 0:
+            bull_force += abs(ce_raw)   # Call unwinding → bullish
+        else:
+            bear_force += abs(ce_raw)   # Call build-up  → bearish
+        if pe_raw > 0:
+            bull_force += abs(pe_raw)   # Put build-up   → bullish
+        else:
+            bear_force += abs(pe_raw)   # Put unwinding  → bearish
+        total_force = bull_force + bear_force
+        if total_force > 0:
+            bull_pct = round(bull_force / total_force * 100)
+            bear_pct = 100 - bull_pct
         else:
             bull_pct = 50
             bear_pct = 50
