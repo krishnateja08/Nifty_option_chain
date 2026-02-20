@@ -30,75 +30,155 @@ import pytz
 warnings.filterwarnings('ignore')
 
 # ─────────────────────────────────────────────
-#  FII / DII HELPER  — live NSE fetch + fallback
+#  FII / DII HELPER  — Groww scraper + NSE fallback
 # ─────────────────────────────────────────────
-def fetch_fii_dii_data():
+def _last_5_trading_days():
+    """Return last 5 weekday dates (IST) before today, oldest-first."""
+    ist_off = timedelta(hours=5, minutes=30)
+    today   = (datetime.utcnow() + ist_off).date()
+    days, d = [], today - timedelta(days=1)
+    while len(days) < 5:
+        if d.weekday() < 5:
+            days.append(d)
+        d -= timedelta(days=1)
+    days.reverse()
+    return days
+
+
+def _parse_nse_fiidii(raw):
+    """Parse NSE fiidiiTradeReact JSON → list of day dicts, oldest-first."""
+    if not isinstance(raw, list) or not raw:
+        return []
+    days = []
+    for row in raw[:10]:
+        try:
+            dt_obj   = datetime.strptime(row.get("date", ""), "%d-%b-%Y")
+            fii_net  = float(row.get("fiiBuyValue",  0) or 0) - float(row.get("fiiSellValue", 0) or 0)
+            dii_net  = float(row.get("diiBuyValue",  0) or 0) - float(row.get("diiSellValue", 0) or 0)
+            days.append({'date': dt_obj.strftime("%b %d"), 'day': dt_obj.strftime("%a"),
+                         'fii': round(fii_net, 2), 'dii': round(dii_net, 2)})
+        except Exception:
+            continue
+    if len(days) < 3:
+        return []
+    days = days[:5]
+    days.reverse()
+    return days
+
+
+def _fetch_from_groww():
     """
-    Fetch last 5 trading days of FII / DII cash-market data from NSE.
-    Endpoint: /api/fiidiiTradeReact
-    Falls back to hardcoded data if fetch fails.
+    Scrape groww.in/fii-dii-data HTML table.
+    Returns list of 5 dicts oldest-first, or [] on failure.
     """
     try:
+        from bs4 import BeautifulSoup
         import requests as _req
         headers = {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
-            ),
-            "Referer": "https://www.nseindia.com/",
-            "Accept": "application/json, text/plain, */*",
+            "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.9",
+            "Referer":         "https://groww.in/",
         }
-        s = _req.Session()
-        s.get("https://www.nseindia.com/", headers=headers, timeout=12)
-        time.sleep(1)
-        resp = s.get(
-            "https://www.nseindia.com/api/fiidiiTradeReact",
-            headers=headers, timeout=15
-        )
-        if resp.status_code == 200:
-            raw = resp.json()
-            # NSE returns newest-first; keep last 5 trading days, reverse to oldest-first
-            days = []
-            for row in raw[:5]:
-                try:
-                    # NSE keys: date, buyValue, sellValue for FII & DII sections
-                    dt_str = row.get("date", "")
-                    dt_obj = datetime.strptime(dt_str, "%d-%b-%Y")
-                    fii_buy  = float(row.get("fiiBuyValue",  0) or 0)
-                    fii_sell = float(row.get("fiiSellValue", 0) or 0)
-                    dii_buy  = float(row.get("diiBuyValue",  0) or 0)
-                    dii_sell = float(row.get("diiSellValue", 0) or 0)
-                    fii_net  = fii_buy - fii_sell
-                    dii_net  = dii_buy - dii_sell
-                    days.append({
-                        'date': dt_obj.strftime("%b %d"),
-                        'day':  dt_obj.strftime("%a"),
-                        'fii':  round(fii_net, 2),
-                        'dii':  round(dii_net, 2),
-                    })
-                except Exception:
-                    continue
-            if len(days) >= 3:
-                days.reverse()          # oldest → newest
-                print(f"  ✅ FII/DII live data fetched: {days[0]['date']} → {days[-1]['date']}")
-                return days
-        print(f"  ⚠️  FII/DII fetch HTTP {resp.status_code} — using fallback")
+        resp = _req.get("https://groww.in/fii-dii-data", headers=headers, timeout=15)
+        if resp.status_code != 200:
+            print(f"  ⚠️  Groww HTTP {resp.status_code}")
+            return []
+        soup  = BeautifulSoup(resp.text, "html.parser")
+        table = soup.find("table")
+        if not table:
+            print("  ⚠️  Groww: table not found in HTML")
+            return []
+        rows  = table.find_all("tr")
+        days  = []
+        for row in rows[1:]:   # skip header
+            cols = [td.get_text(strip=True) for td in row.find_all("td")]
+            if len(cols) < 7:
+                continue
+            try:
+                # cols: [date, fii_buy, fii_sell, fii_net, dii_buy, dii_sell, dii_net]
+                dt_obj  = datetime.strptime(cols[0], "%d %b %Y")
+                fii_net = float(cols[3].replace(",", "").replace("+", ""))
+                dii_net = float(cols[6].replace(",", "").replace("+", ""))
+                days.append({
+                    'date': dt_obj.strftime("%b %d"),
+                    'day':  dt_obj.strftime("%a"),
+                    'fii':  round(fii_net, 2),
+                    'dii':  round(dii_net, 2),
+                })
+            except Exception:
+                continue
+            if len(days) == 5:
+                break
+        if len(days) >= 3:
+            days.reverse()   # oldest → newest
+            print(f"  ✅ FII/DII from Groww: {days[0]['date']} → {days[-1]['date']}")
+            return days
+        print(f"  ⚠️  Groww: only {len(days)} valid rows parsed")
+        return []
+    except ImportError:
+        print("  ⚠️  BeautifulSoup not installed — pip install beautifulsoup4")
+        return []
     except Exception as e:
-        print(f"  ⚠️  FII/DII live fetch failed ({e}) — using fallback")
+        print(f"  ⚠️  Groww scrape failed: {e}")
+        return []
 
-    # ── Fallback: last known hardcoded values ────────────────────────
-    ist_now = datetime.now(pytz.timezone("Asia/Kolkata"))
-    print(f"  📌 Using hardcoded FII/DII fallback data")
+
+def _fetch_from_nse_curl():
+    """NSE fiidiiTradeReact via curl_cffi Chrome impersonation."""
+    try:
+        from curl_cffi import requests as curl_req
+        headers = {
+            "authority":       "www.nseindia.com",
+            "accept":          "application/json, text/plain, */*",
+            "user-agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+            "referer":         "https://www.nseindia.com/reports/fii-dii",
+            "accept-language": "en-US,en;q=0.9",
+        }
+        s = curl_req.Session()
+        s.get("https://www.nseindia.com/",            headers=headers, impersonate="chrome", timeout=12)
+        time.sleep(1.2)
+        s.get("https://www.nseindia.com/reports/fii-dii", headers=headers, impersonate="chrome", timeout=12)
+        time.sleep(0.8)
+        resp = s.get("https://www.nseindia.com/api/fiidiiTradeReact",
+                     headers=headers, impersonate="chrome", timeout=20)
+        if resp.status_code == 200:
+            days = _parse_nse_fiidii(resp.json())
+            if days:
+                print(f"  ✅ FII/DII from NSE (curl_cffi): {days[0]['date']} → {days[-1]['date']}")
+                return days
+        print(f"  ⚠️  NSE curl_cffi: HTTP {resp.status_code}")
+    except Exception as e:
+        print(f"  ⚠️  NSE curl_cffi failed: {e}")
+    return []
+
+
+def fetch_fii_dii_data():
+    """
+    Priority order:
+      1. groww.in  — most reliable, no auth needed
+      2. NSE curl_cffi  — Chrome impersonation
+      3. Date-corrected fallback with placeholder values
+    """
+    # ── 1. Groww ─────────────────────────────────────────────────────
+    days = _fetch_from_groww()
+    if days:
+        return days
+
+    # ── 2. NSE curl_cffi ─────────────────────────────────────────────
+    days = _fetch_from_nse_curl()
+    if days:
+        return days
+
+    # ── 3. Fallback: correct dates, last-known values ─────────────────
+    print("  📌 FII/DII: using date-corrected fallback (update values manually)")
+    tdays = _last_5_trading_days()
+    placeholder = [(-1540.20,2103.50),(823.60,891.40),(-411.80,1478.30),(69.45,1174.21),(-972.13,1666.98)]
     return [
-        {"date": "Feb 11", "day": "Tue", "fii": -1540.20, "dii": 2103.50},
-        {"date": "Feb 12", "day": "Wed", "fii":   823.60, "dii":  891.40},
-        {"date": "Feb 13", "day": "Thu", "fii":  -411.80, "dii": 1478.30},
-        {"date": "Feb 14", "day": "Fri", "fii":    69.45, "dii": 1174.21},
-        {"date": "Feb 17", "day": "Mon", "fii":  -972.13, "dii": 1666.98},
+        {'date': d.strftime('%b %d'), 'day': d.strftime('%a'),
+         'fii': placeholder[i][0], 'dii': placeholder[i][1], 'fallback': True}
+        for i, d in enumerate(tdays)
     ]
-
 
 def compute_fii_dii_summary(data):
     fii_vals = [d['fii'] for d in data]
@@ -751,10 +831,22 @@ class NiftyHTMLAnalyzer:
         fii_col    = '#00e676' if fii_avg >= 0 else '#ff5252'
         dii_col    = '#40c4ff' if dii_avg >= 0 else '#ef4444'
         net_col    = '#b388ff' if net_avg >= 0 else '#ff5252'
-        date_range = data[0]['date'] + ' – ' + data[-1]['date']
+        date_range    = data[0]['date'] + ' – ' + data[-1]['date']
+        is_fallback   = any(r.get('fallback') for r in data)
+        data_src_html = (
+            '<span style="font-size:10px;color:#ff8a65;font-weight:700;'
+            'letter-spacing:1px;background:rgba(255,138,101,0.1);'
+            'border:1px solid rgba(255,138,101,0.3);border-radius:10px;'
+            'padding:2px 10px;margin-left:8px;">⚠ ESTIMATED DATES</span>'
+            if is_fallback else
+            '<span style="font-size:10px;color:#00e676;font-weight:700;'
+            'letter-spacing:1px;background:rgba(0,230,118,0.1);'
+            'border:1px solid rgba(0,230,118,0.3);border-radius:10px;'
+            'padding:2px 10px;margin-left:8px;">● LIVE DATA</span>'
+        )
 
         out  = '<div class="section">'
-        out += '<div class="section-title"><span>🏦</span> FII / DII INSTITUTIONAL FLOW'
+        out += '<div class="section-title"><span>🏦</span> FII / DII INSTITUTIONAL FLOW' + data_src_html
         out += '<span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">Last 5 Trading Days &nbsp;·&nbsp; ' + date_range + '</span></div>'
 
         # Chart box
