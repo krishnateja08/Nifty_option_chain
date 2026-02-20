@@ -39,7 +39,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install curl_cffi pandas yfinance openpyxl
+          pip install curl_cffi pandas yfinance openpyxl beautifulsoup4
       
       - name: Run Analysis
         env:
