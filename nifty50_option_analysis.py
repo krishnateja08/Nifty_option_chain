@@ -22,9 +22,6 @@ import json
 import pytz
 warnings.filterwarnings('ignore')
 
-# ─────────────────────────────────────────────
-#  FII / DII HELPERS
-# ─────────────────────────────────────────────
 def _last_5_trading_days():
     ist_off = timedelta(hours=5, minutes=30)
     today   = (datetime.utcnow() + ist_off).date()
@@ -332,8 +329,6 @@ class NiftyHTMLAnalyzer:
         try:
             print("Calculating technical indicators...")
             nifty = yf.Ticker(self.yf_symbol)
-
-            # ── Daily data: SMAs, RSI, MACD (unchanged) ──
             df = nifty.history(period="1y")
             if df.empty: print("Warning: Failed to fetch historical data"); return None
             df['SMA_20']  = df['Close'].rolling(20).mean()
@@ -349,24 +344,21 @@ class NiftyHTMLAnalyzer:
             df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
             latest = df.iloc[-1]
             current_price = latest['Close']
-
-            # ── 1H data: Support & Resistance for Key Levels ──
             print("  Fetching 1H candles for Key Levels...")
             df_1h = nifty.history(interval="1h", period="60d")
             s1 = s2 = r1 = r2 = None
             if not df_1h.empty:
-                recent_1h = df_1h.tail(120)   # ~17 trading days @ 7 candles/day
+                recent_1h = df_1h.tail(120)
                 highs = sorted(recent_1h['High'].values)
                 lows  = sorted(recent_1h['Low'].values)
                 res_c = [h for h in highs if current_price < h <= current_price + 200]
                 sup_c = [l for l in lows  if current_price - 200 <= l < current_price]
                 if len(res_c) >= 4:
-                    r1 = round(float(np.percentile(res_c, 40)) / 25) * 25  # near resistance
-                    r2 = round(float(np.percentile(res_c, 80)) / 25) * 25  # strong resistance
+                    r1 = round(float(np.percentile(res_c, 40)) / 25) * 25
+                    r2 = round(float(np.percentile(res_c, 80)) / 25) * 25
                 if len(sup_c) >= 4:
-                    s1 = round(float(np.percentile(sup_c, 70)) / 25) * 25  # near support
-                    s2 = round(float(np.percentile(sup_c, 20)) / 25) * 25  # deep support
-                # Safety checks — prevent overlap with current price
+                    s1 = round(float(np.percentile(sup_c, 70)) / 25) * 25
+                    s2 = round(float(np.percentile(sup_c, 20)) / 25) * 25
                 if r1 and r1 <= current_price: r1 = round((current_price + 50) / 25) * 25
                 if r2 and r1 and r2 <= r1:     r2 = r1 + 75
                 if s1 and s1 >= current_price: s1 = round((current_price - 50) / 25) * 25
@@ -374,14 +366,11 @@ class NiftyHTMLAnalyzer:
                 print(f"  ✓ 1H Levels | S2={s2} S1={s1} | Price={current_price:.0f} | R1={r1} R2={r2}")
             else:
                 print("  ⚠️  1H data unavailable — falling back to daily levels")
-
-            # ── Fallback to daily if 1H failed ──
             recent_d = df.tail(60)
             resistance = r1 if r1 else recent_d['High'].quantile(0.90)
             support    = s1 if s1 else recent_d['Low'].quantile(0.10)
             strong_resistance = r2 if r2 else resistance + 100
             strong_support    = s2 if s2 else support - 100
-
             technical = {
                 'current_price':    current_price,
                 'sma_20':           latest['SMA_20'],
@@ -586,50 +575,32 @@ class NiftyHTMLAnalyzer:
                 <div class="card-foot">{sub_html}<span class="tag {tag_cls}">{badge_text}</span></div>
             </div>"""
 
-    # ─────────────────────────────────────────────
-    #  MARKET DIRECTION — HOLOGRAPHIC GLASS WIDGET
-    # ─────────────────────────────────────────────
     def _market_direction_widget_html(self):
         d = self.html_data
-        bias       = d['bias']           # BULLISH / BEARISH / SIDEWAYS
-        confidence = d['confidence']     # HIGH / MEDIUM / LOW
+        bias       = d['bias']
+        confidence = d['confidence']
         bull_score = d['bullish_score']
         bear_score = d['bearish_score']
-
-        # ── Direction text gradient ──
         if bias == 'BULLISH':
             dir_gradient = 'linear-gradient(135deg, #4ecdc4, #2ecc8a)'
         elif bias == 'BEARISH':
             dir_gradient = 'linear-gradient(135deg, #ff6b6b, #cc3333)'
-        else:  # SIDEWAYS
+        else:
             dir_gradient = 'linear-gradient(135deg, #ffcd3c, #f7931e)'
-
-        # ── Bull pill ──
-        bull_pill = (
-            f'<span class="md-pill md-pill-bull">BULL {bull_score}</span>'
-        )
-        # ── Bear pill ──
-        bear_pill = (
-            f'<span class="md-pill md-pill-bear">BEAR {bear_score}</span>'
-        )
-        # ── Confidence pill ──
+        bull_pill = f'<span class="md-pill md-pill-bull">BULL {bull_score}</span>'
+        bear_pill = f'<span class="md-pill md-pill-bear">BEAR {bear_score}</span>'
         if confidence == 'HIGH':
             conf_cls = 'md-pill-conf-high'
         elif confidence == 'MEDIUM':
             conf_cls = 'md-pill-conf-med'
         else:
             conf_cls = 'md-pill-conf-low'
-        conf_pill = (
-            f'<span class="md-pill {conf_cls}">{confidence} CONFIDENCE</span>'
-        )
-
+        conf_pill = f'<span class="md-pill {conf_cls}">{confidence} CONFIDENCE</span>'
         return f"""
     <div class="section">
         <div class="section-title"><span>&#129517;</span> MARKET DIRECTION (Algorithmic)</div>
         <div class="md-widget">
-            <!-- rotating conic glow -->
             <div class="md-glow"></div>
-            <!-- Row 1: label + bull/bear pills -->
             <div class="md-row-top">
                 <div class="md-label">
                     <div class="md-live-dot"></div>
@@ -640,7 +611,6 @@ class NiftyHTMLAnalyzer:
                     {bear_pill}
                 </div>
             </div>
-            <!-- Row 2: direction text + confidence pill -->
             <div class="md-row-bottom">
                 <div class="md-direction" style="background:{dir_gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{bias}</div>
                 {conf_pill}
@@ -658,13 +628,9 @@ class NiftyHTMLAnalyzer:
     </div>
 """
 
-    # ─────────────────────────────────────────────
-    #  FII / DII SECTION — THEME 3 · PULSE FLOW
-    # ─────────────────────────────────────────────
     def _fiidii_section_html(self):
         data = self.html_data['fii_dii_data']
         summ = self.html_data['fii_dii_summ']
-
         badge_map = {
             'fii-bull':  ('#00e676','rgba(0,230,118,0.12)','rgba(0,230,118,0.3)'),
             'fii-cbull': ('#69f0ae','rgba(105,240,174,0.10)','rgba(105,240,174,0.28)'),
@@ -774,14 +740,22 @@ class NiftyHTMLAnalyzer:
     def _oi_navy_command_section(self, d):
         oi_cls=d['oi_class']; direction=d['oi_direction']; signal=d['oi_signal']
         ce_raw=d['total_ce_oi_change']; pe_raw=d['total_pe_oi_change']
+
+        # ── Bull/Bear force (correct directional logic) ──
+        # CE negative = Call Unwinding = Bullish
+        # CE positive = Call Build-up  = Bearish
+        # PE positive = Put Build-up   = Bullish
+        # PE negative = Put Unwinding  = Bearish
         bull_force=0; bear_force=0
         if ce_raw<0: bull_force+=abs(ce_raw)
-        else: bear_force+=abs(ce_raw)
+        else:        bear_force+=abs(ce_raw)
         if pe_raw>0: bull_force+=abs(pe_raw)
-        else: bear_force+=abs(pe_raw)
+        else:        bear_force+=abs(pe_raw)
+
         total_force=bull_force+bear_force
         bull_pct=round(bull_force/total_force*100) if total_force>0 else 50
         bear_pct=100-bull_pct
+
         if oi_cls=='bearish':
             dir_bg='rgba(30,10,14,0.92)';dir_border='rgba(239,68,68,0.35)'
             dir_left_bar='linear-gradient(180deg,#ef4444,#b91c1c)';dir_name_col='#fb7185';dir_desc_col='rgba(251,113,133,0.5)'
@@ -791,6 +765,7 @@ class NiftyHTMLAnalyzer:
         else:
             dir_bg='rgba(20,20,10,0.92)';dir_border='rgba(251,191,36,0.3)'
             dir_left_bar='linear-gradient(180deg,#f59e0b,#d97706)';dir_name_col='#fbbf24';dir_desc_col='rgba(251,191,36,0.5)'
+
         ce_val=d['total_ce_oi_change']; pe_val=d['total_pe_oi_change']; net_val=d['net_oi_change']
         ce_is_bear=ce_val>0; pe_is_bull=pe_val>0
         ce_col='#fb7185' if ce_is_bear else '#34d399'; ce_dot_col='#ef4444' if ce_is_bear else '#10b981'
@@ -803,15 +778,20 @@ class NiftyHTMLAnalyzer:
         pe_btn_col='#10b981' if pe_is_bull else '#ef4444'
         pe_btn_bg='rgba(16,185,129,0.12)' if pe_is_bull else 'rgba(239,68,68,0.12)'
         pe_btn_bdr='rgba(16,185,129,0.4)' if pe_is_bull else 'rgba(239,68,68,0.4)'
-        if net_val>0:
+
+        # ── FIX: Net label/colour uses bull_force vs bear_force, NOT raw net_val ──
+        # raw net_val = pe_val + ce_val is WRONG because CE negative = bullish
+        # (opposite sign meanings for CE vs PE)
+        if bull_force > bear_force:
             net_col='#34d399';net_dot_col='#10b981';net_lbl='Bullish Net'
             net_btn_col='#10b981';net_btn_bg='rgba(16,185,129,0.12)';net_btn_bdr='rgba(16,185,129,0.4)'
-        elif net_val<0:
+        elif bear_force > bull_force:
             net_col='#fb7185';net_dot_col='#ef4444';net_lbl='Bearish Net'
             net_btn_col='#ef4444';net_btn_bg='rgba(239,68,68,0.12)';net_btn_bdr='rgba(239,68,68,0.4)'
         else:
             net_col='#fbbf24';net_dot_col='#f59e0b';net_lbl='Balanced'
             net_btn_col='#f59e0b';net_btn_bg='rgba(245,158,11,0.12)';net_btn_bdr='rgba(245,158,11,0.4)'
+
         def nc_card(label,idc,value,val_col,sub,btn_lbl,btn_col,btn_bg,btn_bdr,icon_char):
             return (f'<div class="nc-card"><div class="nc-card-header">'
                     f'<span class="nc-card-label">{label}</span>'
@@ -819,11 +799,13 @@ class NiftyHTMLAnalyzer:
                     f'<div class="nc-card-value" style="color:{val_col};">{value:+,}</div>'
                     f'<div class="nc-card-sub">{sub}</div>'
                     f'<div class="nc-card-btn" style="color:{btn_col};background:{btn_bg};border:1px solid {btn_bdr};">{btn_lbl}</div></div>')
+
         cards_html = (
             nc_card('CALL OI CHANGE',ce_dot_col,ce_val,ce_col,'CE open interest \u0394',ce_lbl,ce_btn_col,ce_btn_bg,ce_btn_bdr,'🔴' if ce_is_bear else '🟢') +
             nc_card('PUT OI CHANGE',pe_dot_col,pe_val,pe_col,'PE open interest \u0394',pe_lbl,pe_btn_col,pe_btn_bg,pe_btn_bdr,'🟢' if pe_is_bull else '🔴') +
             nc_card('NET OI CHANGE',net_dot_col,net_val,net_col,'PE \u0394 \u2212 CE \u0394',net_lbl,net_btn_col,net_btn_bg,net_btn_bdr,'\u2696\ufe0f')
         )
+
         dual_meters = (
             f'<div class="nc-meters-panel">'
             f'<div class="nc-meter-row"><div class="nc-meter-head-row">'
@@ -841,6 +823,7 @@ class NiftyHTMLAnalyzer:
             f'<div class="nc-meter-head" style="left:{bear_pct}%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div>'
             f'</div></div></div>'
         )
+
         return (
             '\n<div class="section">\n'
             '    <div class="nc-section-header">\n'
@@ -1000,56 +983,22 @@ class NiftyHTMLAnalyzer:
         .tag-neu{{background:rgba(255,183,77,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
         .tag-bull{{background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.35);}}
         .tag-bear{{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.35);}}
-
-        /* ══ HOLOGRAPHIC GLASS MARKET DIRECTION WIDGET ══ */
-        .md-widget{{
-            position:relative;overflow:hidden;
-            background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));
-            border:1px solid rgba(255,255,255,0.1);
-            border-radius:16px;
-            padding:16px 20px;
-            backdrop-filter:blur(20px);
-            display:flex;flex-direction:column;gap:12px;
-        }}
-        .md-glow{{
-            position:absolute;top:-80%;left:-80%;
-            width:260%;height:260%;
-            background:conic-gradient(from 180deg,#ff6b35 0deg,#ffcd3c 120deg,#4ecdc4 240deg,#ff6b35 360deg);
-            opacity:0.05;
-            animation:md-rotate 8s linear infinite;
-            border-radius:50%;
-            pointer-events:none;
-        }}
+        .md-widget{{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:16px 20px;backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:12px;}}
+        .md-glow{{position:absolute;top:-80%;left:-80%;width:260%;height:260%;background:conic-gradient(from 180deg,#ff6b35 0deg,#ffcd3c 120deg,#4ecdc4 240deg,#ff6b35 360deg);opacity:0.05;animation:md-rotate 8s linear infinite;border-radius:50%;pointer-events:none;}}
         @keyframes md-rotate{{to{{transform:rotate(360deg);}}}}
         .md-row-top{{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}}
-        .md-label{{
-            display:flex;align-items:center;gap:7px;
-            font-family:'Space Mono',monospace;
-            font-size:8px;letter-spacing:3px;
-            color:rgba(255,255,255,0.3);text-transform:uppercase;
-        }}
-        .md-live-dot{{
-            width:6px;height:6px;border-radius:50%;
-            background:#4ecdc4;box-shadow:0 0 8px #4ecdc4;
-            animation:md-pulse 2s ease-in-out infinite;flex-shrink:0;
-        }}
+        .md-label{{display:flex;align-items:center;gap:7px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;color:rgba(255,255,255,0.3);text-transform:uppercase;}}
+        .md-live-dot{{width:6px;height:6px;border-radius:50%;background:#4ecdc4;box-shadow:0 0 8px #4ecdc4;animation:md-pulse 2s ease-in-out infinite;flex-shrink:0;}}
         @keyframes md-pulse{{50%{{opacity:0.25;}}}}
         .md-pills-top{{display:flex;gap:8px;}}
-        .md-pill{{
-            font-family:'Space Mono',monospace;font-size:10px;font-weight:700;
-            padding:4px 14px;border-radius:20px;letter-spacing:1px;
-        }}
+        .md-pill{{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;}}
         .md-pill-bull{{background:rgba(78,205,196,0.12);border:1px solid rgba(78,205,196,0.4);color:#4ecdc4;}}
         .md-pill-bear{{background:rgba(255,100,100,0.12);border:1px solid rgba(255,100,100,0.4);color:#ff6b6b;}}
         .md-pill-conf-high{{background:rgba(78,205,196,0.12);border:1px solid rgba(78,205,196,0.35);color:#4ecdc4;}}
         .md-pill-conf-med{{background:rgba(255,205,60,0.12);border:1px solid rgba(255,205,60,0.35);color:#ffcd3c;}}
         .md-pill-conf-low{{background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.35);color:#ff6b6b;}}
         .md-row-bottom{{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}}
-        .md-direction{{
-            font-family:'Orbitron',monospace;font-weight:900;font-size:36px;
-            letter-spacing:3px;line-height:1;
-        }}
-
+        .md-direction{{font-family:'Orbitron',monospace;font-weight:900;font-size:36px;letter-spacing:3px;line-height:1;}}
         .logic-box{{background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.14);border-left:3px solid #4fc3f7;border-radius:10px;padding:10px 16px;margin-top:12px;}}
         .logic-box-head{{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;color:#4fc3f7;letter-spacing:2px;margin-bottom:7px;}}
         .logic-grid{{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;}}
@@ -1064,7 +1013,6 @@ class NiftyHTMLAnalyzer:
         .rl-dot{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}}
         .rl-lbl{{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}}
         .rl-val{{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}}
-        /* ══ PULSE FLOW FII/DII ══ */
         .pf-live-badge{{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:1px;}}
         .pf-live{{background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
         .pf-estimated{{background:rgba(255,138,101,0.1);color:#ff8a65;border:1px solid rgba(255,138,101,0.3);}}
@@ -1099,7 +1047,6 @@ class NiftyHTMLAnalyzer:
         .pf-insight-lbl{{font-size:9px;letter-spacing:2px;font-weight:700;text-transform:uppercase;}}
         .pf-verdict-badge{{display:inline-block;padding:3px 14px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:1px;}}
         .pf-insight-text{{font-size:13px;color:#cfd8dc;line-height:1.85;font-weight:500;}}
-        /* ══ SCOREBOARD ══ */
         .sb-wrap{{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.15);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.3);}}
         .sb-header{{padding:11px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.1);}}
         .sb-header.cyan{{background:rgba(79,195,247,0.08);border-left:4px solid #4fc3f7;}}
@@ -1120,20 +1067,17 @@ class NiftyHTMLAnalyzer:
         .sb-footer{{padding:11px 16px;background:rgba(0,0,0,0.25);font-family:'JetBrains Mono',monospace;font-size:13px;color:#ffffff;font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}}
         .sb-footer .sf-lbl{{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;}}
         .sb-footer .sf-why{{font-size:13px;color:#ffffff;font-style:italic;font-family:'Rajdhani',sans-serif;font-weight:500;margin-left:auto;}}
-        /* ══ STRIKES TABLE ══ */
         .strikes-table{{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}}
         .strikes-table th{{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:14px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;}}
         .strikes-table td{{padding:14px;border-bottom:1px solid rgba(79,195,247,0.08);color:#b0bec5;font-size:13px;}}
         .strikes-table tr:hover{{background:rgba(79,195,247,0.06);}}
         .strikes-table tbody tr:last-child td{{border-bottom:none;}}
-        /* ══ SNAP GRID ══ */
         .snap-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}}
         .snap-card{{padding:18px 16px;}}
         .snap-card .card-top-row{{margin-bottom:8px;padding:0;}}
         .snap-card .val{{font-size:26px;padding:0;margin-bottom:0;}}
         .disclaimer{{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:13px;color:#ffb74d;line-height:1.8;}}
         .footer{{text-align:center;padding:24px;color:#546e7a;font-size:12px;background:rgba(10,20,28,0.4);}}
-        /* ══ NAVY COMMAND OI ══ */
         .nc-section-header{{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(79,195,247,0.14);}}
         .nc-header-left{{display:flex;align-items:center;gap:14px;}}
         .nc-header-icon{{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1e3a5f,#1a3052);border:1px solid rgba(79,195,247,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px rgba(79,195,247,0.15);}}
@@ -1162,7 +1106,6 @@ class NiftyHTMLAnalyzer:
         .nc-card-value{{font-family:'Oxanium',sans-serif;font-size:30px;font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-0.5px;}}
         .nc-card-sub{{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(100,116,139,0.7);margin-bottom:14px;}}
         .nc-card-btn{{display:block;width:100%;padding:9px 14px;border-radius:7px;text-align:center;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.5px;cursor:default;}}
-        /* ══ RESPONSIVE TABLET ≤1024px ══ */
         @media(max-width:1024px){{
             body{{padding:16px;}}.container{{border-radius:16px;}}.header{{padding:28px 20px;}}.header h1{{font-size:24px;}}
             .section{{padding:22px 18px;}}.grid-5{{grid-template-columns:repeat(3,1fr);}}.grid-4{{grid-template-columns:repeat(2,1fr);}}
@@ -1172,7 +1115,6 @@ class NiftyHTMLAnalyzer:
             .nc-cards-grid{{grid-template-columns:repeat(3,1fr);}}.nc-dir-name{{font-size:22px;}}.nc-meter-track{{width:140px;}}.nc-card-value{{font-size:24px;}}
             .strikes-wrap{{grid-template-columns:1fr !important;}}
         }}
-        /* ══ RESPONSIVE MOBILE ≤600px ══ */
         @media(max-width:600px){{
             body{{padding:8px;}}.container{{border-radius:12px;}}.header{{padding:20px 14px;}}.header h1{{font-size:18px;}}.header p{{font-size:11px;}}
             .section{{padding:16px 12px;}}.section-title{{font-size:11px;letter-spacing:1.5px;gap:6px;}}.grid-5,.grid-4{{grid-template-columns:1fr;}}
@@ -1180,24 +1122,19 @@ class NiftyHTMLAnalyzer:
             .logic-grid{{grid-template-columns:1fr;}}
             .sb-cell{{border-right:none !important;border-bottom:1px solid rgba(79,195,247,0.06);}}.sb-cell:last-child{{border-bottom:none;}}
             .sb-footer{{font-size:11px;flex-direction:column;gap:6px;}}.sb-footer .sf-why{{margin-left:0;}}
-            .logic-box p{{font-size:11px;line-height:1.7;}}
             div[style*="grid-template-columns:1fr 1fr"]{{grid-template-columns:1fr !important;}}
             .strikes-wrap{{grid-template-columns:1fr !important;}}.strikes-table th,.strikes-table td{{padding:10px 8px;font-size:11px;}}
-            /* PF mobile */
             .pf-grid{{grid-template-columns:repeat(2,1fr);gap:10px;}}
             .pf-avg-strip{{grid-template-columns:1fr;gap:12px;padding:14px;}}
             .pf-avg-sep{{display:none;}}
             .pf-avg-cell{{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;}}
             .pf-avg-eyebrow{{margin-bottom:0;}}.pf-avg-val{{font-size:20px;}}.pf-insight-text{{font-size:12px;}}.pf-date-range{{display:none;}}
-            /* MD widget mobile */
             .md-direction{{font-size:24px;letter-spacing:1px;}}
             .md-label{{font-size:7px;letter-spacing:2px;}}
-            /* NC mobile */
             .nc-section-header{{flex-direction:column;align-items:flex-start;gap:10px;}}.nc-atm-badge{{align-self:flex-end;}}
             .nc-cards-grid{{grid-template-columns:1fr;}}.nc-dir-name{{font-size:20px;}}
             .nc-meters-panel{{min-width:unset;width:100%;}}.nc-meter-track{{width:100%;}}.nc-card-value{{font-size:26px;}}
         }}
-        /* ══ SMALL MOBILE ≤380px ══ */
         @media(max-width:380px){{
             .header h1{{font-size:15px;}}.sb-body{{grid-template-columns:1fr;}}.section{{padding:12px 10px;}}.val{{font-size:17px;}}
             .pf-grid{{grid-template-columns:1fr;}}.pf-block-val{{font-size:16px;}}
@@ -1225,7 +1162,6 @@ class NiftyHTMLAnalyzer:
             html += self._oi_navy_command_section(d)
         html += self._key_levels_visual_section(d,_pct_cp,_pts_to_res,_pts_to_sup,_mp_node)
         html += self._fiidii_section_html()
-        # ── NEW: Holographic Glass Market Direction Widget ──
         html += self._market_direction_widget_html()
         html += f"""
     <div class="section">
