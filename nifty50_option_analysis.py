@@ -5,6 +5,7 @@ CHANGE IN OPEN INTEREST: Navy Command Theme (v3)
 FII/DII SECTION: Theme 3 · Pulse Flow
 MARKET DIRECTION: Holographic Glass Widget (Compact)
 KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
+AUTO REFRESH: Silent background fetch every 30s · No flicker · No scroll jump
 """
 from curl_cffi import requests
 import pandas as pd
@@ -741,11 +742,6 @@ class NiftyHTMLAnalyzer:
         oi_cls=d['oi_class']; direction=d['oi_direction']; signal=d['oi_signal']
         ce_raw=d['total_ce_oi_change']; pe_raw=d['total_pe_oi_change']
 
-        # ── Bull/Bear force (correct directional logic) ──
-        # CE negative = Call Unwinding = Bullish
-        # CE positive = Call Build-up  = Bearish
-        # PE positive = Put Build-up   = Bullish
-        # PE negative = Put Unwinding  = Bearish
         bull_force=0; bear_force=0
         if ce_raw<0: bull_force+=abs(ce_raw)
         else:        bear_force+=abs(ce_raw)
@@ -779,9 +775,6 @@ class NiftyHTMLAnalyzer:
         pe_btn_bg='rgba(16,185,129,0.12)' if pe_is_bull else 'rgba(239,68,68,0.12)'
         pe_btn_bdr='rgba(16,185,129,0.4)' if pe_is_bull else 'rgba(239,68,68,0.4)'
 
-        # ── FIX: Net label/colour uses bull_force vs bear_force, NOT raw net_val ──
-        # raw net_val = pe_val + ce_val is WRONG because CE negative = bullish
-        # (opposite sign meanings for CE vs PE)
         if bull_force > bear_force:
             net_col='#34d399';net_dot_col='#10b981';net_lbl='Bullish Net'
             net_btn_col='#10b981';net_btn_bg='rgba(16,185,129,0.12)';net_btn_bdr='rgba(16,185,129,0.4)'
@@ -938,6 +931,73 @@ class NiftyHTMLAnalyzer:
                       f'<div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>'
                       f'<div class="rl-val" style="color:#ffb74d;">\u20b9{d["max_pain"]:,}</div></div>')
 
+        # ── NEW: Silent auto-refresh JavaScript (30s, no flicker, no scroll jump) ──
+        auto_refresh_js = """
+    <script>
+    (function() {
+        var REFRESH_INTERVAL = 30000; // 30 seconds
+        var countdown        = REFRESH_INTERVAL / 1000;
+        var lastRefreshEl    = document.getElementById('last-refresh-val');
+        var countdownEl      = document.getElementById('refresh-countdown');
+        var nowClockEl       = document.getElementById('ist-clock');
+
+        // ── IST live clock (ticks every second) ──
+        function updateClock() {
+            var now = new Date();
+            var ist = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
+            var h   = String(ist.getHours()).padStart(2,'0');
+            var m   = String(ist.getMinutes()).padStart(2,'0');
+            var s   = String(ist.getSeconds()).padStart(2,'0');
+            if (nowClockEl) nowClockEl.textContent = h + ':' + m + ':' + s + ' IST';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ── Countdown display ──
+        function updateCountdown() {
+            if (countdownEl) countdownEl.textContent = countdown + 's';
+            countdown--;
+            if (countdown < 0) countdown = REFRESH_INTERVAL / 1000;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // ── Silent background fetch & DOM swap ──
+        function silentRefresh() {
+            var scrollY = window.scrollY || window.pageYOffset;
+            fetch(window.location.href + '?_t=' + Date.now(), {cache: 'no-store'})
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                    var parser   = new DOMParser();
+                    var newDoc   = parser.parseFromString(html, 'text/html');
+                    var newBody  = newDoc.querySelector('.container');
+                    var oldBody  = document.querySelector('.container');
+                    if (newBody && oldBody) {
+                        oldBody.innerHTML = newBody.innerHTML;
+                        // Restore scroll position silently
+                        window.scrollTo({top: scrollY, behavior: 'instant'});
+                        // Update last refresh time
+                        var now = new Date();
+                        var ist = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
+                        var h   = String(ist.getHours()).padStart(2,'0');
+                        var m   = String(ist.getMinutes()).padStart(2,'0');
+                        var s   = String(ist.getSeconds()).padStart(2,'0');
+                        var el  = document.getElementById('last-refresh-val');
+                        if (el) el.textContent = h + ':' + m + ':' + s + ' IST';
+                        // Re-bind clock & countdown to new DOM elements
+                        lastRefreshEl = document.getElementById('last-refresh-val');
+                        countdownEl   = document.getElementById('refresh-countdown');
+                        nowClockEl    = document.getElementById('ist-clock');
+                        countdown     = REFRESH_INTERVAL / 1000;
+                    }
+                })
+                .catch(function(e) { console.warn('Silent refresh failed:', e); });
+        }
+        setInterval(silentRefresh, REFRESH_INTERVAL);
+    })();
+    </script>
+"""
+
         html = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -953,6 +1013,17 @@ class NiftyHTMLAnalyzer:
         .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}}
         .header h1{{font-family:'Oxanium',sans-serif;font-size:30px;font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:2px;position:relative;z-index:1;}}
         .header p{{color:#80deea;font-size:13px;margin-top:8px;position:relative;z-index:1;}}
+        /* ── Auto-refresh status bar ── */
+        .refresh-bar{{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:16px;padding:10px 20px;background:rgba(0,0,0,0.25);border-radius:10px;border:1px solid rgba(79,195,247,0.12);position:relative;z-index:1;}}
+        .refresh-item{{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:11px;}}
+        .refresh-dot{{width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:rb-pulse 2s ease-in-out infinite;flex-shrink:0;}}
+        .refresh-dot.clock-dot{{background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;animation:none;}}
+        .refresh-dot.cd-dot{{background:#ffb74d;box-shadow:0 0 8px #ffb74d;animation:none;}}
+        @keyframes rb-pulse{{50%{{opacity:0.2;}}}}
+        .refresh-label{{color:rgba(128,222,234,0.45);letter-spacing:1.5px;text-transform:uppercase;font-size:9px;}}
+        .refresh-value{{color:#e0f7fa;font-weight:700;letter-spacing:0.5px;}}
+        .refresh-sep{{width:1px;height:22px;background:rgba(79,195,247,0.15);}}
+        /* rest of styles unchanged */
         .section{{padding:28px 26px;border-bottom:1px solid rgba(79,195,247,0.08);}}
         .section:last-child{{border-bottom:none;}}
         .section-title{{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}}
@@ -1134,6 +1205,8 @@ class NiftyHTMLAnalyzer:
             .nc-section-header{{flex-direction:column;align-items:flex-start;gap:10px;}}.nc-atm-badge{{align-self:flex-end;}}
             .nc-cards-grid{{grid-template-columns:1fr;}}.nc-dir-name{{font-size:20px;}}
             .nc-meters-panel{{min-width:unset;width:100%;}}.nc-meter-track{{width:100%;}}.nc-card-value{{font-size:26px;}}
+            .refresh-bar{{gap:12px;padding:8px 12px;}}
+            .refresh-sep{{display:none;}}
         }}
         @media(max-width:380px){{
             .header h1{{font-size:15px;}}.sb-body{{grid-template-columns:1fr;}}.section{{padding:12px 10px;}}.val{{font-size:17px;}}
@@ -1147,7 +1220,27 @@ class NiftyHTMLAnalyzer:
 <div class="container">
     <div class="header">
         <h1>&#128202; NIFTY 50 DAILY REPORT</h1>
-        <p>Generated: {d['timestamp']}</p>
+        <p>Data Generated: {d['timestamp']}</p>
+        <!-- ── Auto-refresh status bar ── -->
+        <div class="refresh-bar">
+            <div class="refresh-item">
+                <div class="refresh-dot clock-dot"></div>
+                <span class="refresh-label">IST Now</span>
+                <span class="refresh-value" id="ist-clock">--:--:-- IST</span>
+            </div>
+            <div class="refresh-sep"></div>
+            <div class="refresh-item">
+                <div class="refresh-dot"></div>
+                <span class="refresh-label">Last Refresh</span>
+                <span class="refresh-value" id="last-refresh-val">{d['timestamp'].replace(' IST','')}</span>
+            </div>
+            <div class="refresh-sep"></div>
+            <div class="refresh-item">
+                <div class="refresh-dot cd-dot"></div>
+                <span class="refresh-label">Next in</span>
+                <span class="refresh-value" id="refresh-countdown">30s</span>
+            </div>
+        </div>
     </div>
     <div class="section">
         <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
@@ -1205,7 +1298,11 @@ class NiftyHTMLAnalyzer:
         <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
         <p style="margin-top:6px;">\u00a9 2026 \u00b7 Glassmorphism UI \u00b7 Deep Ocean Theme \u00b7 Navy Command OI \u00b7 Pulse Flow FII/DII \u00b7 Holographic Glass Market Direction \u00b7 For Educational Purposes Only</p>
     </div>
-</div></body></html>"""
+</div>
+"""
+        # Inject JS just before </body>
+        html += auto_refresh_js
+        html += "\n</body></html>"
         return html
 
     def _generate_recommendations_html(self, d):
