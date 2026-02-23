@@ -13,7 +13,6 @@
         .header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}
         .header h1{font-family:'Oxanium',sans-serif;font-size:30px;font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:2px;position:relative;z-index:1;}
         .header p{color:#80deea;font-size:13px;margin-top:8px;position:relative;z-index:1;}
-        /* ── Auto-refresh status bar ── */
         .refresh-bar{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:16px;padding:10px 20px;background:rgba(0,0,0,0.25);border-radius:10px;border:1px solid rgba(79,195,247,0.12);position:relative;z-index:1;}
         .refresh-item{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:11px;}
         .refresh-dot{width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:rb-pulse 2s ease-in-out infinite;flex-shrink:0;}
@@ -23,7 +22,6 @@
         .refresh-label{color:rgba(128,222,234,0.45);letter-spacing:1.5px;text-transform:uppercase;font-size:9px;}
         .refresh-value{color:#e0f7fa;font-weight:700;letter-spacing:0.5px;}
         .refresh-sep{width:1px;height:22px;background:rgba(79,195,247,0.15);}
-        /* rest of styles unchanged */
         .section{padding:28px 26px;border-bottom:1px solid rgba(79,195,247,0.08);}
         .section:last-child{border-bottom:none;}
         .section-title{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}
@@ -220,8 +218,7 @@
 <div class="container">
     <div class="header">
         <h1>&#128202; NIFTY 50 DAILY REPORT</h1>
-        <p>Data Generated: 23-Feb-2026 08:23 IST</p>
-        <!-- ── Auto-refresh status bar ── -->
+        <p>Data Generated: 23-Feb-2026 08:50 IST</p>
         <div class="refresh-bar">
             <div class="refresh-item">
                 <div class="refresh-dot clock-dot"></div>
@@ -232,7 +229,7 @@
             <div class="refresh-item">
                 <div class="refresh-dot"></div>
                 <span class="refresh-label">Last Refresh</span>
-                <span class="refresh-value" id="last-refresh-val">23-Feb-2026 08:23</span>
+                <span class="refresh-value" id="last-refresh-val">23-Feb-2026 08:50</span>
             </div>
             <div class="refresh-sep"></div>
             <div class="refresh-item">
@@ -271,13 +268,13 @@
             </div>
         </div>
     </div>
-    <div class="nc-cards-grid"><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">CALL OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">🟢</span></div><div class="nc-card-value" style="color:#34d399;">-337,700</div><div class="nc-card-sub">CE open interest Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">PUT OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">🟢</span></div><div class="nc-card-value" style="color:#34d399;">+242,591</div><div class="nc-card-sub">PE open interest Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">NET OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">⚖️</span></div><div class="nc-card-value" style="color:#34d399;">-95,109</div><div class="nc-card-sub">PE Δ − CE Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Net</div></div></div>
+    <div class="nc-cards-grid"><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">CALL OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">🟢</span></div><div class="nc-card-value" style="color:#34d399;">-337,700</div><div class="nc-card-sub">CE open interest Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">PUT OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">🟢</span></div><div class="nc-card-value" style="color:#34d399;">+242,591</div><div class="nc-card-sub">PE open interest Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">NET OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">⚖️</span></div><div class="nc-card-value" style="color:#34d399;">+580,291</div><div class="nc-card-sub">PE Δ − CE Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Net</div></div></div>
     <div class="logic-box" style="margin-top:16px;">
         <div class="logic-box-head">📖 HOW TO READ</div>
         <div class="logic-grid">
             <div class="logic-item"><span class="lc-info">Call OI +</span> Writers selling calls <span class="lc-bear">Bearish</span>&nbsp;&nbsp;<span class="lc-info">Call OI −</span> Unwinding <span class="lc-bull">Bullish</span></div>
             <div class="logic-item"><span class="lc-info">Put OI +</span> Writers selling puts <span class="lc-bull">Bullish</span>&nbsp;&nbsp;<span class="lc-info">Put OI −</span> Unwinding <span class="lc-bear">Bearish</span></div>
-            <div class="logic-item"><span class="lc-info">Net OI</span> = Put Δ − Call Δ &nbsp;·&nbsp; <span class="lc-bull">Positive = Bullish</span> &nbsp;<span class="lc-bear">Negative = Bearish</span></div>
+            <div class="logic-item"><span class="lc-info">Net OI</span> = PE Δ − CE Δ &nbsp;·&nbsp; <span class="lc-bull">Positive = Bullish</span> &nbsp;<span class="lc-bear">Negative = Bearish</span></div>
             <div class="logic-item"><span class="lc-info">Bull % + Bear %</span> = 100% &nbsp;·&nbsp; relative dominance</div>
         </div>
     </div>
@@ -508,13 +505,12 @@
 
     <script>
     (function() {
-        var REFRESH_INTERVAL = 30000; // 30 seconds
+        var REFRESH_INTERVAL = 30000;
         var countdown        = REFRESH_INTERVAL / 1000;
         var lastRefreshEl    = document.getElementById('last-refresh-val');
         var countdownEl      = document.getElementById('refresh-countdown');
         var nowClockEl       = document.getElementById('ist-clock');
 
-        // ── IST live clock (ticks every second) ──
         function updateClock() {
             var now = new Date();
             var ist = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
@@ -526,7 +522,6 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // ── Countdown display ──
         function updateCountdown() {
             if (countdownEl) countdownEl.textContent = countdown + 's';
             countdown--;
@@ -535,7 +530,6 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // ── Silent background fetch & DOM swap ──
         function silentRefresh() {
             var scrollY = window.scrollY || window.pageYOffset;
             fetch(window.location.href + '?_t=' + Date.now(), {cache: 'no-store'})
@@ -547,9 +541,7 @@
                     var oldBody  = document.querySelector('.container');
                     if (newBody && oldBody) {
                         oldBody.innerHTML = newBody.innerHTML;
-                        // Restore scroll position silently
                         window.scrollTo({top: scrollY, behavior: 'instant'});
-                        // Update last refresh time
                         var now = new Date();
                         var ist = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
                         var h   = String(ist.getHours()).padStart(2,'0');
@@ -557,7 +549,6 @@
                         var s   = String(ist.getSeconds()).padStart(2,'0');
                         var el  = document.getElementById('last-refresh-val');
                         if (el) el.textContent = h + ':' + m + ':' + s + ' IST';
-                        // Re-bind clock & countdown to new DOM elements
                         lastRefreshEl = document.getElementById('last-refresh-val');
                         countdownEl   = document.getElementById('refresh-countdown');
                         nowClockEl    = document.getElementById('ist-clock');
