@@ -6,6 +6,10 @@ FII/DII SECTION: Theme 3 · Pulse Flow
 MARKET DIRECTION: Holographic Glass Widget (Compact)
 KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
 AUTO REFRESH: Silent background fetch every 30s · No flicker · No scroll jump
+
+FIX: Net OI = PE Δ - CE Δ (corrected from PE + CE)
+     Net label now matches actual calculation.
+     Bullish when Net > 0, Bearish when Net < 0.
 """
 from curl_cffi import requests
 import pandas as pd
@@ -288,7 +292,12 @@ class NiftyHTMLAnalyzer:
         pcr_vol = total_pe_vol / total_ce_vol if total_ce_vol > 0 else 0
         total_ce_oi_change = int(df['CE_OI_Change'].sum())
         total_pe_oi_change = int(df['PE_OI_Change'].sum())
-        net_oi_change      = total_pe_oi_change + total_ce_oi_change
+
+        # ── FIX: Net OI = PE Δ - CE Δ (directional subtraction, not addition) ──
+        # Positive Net = Bullish, Negative Net = Bearish
+        # Example: CE=-338K, PE=+234K → Net = 234 - (-338) = +572K → Bullish ✅
+        net_oi_change = total_pe_oi_change - total_ce_oi_change
+
         if   total_ce_oi_change > 0 and total_pe_oi_change < 0:
             oi_direction,oi_signal,oi_icon,oi_class="Strong Bearish","Call Build-up + Put Unwinding","🔴","bearish"
         elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
@@ -303,9 +312,11 @@ class NiftyHTMLAnalyzer:
         elif total_ce_oi_change < 0 and total_pe_oi_change < 0:
             oi_direction,oi_signal,oi_icon,oi_class="Neutral (Unwinding)","Both Calls & Puts Unwinding","🟡","neutral"
         else:
+            # ── FIX: net_oi_change is now PE - CE, so positive = bullish ──
             if   net_oi_change > 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bullish","Net Put Accumulation","🟢","bullish"
             elif net_oi_change < 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bearish","Net Call Accumulation","🔴","bearish"
             else:                   oi_direction,oi_signal,oi_icon,oi_class="Neutral","Balanced OI Changes","🟡","neutral"
+
         max_ce_oi_row = df.loc[df['CE_OI'].idxmax()]; max_pe_oi_row = df.loc[df['PE_OI'].idxmax()]
         df['pain']    = abs(df['CE_OI'] - df['PE_OI']); max_pain_row = df.loc[df['pain'].idxmin()]
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
@@ -742,11 +753,14 @@ class NiftyHTMLAnalyzer:
         oi_cls=d['oi_class']; direction=d['oi_direction']; signal=d['oi_signal']
         ce_raw=d['total_ce_oi_change']; pe_raw=d['total_pe_oi_change']
 
+        # ── FIX: Bull/Bear force logic aligned with corrected Net OI (PE - CE) ──
+        # Call OI decreasing (negative) = bullish force
+        # Put OI increasing (positive)  = bullish force
         bull_force=0; bear_force=0
-        if ce_raw<0: bull_force+=abs(ce_raw)
-        else:        bear_force+=abs(ce_raw)
-        if pe_raw>0: bull_force+=abs(pe_raw)
-        else:        bear_force+=abs(pe_raw)
+        if ce_raw < 0: bull_force += abs(ce_raw)   # Call unwinding = bullish
+        else:          bear_force += abs(ce_raw)    # Call build-up  = bearish
+        if pe_raw > 0: bull_force += abs(pe_raw)    # Put build-up   = bullish
+        else:          bear_force += abs(pe_raw)    # Put unwinding  = bearish
 
         total_force=bull_force+bear_force
         bull_pct=round(bull_force/total_force*100) if total_force>0 else 50
@@ -762,7 +776,9 @@ class NiftyHTMLAnalyzer:
             dir_bg='rgba(20,20,10,0.92)';dir_border='rgba(251,191,36,0.3)'
             dir_left_bar='linear-gradient(180deg,#f59e0b,#d97706)';dir_name_col='#fbbf24';dir_desc_col='rgba(251,191,36,0.5)'
 
-        ce_val=d['total_ce_oi_change']; pe_val=d['total_pe_oi_change']; net_val=d['net_oi_change']
+        ce_val=d['total_ce_oi_change']; pe_val=d['total_pe_oi_change']
+        # ── FIX: net_val now uses corrected PE - CE formula ──
+        net_val=d['net_oi_change']   # already = PE Δ - CE Δ from analyze_option_chain_data
         ce_is_bear=ce_val>0; pe_is_bull=pe_val>0
         ce_col='#fb7185' if ce_is_bear else '#34d399'; ce_dot_col='#ef4444' if ce_is_bear else '#10b981'
         ce_lbl='Bearish Signal' if ce_is_bear else 'Bullish Signal'
@@ -775,10 +791,11 @@ class NiftyHTMLAnalyzer:
         pe_btn_bg='rgba(16,185,129,0.12)' if pe_is_bull else 'rgba(239,68,68,0.12)'
         pe_btn_bdr='rgba(16,185,129,0.4)' if pe_is_bull else 'rgba(239,68,68,0.4)'
 
-        if bull_force > bear_force:
+        # ── FIX: Net card color based on net_val sign (positive=bullish, negative=bearish) ──
+        if net_val > 0:
             net_col='#34d399';net_dot_col='#10b981';net_lbl='Bullish Net'
             net_btn_col='#10b981';net_btn_bg='rgba(16,185,129,0.12)';net_btn_bdr='rgba(16,185,129,0.4)'
-        elif bear_force > bull_force:
+        elif net_val < 0:
             net_col='#fb7185';net_dot_col='#ef4444';net_lbl='Bearish Net'
             net_btn_col='#ef4444';net_btn_bg='rgba(239,68,68,0.12)';net_btn_bdr='rgba(239,68,68,0.4)'
         else:
@@ -796,6 +813,7 @@ class NiftyHTMLAnalyzer:
         cards_html = (
             nc_card('CALL OI CHANGE',ce_dot_col,ce_val,ce_col,'CE open interest \u0394',ce_lbl,ce_btn_col,ce_btn_bg,ce_btn_bdr,'🔴' if ce_is_bear else '🟢') +
             nc_card('PUT OI CHANGE',pe_dot_col,pe_val,pe_col,'PE open interest \u0394',pe_lbl,pe_btn_col,pe_btn_bg,pe_btn_bdr,'🟢' if pe_is_bull else '🔴') +
+            # ── FIX: sub-label now correctly says "PE Δ − CE Δ" matching the actual formula ──
             nc_card('NET OI CHANGE',net_dot_col,net_val,net_col,'PE \u0394 \u2212 CE \u0394',net_lbl,net_btn_col,net_btn_bg,net_btn_bdr,'\u2696\ufe0f')
         )
 
@@ -844,7 +862,8 @@ class NiftyHTMLAnalyzer:
             '        <div class="logic-grid">\n'
             '            <div class="logic-item"><span class="lc-info">Call OI +</span> Writers selling calls <span class="lc-bear">Bearish</span>&nbsp;&nbsp;<span class="lc-info">Call OI \u2212</span> Unwinding <span class="lc-bull">Bullish</span></div>\n'
             '            <div class="logic-item"><span class="lc-info">Put OI +</span> Writers selling puts <span class="lc-bull">Bullish</span>&nbsp;&nbsp;<span class="lc-info">Put OI \u2212</span> Unwinding <span class="lc-bear">Bearish</span></div>\n'
-            '            <div class="logic-item"><span class="lc-info">Net OI</span> = Put \u0394 \u2212 Call \u0394 &nbsp;\u00b7&nbsp; <span class="lc-bull">Positive = Bullish</span> &nbsp;<span class="lc-bear">Negative = Bearish</span></div>\n'
+            # ── FIX: Updated "HOW TO READ" section — positive net = bullish ──
+            '            <div class="logic-item"><span class="lc-info">Net OI</span> = PE \u0394 \u2212 CE \u0394 &nbsp;\u00b7&nbsp; <span class="lc-bull">Positive = Bullish</span> &nbsp;<span class="lc-bear">Negative = Bearish</span></div>\n'
             '            <div class="logic-item"><span class="lc-info">Bull % + Bear %</span> = 100% &nbsp;\u00b7&nbsp; relative dominance</div>\n'
             '        </div>\n'
             '    </div>\n'
@@ -931,17 +950,15 @@ class NiftyHTMLAnalyzer:
                       f'<div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>'
                       f'<div class="rl-val" style="color:#ffb74d;">\u20b9{d["max_pain"]:,}</div></div>')
 
-        # ── NEW: Silent auto-refresh JavaScript (30s, no flicker, no scroll jump) ──
         auto_refresh_js = """
     <script>
     (function() {
-        var REFRESH_INTERVAL = 30000; // 30 seconds
+        var REFRESH_INTERVAL = 30000;
         var countdown        = REFRESH_INTERVAL / 1000;
         var lastRefreshEl    = document.getElementById('last-refresh-val');
         var countdownEl      = document.getElementById('refresh-countdown');
         var nowClockEl       = document.getElementById('ist-clock');
 
-        // ── IST live clock (ticks every second) ──
         function updateClock() {
             var now = new Date();
             var ist = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
@@ -953,7 +970,6 @@ class NiftyHTMLAnalyzer:
         setInterval(updateClock, 1000);
         updateClock();
 
-        // ── Countdown display ──
         function updateCountdown() {
             if (countdownEl) countdownEl.textContent = countdown + 's';
             countdown--;
@@ -962,7 +978,6 @@ class NiftyHTMLAnalyzer:
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // ── Silent background fetch & DOM swap ──
         function silentRefresh() {
             var scrollY = window.scrollY || window.pageYOffset;
             fetch(window.location.href + '?_t=' + Date.now(), {cache: 'no-store'})
@@ -974,9 +989,7 @@ class NiftyHTMLAnalyzer:
                     var oldBody  = document.querySelector('.container');
                     if (newBody && oldBody) {
                         oldBody.innerHTML = newBody.innerHTML;
-                        // Restore scroll position silently
                         window.scrollTo({top: scrollY, behavior: 'instant'});
-                        // Update last refresh time
                         var now = new Date();
                         var ist = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
                         var h   = String(ist.getHours()).padStart(2,'0');
@@ -984,7 +997,6 @@ class NiftyHTMLAnalyzer:
                         var s   = String(ist.getSeconds()).padStart(2,'0');
                         var el  = document.getElementById('last-refresh-val');
                         if (el) el.textContent = h + ':' + m + ':' + s + ' IST';
-                        // Re-bind clock & countdown to new DOM elements
                         lastRefreshEl = document.getElementById('last-refresh-val');
                         countdownEl   = document.getElementById('refresh-countdown');
                         nowClockEl    = document.getElementById('ist-clock');
@@ -1013,7 +1025,6 @@ class NiftyHTMLAnalyzer:
         .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}}
         .header h1{{font-family:'Oxanium',sans-serif;font-size:30px;font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:2px;position:relative;z-index:1;}}
         .header p{{color:#80deea;font-size:13px;margin-top:8px;position:relative;z-index:1;}}
-        /* ── Auto-refresh status bar ── */
         .refresh-bar{{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:16px;padding:10px 20px;background:rgba(0,0,0,0.25);border-radius:10px;border:1px solid rgba(79,195,247,0.12);position:relative;z-index:1;}}
         .refresh-item{{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:11px;}}
         .refresh-dot{{width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:rb-pulse 2s ease-in-out infinite;flex-shrink:0;}}
@@ -1023,7 +1034,6 @@ class NiftyHTMLAnalyzer:
         .refresh-label{{color:rgba(128,222,234,0.45);letter-spacing:1.5px;text-transform:uppercase;font-size:9px;}}
         .refresh-value{{color:#e0f7fa;font-weight:700;letter-spacing:0.5px;}}
         .refresh-sep{{width:1px;height:22px;background:rgba(79,195,247,0.15);}}
-        /* rest of styles unchanged */
         .section{{padding:28px 26px;border-bottom:1px solid rgba(79,195,247,0.08);}}
         .section:last-child{{border-bottom:none;}}
         .section-title{{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}}
@@ -1221,7 +1231,6 @@ class NiftyHTMLAnalyzer:
     <div class="header">
         <h1>&#128202; NIFTY 50 DAILY REPORT</h1>
         <p>Data Generated: {d['timestamp']}</p>
-        <!-- ── Auto-refresh status bar ── -->
         <div class="refresh-bar">
             <div class="refresh-item">
                 <div class="refresh-dot clock-dot"></div>
@@ -1300,7 +1309,6 @@ class NiftyHTMLAnalyzer:
     </div>
 </div>
 """
-        # Inject JS just before </body>
         html += auto_refresh_js
         html += "\n</body></html>"
         return html
