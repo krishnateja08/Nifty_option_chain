@@ -254,34 +254,6 @@
         .pf-insight-lbl{font-size:9px;letter-spacing:2px;font-weight:700;text-transform:uppercase;}
         .pf-verdict-badge{display:inline-block;padding:3px 14px;border-radius:20px;font-size:clamp(10px,1.5vw,11px);font-weight:800;letter-spacing:1px;white-space:nowrap;}
         .pf-insight-text{font-size:clamp(12px,1.5vw,13px);color:#cfd8dc;line-height:1.85;font-weight:500;}
-        /* ═══ STRATEGY BOXES ════════════════════════════════════════════════ */
-        .sb-wrap{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.15);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.3);}
-        .sb-header{padding:11px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.1);flex-wrap:wrap;gap:8px;}
-        .sb-header.cyan{background:rgba(79,195,247,0.08);border-left:4px solid #4fc3f7;}
-        .sb-header.gold{background:rgba(255,183,77,0.08);border-left:4px solid #ffb74d;}
-        .sb-h-title{font-family:'Oxanium',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;color:#4fc3f7;letter-spacing:1px;word-break:break-word;}
-        .sb-h-title.gold{color:#ffb74d;}
-        .sb-h-badge{font-size:9px;padding:3px 12px;border-radius:10px;font-weight:700;letter-spacing:1px;white-space:nowrap;}
-        .sb-h-badge.cyan{background:rgba(79,195,247,0.12);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3);}
-        .sb-h-badge.gold{background:rgba(255,183,77,0.12);color:#ffb74d;border:1px solid rgba(255,183,77,0.3);}
-        /* Strategy body: auto-fill columns, min 120px each */
-        .sb-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));}
-        .sb-cell{padding:12px 10px;text-align:center;border-right:1px solid rgba(79,195,247,0.06);min-width:0;}
-        .sb-cell:last-child{border-right:none;}
-        .sb-lbl{font-size:9px;letter-spacing:1.5px;color:#80a0b8;text-transform:uppercase;margin-bottom:5px;font-weight:600;}
-        .sb-val{font-family:'Oxanium',sans-serif;font-size:clamp(11px,1.5vw,14px);font-weight:700;color:#e0f7fa;word-break:break-word;}
-        .sb-val.green{color:#00e676;}.sb-val.cyan{color:#00bcd4;}.sb-val.gold{color:#ffb74d;}.sb-val.red{color:#ff5252;}.sb-val.small{font-size:clamp(9px,1.2vw,11px);}
-        .sb-signal{padding:10px 16px;background:rgba(79,195,247,0.05);border-top:1px solid rgba(79,195,247,0.06);border-bottom:1px solid rgba(79,195,247,0.06);font-size:clamp(12px,1.5vw,14px);color:#ffffff;font-weight:500;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-        .sb-signal .sig-lbl{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-weight:700;}
-        .sb-footer{padding:11px 16px;background:rgba(0,0,0,0.25);font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.5vw,13px);color:#ffffff;font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
-        .sb-footer .sf-lbl{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;}
-        .sb-footer .sf-why{font-size:clamp(11px,1.5vw,13px);color:#ffffff;font-style:italic;font-family:'Rajdhani',sans-serif;font-weight:500;margin-left:auto;}
-        /* ═══ STRIKES TABLE ══════════════════════════════════════════════════ */
-        .strikes-table{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}
-        .strikes-table th{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:clamp(8px,1.5vw,14px);text-align:left;font-weight:700;font-size:clamp(10px,1.3vw,12px);text-transform:uppercase;}
-        .strikes-table td{padding:clamp(8px,1.5vw,14px);border-bottom:1px solid rgba(79,195,247,0.08);color:#b0bec5;font-size:clamp(11px,1.5vw,13px);word-break:break-word;}
-        .strikes-table tr:hover{background:rgba(79,195,247,0.06);}
-        .strikes-table tbody tr:last-child td{border-bottom:none;}
         /* ═══ DISCLAIMER & FOOTER ════════════════════════════════════════════ */
         .disclaimer{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}
         .footer{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}
@@ -321,7 +293,6 @@
             .pf-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
             .nc-cards-grid{grid-template-columns:repeat(3,minmax(0,1fr));}
             .nc-meter-track{width:140px;}
-            .strikes-wrap{grid-template-columns:1fr !important;}
         }
         /* ═══ MOBILE: 600px ════════════════════════════════════════════════ */
         @media(max-width:600px){
@@ -352,22 +323,13 @@
             /* Direction widget */
             .md-direction{font-size:clamp(20px,6vw,28px);}
             .md-row-top,.md-row-bottom{flex-direction:column;align-items:flex-start;}
-            /* Strategy cells wrap */
-            .sb-body{grid-template-columns:repeat(2,minmax(0,1fr));}
-            .sb-cell{border-right:none;border-bottom:1px solid rgba(79,195,247,0.06);}
-            .sb-cell:last-child{border-bottom:none;}
-            .sb-footer{flex-direction:column;gap:6px;}
-            .sb-footer .sf-why{margin-left:0;}
             /* Inline style grid override for key levels distance row */
             div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}
-            .strikes-wrap{grid-template-columns:1fr !important;}
             /* Status bar wraps to 2×2 on mobile */
             .status-bar{flex-wrap:wrap;}
             .sb-item{flex:1 1 45%;border-right:none;border-bottom:1px solid rgba(79,195,247,0.08);}
             .sb-item:nth-child(odd){border-right:1px solid rgba(79,195,247,0.08);}
             .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){border-bottom:none;}
-            /* Refresh sep hidden */
-            .refresh-sep{display:none;}
             /* Date range label hidden — saves space */
             .pf-date-range{display:none;}
         }
@@ -375,8 +337,6 @@
         @media(max-width:400px){
             .snap-grid{grid-template-columns:minmax(0,1fr);}
             .pf-grid{grid-template-columns:minmax(0,1fr);}
-            .sb-body{grid-template-columns:minmax(0,1fr);}
-            .sb-cell{border-right:none;}
             .nc-dir-name{font-size:clamp(16px,5vw,20px);}
             .header h1{letter-spacing:0;}
         }
@@ -392,7 +352,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">24-Feb-2026 22:11 IST</span>
+                <span class="sb-value gen-val">24-Feb-2026 22:23 IST</span>
             </div>
 
             <!-- 2. LIVE IST CLOCK (ticks every second via JS) -->
@@ -406,7 +366,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-updated"></span>
                 <span class="sb-label">Last Updated</span>
-                <span class="sb-value updated-val" id="last-updated">24-Feb-2026 22:11 IST</span>
+                <span class="sb-value updated-val" id="last-updated">24-Feb-2026 22:23 IST</span>
             </div>
 
             <!-- 4. NEXT REFRESH COUNTDOWN -->
@@ -616,59 +576,6 @@
                 <div class="card-foot"><div class="sub">PE floor</div><span class="tag tag-bull">Support</span></div>
             </div></div>
     </div>
-
-    <div class="section">
-        <div class="section-title"><span>&#128161;</span> TRADING RECOMMENDATIONS (Dual Strategy)</div>
-        <p style="color:#90a4ae;font-size:13px;margin-bottom:16px;letter-spacing:0.5px;">
-            Two independent strategy recommendations based on
-            <strong style="color:#4fc3f7;">Technical Analysis</strong> and
-            <strong style="color:#ffb74d;">OI Momentum</strong>.
-        </p>
-
-        <div class="sb-wrap">
-            <div class="sb-header cyan"><span class="sb-h-title">1️⃣ TECHNICAL ANALYSIS STRATEGY &nbsp;·&nbsp; Bear Put Spread</span><span class="sb-h-badge cyan">Positional · 1–5 Days</span></div>
-            <div class="sb-body">
-                <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val red">Bearish</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">Debit</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Risk</div><div class="sb-val gold">Moderate</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val cyan small">Capped</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val gold small">Premium Paid</div></div>
-            </div>
-            <div class="sb-footer"><span class="sf-lbl">&#128203; Setup</span><span>Buy 25400 PE, Sell 25200 PE</span><span class="sf-why">&#128161; Moderate downside with limited risk</span></div>
-        </div>
-
-        <div class="sb-wrap">
-            <div class="sb-header gold"><span class="sb-h-title gold">2️⃣ OI MOMENTUM STRATEGY &nbsp;·&nbsp; Long Put</span><span class="sb-h-badge gold">Intraday to 1-2 days</span></div>
-            <div class="sb-signal"><span class="sig-lbl">&#128202; OI Signal</span><span style="color:#ffffff;font-weight:500;">🔴 Institutional selling interest detected</span></div>
-            <div class="sb-body">
-                <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val red">Bearish</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">Debit</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Risk</div><div class="sb-val red">High</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val cyan small">Huge (to ₹0)</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val gold small">Premium Paid</div></div>
-            </div>
-            <div class="sb-footer"><span class="sf-lbl">&#128203; Setup</span><span>Buy 25400 PE</span><span class="sf-why">&#128161; Call build-up indicates bearish momentum</span></div>
-        </div>
-
-    <div class="section">
-        <div class="section-title"><span>&#128203;</span> TOP 5 STRIKES BY OPEN INTEREST <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Only)</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="strikes-wrap">
-            <div><h3 style="color:#00bcd4;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">&#128222; CALL OPTIONS (CE)</h3>
-            <table class="strikes-table"><thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>&#8377;25,500</strong></td><td>104,823</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;167.00</td></tr>
-<tr><td><strong>2</strong></td><td><strong>&#8377;25,800</strong></td><td>76,484</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;56.00</td></tr>
-<tr><td><strong>3</strong></td><td><strong>&#8377;25,700</strong></td><td>71,824</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;82.95</td></tr>
-<tr><td><strong>4</strong></td><td><strong>&#8377;25,600</strong></td><td>65,248</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;120.00</td></tr>
-<tr><td><strong>5</strong></td><td><strong>&#8377;25,900</strong></td><td>43,044</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;37.40</td></tr>
-</tbody></table></div>
-            <div><h3 style="color:#f44336;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">&#128201; PUT OPTIONS (PE)</h3>
-            <table class="strikes-table"><thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-<tr><td><strong>1</strong></td><td><strong>&#8377;25,000</strong></td><td>66,264</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;47.00</td></tr>
-<tr><td><strong>2</strong></td><td><strong>&#8377;25,500</strong></td><td>62,098</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;186.00</td></tr>
-<tr><td><strong>3</strong></td><td><strong>&#8377;25,400</strong></td><td>46,891</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;143.00</td></tr>
-<tr><td><strong>4</strong></td><td><strong>&#8377;25,300</strong></td><td>29,963</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;108.05</td></tr>
-<tr><td><strong>5</strong></td><td><strong>&#8377;25,200</strong></td><td>27,160</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;81.45</td></tr>
-</tbody></table></div></div></div>
 
     <div class="section">
         <div class="disclaimer"><strong>⚠️ DISCLAIMER</strong><br><br>
