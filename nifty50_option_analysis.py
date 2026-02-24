@@ -1055,59 +1055,24 @@ class NiftyHTMLAnalyzer:
         auto_refresh_js = """
     <script>
     (function() {
-        var REFRESH_INTERVAL = 30000;
-        var countdown        = REFRESH_INTERVAL / 1000;
-        var lastRefreshEl    = document.getElementById('last-refresh-val');
-        var countdownEl      = document.getElementById('refresh-countdown');
-        var nowClockEl       = document.getElementById('ist-clock');
-
-        function updateClock() {
-            var now = new Date();
-            var ist = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
-            var h   = String(ist.getHours()).padStart(2,'0');
-            var m   = String(ist.getMinutes()).padStart(2,'0');
-            var s   = String(ist.getSeconds()).padStart(2,'0');
-            if (nowClockEl) nowClockEl.textContent = h + ':' + m + ':' + s + ' IST';
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        function updateCountdown() {
-            if (countdownEl) countdownEl.textContent = countdown + 's';
-            countdown--;
-            if (countdown < 0) countdown = REFRESH_INTERVAL / 1000;
-        }
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-
+        /* Silent background page refresh every 30s — no scroll jump */
         function silentRefresh() {
             var scrollY = window.scrollY || window.pageYOffset;
             fetch(window.location.href + '?_t=' + Date.now(), {cache: 'no-store'})
                 .then(function(r) { return r.text(); })
                 .then(function(html) {
-                    var parser   = new DOMParser();
-                    var newDoc   = parser.parseFromString(html, 'text/html');
-                    var newBody  = newDoc.querySelector('.container');
-                    var oldBody  = document.querySelector('.container');
+                    var parser  = new DOMParser();
+                    var newDoc  = parser.parseFromString(html, 'text/html');
+                    var newBody = newDoc.querySelector('.container');
+                    var oldBody = document.querySelector('.container');
                     if (newBody && oldBody) {
                         oldBody.innerHTML = newBody.innerHTML;
                         window.scrollTo({top: scrollY, behavior: 'instant'});
-                        var now = new Date();
-                        var ist = new Date(now.toLocaleString('en-US', {timeZone: 'Asia/Kolkata'}));
-                        var h   = String(ist.getHours()).padStart(2,'0');
-                        var m   = String(ist.getMinutes()).padStart(2,'0');
-                        var s   = String(ist.getSeconds()).padStart(2,'0');
-                        var el  = document.getElementById('last-refresh-val');
-                        if (el) el.textContent = h + ':' + m + ':' + s + ' IST';
-                        lastRefreshEl = document.getElementById('last-refresh-val');
-                        countdownEl   = document.getElementById('refresh-countdown');
-                        nowClockEl    = document.getElementById('ist-clock');
-                        countdown     = REFRESH_INTERVAL / 1000;
                     }
                 })
                 .catch(function(e) { console.warn('Silent refresh failed:', e); });
         }
-        setInterval(silentRefresh, REFRESH_INTERVAL);
+        setInterval(silentRefresh, 30000);
     })();
     </script>
 """
@@ -1441,24 +1406,11 @@ class NiftyHTMLAnalyzer:
 <div class="container">
     <div class="header">
         <h1>&#128202; NIFTY 50 DAILY REPORT</h1>
-        <p>Data Generated: {d['timestamp']}</p>
         <div class="refresh-bar">
             <div class="refresh-item">
-                <div class="refresh-dot clock-dot"></div>
-                <span class="refresh-label">IST Now</span>
-                <span class="refresh-value" id="ist-clock">--:--:-- IST</span>
-            </div>
-            <div class="refresh-sep"></div>
-            <div class="refresh-item">
                 <div class="refresh-dot"></div>
-                <span class="refresh-label">Last Refresh</span>
-                <span class="refresh-value" id="last-refresh-val">{d['timestamp'].replace(' IST','')}</span>
-            </div>
-            <div class="refresh-sep"></div>
-            <div class="refresh-item">
-                <div class="refresh-dot cd-dot"></div>
-                <span class="refresh-label">Next in</span>
-                <span class="refresh-value" id="refresh-countdown">30s</span>
+                <span class="refresh-label">Data Generated</span>
+                <span class="refresh-value">{d['timestamp']}</span>
             </div>
         </div>
     </div>
