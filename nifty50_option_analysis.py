@@ -44,7 +44,23 @@ warnings.filterwarnings('ignore')
 # trading day (Monday, or Friday if Monday is also a holiday, etc.).
 # Source: NSE official holiday circular. Update this set each January.
 NSE_FO_HOLIDAYS = {
-   
+    # ── 2025 ──────────────────────────────────────────────────────────────
+    "26-Jan-2025",  # Republic Day
+    "19-Feb-2025",  # Chhatrapati Shivaji Maharaj Jayanti
+    "14-Mar-2025",  # Holi
+    "31-Mar-2025",  # Id-Ul-Fitr (Ramzan Eid)
+    "10-Apr-2025",  # Dr. Baba Saheb Ambedkar Jayanti / Shri Ram Navami
+    "14-Apr-2025",  # Dr. Baba Saheb Ambedkar Jayanti
+    "18-Apr-2025",  # Good Friday
+    "01-May-2025",  # Maharashtra Day
+    "15-Aug-2025",  # Independence Day
+    "27-Aug-2025",  # Ganesh Chaturthi
+    "02-Oct-2025",  # Mahatma Gandhi Jayanti / Dussehra
+    "20-Oct-2025",  # Diwali - Laxmi Pujan
+    "21-Oct-2025",  # Diwali - Balipratipada
+    "05-Nov-2025",  # Prakash Gurpurb Sri Guru Nanak Dev Ji
+    "19-Nov-2025",  # Gurunanak Jayanti (alternate)
+    "25-Dec-2025",  # Christmas
     # ── 2026 — OFFICIAL NSE TRADING HOLIDAYS (F&O Segment) ───────────────
     # Source: NSE official circular (verified from exchange calendar)
     "15-Jan-2026",  # Municipal Corporation Election - Maharashtra
@@ -1055,24 +1071,61 @@ class NiftyHTMLAnalyzer:
         auto_refresh_js = """
     <script>
     (function() {
-        /* Silent background page refresh every 30s — no scroll jump */
-        function silentRefresh() {
-            var scrollY = window.scrollY || window.pageYOffset;
-            fetch(window.location.href + '?_t=' + Date.now(), {cache: 'no-store'})
-                .then(function(r) { return r.text(); })
-                .then(function(html) {
-                    var parser  = new DOMParser();
-                    var newDoc  = parser.parseFromString(html, 'text/html');
-                    var newBody = newDoc.querySelector('.container');
-                    var oldBody = document.querySelector('.container');
-                    if (newBody && oldBody) {
-                        oldBody.innerHTML = newBody.innerHTML;
-                        window.scrollTo({top: scrollY, behavior: 'instant'});
-                    }
-                })
-                .catch(function(e) { console.warn('Silent refresh failed:', e); });
+        var INTERVAL  = 30000;
+        var countdown = INTERVAL / 1000;
+
+        /* ── helpers ───────────────────────────────────────────────────── */
+        function istNow() {
+            return new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
         }
-        setInterval(silentRefresh, 30000);
+        function pad(n){ return String(n).padStart(2,'0'); }
+        function fmtTime(d){ return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()); }
+        function fmtDate(d){
+            var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            return pad(d.getDate())+'-'+M[d.getMonth()]+'-'+d.getFullYear();
+        }
+
+        /* ── live IST clock + countdown, ticks every second ────────────── */
+        function tick() {
+            var now    = istNow();
+            var clockEl = document.getElementById('live-ist-clock');
+            if (clockEl) clockEl.textContent = fmtDate(now) + '  ' + fmtTime(now) + ' IST';
+
+            countdown--;
+            if (countdown < 0) countdown = INTERVAL / 1000;
+            var cdEl = document.getElementById('refresh-countdown');
+            if (cdEl) {
+                var s = countdown % 60;
+                var m = Math.floor(countdown / 60);
+                cdEl.textContent = (m > 0 ? m + 'm ' : '') + s + 's';
+            }
+        }
+        setInterval(tick, 1000);
+        tick();
+
+        /* ── silent background refresh — swap .container only ───────────── */
+        function silentRefresh() {
+            fetch(window.location.href + '?_t=' + Date.now(), {cache:'no-store'})
+                .then(function(r){ return r.text(); })
+                .then(function(html){
+                    var parser   = new DOMParser();
+                    var newDoc   = parser.parseFromString(html,'text/html');
+                    var newCont  = newDoc.querySelector('.container');
+                    var oldCont  = document.querySelector('.container');
+                    if (!newCont || !oldCont) return;
+                    var sy = window.scrollY || window.pageYOffset;
+                    oldCont.innerHTML = newCont.innerHTML;
+                    window.scrollTo({top:sy, behavior:'instant'});
+                    /* stamp last-updated after swap */
+                    var now   = istNow();
+                    var stamp = fmtDate(now) + '  ' + fmtTime(now) + ' IST';
+                    var el    = document.getElementById('last-updated');
+                    if (el) el.textContent = stamp;
+                    countdown = INTERVAL / 1000;
+                })
+                .catch(function(e){ console.warn('Refresh failed:',e); });
+        }
+        setInterval(silentRefresh, INTERVAL);
     })();
     </script>
 """
@@ -1114,7 +1167,7 @@ class NiftyHTMLAnalyzer:
         /* ═══ HEADER ═════════════════════════════════════════════════════════ */
         .header{{
             background:linear-gradient(135deg,#0f2027,#203a43);
-            padding:clamp(20px,4vw,40px) clamp(14px,3vw,30px);
+            padding:clamp(16px,3vw,32px) clamp(14px,3vw,30px) clamp(14px,2vw,24px);
             text-align:center;
             border-bottom:2px solid rgba(79,195,247,0.3);
             position:relative;overflow:hidden;
@@ -1128,8 +1181,63 @@ class NiftyHTMLAnalyzer:
             letter-spacing:clamp(0.5px,0.3vw,2px);
             position:relative;z-index:1;
             word-break:break-word;
+            margin-bottom:clamp(10px,2vw,18px);
         }}
-        .header p{{color:#80deea;font-size:clamp(10px,1.5vw,13px);margin-top:8px;position:relative;z-index:1;}}
+        /* ── Status bar: single row, all 4 items inline ─────────────────── */
+        .status-bar{{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-wrap:wrap;
+            gap:0;
+            background:rgba(0,0,0,0.30);
+            border:1px solid rgba(79,195,247,0.15);
+            border-radius:10px;
+            padding:0;
+            overflow:hidden;
+            position:relative;z-index:1;
+            /* subtle top-line */
+            box-shadow:inset 0 1px 0 rgba(79,195,247,0.12);
+        }}
+        .sb-item{{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:10px clamp(10px,2vw,20px);
+            flex:1 1 auto;
+            min-width:0;
+            border-right:1px solid rgba(79,195,247,0.10);
+            white-space:nowrap;
+        }}
+        .sb-item:last-child{{border-right:none;}}
+        .sb-dot{{
+            width:8px;height:8px;border-radius:50%;flex-shrink:0;
+        }}
+        .sb-dot-gen{{ background:#00e676;box-shadow:0 0 8px #00e676; }}
+        .sb-dot-clock{{ background:#4fc3f7;box-shadow:0 0 8px #4fc3f7; }}
+        .sb-dot-updated{{ background:#ffb74d;box-shadow:0 0 8px #ffb74d; animation:sb-pulse 2s ease-in-out infinite; }}
+        .sb-dot-cd{{ background:#b388ff;box-shadow:0 0 8px #b388ff; }}
+        @keyframes sb-pulse{{50%{{opacity:0.2;}}}}
+        .sb-label{{
+            font-family:'JetBrains Mono',monospace;
+            font-size:clamp(8px,1vw,9px);
+            letter-spacing:1.8px;
+            text-transform:uppercase;
+            color:rgba(128,222,234,0.40);
+            flex-shrink:0;
+        }}
+        .sb-value{{
+            font-family:'JetBrains Mono',monospace;
+            font-size:clamp(10px,1.3vw,12px);
+            font-weight:700;
+            color:#e0f7fa;
+            overflow:hidden;
+            text-overflow:ellipsis;
+        }}
+        .sb-value.gen-val{{ color:#80deea; }}
+        .sb-value.clock-val{{ color:#4fc3f7; font-size:clamp(11px,1.5vw,13px); }}
+        .sb-value.updated-val{{ color:#ffb74d; }}
+        .sb-value.cd-val{{ color:#b388ff; min-width:28px; }}
         /* ═══ REFRESH BAR ════════════════════════════════════════════════════ */
         .refresh-bar{{
             display:flex;align-items:center;justify-content:center;
@@ -1385,9 +1493,13 @@ class NiftyHTMLAnalyzer:
             /* Inline style grid override for key levels distance row */
             div[style*="grid-template-columns:1fr 1fr"]{{grid-template-columns:1fr !important;}}
             .strikes-wrap{{grid-template-columns:1fr !important;}}
-            /* Refresh bar compact */
+            /* Status bar wraps to 2×2 on mobile */
+            .status-bar{{flex-wrap:wrap;}}
+            .sb-item{{flex:1 1 45%;border-right:none;border-bottom:1px solid rgba(79,195,247,0.08);}}
+            .sb-item:nth-child(odd){{border-right:1px solid rgba(79,195,247,0.08);}}
+            .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){{border-bottom:none;}}
+            /* Refresh sep hidden */
             .refresh-sep{{display:none;}}
-            .refresh-bar{{gap:10px;}}
             /* Date range label hidden — saves space */
             .pf-date-range{{display:none;}}
         }}
@@ -1406,12 +1518,36 @@ class NiftyHTMLAnalyzer:
 <div class="container">
     <div class="header">
         <h1>&#128202; NIFTY 50 DAILY REPORT</h1>
-        <div class="refresh-bar">
-            <div class="refresh-item">
-                <div class="refresh-dot"></div>
-                <span class="refresh-label">Data Generated</span>
-                <span class="refresh-value">{d['timestamp']}</span>
+        <div class="status-bar">
+
+            <!-- 1. DATA GENERATED (static — set when Python ran) -->
+            <div class="sb-item">
+                <span class="sb-dot sb-dot-gen"></span>
+                <span class="sb-label">Generated</span>
+                <span class="sb-value gen-val">{d['timestamp']}</span>
             </div>
+
+            <!-- 2. LIVE IST CLOCK (ticks every second via JS) -->
+            <div class="sb-item">
+                <span class="sb-dot sb-dot-clock"></span>
+                <span class="sb-label">IST Now</span>
+                <span class="sb-value clock-val" id="live-ist-clock">--:--:--</span>
+            </div>
+
+            <!-- 3. LAST UPDATED (set after each silent refresh) -->
+            <div class="sb-item">
+                <span class="sb-dot sb-dot-updated"></span>
+                <span class="sb-label">Last Updated</span>
+                <span class="sb-value updated-val" id="last-updated">{d['timestamp']}</span>
+            </div>
+
+            <!-- 4. NEXT REFRESH COUNTDOWN -->
+            <div class="sb-item">
+                <span class="sb-dot sb-dot-cd"></span>
+                <span class="sb-label">Next Refresh</span>
+                <span class="sb-value cd-val" id="refresh-countdown">30s</span>
+            </div>
+
         </div>
     </div>
     <div class="section">
