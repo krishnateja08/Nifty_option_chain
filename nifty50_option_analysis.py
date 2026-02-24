@@ -1,23 +1,23 @@
 """
-NIFTY 50 COMPLETE ANALYSIS - SLATE TEAL THEME
+NIFTY 50 COMPLETE ANALYSIS - WARM CHARCOAL GOLD THEME
 ═══════════════════════════════════════════════════════════════
-THEME    : Slate Teal (Theme 1)
+THEME    : Warm Charcoal Gold (Theme 2)
 PALETTE  :
-  --bg           : #1c2b32   (slate ocean base)
-  --surface      : #233039   (card background)
-  --surface2     : #2a3c46   (hover / nested)
-  --border       : rgba(45,212,191,0.12)
-  --accent       : #2dd4bf   (teal)
-  --accent2      : #38bdf8   (sky blue)
-  --text         : #e2eef2   (primary text)
-  --muted        : #7a9aaa   (secondary text)
-  --pos          : #4ade80   (green / bullish)
-  --neg          : #f87171   (red / bearish)
-  --neu          : #fbbf24   (yellow / neutral)
+  --bg           : #1c1a17   (warm charcoal base)
+  --surface      : #262320   (card background)
+  --surface2     : #2d2a26   (hover / nested)
+  --border       : rgba(212,168,83,0.12)
+  --accent       : #d4a853   (gold)
+  --accent2      : #f0c070   (light gold)
+  --text         : #e8dfd0   (warm cream)
+  --muted        : #8a7d68   (secondary text)
+  --pos          : #6bcf8f   (green / bullish)
+  --neg          : #e07070   (red / bearish)
+  --neu          : #d4a853   (gold / neutral)
 ═══════════════════════════════════════════════════════════════
-CARD STYLE        : Glassmorphism Frosted — Stat Card + Progress Bar
-CHANGE IN OI      : Slate Teal Command Theme
-FII/DII SECTION   : Pulse Flow (Teal Palette)
+CARD STYLE        : Warm Charcoal — Playfair serif + border-left accent
+CHANGE IN OI      : Warm Gold Command Theme
+FII/DII SECTION   : Pulse Flow (Gold Palette)
 MARKET DIRECTION  : Holographic Glass Widget (Compact)
 KEY LEVELS        : 1H Candles · Last 120 bars · ±200 pts from price
 AUTO REFRESH      : Silent background fetch every 30s
@@ -56,45 +56,45 @@ NSE_FO_HOLIDAYS = {
 }
 
 # ═══════════════════════════════════════════════════════════════════════════════
-#  SLATE TEAL CSS VARIABLES — single source of truth for the entire theme
+#  WARM CHARCOAL GOLD CSS VARIABLES — single source of truth for the entire theme
 # ═══════════════════════════════════════════════════════════════════════════════
 
 THEME_CSS_VARS = """
-    --bg:           #1c2b32;
-    --surface:      #233039;
-    --surface2:     #2a3c46;
-    --surface3:     #324d5c;
-    --border:       rgba(45,212,191,0.12);
-    --border2:      rgba(45,212,191,0.22);
-    --accent:       #2dd4bf;
-    --accent2:      #38bdf8;
-    --accent-glow:  rgba(45,212,191,0.18);
-    --text:         #e2eef2;
-    --text2:        #b8d0d8;
-    --muted:        #7a9aaa;
-    --muted2:       #4a6a7a;
-    --pos:          #4ade80;
-    --pos-bg:       rgba(74,222,128,0.10);
-    --pos-border:   rgba(74,222,128,0.22);
-    --neg:          #f87171;
-    --neg-bg:       rgba(248,113,113,0.10);
-    --neg-border:   rgba(248,113,113,0.22);
-    --neu:          #fbbf24;
-    --neu-bg:       rgba(251,191,36,0.08);
-    --neu-border:   rgba(251,191,36,0.20);
-    --info:         #38bdf8;
-    --info-bg:      rgba(56,189,248,0.08);
-    --info-border:  rgba(56,189,248,0.20);
-    --grad-accent:  linear-gradient(135deg,#2dd4bf,#38bdf8);
-    --grad-pos:     linear-gradient(90deg,#4ade80,#22c55e);
-    --grad-neg:     linear-gradient(90deg,#f87171,#ef4444);
-    --grad-neu:     linear-gradient(90deg,#fbbf24,#f59e0b);
-    --grad-header:  linear-gradient(135deg,#1c3a45 0%,#1e3040 50%,#1c2b38 100%);
-    --shadow-card:  0 4px 20px rgba(0,0,0,0.30);
-    --shadow-hover: 0 8px 32px rgba(0,0,0,0.40);
-    --radius-card:  14px;
-    --radius-sm:    8px;
-    --radius-lg:    18px;
+    --bg:           #1c1a17;
+    --surface:      #262320;
+    --surface2:     #2d2a26;
+    --surface3:     #363028;
+    --border:       rgba(212,168,83,0.12);
+    --border2:      rgba(212,168,83,0.28);
+    --accent:       #d4a853;
+    --accent2:      #f0c070;
+    --accent-glow:  rgba(212,168,83,0.10);
+    --text:         #e8dfd0;
+    --text2:        #d0c4b0;
+    --muted:        #8a7d68;
+    --muted2:       #5a4e3c;
+    --pos:          #6bcf8f;
+    --pos-bg:       rgba(107,207,143,0.10);
+    --pos-border:   rgba(107,207,143,0.22);
+    --neg:          #e07070;
+    --neg-bg:       rgba(224,112,112,0.10);
+    --neg-border:   rgba(224,112,112,0.22);
+    --neu:          #d4a853;
+    --neu-bg:       rgba(212,168,83,0.08);
+    --neu-border:   rgba(212,168,83,0.22);
+    --info:         #d4a853;
+    --info-bg:      rgba(212,168,83,0.07);
+    --info-border:  rgba(212,168,83,0.18);
+    --grad-accent:  linear-gradient(135deg,#d4a853,#f0c070);
+    --grad-pos:     linear-gradient(90deg,#6bcf8f,#4aba7a);
+    --grad-neg:     linear-gradient(90deg,#e07070,#c95050);
+    --grad-neu:     linear-gradient(90deg,#d4a853,#f0c070);
+    --grad-header:  linear-gradient(135deg,#1a1714 0%,#23201c 50%,#1c1a17 100%);
+    --shadow-card:  0 4px 20px rgba(0,0,0,0.35);
+    --shadow-hover: 0 8px 32px rgba(0,0,0,0.45);
+    --radius-card:  4px;
+    --radius-sm:    4px;
+    --radius-lg:    6px;
 """
 
 
@@ -483,7 +483,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
     dashoffset    = circumference * (1 - arc_pct)
 
     if   total_score >= 3:  ring_color = "var(--pos)";    bias_gradient = "linear-gradient(135deg,#4ade80,#22c55e)"
-    elif total_score >= 1:  ring_color = "var(--accent)"; bias_gradient = "linear-gradient(135deg,#2dd4bf,#38bdf8)"
+    elif total_score >= 1:  ring_color = "var(--accent)"; bias_gradient = "linear-gradient(135deg,#d4a853,#f0c070)"
     elif total_score <= -3: ring_color = "var(--neg)";    bias_gradient = "linear-gradient(135deg,#f87171,#ef4444)"
     elif total_score <= -1: ring_color = "#fb923c";       bias_gradient = "linear-gradient(135deg,#fb923c,#f97316)"
     else:                   ring_color = "var(--neu)";    bias_gradient = "linear-gradient(135deg,#fbbf24,#f59e0b)"
@@ -591,7 +591,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
             <div class="score-meter">
                 <div class="score-ring-wrap">
                     <svg width="120" height="120" viewBox="0 0 110 110">
-                        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(45,212,191,0.08)" stroke-width="9"/>
+                        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(212,168,83,0.08)" stroke-width="9"/>
                         <circle cx="55" cy="55" r="46" fill="none"
                             stroke="{ring_color}" stroke-width="9" stroke-linecap="round"
                             stroke-dasharray="{circumference:.1f}" stroke-dashoffset="{dashoffset:.1f}"
@@ -1129,13 +1129,13 @@ class NiftyHTMLAnalyzer:
             fii_w=round(min(100,abs(fii_v)/max_abs*100),1)
             dii_w=round(min(100,abs(dii_v)/max_abs*100),1)
             fii_col = 'var(--accent2)' if fii_v>=0 else 'var(--neg)'
-            fii_bar = 'linear-gradient(90deg,#38bdf8,#0ea5e9)' if fii_v>=0 else 'linear-gradient(90deg,#f87171,#ef4444)'
+            fii_bar = 'linear-gradient(90deg,#d4a853,#f0c070)' if fii_v>=0 else 'linear-gradient(90deg,#e07070,#c95050)'
             dii_col = 'var(--accent)'  if dii_v>=0 else 'var(--neg)'
-            dii_bar = 'linear-gradient(90deg,#2dd4bf,#0d9488)' if dii_v>=0 else 'linear-gradient(90deg,#f87171,#ef4444)'
+            dii_bar = 'linear-gradient(90deg,#6bcf8f,#4aba7a)' if dii_v>=0 else 'linear-gradient(90deg,#e07070,#c95050)'
             net_col = 'var(--pos)' if net_v>=0 else 'var(--neg)'
             fii_s='+' if fii_v>=0 else ''; dii_s='+' if dii_v>=0 else ''; net_s='+' if net_v>=0 else ''
-            bdr = 'rgba(45,212,191,0.18)' if net_v>=0 else 'rgba(248,113,113,0.18)'
-            topL= 'linear-gradient(90deg,transparent,#2dd4bf,transparent)' if net_v>=0 else 'linear-gradient(90deg,transparent,#f87171,transparent)'
+            bdr = 'rgba(212,168,83,0.20)' if net_v>=0 else 'rgba(224,112,112,0.18)'
+            topL= 'linear-gradient(90deg,transparent,#d4a853,transparent)' if net_v>=0 else 'linear-gradient(90deg,transparent,#e07070,transparent)'
             return (f'<div class="pf-card" style="border-color:{bdr};">'
                     f'<div class="pf-card-topline" style="background:{topL};"></div>'
                     f'<div class="pf-card-head"><span class="pf-card-date">{row["date"]}</span><span class="pf-card-day">{row["day"]}</span></div>'
@@ -1200,8 +1200,8 @@ class NiftyHTMLAnalyzer:
             dir_name_col='var(--neg)'; dir_desc_col='rgba(248,113,113,0.5)'
         elif oi_cls == 'bullish':
             dir_bg='rgba(45,212,191,0.06)'; dir_border='var(--border2)'
-            dir_bar='linear-gradient(180deg,var(--accent),#0d9488)'
-            dir_name_col='var(--accent)'; dir_desc_col='rgba(45,212,191,0.5)'
+            dir_bar='linear-gradient(180deg,var(--accent),#b8892e)'
+            dir_name_col='var(--accent)'; dir_desc_col='rgba(212,168,83,0.5)'
         else:
             dir_bg='rgba(251,191,36,0.05)'; dir_border='var(--neu-border)'
             dir_bar='linear-gradient(180deg,var(--neu),#d97706)'
@@ -1301,7 +1301,7 @@ class NiftyHTMLAnalyzer:
         <div style="position:relative;height:62px;">
             <div class="rl-node-a" style="left:3%;"><div class="rl-lbl" style="color:var(--accent);">Strong<br>Support</div><div class="rl-val" style="color:var(--accent);">₹{d['strong_support']:,.0f}</div><div class="rl-dot" style="background:var(--accent);margin:6px auto 0;"></div></div>
             <div class="rl-node-a" style="left:22%;"><div class="rl-lbl" style="color:var(--accent2);">Support</div><div class="rl-val" style="color:var(--accent2);">₹{d['support']:,.0f}</div><div class="rl-dot" style="background:var(--accent2);box-shadow:0 0 8px var(--accent2);margin:6px auto 0;"></div></div>
-            <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);bottom:4px;background:var(--accent2);color:#0f172a;font-size:11px;font-weight:700;padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;box-shadow:0 0 16px rgba(56,189,248,0.5);">▼ NOW &nbsp;₹{d['current_price']:,.0f}</div>
+            <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);bottom:4px;background:var(--accent);color:#1c1a17;font-size:11px;font-weight:700;padding:4px 13px;border-radius:2px;white-space:nowrap;z-index:10;box-shadow:0 0 12px rgba(212,168,83,0.4);">▼ NOW &nbsp;₹{d['current_price']:,.0f}</div>
             <div class="rl-node-a" style="left:75%;"><div class="rl-lbl" style="color:#fb923c;">Resistance</div><div class="rl-val" style="color:#fb923c;">₹{d['resistance']:,.0f}</div><div class="rl-dot" style="background:#fb923c;box-shadow:0 0 8px #fb923c;margin:6px auto 0;"></div></div>
             <div class="rl-node-a" style="left:95%;"><div class="rl-lbl" style="color:var(--neg);">Strong<br>Resistance</div><div class="rl-val" style="color:var(--neg);">₹{d['strong_resistance']:,.0f}</div><div class="rl-dot" style="background:var(--neg);margin:6px auto 0;"></div></div>
         </div>
@@ -1450,18 +1450,18 @@ class NiftyHTMLAnalyzer:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nifty 50 Daily Report — Slate Teal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Nifty 50 Daily Report — Warm Gold</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         /* ══════════════════════════════════════════
-           SLATE TEAL THEME — CSS VARIABLES
+           WARM CHARCOAL GOLD THEME — CSS VARIABLES
         ══════════════════════════════════════════ */
         :root {{{THEME_CSS_VARS}}}
 
         *{{margin:0;padding:0;box-sizing:border-box;}}
         html{{scroll-behavior:smooth;}}
         body{{
-            font-family:'Space Grotesk',sans-serif;
+            font-family:'Raleway',sans-serif;
             background:var(--bg);
             min-height:100vh;
             padding:clamp(8px,2vw,24px);
@@ -1473,21 +1473,21 @@ class NiftyHTMLAnalyzer:
         /* ── TABS ── */
         .tab-nav{{display:flex;gap:0;border-bottom:2px solid var(--border);overflow-x:auto;scrollbar-width:none;background:var(--surface);}}
         .tab-nav::-webkit-scrollbar{{display:none;}}
-        .tab-btn{{display:flex;align-items:center;gap:8px;padding:13px clamp(14px,2.5vw,28px);font-family:'Space Grotesk',sans-serif;font-size:clamp(10px,1.4vw,13px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;white-space:nowrap;transition:all 0.25s ease;position:relative;bottom:-2px;}}
+        .tab-btn{{display:flex;align-items:center;gap:8px;padding:13px clamp(14px,2.5vw,28px);font-family:'Raleway',sans-serif;font-size:clamp(10px,1.4vw,13px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;white-space:nowrap;transition:all 0.25s ease;position:relative;bottom:-2px;}}
         .tab-btn:hover{{color:var(--accent);background:var(--accent-glow);}}
         .tab-btn.active{{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-glow);}}
         .tab-dot{{width:7px;height:7px;border-radius:50%;background:var(--muted2);flex-shrink:0;transition:all 0.25s;}}
-        .tab-btn.active .tab-dot{{background:var(--accent);box-shadow:0 0 8px var(--accent);}}
-        .tab-badge{{font-size:9px;padding:2px 7px;border-radius:10px;background:var(--accent-glow);border:1px solid var(--border2);color:var(--accent);}}
+        .tab-btn.active .tab-dot{{background:var(--accent);box-shadow:0 0 8px rgba(212,168,83,0.5);}}
+        .tab-badge{{font-size:9px;padding:2px 7px;border-radius:2px;background:var(--accent-glow);border:1px solid var(--border2);color:var(--accent);}}
         .tab-panel{{display:none;}} .tab-panel.active{{display:block;}}
 
         /* ── CONTAINER ── */
         .container{{max-width:100%;margin:0 auto;background:var(--surface);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-card);border:1px solid var(--border);min-width:0;}}
 
         /* ── HEADER ── */
-        .header{{background:var(--grad-header);padding:clamp(16px,3vw,28px) clamp(14px,3vw,30px) 0;position:relative;overflow:hidden;}}
-        .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,var(--accent-glow) 0%,transparent 70%);pointer-events:none;}}
-        .header h1{{font-family:'Syne',sans-serif;font-size:clamp(16px,3.5vw,28px);font-weight:800;color:var(--accent);text-shadow:0 0 30px var(--accent-glow);letter-spacing:clamp(0.5px,0.3vw,2px);position:relative;z-index:1;word-break:break-word;margin-bottom:clamp(10px,2vw,18px);}}
+        .header{{background:var(--grad-header);padding:clamp(16px,3vw,28px) clamp(14px,3vw,30px) 0;position:relative;overflow:hidden;border-bottom:2px solid rgba(212,168,83,0.20);}}
+        .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(212,168,83,0.05) 0%,transparent 70%);pointer-events:none;}}
+        .header h1{{font-family:'Playfair Display',serif;font-size:clamp(18px,3.5vw,30px);font-weight:800;color:var(--accent);text-shadow:0 2px 20px rgba(212,168,83,0.20);letter-spacing:clamp(0.3px,0.2vw,0.8px);position:relative;z-index:1;word-break:break-word;margin-bottom:clamp(10px,2vw,18px);}}
 
         /* ── STATUS BAR ── */
         .status-bar{{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;padding:0;overflow:hidden;position:relative;z-index:1;margin-bottom:16px;}}
@@ -1509,60 +1509,59 @@ class NiftyHTMLAnalyzer:
         /* ── SECTIONS ── */
         .section{{padding:clamp(14px,2.5vw,28px) clamp(12px,2.5vw,26px);border-bottom:1px solid var(--border);}}
         .section:last-child{{border-bottom:none;}}
-        .section-title{{font-family:'Syne',sans-serif;font-size:clamp(10px,1.5vw,13px);font-weight:700;letter-spacing:clamp(1px,0.3vw,2.5px);color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:clamp(12px,2vw,20px);padding-bottom:12px;border-bottom:1px solid var(--border);flex-wrap:wrap;}}
+        .section-title{{font-family:'Playfair Display',serif;font-size:clamp(14px,1.8vw,18px);font-weight:800;letter-spacing:0.2px;color:var(--text);display:flex;align-items:center;gap:10px;margin-bottom:clamp(12px,2vw,20px);padding-bottom:12px;border-bottom:1px solid rgba(212,168,83,0.15);flex-wrap:wrap;}}
 
         /* ── STAT CARDS ── */
-        .g{{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-card);position:relative;overflow:hidden;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);min-width:0;}}
-        .g::before{{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0.5;z-index:1;}}
-        .g:hover{{background:var(--surface3);border-color:var(--border2);box-shadow:var(--shadow-hover);transform:translateY(-3px);}}
-        .g-hi{{background:rgba(45,212,191,0.08);border-color:var(--border2);}}
-        .g-red{{background:rgba(248,113,113,0.06);border-color:var(--neg-border);}}
+        .g{{background:var(--surface);border:1px solid var(--border);border-left:3px solid transparent;border-radius:var(--radius-card);position:relative;overflow:hidden;transition:all 0.2s ease;min-width:0;}}
+        .g:hover{{background:var(--surface2);border-left-color:var(--accent);box-shadow:var(--shadow-hover);transform:translateY(-2px);}}
+        .g-hi{{background:var(--surface2);border-left-color:var(--accent);}}
+        .g-red{{background:rgba(224,112,112,0.04);border-color:var(--neg-border);border-left-color:var(--neg);}}
         .card-grid{{display:grid;gap:14px;}}
         .grid-5{{grid-template-columns:repeat(5,minmax(0,1fr));}}
         .grid-4{{grid-template-columns:repeat(4,minmax(0,1fr));}}
         .g .card-top-row{{display:flex;align-items:center;gap:10px;margin-bottom:10px;position:relative;z-index:2;padding:14px 16px 0;}}
         .card-ico{{font-size:clamp(16px,2vw,22px);line-height:1;flex-shrink:0;}}
-        .lbl{{font-size:clamp(8px,1vw,9px);letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;font-weight:600;line-height:1.3;}}
-        .val{{font-family:'Syne',sans-serif;font-size:clamp(16px,2.5vw,22px);font-weight:700;color:var(--text);display:block;margin-bottom:10px;position:relative;z-index:2;padding:0 16px;word-break:break-word;overflow:hidden;text-overflow:ellipsis;}}
-        .bar-wrap{{height:4px;background:rgba(0,0,0,0.3);border-radius:2px;margin:0 16px 12px;overflow:hidden;position:relative;z-index:2;}}
-        .bar-fill{{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}}
-        .bar-teal{{background:var(--grad-accent);box-shadow:0 0 8px var(--accent-glow);}}
+        .lbl{{font-size:clamp(8px,1vw,9px);letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;font-weight:700;line-height:1.3;}}
+        .val{{font-family:'Playfair Display',serif;font-size:clamp(16px,2.5vw,22px);font-weight:700;color:var(--text);display:block;margin-bottom:10px;position:relative;z-index:2;padding:0 16px;word-break:break-word;overflow:hidden;text-overflow:ellipsis;}}
+        .bar-wrap{{height:3px;background:rgba(255,255,255,0.05);border-radius:0;margin:0 16px 12px;overflow:hidden;position:relative;z-index:2;}}
+        .bar-fill{{height:100%;border-radius:0;transition:width 1.2s ease;}}
+        .bar-teal{{background:var(--grad-accent);}}
         .bar-red{{background:var(--grad-neg);}}
         .bar-gold{{background:var(--grad-neu);}}
         .card-foot{{display:flex;justify-content:space-between;align-items:center;padding:0 16px 14px;position:relative;z-index:2;flex-wrap:wrap;gap:4px;}}
         .sub{{font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;}}
-        .tag{{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:clamp(9px,1.2vw,11px);font-weight:700;letter-spacing:0.5px;white-space:nowrap;}}
-        .tag-neu{{background:var(--neu-bg);color:var(--neu);border:1px solid var(--neu-border);}}
-        .tag-bull{{background:var(--accent-glow);color:var(--accent);border:1px solid var(--border2);}}
-        .tag-bear{{background:var(--neg-bg);color:var(--neg);border:1px solid var(--neg-border);}}
+        .tag{{display:inline-flex;align-items:center;padding:3px 10px;font-size:clamp(9px,1.2vw,11px);font-weight:700;letter-spacing:0.5px;white-space:nowrap;border-bottom:2px solid;}}
+        .tag-neu{{color:var(--neu);border-color:var(--neu);}}
+        .tag-bull{{color:var(--pos);border-color:var(--pos);}}
+        .tag-bear{{color:var(--neg);border-color:var(--neg);}}
 
         /* ── SNAPSHOT GRID ── */
         .snap-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}}
         .snap-card{{padding:18px 16px;}}
         .snap-card .card-top-row{{margin-bottom:8px;padding:0;}}
-        .snap-card .val{{font-size:clamp(18px,3vw,24px);padding:0;margin-bottom:0;}}
+        .snap-card .val{{font-size:clamp(18px,3vw,26px);padding:0;margin-bottom:0;}}
 
         /* ── MARKET DIRECTION ── */
-        .md-widget{{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--surface2),var(--surface));border:1px solid var(--border);border-radius:var(--radius-card);padding:clamp(12px,2vw,16px) clamp(14px,2vw,20px);display:flex;flex-direction:column;gap:12px;}}
-        .md-glow{{position:absolute;top:-80%;left:-80%;width:260%;height:260%;background:conic-gradient(from 180deg,var(--accent) 0deg,var(--accent2) 120deg,var(--pos) 240deg,var(--accent) 360deg);opacity:0.04;animation:md-rotate 10s linear infinite;border-radius:50%;pointer-events:none;}}
+        .md-widget{{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-card);padding:clamp(12px,2vw,16px) clamp(14px,2vw,20px);display:flex;flex-direction:column;gap:12px;}}
+        .md-glow{{display:none;}}
         @keyframes md-rotate{{to{{transform:rotate(360deg);}}}}
         .md-row-top{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}}
         .md-label{{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:clamp(7px,1vw,8px);letter-spacing:3px;color:var(--muted2);text-transform:uppercase;}}
-        .md-live-dot{{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:md-pulse 2s ease-in-out infinite;flex-shrink:0;}}
+        .md-live-dot{{width:6px;height:6px;border-radius:50%;background:var(--pos);box-shadow:0 0 6px rgba(107,207,143,0.5);animation:md-pulse 2s ease-in-out infinite;flex-shrink:0;}}
         @keyframes md-pulse{{50%{{opacity:0.25;}}}}
         .md-pills-top{{display:flex;gap:8px;flex-wrap:wrap;}}
-        .md-pill{{font-family:'JetBrains Mono',monospace;font-size:clamp(8px,1.2vw,10px);font-weight:700;padding:4px clamp(8px,1.5vw,14px);border-radius:20px;letter-spacing:1px;white-space:nowrap;}}
-        .md-pill-bull{{background:var(--accent-glow);border:1px solid var(--border2);color:var(--accent);}}
+        .md-pill{{font-family:'JetBrains Mono',monospace;font-size:clamp(8px,1.2vw,10px);font-weight:700;padding:4px clamp(8px,1.5vw,14px);border-radius:2px;letter-spacing:1px;white-space:nowrap;}}
+        .md-pill-bull{{background:rgba(107,207,143,0.08);border:1px solid rgba(107,207,143,0.20);color:var(--pos);}}
         .md-pill-bear{{background:var(--neg-bg);border:1px solid var(--neg-border);color:var(--neg);}}
-        .md-pill-conf-high{{background:var(--accent-glow);border:1px solid var(--border2);color:var(--accent);}}
+        .md-pill-conf-high{{background:rgba(107,207,143,0.08);border:1px solid rgba(107,207,143,0.20);color:var(--pos);}}
         .md-pill-conf-med{{background:var(--neu-bg);border:1px solid var(--neu-border);color:var(--neu);}}
         .md-pill-conf-low{{background:var(--neg-bg);border:1px solid var(--neg-border);color:var(--neg);}}
         .md-row-bottom{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}}
-        .md-direction{{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(22px,5vw,36px);letter-spacing:clamp(1px,0.5vw,3px);line-height:1;}}
+        .md-direction{{font-family:'Playfair Display',serif;font-weight:800;font-size:clamp(22px,5vw,36px);letter-spacing:0.5px;line-height:1;}}
 
         /* ── LOGIC BOX ── */
-        .logic-box{{background:var(--accent-glow);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:10px 16px;margin-top:12px;}}
-        .logic-box-head{{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:2px;margin-bottom:7px;}}
+        .logic-box{{background:rgba(212,168,83,0.04);border:1px solid rgba(212,168,83,0.15);border-left:3px solid var(--accent);border-radius:0;padding:10px 16px;margin-top:12px;}}
+        .logic-box-head{{font-family:'Raleway',sans-serif;font-size:10px;font-weight:800;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;}}
         .logic-grid{{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;}}
         .logic-item{{display:flex;align-items:center;gap:7px;font-size:clamp(10px,1.3vw,11px);color:var(--muted);flex-wrap:wrap;}}
         .logic-item .lv{{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);}}
@@ -1579,21 +1578,21 @@ class NiftyHTMLAnalyzer:
         .rl-val{{font-size:clamp(10px,1.5vw,13px);font-weight:700;color:var(--text);white-space:nowrap;margin-top:2px;}}
 
         /* ── FII/DII ── */
-        .pf-live-badge{{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:1px;}}
-        .pf-live{{background:var(--pos-bg);color:var(--pos);border:1px solid var(--pos-border);}}
-        .pf-estimated{{background:rgba(251,146,60,0.1);color:#fb923c;border:1px solid rgba(251,146,60,0.25);}}
+        .pf-live-badge{{display:inline-block;padding:2px 10px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:1px;}}
+        .pf-live{{background:rgba(107,207,143,0.08);color:var(--pos);border:1px solid rgba(107,207,143,0.22);}}
+        .pf-estimated{{background:rgba(212,168,83,0.08);color:#d4a853;border:1px solid rgba(212,168,83,0.22);}}
         .pf-date-range{{font-size:11px;color:var(--muted);font-weight:400;letter-spacing:1px;}}
         .pf-grid{{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:18px;}}
-        .pf-card{{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-card);padding:16px 14px 14px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;transition:all 0.25s;min-width:0;}}
-        .pf-card:hover{{background:var(--surface3);transform:translateY(-3px);box-shadow:var(--shadow-hover);}}
+        .pf-card{{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);padding:16px 14px 14px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;transition:all 0.2s;min-width:0;border-left:3px solid transparent;}}
+        .pf-card:hover{{background:var(--surface2);border-left-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow-hover);}}
         .pf-card-topline{{position:absolute;top:0;left:0;right:0;height:1px;}}
         .pf-card-head{{display:flex;justify-content:space-between;align-items:baseline;}}
-        .pf-card-date{{font-family:'Syne',sans-serif;font-size:clamp(10px,1.5vw,12px);font-weight:700;color:var(--text);letter-spacing:1px;}}
+        .pf-card-date{{font-family:'Playfair Display',serif;font-size:clamp(10px,1.5vw,12px);font-weight:700;color:var(--text);letter-spacing:0.5px;}}
         .pf-card-day{{font-size:9px;letter-spacing:1.5px;color:var(--muted2);text-transform:uppercase;}}
         .pf-block{{display:flex;flex-direction:column;gap:5px;}}
         .pf-block-header{{display:flex;justify-content:space-between;align-items:baseline;}}
         .pf-block-lbl{{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}}
-        .pf-fii-lbl{{color:rgba(56,189,248,0.5);}} .pf-dii-lbl{{color:rgba(45,212,191,0.5);}}
+        .pf-fii-lbl{{color:rgba(212,168,83,0.6);}} .pf-dii-lbl{{color:rgba(107,207,143,0.6);}}
         .pf-block-val{{font-family:'JetBrains Mono',monospace;font-size:clamp(12px,1.8vw,15px);font-weight:700;line-height:1;word-break:break-all;}}
         .pf-bar-track{{height:4px;background:rgba(0,0,0,0.3);border-radius:2px;overflow:hidden;}}
         .pf-bar-fill{{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}}
@@ -1604,7 +1603,7 @@ class NiftyHTMLAnalyzer:
         .pf-avg-strip{{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:14px;padding:18px 24px;margin-bottom:16px;}}
         .pf-avg-cell{{text-align:center;min-width:0;}}
         .pf-avg-eyebrow{{font-size:8px;letter-spacing:2.5px;color:var(--muted2);text-transform:uppercase;margin-bottom:6px;font-weight:700;}}
-        .pf-avg-val{{font-family:'Syne',sans-serif;font-size:clamp(18px,3vw,26px);font-weight:800;line-height:1;letter-spacing:-0.5px;word-break:break-word;}}
+        .pf-avg-val{{font-family:'Playfair Display',serif;font-size:clamp(18px,3vw,26px);font-weight:800;line-height:1;letter-spacing:-0.5px;word-break:break-word;}}
         .pf-avg-unit{{font-size:9px;color:var(--muted2);margin-top:3px;letter-spacing:1px;}}
         .pf-avg-sep{{width:1px;height:48px;background:linear-gradient(180deg,transparent,var(--border),transparent);margin:0 16px;flex-shrink:0;}}
         .pf-insight-box{{border-radius:12px;padding:16px 18px;}}
@@ -1617,14 +1616,14 @@ class NiftyHTMLAnalyzer:
         .nc-section-header{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);}}
         .nc-header-left{{display:flex;align-items:center;gap:14px;}}
         .nc-header-icon{{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--surface2),var(--surface3));border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px var(--accent-glow);}}
-        .nc-header-title{{font-family:'Syne',sans-serif;font-size:clamp(13px,2vw,17px);font-weight:700;color:var(--text);letter-spacing:0.3px;}}
+        .nc-header-title{{font-family:'Playfair Display',serif;font-size:clamp(13px,2vw,17px);font-weight:700;color:var(--text);letter-spacing:0.3px;}}
         .nc-header-sub{{font-size:11px;font-weight:400;color:var(--muted);margin-top:2px;letter-spacing:0.5px;}}
         .nc-atm-badge{{background:var(--surface2);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;padding:6px 16px;border-radius:20px;letter-spacing:1.5px;border:1px solid var(--border2);box-shadow:0 2px 10px var(--accent-glow);white-space:nowrap;}}
         .nc-dir-box{{border-radius:var(--radius-card);padding:clamp(14px,2vw,20px) clamp(14px,2vw,22px);margin-bottom:18px;box-shadow:var(--shadow-card);}}
         .nc-dir-bar{{width:4px;border-radius:2px;flex-shrink:0;min-height:60px;}}
         .nc-dir-tag{{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--muted2);text-transform:uppercase;margin-bottom:6px;}}
-        .nc-dir-name{{font-family:'Syne',sans-serif;font-size:clamp(18px,3vw,28px);font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-0.5px;}}
-        .nc-dir-signal{{font-family:'Space Grotesk',sans-serif;font-size:clamp(10px,1.3vw,12px);font-weight:400;}}
+        .nc-dir-name{{font-family:'Playfair Display',serif;font-size:clamp(18px,3vw,28px);font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-0.5px;}}
+        .nc-dir-signal{{font-family:'Raleway',sans-serif;font-size:clamp(10px,1.3vw,12px);font-weight:400;}}
         .nc-meters-panel{{display:flex;flex-direction:column;gap:14px;min-width:180px;justify-content:center;}}
         .nc-meter-row{{display:flex;flex-direction:column;gap:5px;}}
         .nc-meter-head-row{{display:flex;justify-content:space-between;align-items:center;}}
@@ -1632,51 +1631,51 @@ class NiftyHTMLAnalyzer:
         .nc-meter-track{{position:relative;height:8px;background:rgba(0,0,0,0.35);border-radius:4px;overflow:visible;width:clamp(120px,20vw,200px);}}
         .nc-meter-fill{{height:100%;border-radius:4px;}}
         .nc-meter-head{{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;border:2px solid var(--surface);}}
-        .nc-meter-pct{{font-family:'Syne',sans-serif;font-size:clamp(12px,1.8vw,15px);font-weight:700;letter-spacing:0.5px;}}
+        .nc-meter-pct{{font-family:'Playfair Display',serif;font-size:clamp(12px,1.8vw,15px);font-weight:700;letter-spacing:0.5px;}}
         .nc-cards-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}}
-        .nc-card{{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-card);padding:clamp(12px,2vw,18px);transition:all 0.3s ease;position:relative;overflow:hidden;min-width:0;}}
+        .nc-card{{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);padding:clamp(12px,2vw,18px);transition:all 0.2s ease;position:relative;overflow:hidden;min-width:0;border-left:3px solid transparent;}}
         .nc-card::before{{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);}}
-        .nc-card:hover{{border-color:var(--border2);background:var(--surface3);transform:translateY(-3px);box-shadow:var(--shadow-hover);}}
+        .nc-card:hover{{border-color:var(--border2);border-left-color:var(--accent);background:var(--surface2);transform:translateY(-2px);box-shadow:var(--shadow-hover);}}
         .nc-card-header{{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:4px;}}
         .nc-card-label{{font-family:'JetBrains Mono',monospace;font-size:clamp(8px,1.2vw,10px);font-weight:700;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}}
-        .nc-card-value{{font-family:'Syne',sans-serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-0.5px;word-break:break-word;}}
+        .nc-card-value{{font-family:'Playfair Display',serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-0.5px;word-break:break-word;}}
         .nc-card-sub{{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);margin-bottom:14px;}}
-        .nc-card-btn{{display:block;width:100%;padding:9px 14px;border-radius:7px;text-align:center;font-family:'Space Grotesk',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;letter-spacing:0.5px;cursor:default;}}
+        .nc-card-btn{{display:block;width:100%;padding:9px 14px;border-radius:2px;text-align:center;font-family:'Raleway',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;letter-spacing:0.5px;cursor:default;}}
 
         /* ── STRATEGY CHECKLIST ── */
-        .annot-badge{{font-size:9px;padding:2px 10px;border-radius:8px;background:var(--pos-bg);border:1px solid var(--pos-border);color:var(--pos);font-family:'JetBrains Mono',monospace;letter-spacing:1px;font-weight:700;white-space:nowrap;}}
+        .annot-badge{{font-size:9px;padding:2px 10px;border-radius:2px;background:rgba(107,207,143,0.08);border:1px solid rgba(107,207,143,0.22);color:var(--pos);font-family:'JetBrains Mono',monospace;letter-spacing:1px;font-weight:700;white-space:nowrap;}}
         .input-summary-grid{{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
-        .inp-auto-card{{border-radius:12px;padding:14px 16px;border:1px solid var(--border);background:var(--accent-glow);transition:all 0.2s;}}
+        .inp-auto-card{{border-radius:2px;padding:14px 16px;border:1px solid var(--border);border-left:3px solid var(--accent);background:rgba(212,168,83,0.04);transition:all 0.2s;}}
         .inp-s-label{{font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;color:var(--muted);}}
-        .inp-s-val{{font-family:'Syne',sans-serif;font-size:clamp(14px,2vw,18px);font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.2;}}
+        .inp-s-val{{font-family:'Playfair Display',serif;font-size:clamp(14px,2vw,18px);font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.2;}}
         .inp-s-src{{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--muted2);}}
         .na-inline{{color:var(--muted2);font-family:'JetBrains Mono',monospace;font-size:13px;}}
         .signal-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
-        .sig-card{{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;transition:all 0.2s;}}
-        .sig-card:hover{{background:var(--surface3);border-color:var(--border2);}}
-        .sig-icon{{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}}
+        .sig-card{{background:var(--surface);border:1px solid var(--border);border-left:3px solid transparent;border-radius:2px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;transition:all 0.2s;}}
+        .sig-card:hover{{background:var(--surface2);border-left-color:var(--accent);}}
+        .sig-icon{{width:38px;height:38px;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}}
         .sig-bull{{background:var(--pos-bg);border:1px solid var(--pos-border);}}
         .sig-bear{{background:var(--neg-bg);border:1px solid var(--neg-border);}}
         .sig-neu{{background:var(--neu-bg);border:1px solid var(--neu-border);}}
         .sig-na{{background:rgba(122,154,170,0.06);border:1px solid rgba(122,154,170,0.12);}}
         .sig-body{{flex:1;min-width:0;}}
         .sig-name{{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}}
-        .sig-val{{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;}}
+        .sig-val{{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;}}
         .sig-val.na-val{{color:var(--muted2);font-family:'JetBrains Mono',monospace;font-size:13px;}}
         .sig-msg{{font-size:11px;color:var(--muted);line-height:1.5;}}
-        .sig-score{{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:3px 9px;border-radius:6px;flex-shrink:0;margin-top:2px;}}
-        .score-p{{background:var(--pos-bg);color:var(--pos);border:1px solid var(--pos-border);}}
-        .score-n{{background:var(--neg-bg);color:var(--neg);border:1px solid var(--neg-border);}}
-        .score-0{{background:var(--neu-bg);color:var(--neu);border:1px solid var(--neu-border);}}
-        .score-na{{background:rgba(122,154,170,0.06);color:var(--muted2);border:1px solid rgba(122,154,170,0.12);}}
-        .auto-badge{{font-size:8px;padding:1px 6px;border-radius:4px;background:var(--pos-bg);border:1px solid var(--pos-border);color:var(--pos);font-weight:700;letter-spacing:0.5px;}}
-        .score-meter{{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:16px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}}
+        .sig-score{{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:3px 9px;border-radius:2px;flex-shrink:0;margin-top:2px;}}
+        .score-p{{background:rgba(107,207,143,0.08);color:var(--pos);border-bottom:2px solid var(--pos);}}
+        .score-n{{background:var(--neg-bg);color:var(--neg);border-bottom:2px solid var(--neg);}}
+        .score-0{{background:var(--neu-bg);color:var(--neu);border-bottom:2px solid var(--neu);}}
+        .score-na{{background:rgba(138,125,104,0.06);color:var(--muted);border-bottom:2px solid var(--muted2);}}
+        .auto-badge{{font-size:8px;padding:1px 6px;border-radius:2px;background:rgba(107,207,143,0.08);border:1px solid rgba(107,207,143,0.22);color:var(--pos);font-weight:700;letter-spacing:0.5px;}}
+        .score-meter{{background:rgba(212,168,83,0.04);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:2px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}}
         .score-ring-wrap{{position:relative;flex-shrink:0;width:120px;height:120px;}}
         .score-ring-label{{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}}
-        .score-ring-num{{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1;}}
+        .score-ring-num{{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;line-height:1;}}
         .score-ring-txt{{font-size:8px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;}}
         .score-detail{{flex:1;min-width:200px;}}
-        .score-bias-lbl{{font-family:'Syne',sans-serif;font-size:clamp(16px,3vw,24px);font-weight:800;letter-spacing:2px;margin-bottom:8px;}}
+        .score-bias-lbl{{font-family:'Playfair Display',serif;font-size:clamp(16px,3vw,24px);font-weight:800;letter-spacing:2px;margin-bottom:8px;}}
         .score-sub{{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:8px;}}
         .score-pills{{display:flex;gap:8px;flex-wrap:wrap;}}
         .sc-pill{{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:1px;}}
@@ -1685,27 +1684,27 @@ class NiftyHTMLAnalyzer:
         .sc-pill-neu{{background:var(--neu-bg);border:1px solid var(--neu-border);color:var(--neu);}}
         .sc-pill-na{{background:rgba(122,154,170,0.06);border:1px solid rgba(122,154,170,0.12);color:var(--muted2);}}
         .strat-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}}
-        .strat-card{{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-card);padding:16px;position:relative;overflow:hidden;transition:all 0.25s;}}
-        .strat-card::before{{content:'';position:absolute;top:0;left:0;right:0;height:2px;}}
-        .strat-bull::before{{background:linear-gradient(90deg,transparent,var(--pos),transparent);}}
-        .strat-bear::before{{background:linear-gradient(90deg,transparent,var(--neg),transparent);}}
-        .strat-neu::before{{background:linear-gradient(90deg,transparent,var(--neu),transparent);}}
-        .strat-vol::before{{background:linear-gradient(90deg,transparent,#a855f7,transparent);}}
-        .strat-misc::before{{background:linear-gradient(90deg,transparent,var(--accent),transparent);}}
-        .strat-card:hover{{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--border2);}}
+        .strat-card{{background:var(--surface);border:1px solid var(--border);border-left:3px solid transparent;border-radius:var(--radius-card);padding:16px;position:relative;overflow:hidden;transition:all 0.2s;}}
+        .strat-card::before{{content:'';}}
+        .strat-bull{{border-left-color:var(--pos);}}
+        .strat-bear{{border-left-color:var(--neg);}}
+        .strat-neu{{border-left-color:var(--neu);}}
+        .strat-vol{{border-left-color:#a855f7;}}
+        .strat-misc{{border-left-color:var(--accent);}}
+        .strat-card:hover{{transform:translateY(-2px);box-shadow:var(--shadow-hover);background:var(--surface2);}}
         .strat-num{{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);margin-bottom:6px;letter-spacing:1px;}}
-        .strat-name{{font-family:'Syne',sans-serif;font-size:clamp(12px,1.5vw,14px);font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3;}}
-        .strat-tag{{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;}}
-        .strat-tag-bull{{background:var(--pos-bg);border:1px solid var(--pos-border);color:var(--pos);}}
-        .strat-tag-bear{{background:var(--neg-bg);border:1px solid var(--neg-border);color:var(--neg);}}
-        .strat-tag-neu{{background:var(--neu-bg);border:1px solid var(--neu-border);color:var(--neu);}}
-        .strat-tag-vol{{background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.25);color:#c084fc;}}
-        .strat-tag-misc{{background:var(--info-bg);border:1px solid var(--info-border);color:var(--info);}}
-        .filter-btn{{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.2s;font-family:'Space Grotesk',sans-serif;}}
+        .strat-name{{font-family:'Playfair Display',serif;font-size:clamp(12px,1.5vw,14px);font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.3;}}
+        .strat-tag{{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:1px;border-bottom:2px solid;}}
+        .strat-tag-bull{{color:var(--pos);border-color:var(--pos);}}
+        .strat-tag-bear{{color:var(--neg);border-color:var(--neg);}}
+        .strat-tag-neu{{color:var(--neu);border-color:var(--neu);}}
+        .strat-tag-vol{{color:#c084fc;border-color:#a855f7;}}
+        .strat-tag-misc{{color:var(--accent);border-color:var(--accent);}}
+        .filter-btn{{padding:6px 14px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.2s;font-family:'Raleway',sans-serif;}}
         .filter-btn.active,.filter-btn:hover{{background:var(--accent-glow);border-color:var(--border2);color:var(--accent);}}
 
         /* ── DISCLAIMER + FOOTER ── */
-        .disclaimer{{background:var(--neu-bg);padding:22px;border-radius:12px;border-left:4px solid var(--neu);font-size:clamp(11px,1.5vw,13px);color:var(--neu);line-height:1.8;}}
+        .disclaimer{{background:rgba(212,168,83,0.05);padding:22px;border-radius:2px;border-left:4px solid var(--accent);font-size:clamp(11px,1.5vw,13px);color:var(--muted);line-height:1.8;}}
         .footer{{text-align:center;padding:24px;color:var(--muted2);font-size:clamp(10px,1.3vw,12px);background:rgba(0,0,0,0.15);border-top:1px solid var(--border);}}
 
         /* ── RESPONSIVE ── */
@@ -1852,8 +1851,8 @@ class NiftyHTMLAnalyzer:
     <div class="footer">
         <p>Automated Nifty 50 · Option Chain + Technical Analysis · Fully Auto Strategy Checklist</p>
         <p style="margin-top:6px;color:var(--muted2);">
-            © 2026 · <span style="color:var(--accent);">Slate Teal Theme</span> ·
-            Teal Command OI · Pulse Flow FII/DII · 100% Auto Signals · Educational Purposes Only
+            © 2026 · <span style="color:var(--accent);">Warm Charcoal Gold Theme</span> ·
+            Gold Command OI · Pulse Flow FII/DII · 100% Auto Signals · Educational Purposes Only
         </p>
     </div>
 </div>
@@ -1887,7 +1886,7 @@ class NiftyHTMLAnalyzer:
                 'global_bias':       global_bias,
                 'vol_view':          vol_view,
                 'india_vix':         india_vix,
-                'theme':             'Slate Teal',
+                'theme':             'Warm Charcoal Gold',
             }
             with open('latest_report.json', 'w') as f:
                 json.dump(metadata, f, indent=2)
@@ -1909,7 +1908,7 @@ class NiftyHTMLAnalyzer:
             msg = MIMEMultipart('alternative')
             msg['From']    = gmail_user
             msg['To']      = f"{recipient1}, {recipient2}"
-            msg['Subject'] = f"📊 Nifty 50 Slate Teal Report — {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
+            msg['Subject'] = f"📊 Nifty 50 Warm Gold Report — {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
             msg.attach(MIMEText(self.generate_html_email(
                 vol_support, vol_resistance, global_bias, vol_view, india_vix), 'html'))
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
@@ -1922,7 +1921,7 @@ class NiftyHTMLAnalyzer:
     def generate_full_report(self):
         ist_now = datetime.now(pytz.timezone('Asia/Kolkata'))
         print("=" * 70)
-        print("NIFTY 50 DAILY REPORT — SLATE TEAL THEME · FULLY AUTO")
+        print("NIFTY 50 DAILY REPORT — WARM CHARCOAL GOLD THEME · FULLY AUTO")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("=" * 70)
         oc_data = self.fetch_nse_option_chain_silent()
@@ -1943,7 +1942,7 @@ class NiftyHTMLAnalyzer:
 
 def main():
     try:
-        print("\n🚀 Starting Nifty 50 Analysis — Slate Teal Theme · Fully Automated v4\n")
+        print("\n🚀 Starting Nifty 50 Analysis — Warm Charcoal Gold Theme · Fully Automated v4\n")
         analyzer = NiftyHTMLAnalyzer()
         option_analysis = analyzer.generate_full_report()
 
