@@ -7,6 +7,13 @@ MARKET DIRECTION: Holographic Glass Widget (Compact)
 KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
 AUTO REFRESH: Silent background fetch every 30s · No flicker · No scroll jump
 
+FIX v3: Holiday-aware expiry logic
+     - fetch_nse_option_chain_silent() now queries NSE live expiry list FIRST
+       (NSE itself publishes the shifted date when Tuesday is a holiday)
+     - Falls back to computed Tuesday with a backwards holiday walk:
+       Tuesday holiday → Monday, Monday holiday → Friday, etc.
+     - NSE_FO_HOLIDAYS set covers 2025-2026; update annually.
+
 FIX v2: Expiry date now time-aware:
      - Tuesday before 4:00 PM IST  → use TODAY's expiry
      - Tuesday after  4:00 PM IST  → roll to NEXT Tuesday
@@ -31,6 +38,48 @@ from email.mime.multipart import MIMEMultipart
 import json
 import pytz
 warnings.filterwarnings('ignore')
+
+# ─── NSE FO Segment Trading Holidays 2025-2026 ────────────────────────────────
+# When a Tuesday falls on one of these, NSE shifts expiry to the previous
+# trading day (Monday, or Friday if Monday is also a holiday, etc.).
+# Source: NSE official holiday circular. Update this set each January.
+NSE_FO_HOLIDAYS = {
+    # ── 2025 ──────────────────────────────────────────────────────────────
+    "26-Jan-2025",  # Republic Day
+    "19-Feb-2025",  # Chhatrapati Shivaji Maharaj Jayanti
+    "14-Mar-2025",  # Holi
+    "31-Mar-2025",  # Id-Ul-Fitr (Ramzan Eid)
+    "10-Apr-2025",  # Dr. Baba Saheb Ambedkar Jayanti / Shri Ram Navami
+    "14-Apr-2025",  # Dr. Baba Saheb Ambedkar Jayanti
+    "18-Apr-2025",  # Good Friday
+    "01-May-2025",  # Maharashtra Day
+    "15-Aug-2025",  # Independence Day
+    "27-Aug-2025",  # Ganesh Chaturthi
+    "02-Oct-2025",  # Mahatma Gandhi Jayanti / Dussehra
+    "20-Oct-2025",  # Diwali - Laxmi Pujan
+    "21-Oct-2025",  # Diwali - Balipratipada
+    "05-Nov-2025",  # Prakash Gurpurb Sri Guru Nanak Dev Ji
+    "19-Nov-2025",  # Gurunanak Jayanti (alternate)
+    "25-Dec-2025",  # Christmas
+    # ── 2026 ──────────────────────────────────────────────────────────────
+    "26-Jan-2026",  # Republic Day
+    "19-Feb-2026",  # Chhatrapati Shivaji Maharaj Jayanti
+    "20-Feb-2026",  # (bridge day if applicable)
+    "03-Apr-2026",  # Good Friday / Holi
+    "06-Apr-2026",  # Gudi Padwa / Ugadi
+    "09-Apr-2026",  # Ram Navami
+    "14-Apr-2026",  # Dr. Ambedkar Jayanti
+    "24-Apr-2026",  # (tentative — verify with NSE circular)
+    "01-May-2026",  # Maharashtra Day
+    "15-Aug-2026",  # Independence Day
+    "22-Sep-2026",  # (tentative)
+    "02-Oct-2026",  # Mahatma Gandhi Jayanti
+    "08-Oct-2026",  # Dussehra (tentative)
+    "09-Nov-2026",  # (tentative)
+    "30-Nov-2026",  # (tentative)
+    "25-Dec-2026",  # Christmas
+}
+
 
 def _last_5_trading_days():
     ist_off = timedelta(hours=5, minutes=30)
@@ -203,38 +252,60 @@ class NiftyHTMLAnalyzer:
             print(f"  ⚠️  Session warm-up warning: {e}")
         return session, headers
 
+    # ══════════════════════════════════════════════════════════════════════
+    #  FIX v3 — HOLIDAY-AWARE EXPIRY COMPUTATION
+    # ══════════════════════════════════════════════════════════════════════
     def get_upcoming_expiry_tuesday(self):
         """
-        Returns the correct weekly expiry (Tuesday) based on current IST time.
+        Returns the correct weekly expiry date string (dd-MMM-YYYY).
 
-        Rules:
-          - If today IS Tuesday AND current IST time is BEFORE 4:00 PM
-            → use TODAY as expiry (NSE market closes 3:30 PM, data valid till ~4 PM)
-          - If today IS Tuesday AND current IST time is 4:00 PM or LATER
-            → today's expiry session is done; roll forward to NEXT Tuesday
-          - Any other weekday → nearest upcoming Tuesday
+        ALGORITHM:
+          1. Compute the nearest upcoming Tuesday using IST 4 PM cutoff:
+             - Tuesday before 4 PM  → use today
+             - Tuesday after  4 PM  → jump to NEXT Tuesday
+             - Any other weekday    → roll forward to nearest Tuesday
+          2. Walk BACKWARDS day-by-day from that Tuesday until we reach a
+             day that is neither in NSE_FO_HOLIDAYS nor a weekend.
+             Example: Tue is Holi → try Mon → Mon is clear → use Mon.
+             Example: Tue is holiday, Mon also holiday → try Fri → use Fri.
+
+        This method is the FALLBACK path. fetch_nse_option_chain_silent()
+        first tries the live NSE API expiry list, which is always accurate.
         """
-        ist_tz    = pytz.timezone('Asia/Kolkata')
-        now_ist   = datetime.now(ist_tz)
-        today_ist = now_ist.date()
-        weekday   = today_ist.weekday()   # Mon=0, Tue=1, Wed=2 … Sun=6
-
-        # After 4:00 PM IST, today's expiry data is stale — roll to next week
+        ist_tz      = pytz.timezone('Asia/Kolkata')
+        now_ist     = datetime.now(ist_tz)
+        today_ist   = now_ist.date()
+        weekday     = today_ist.weekday()          # Mon=0, Tue=1 … Sun=6
         past_cutoff = (now_ist.hour, now_ist.minute) >= (16, 0)
 
+        # ── Step 1: find the raw Tuesday ──────────────────────────────────
         if weekday == 1 and not past_cutoff:
-            days_ahead = 0   # Today IS Tuesday, before 4 PM → use today's expiry
+            days_ahead = 0        # today IS Tuesday, market still active
         elif weekday == 1 and past_cutoff:
-            days_ahead = 7   # Today IS Tuesday, after  4 PM → next Tuesday
+            days_ahead = 7        # today IS Tuesday but session done → next week
         elif weekday < 1:
-            days_ahead = 1 - weekday   # Monday → tomorrow (Tuesday)
+            days_ahead = 1 - weekday   # Monday → 1 day ahead
         else:
-            days_ahead = 8 - weekday   # Wed–Sun → next Tuesday
+            days_ahead = 8 - weekday   # Wed=2 → 6, Thu=3 → 5, Fri=4 → 4, etc.
 
-        expiry_date = today_ist + timedelta(days=days_ahead)
-        expiry_str  = expiry_date.strftime('%d-%b-%Y')
+        raw_tuesday = today_ist + timedelta(days=days_ahead)
+
+        # ── Step 2: walk backwards if Tuesday is a holiday ────────────────
+        candidate = raw_tuesday
+        for _ in range(6):                         # safety: max 6-day lookback
+            cstr       = candidate.strftime('%d-%b-%Y')
+            is_weekend = candidate.weekday() >= 5   # Sat=5, Sun=6
+            if cstr not in NSE_FO_HOLIDAYS and not is_weekend:
+                break
+            candidate -= timedelta(days=1)
+
+        expiry_str = candidate.strftime('%d-%b-%Y')
+        holiday_shifted = (candidate != raw_tuesday)
+        shift_note = f" ⚠️ HOLIDAY SHIFT from {raw_tuesday.strftime('%d-%b-%Y')}" if holiday_shifted else ""
         print(f"  📅 Now (IST): {now_ist.strftime('%A %d-%b-%Y %H:%M')} | "
-              f"Past 4PM cutoff: {past_cutoff} | Expiry: {expiry_str}")
+              f"Raw Tue: {raw_tuesday.strftime('%d-%b-%Y')} | "
+              f"Adjusted expiry: {expiry_str}{shift_note} | "
+              f"Past 4PM: {past_cutoff}")
         return expiry_str
 
     def fetch_available_expiries(self, session, headers):
@@ -251,20 +322,52 @@ class NiftyHTMLAnalyzer:
             print(f"  ⚠️  Could not fetch expiry list: {e}")
         return None
 
+    # ══════════════════════════════════════════════════════════════════════
+    #  FIX v3 — LIVE EXPIRY API FIRST, HOLIDAY-ADJUSTED FALLBACK SECOND
+    # ══════════════════════════════════════════════════════════════════════
     def fetch_nse_option_chain_silent(self):
+        """
+        UPDATED PRIORITY ORDER (fixes N/A expiry on holiday weeks):
+
+          Layer 1 — NSE live expiry list (fetch_available_expiries):
+            NSE's own API returns only valid trading expiries.
+            If Tuesday is Holi, NSE publishes Monday as the expiry date.
+            This is the most reliable source — use it FIRST.
+
+          Layer 2 — Computed + holiday-adjusted Tuesday:
+            If NSE API is unreachable, compute Tuesday locally and
+            walk backwards past any holidays (get_upcoming_expiry_tuesday).
+
+          Layer 3 — Retry with Layer 2 date even if Layer 1 failed differently.
+        """
         session, headers = self._make_nse_session()
-        selected_expiry  = self.get_upcoming_expiry_tuesday()
-        print(f"  🗓️  Fetching option chain for: {selected_expiry}")
-        result = self._fetch_chain_for_expiry(session, headers, selected_expiry)
-        if result is None:
-            print(f"  ⚠️  No data for {selected_expiry}. Trying NSE expiry list...")
-            real_expiry = self.fetch_available_expiries(session, headers)
-            if real_expiry and real_expiry != selected_expiry:
-                print(f"  🔄 Retrying with: {real_expiry}")
-                result = self._fetch_chain_for_expiry(session, headers, real_expiry)
-        if result is None:
-            print("  ❌ Option chain fetch failed after all attempts.")
-        return result
+
+        # ── Layer 1: ask NSE what the real next expiry is ──────────────────
+        real_expiry = self.fetch_available_expiries(session, headers)
+        if real_expiry:
+            print(f"  🗓️  Fetching option chain for NSE live expiry: {real_expiry}")
+            result = self._fetch_chain_for_expiry(session, headers, real_expiry)
+            if result:
+                return result
+            print(f"  ⚠️  Chain data empty for live expiry {real_expiry}. Trying fallback...")
+
+        # ── Layer 2: computed + holiday-adjusted Tuesday ───────────────────
+        computed_expiry = self.get_upcoming_expiry_tuesday()
+        if computed_expiry != real_expiry:
+            print(f"  🔄 Fallback computed expiry: {computed_expiry}")
+            result = self._fetch_chain_for_expiry(session, headers, computed_expiry)
+            if result:
+                return result
+
+        # ── Layer 3: if both dates differ, try real_expiry one more time ───
+        if real_expiry and real_expiry != computed_expiry:
+            print(f"  🔄 Last attempt with real_expiry: {real_expiry}")
+            result = self._fetch_chain_for_expiry(session, headers, real_expiry)
+            if result:
+                return result
+
+        print("  ❌ Option chain fetch failed after all attempts.")
+        return None
 
     def _fetch_chain_for_expiry(self, session, headers, expiry):
         api_url = (f"https://www.nseindia.com/api/option-chain-v3"
@@ -354,7 +457,7 @@ class NiftyHTMLAnalyzer:
             'pcr_oi': round(pcr_oi,3), 'pcr_volume': round(pcr_vol,3),
             'total_ce_oi': int(total_ce_oi), 'total_pe_oi': int(total_pe_oi),
             'max_ce_oi_strike': int(max_ce_oi_row['Strike']), 'max_ce_oi_value': int(max_ce_oi_row['CE_OI']),
-            'max_pe_oi_strike': int(max_pe_oi_row['Strike']), 'max_pe_oi_value': int(max_pe_oi_row['PE_OI']),
+            'max_pe_oi_strike': int(max_pe_oi_row['Strike']), 'max_pe_oi_value': int(max_pe_oi_row['CE_OI']),
             'max_pain': int(max_pain_row['Strike']),
             'top_ce_strikes': top_ce_strikes, 'top_pe_strikes': top_pe_strikes,
             'total_ce_oi_change': total_ce_oi_change, 'total_pe_oi_change': total_pe_oi_change,
