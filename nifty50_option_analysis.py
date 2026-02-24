@@ -430,92 +430,106 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 
     timestamp = d.get('timestamp', 'N/A')
 
-    return f"""
-    <!-- ════════════════════════════════════════════════════════════
-         TAB 2: STRATEGY CHECKLIST
-    ════════════════════════════════════════════════════════════ -->
+    # ── Pre-compute all dynamic values — avoids backslash-in-f-string error ──
+    na_span     = '<span class="na-inline">N/A</span>'
+    val_pcr     = f"{d['pcr']:.3f}" if d.get('has_option_data') and d.get('pcr') else na_span
+    val_rsi     = f"{d['rsi']:.1f}" if d.get('rsi') else na_span
+    if d.get('macd_bullish') is True:
+        val_macd = "Bullish"
+    elif d.get('macd_bullish') is False:
+        val_macd = "Bearish"
+    else:
+        val_macd = na_span
+    if d.get('sma_200_above') is None:
+        val_trend = na_span
+    elif d.get('sma_200_above') and d.get('sma_50_above'):
+        val_trend = "Uptrend"
+    elif not d.get('sma_200_above') and not d.get('sma_50_above'):
+        val_trend = "Downtrend"
+    else:
+        val_trend = "Mixed"
+    val_oi_dir  = d.get('oi_direction', 'N/A') if d.get('has_option_data') else na_span
+    val_global  = global_bias.title() if global_bias else na_span
+    val_vol_sup = f"{vol_support:+.0f}%" if vol_support is not None else na_span
+    val_vol_res = f"{vol_resistance:+.0f}%" if vol_resistance is not None else na_span
+    na_pill     = f'<span class="sc-pill sc-pill-na">— N/A: {na_count}</span>' if na_count > 0 else ''
+    score_note  = ("Strong directional conviction — proceed with caution and stop losses."
+                   if abs(total_score) >= 3 else
+                   "Moderate signal — size positions conservatively."
+                   if abs(total_score) >= 1 else
+                   "Mixed signals — range-bound or sideways strategies preferred.")
+    strat_count = len(strategy_list)
+
+    html_parts = []
+    html_parts.append(f"""
+    <!-- TAB 2: STRATEGY CHECKLIST -->
     <div class="tab-panel" id="tab-checklist">
 
-        <!-- SECTION A: AUTO-FILLED INPUTS SUMMARY -->
         <div class="section">
             <div class="section-title">
-                <span>⚙️</span> LIVE DATA INPUTS
+                <span>&#9881;&#65039;</span> LIVE DATA INPUTS
                 <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
                 <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: {timestamp}</span>
             </div>
             <div class="input-summary-grid">
-
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">PCR (OI)</div>
-                    <div class="inp-s-val">{ f"{d['pcr']:.3f}" if d.get('has_option_data') and d.get('pcr') else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-val">{val_pcr}</div>
                     <div class="inp-s-src">Option Chain</div>
                 </div>
-
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">RSI (14)</div>
-                    <div class="inp-s-val">{ f"{d['rsi']:.1f}" if d.get('rsi') else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-val">{val_rsi}</div>
                     <div class="inp-s-src">Technical</div>
                 </div>
-
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">MACD</div>
-                    <div class="inp-s-val">{ "Bullish" if d.get('macd_bullish') else ("Bearish" if d.get('macd_bullish') is not None else '<span class=\"na-inline\">N/A</span>') }</div>
+                    <div class="inp-s-val">{val_macd}</div>
                     <div class="inp-s-src">Technical</div>
                 </div>
-
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Market Trend</div>
-                    <div class="inp-s-val">{ "Uptrend" if (d.get('sma_200_above') and d.get('sma_50_above')) else ("Downtrend" if (not d.get('sma_200_above') and not d.get('sma_50_above')) else "Mixed") if d.get('sma_200_above') is not None else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-val">{val_trend}</div>
                     <div class="inp-s-src">SMA 20/50/200</div>
                 </div>
-
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">OI Direction</div>
-                    <div class="inp-s-val">{ d.get('oi_direction','N/A') if d.get('has_option_data') else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-val">{val_oi_dir}</div>
                     <div class="inp-s-src">CHG OI</div>
                 </div>
-
                 <div class="inp-summary-card inp-manual-card">
                     <div class="inp-s-label">Global Bias</div>
-                    <div class="inp-s-val">{ global_bias.title() if global_bias else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-val">{val_global}</div>
                     <div class="inp-s-src">Manual Input</div>
                 </div>
-
                 <div class="inp-summary-card inp-manual-card">
                     <div class="inp-s-label">Vol at Support</div>
-                    <div class="inp-s-val">{ f"{vol_support:+.0f}%" if vol_support is not None else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-val">{val_vol_sup}</div>
                     <div class="inp-s-src">Manual Input</div>
                 </div>
-
                 <div class="inp-summary-card inp-manual-card">
                     <div class="inp-s-label">Vol at Resistance</div>
-                    <div class="inp-s-val">{ f"{vol_resistance:+.0f}%" if vol_resistance is not None else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-val">{val_vol_res}</div>
                     <div class="inp-s-src">Manual Input</div>
                 </div>
-
                 <div class="inp-summary-card inp-manual-card">
                     <div class="inp-s-label">IV View</div>
-                    <div class="inp-s-val">{ vol_view.upper() }</div>
+                    <div class="inp-s-val">{vol_view.upper()}</div>
                     <div class="inp-s-src">Manual Input</div>
                 </div>
-
             </div>
         </div>
 
-        <!-- SECTION B: SIGNAL CHECKLIST -->
         <div class="section">
             <div class="section-title">
-                <span>📋</span> SIGNAL CHECKLIST
+                <span>&#128203;</span> SIGNAL CHECKLIST
                 <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-                    {bull_count} Bullish · {bear_count} Bearish · {neu_count} Neutral · {na_count} N/A
+                    {bull_count} Bullish &middot; {bear_count} Bearish &middot; {neu_count} Neutral &middot; {na_count} N/A
                 </span>
             </div>
-
             <div class="signal-grid">
                 {sig_cards_html}
             </div>
-
-            <!-- TOTAL SCORE METER -->
             <div class="score-meter">
                 <div class="score-ring-wrap">
                     <svg width="120" height="120" viewBox="0 0 110 110">
@@ -538,80 +552,75 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                     </div>
                     <div class="score-sub">
                         Score {score_sign}{total_score} from {len(signals)} signals ({na_count} skipped as N/A).<br>
-                        { "Strong directional conviction — proceed with caution and stop losses." if abs(total_score) >= 3 else
-                          "Moderate signal — size positions conservatively." if abs(total_score) >= 1 else
-                          "Mixed signals — range-bound or sideways strategies preferred." }
+                        {score_note}
                     </div>
                     <div class="score-pills">
-                        <span class="sc-pill sc-pill-bull">✅ BULL: {bull_count}</span>
-                        <span class="sc-pill sc-pill-bear">❌ BEAR: {bear_count}</span>
-                        <span class="sc-pill sc-pill-neu">⬜ NEUTRAL: {neu_count}</span>
-                        { f'<span class="sc-pill sc-pill-na">— N/A: {na_count}</span>' if na_count > 0 else '' }
+                        <span class="sc-pill sc-pill-bull">&#10003; BULL: {bull_count}</span>
+                        <span class="sc-pill sc-pill-bear">&#10007; BEAR: {bear_count}</span>
+                        <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: {neu_count}</span>
+                        {na_pill}
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- SECTION C: STRATEGY SUGGESTIONS -->
         <div class="section">
             <div class="section-title">
-                <span>🎯</span> SUGGESTED STRATEGY TYPES
+                <span>&#127919;</span> SUGGESTED STRATEGY TYPES
                 <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;">
-                    For study &amp; backtesting only — NOT financial advice
+                    For study &amp; backtesting only &mdash; NOT financial advice
                 </span>
             </div>
-
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
                 <div style="font-size:12px;color:rgba(176,190,197,0.4);">
                     IV View: <strong style="color:{ring_color};">{vol_view.upper()}</strong>
-                    &nbsp;·&nbsp; Bias: <strong style="color:{ring_color};">{bias_label}</strong>
-                    &nbsp;·&nbsp; <span style="color:rgba(128,222,234,0.4);">{len(strategy_list)} strategies found</span>
+                    &nbsp;&middot;&nbsp; Bias: <strong style="color:{ring_color};">{bias_label}</strong>
+                    &nbsp;&middot;&nbsp; <span style="color:rgba(128,222,234,0.4);">{strat_count} strategies found</span>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <button class="filter-btn active" onclick="filterStrats('all',this)">All</button>
-                    <button class="filter-btn" onclick="filterStrats('bullish',this)">🟢 Bullish</button>
-                    <button class="filter-btn" onclick="filterStrats('bearish',this)">🔴 Bearish</button>
-                    <button class="filter-btn" onclick="filterStrats('neutral',this)">🟡 Neutral</button>
-                    <button class="filter-btn" onclick="filterStrats('volatility',this)">🟣 Volatility</button>
-                    <button class="filter-btn" onclick="filterStrats('advanced',this)">🔵 Advanced</button>
+                    <button class="filter-btn" onclick="filterStrats('bullish',this)">&#128994; Bullish</button>
+                    <button class="filter-btn" onclick="filterStrats('bearish',this)">&#128308; Bearish</button>
+                    <button class="filter-btn" onclick="filterStrats('neutral',this)">&#128993; Neutral</button>
+                    <button class="filter-btn" onclick="filterStrats('volatility',this)">&#128995; Volatility</button>
+                    <button class="filter-btn" onclick="filterStrats('advanced',this)">&#128309; Advanced</button>
                 </div>
             </div>
-
             <div class="strat-grid" id="stratGrid">
                 {strat_cards_html}
             </div>
         </div>
 
-        <!-- SECTION D: SCORING LEGEND -->
         <div class="section">
-            <div class="section-title"><span>📖</span> SCORING LEGEND</div>
+            <div class="section-title"><span>&#128218;</span> SCORING LEGEND</div>
             <div class="logic-box" style="margin-top:0;">
                 <div class="logic-box-head">HOW THE SCORE WORKS</div>
                 <div class="logic-grid">
-                    <div class="logic-item"><span class="lc-bull">+1</span> Signal is bullish — adds to bull case</div>
-                    <div class="logic-item"><span class="lc-bear">−1</span> Signal is bearish — adds to bear case</div>
-                    <div class="logic-item"><span class="lc-side">0</span> Neutral signal — no directional contribution</div>
-                    <div class="logic-item"><span class="lc-info">N/A</span> Data not available — excluded from score</div>
-                    <div class="logic-item"><span class="lc-bull">≥ +3</span> Strongly Bullish · <span class="lc-bull">+1/+2</span> Mildly Bullish</div>
-                    <div class="logic-item"><span class="lc-bear">≤ −3</span> Strongly Bearish · <span class="lc-bear">−1/−2</span> Mildly Bearish</div>
+                    <div class="logic-item"><span class="lc-bull">+1</span> Signal is bullish &mdash; adds to bull case</div>
+                    <div class="logic-item"><span class="lc-bear">&minus;1</span> Signal is bearish &mdash; adds to bear case</div>
+                    <div class="logic-item"><span class="lc-side">0</span> Neutral signal &mdash; no directional contribution</div>
+                    <div class="logic-item"><span class="lc-info">N/A</span> Data not available &mdash; excluded from score</div>
+                    <div class="logic-item"><span class="lc-bull">&ge; +3</span> Strongly Bullish &middot; <span class="lc-bull">+1/+2</span> Mildly Bullish</div>
+                    <div class="logic-item"><span class="lc-bear">&le; &minus;3</span> Strongly Bearish &middot; <span class="lc-bear">&minus;1/&minus;2</span> Mildly Bearish</div>
                     <div class="logic-item"><span class="lc-info">AUTO</span> Filled from live NSE + yfinance data</div>
-                    <div class="logic-item"><span class="lc-side">MANUAL</span> Requires your input — shown as N/A if not set</div>
+                    <div class="logic-item"><span class="lc-side">MANUAL</span> Requires your input &mdash; shown as N/A if not set</div>
                 </div>
             </div>
         </div>
 
-        <!-- SECTION E: DISCLAIMER -->
         <div class="section">
             <div class="disclaimer">
-                <strong>⚠️ DISCLAIMER</strong><br><br>
-                This checklist is for <strong>EDUCATIONAL purposes only</strong> — NOT financial advice.<br>
+                <strong>&#9888;&#65039; DISCLAIMER</strong><br><br>
+                This checklist is for <strong>EDUCATIONAL purposes only</strong> &mdash; NOT financial advice.<br>
                 Strategy suggestions are based on a rules-based scoring model and have not been backtested.<br>
                 Always validate with your own analysis. Consult a SEBI-registered investment advisor.
             </div>
         </div>
 
     </div><!-- /tab-checklist -->
-"""
+""")
+    return "".join(html_parts)
+
 
 
 class NiftyHTMLAnalyzer:
