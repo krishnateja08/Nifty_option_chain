@@ -450,8 +450,6 @@ class NiftyHTMLAnalyzer:
         max_ce_oi_row = df.loc[df['CE_OI'].idxmax()]; max_pe_oi_row = df.loc[df['PE_OI'].idxmax()]
         df['pain']    = abs(df['CE_OI'] - df['PE_OI']); max_pain_row = df.loc[df['pain'].idxmin()]
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
-        top_ce_strikes = df.nlargest(5,'CE_OI')[['Strike','CE_OI','CE_LTP']].to_dict('records')
-        top_pe_strikes = df.nlargest(5,'PE_OI')[['Strike','PE_OI','PE_LTP']].to_dict('records')
         return {
             'expiry': oc_data['expiry'], 'underlying_value': oc_data['underlying'],
             'atm_strike': oc_data['atm_strike'],
@@ -460,7 +458,6 @@ class NiftyHTMLAnalyzer:
             'max_ce_oi_strike': int(max_ce_oi_row['Strike']), 'max_ce_oi_value': int(max_ce_oi_row['CE_OI']),
             'max_pe_oi_strike': int(max_pe_oi_row['Strike']), 'max_pe_oi_value': int(max_pe_oi_row['CE_OI']),
             'max_pain': int(max_pain_row['Strike']),
-            'top_ce_strikes': top_ce_strikes, 'top_pe_strikes': top_pe_strikes,
             'total_ce_oi_change': total_ce_oi_change, 'total_pe_oi_change': total_pe_oi_change,
             'net_oi_change': net_oi_change,
             'oi_direction': oi_direction, 'oi_signal': oi_signal,
@@ -536,43 +533,6 @@ class NiftyHTMLAnalyzer:
         elif bias == "BEARISH": return round(min(resistance + 30, current_price + 150), 0)
         return None
 
-    def select_best_technical_strategy(self, bias, option_strategies):
-        name_map = {"BULLISH": "Bull Call Spread", "BEARISH": "Bear Put Spread", "SIDEWAYS": "Iron Condor"}
-        target   = name_map.get(bias, "")
-        for s in option_strategies:
-            if s['name'] == target: return s
-        return option_strategies[0]
-
-    def select_best_oi_strategy(self, oi_direction, atm_strike):
-        if "Strong Bullish" in oi_direction or oi_direction == "Bullish":
-            return {'name':'Long Call','market_bias':'Bullish','type':'Debit','risk':'High',
-                    'max_profit':'Unlimited','max_loss':'Premium Paid',
-                    'description':f'Buy {atm_strike} CE','best_for':'Put build-up indicates bullish momentum',
-                    'signal':'🟢 Institutional buying interest detected','time_horizon':'Intraday to 1-2 days'}
-        elif "Strong Bearish" in oi_direction or oi_direction == "Bearish":
-            return {'name':'Long Put','market_bias':'Bearish','type':'Debit','risk':'High',
-                    'max_profit':'Huge (to ₹0)','max_loss':'Premium Paid',
-                    'description':f'Buy {atm_strike} PE','best_for':'Call build-up indicates bearish momentum',
-                    'signal':'🔴 Institutional selling interest detected','time_horizon':'Intraday to 1-2 days'}
-        elif "High Vol" in oi_direction:
-            return {'name':'Long Straddle','market_bias':'Volatile','type':'Debit','risk':'High',
-                    'max_profit':'Unlimited','max_loss':'Premium Paid',
-                    'description':f'Buy {atm_strike} CE + {atm_strike} PE',
-                    'best_for':'Both Calls & Puts building',
-                    'signal':'🟡 Big move expected, direction uncertain','time_horizon':'Intraday'}
-        elif "Unwinding" in oi_direction:
-            return {'name':'Iron Butterfly','market_bias':'Neutral','type':'Credit','risk':'Low',
-                    'max_profit':'Premium Received','max_loss':'Capped',
-                    'description':f'Sell {atm_strike} CE + PE, Buy {atm_strike+100} CE + {atm_strike-100} PE',
-                    'best_for':'Unwinding suggests reduced volatility',
-                    'signal':'🟡 Position squaring, range-bound expected','time_horizon':'Intraday'}
-        else:
-            return {'name':'Vertical Spread','market_bias':'Moderate','type':'Debit','risk':'Moderate',
-                    'max_profit':'Capped','max_loss':'Limited',
-                    'description':f'Vertical spread near {atm_strike}',
-                    'best_for':'Balanced OI changes',
-                    'signal':'🟡 Moderate directional move expected','time_horizon':'1-2 days'}
-
     def generate_analysis_data(self, technical, option_analysis):
         if not technical:
             self.log("⚠️  Technical data unavailable"); return
@@ -620,28 +580,12 @@ class NiftyHTMLAnalyzer:
             mid=((support+resistance)/2); entry_low=current-100 if current>mid else current-50
             entry_high=current-50 if current>mid else current; target_1=resistance; target_2=max_ce_strike
             stop_loss=self.calculate_smart_stop_loss(current,support,resistance,"BULLISH")
-            option_strategies=[
-                {'name':'Long Call','market_bias':'Bullish','type':'Debit','risk':'High','max_profit':'Unlimited','max_loss':'Premium Paid','description':f'Buy {atm_strike} CE','best_for':'Strong upward momentum expected'},
-                {'name':'Bull Call Spread','market_bias':'Bullish','type':'Debit','risk':'Moderate','max_profit':'Capped','max_loss':'Premium Paid','description':f'Buy {atm_strike} CE, Sell {atm_strike+200} CE','best_for':'Moderate upside with limited risk'},
-                {'name':'Bull Put Spread','market_bias':'Bullish','type':'Credit','risk':'Moderate','max_profit':'Premium Received','max_loss':'Capped','description':f'Sell {atm_strike-100} PE, Buy {atm_strike-200} PE','best_for':'Expect market to stay above support'},
-            ]
         elif bias == "BEARISH":
             mid=((support+resistance)/2); entry_low=current
             entry_high=current+100 if current<mid else current+50; target_1=support; target_2=max_pe_strike
             stop_loss=self.calculate_smart_stop_loss(current,support,resistance,"BEARISH")
-            option_strategies=[
-                {'name':'Long Put','market_bias':'Bearish','type':'Debit','risk':'High','max_profit':'Huge (to ₹0)','max_loss':'Premium Paid','description':f'Buy {atm_strike} PE','best_for':'Strong downward momentum expected'},
-                {'name':'Bear Put Spread','market_bias':'Bearish','type':'Debit','risk':'Moderate','max_profit':'Capped','max_loss':'Premium Paid','description':f'Buy {atm_strike} PE, Sell {atm_strike-200} PE','best_for':'Moderate downside with limited risk'},
-                {'name':'Bear Call Spread','market_bias':'Bearish','type':'Credit','risk':'Moderate','max_profit':'Premium Received','max_loss':'Capped','description':f'Sell {atm_strike+100} CE, Buy {atm_strike+200} CE','best_for':'Expect market to stay below resistance'},
-            ]
         else:
             entry_low=support; entry_high=resistance; target_1=resistance; target_2=support; stop_loss=None
-            option_strategies=[
-                {'name':'Iron Condor','market_bias':'Neutral','type':'Credit','risk':'Low','max_profit':'Premium Received','max_loss':'Capped','description':f'Sell {atm_strike+100} CE + Buy {atm_strike+200} CE, Sell {atm_strike-100} PE + Buy {atm_strike-200} PE','best_for':'Expect low volatility, range-bound market'},
-                {'name':'Iron Butterfly','market_bias':'Neutral','type':'Credit','risk':'Low','max_profit':'Premium Received','max_loss':'Capped','description':f'Sell {atm_strike} CE + Sell {atm_strike} PE, Buy {atm_strike+100} CE + Buy {atm_strike-100} PE','best_for':'Expect price to remain near ATM strike'},
-                {'name':'Short Straddle','market_bias':'Neutral','type':'Credit','risk':'Very High','max_profit':'Premium Received','max_loss':'Unlimited','description':f'Sell {atm_strike} CE + Sell {atm_strike} PE','best_for':'ONLY for experienced traders!'},
-                {'name':'Long Strangle','market_bias':'Volatile','type':'Debit','risk':'High','max_profit':'Unlimited','max_loss':'Premium Paid','description':f'Buy {atm_strike+100} CE + Buy {atm_strike-100} PE','best_for':'Expect big move but unsure of direction'},
-            ]
         if stop_loss and bias != "SIDEWAYS":
             risk_points=abs(current-stop_loss); reward_points=abs(target_1-current)
             risk_reward_ratio=round(reward_points/risk_points,2) if risk_points>0 else 0
@@ -690,13 +634,6 @@ class NiftyHTMLAnalyzer:
             'target_1': target_1, 'target_2': target_2, 'stop_loss': stop_loss,
             'risk_points': int(risk_points), 'reward_points': int(reward_points),
             'risk_reward_ratio': risk_reward_ratio,
-            'option_strategies': option_strategies,
-            'recommended_technical_strategy': self.select_best_technical_strategy(bias, option_strategies),
-            'recommended_oi_strategy': self.select_best_oi_strategy(
-                option_analysis['oi_direction'] if option_analysis else 'Neutral', atm_strike
-            ) if option_analysis else None,
-            'top_ce_strikes': option_analysis['top_ce_strikes'] if option_analysis else [],
-            'top_pe_strikes': option_analysis['top_pe_strikes'] if option_analysis else [],
             'has_option_data': option_analysis is not None,
             'fii_dii_data': fii_dii_raw, 'fii_dii_summ': fii_dii_summ,
         }
@@ -1386,34 +1323,6 @@ class NiftyHTMLAnalyzer:
         .pf-insight-lbl{{font-size:9px;letter-spacing:2px;font-weight:700;text-transform:uppercase;}}
         .pf-verdict-badge{{display:inline-block;padding:3px 14px;border-radius:20px;font-size:clamp(10px,1.5vw,11px);font-weight:800;letter-spacing:1px;white-space:nowrap;}}
         .pf-insight-text{{font-size:clamp(12px,1.5vw,13px);color:#cfd8dc;line-height:1.85;font-weight:500;}}
-        /* ═══ STRATEGY BOXES ════════════════════════════════════════════════ */
-        .sb-wrap{{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.15);border-radius:12px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 24px rgba(0,0,0,0.3);}}
-        .sb-header{{padding:11px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(79,195,247,0.1);flex-wrap:wrap;gap:8px;}}
-        .sb-header.cyan{{background:rgba(79,195,247,0.08);border-left:4px solid #4fc3f7;}}
-        .sb-header.gold{{background:rgba(255,183,77,0.08);border-left:4px solid #ffb74d;}}
-        .sb-h-title{{font-family:'Oxanium',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;color:#4fc3f7;letter-spacing:1px;word-break:break-word;}}
-        .sb-h-title.gold{{color:#ffb74d;}}
-        .sb-h-badge{{font-size:9px;padding:3px 12px;border-radius:10px;font-weight:700;letter-spacing:1px;white-space:nowrap;}}
-        .sb-h-badge.cyan{{background:rgba(79,195,247,0.12);color:#4fc3f7;border:1px solid rgba(79,195,247,0.3);}}
-        .sb-h-badge.gold{{background:rgba(255,183,77,0.12);color:#ffb74d;border:1px solid rgba(255,183,77,0.3);}}
-        /* Strategy body: auto-fill columns, min 120px each */
-        .sb-body{{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));}}
-        .sb-cell{{padding:12px 10px;text-align:center;border-right:1px solid rgba(79,195,247,0.06);min-width:0;}}
-        .sb-cell:last-child{{border-right:none;}}
-        .sb-lbl{{font-size:9px;letter-spacing:1.5px;color:#80a0b8;text-transform:uppercase;margin-bottom:5px;font-weight:600;}}
-        .sb-val{{font-family:'Oxanium',sans-serif;font-size:clamp(11px,1.5vw,14px);font-weight:700;color:#e0f7fa;word-break:break-word;}}
-        .sb-val.green{{color:#00e676;}}.sb-val.cyan{{color:#00bcd4;}}.sb-val.gold{{color:#ffb74d;}}.sb-val.red{{color:#ff5252;}}.sb-val.small{{font-size:clamp(9px,1.2vw,11px);}}
-        .sb-signal{{padding:10px 16px;background:rgba(79,195,247,0.05);border-top:1px solid rgba(79,195,247,0.06);border-bottom:1px solid rgba(79,195,247,0.06);font-size:clamp(12px,1.5vw,14px);color:#ffffff;font-weight:500;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}}
-        .sb-signal .sig-lbl{{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-weight:700;}}
-        .sb-footer{{padding:11px 16px;background:rgba(0,0,0,0.25);font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.5vw,13px);color:#ffffff;font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}}
-        .sb-footer .sf-lbl{{font-size:10px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;flex-shrink:0;font-family:'Rajdhani',sans-serif;font-weight:700;}}
-        .sb-footer .sf-why{{font-size:clamp(11px,1.5vw,13px);color:#ffffff;font-style:italic;font-family:'Rajdhani',sans-serif;font-weight:500;margin-left:auto;}}
-        /* ═══ STRIKES TABLE ══════════════════════════════════════════════════ */
-        .strikes-table{{width:100%;border-collapse:collapse;margin-top:18px;border-radius:10px;overflow:hidden;}}
-        .strikes-table th{{background:linear-gradient(135deg,#4fc3f7,#26c6da);color:#000;padding:clamp(8px,1.5vw,14px);text-align:left;font-weight:700;font-size:clamp(10px,1.3vw,12px);text-transform:uppercase;}}
-        .strikes-table td{{padding:clamp(8px,1.5vw,14px);border-bottom:1px solid rgba(79,195,247,0.08);color:#b0bec5;font-size:clamp(11px,1.5vw,13px);word-break:break-word;}}
-        .strikes-table tr:hover{{background:rgba(79,195,247,0.06);}}
-        .strikes-table tbody tr:last-child td{{border-bottom:none;}}
         /* ═══ DISCLAIMER & FOOTER ════════════════════════════════════════════ */
         .disclaimer{{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}}
         .footer{{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}}
@@ -1453,7 +1362,6 @@ class NiftyHTMLAnalyzer:
             .pf-grid{{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}}
             .nc-cards-grid{{grid-template-columns:repeat(3,minmax(0,1fr));}}
             .nc-meter-track{{width:140px;}}
-            .strikes-wrap{{grid-template-columns:1fr !important;}}
         }}
         /* ═══ MOBILE: 600px ════════════════════════════════════════════════ */
         @media(max-width:600px){{
@@ -1484,22 +1392,13 @@ class NiftyHTMLAnalyzer:
             /* Direction widget */
             .md-direction{{font-size:clamp(20px,6vw,28px);}}
             .md-row-top,.md-row-bottom{{flex-direction:column;align-items:flex-start;}}
-            /* Strategy cells wrap */
-            .sb-body{{grid-template-columns:repeat(2,minmax(0,1fr));}}
-            .sb-cell{{border-right:none;border-bottom:1px solid rgba(79,195,247,0.06);}}
-            .sb-cell:last-child{{border-bottom:none;}}
-            .sb-footer{{flex-direction:column;gap:6px;}}
-            .sb-footer .sf-why{{margin-left:0;}}
             /* Inline style grid override for key levels distance row */
             div[style*="grid-template-columns:1fr 1fr"]{{grid-template-columns:1fr !important;}}
-            .strikes-wrap{{grid-template-columns:1fr !important;}}
             /* Status bar wraps to 2×2 on mobile */
             .status-bar{{flex-wrap:wrap;}}
             .sb-item{{flex:1 1 45%;border-right:none;border-bottom:1px solid rgba(79,195,247,0.08);}}
             .sb-item:nth-child(odd){{border-right:1px solid rgba(79,195,247,0.08);}}
             .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){{border-bottom:none;}}
-            /* Refresh sep hidden */
-            .refresh-sep{{display:none;}}
             /* Date range label hidden — saves space */
             .pf-date-range{{display:none;}}
         }}
@@ -1507,8 +1406,6 @@ class NiftyHTMLAnalyzer:
         @media(max-width:400px){{
             .snap-grid{{grid-template-columns:minmax(0,1fr);}}
             .pf-grid{{grid-template-columns:minmax(0,1fr);}}
-            .sb-body{{grid-template-columns:minmax(0,1fr);}}
-            .sb-cell{{border-right:none;}}
             .nc-dir-name{{font-size:clamp(16px,5vw,20px);}}
             .header h1{{letter-spacing:0;}}
         }}
@@ -1577,24 +1474,7 @@ class NiftyHTMLAnalyzer:
         <div class="card-grid grid-4">{oc_cards}</div>
     </div>
 """
-        html += self._generate_recommendations_html(d)
-        if d['has_option_data'] and (d['top_ce_strikes'] or d['top_pe_strikes']):
-            html += """
-    <div class="section">
-        <div class="section-title"><span>&#128203;</span> TOP 5 STRIKES BY OPEN INTEREST <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM \u00b110 Only)</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="strikes-wrap">
-            <div><h3 style="color:#00bcd4;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">&#128222; CALL OPTIONS (CE)</h3>
-            <table class="strikes-table"><thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-"""
-            for i,s in enumerate(d['top_ce_strikes'],1):
-                html += f"<tr><td><strong>{i}</strong></td><td><strong>&#8377;{int(s['Strike']):,}</strong></td><td>{int(s['CE_OI']):,}</td><td style='color:#00bcd4;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;{s['CE_LTP']:.2f}</td></tr>\n"
-            html += """</tbody></table></div>
-            <div><h3 style="color:#f44336;margin-bottom:14px;font-size:15px;font-family:'Oxanium',sans-serif;">&#128201; PUT OPTIONS (PE)</h3>
-            <table class="strikes-table"><thead><tr><th>#</th><th>Strike</th><th>OI</th><th>LTP</th></tr></thead><tbody>
-"""
-            for i,s in enumerate(d['top_pe_strikes'],1):
-                html += f"<tr><td><strong>{i}</strong></td><td><strong>&#8377;{int(s['Strike']):,}</strong></td><td>{int(s['PE_OI']):,}</td><td style='color:#f44336;font-weight:700;font-family:Oxanium,sans-serif;'>&#8377;{s['PE_LTP']:.2f}</td></tr>\n"
-            html += "</tbody></table></div></div></div>\n"
+
         html += """
     <div class="section">
         <div class="disclaimer"><strong>\u26a0\ufe0f DISCLAIMER</strong><br><br>
@@ -1610,63 +1490,6 @@ class NiftyHTMLAnalyzer:
 """
         html += auto_refresh_js
         html += "\n</body></html>"
-        return html
-
-    def _generate_recommendations_html(self, d):
-        ts=d['recommended_technical_strategy']
-        def bias_color(b):
-            b=b.lower()
-            if 'bull' in b: return 'green'
-            if 'bear' in b: return 'red'
-            if 'vol' in b: return 'gold'
-            return 'gold'
-        def risk_color(r):
-            r=r.lower()
-            if 'low' in r: return 'cyan'
-            if 'high' in r or 'very' in r: return 'red'
-            return 'gold'
-        def profit_color(p):
-            return 'green' if ('unlimited' in p.lower() or 'receiv' in p.lower()) else 'cyan'
-        def loss_color(l):
-            return 'red' if 'unlimit' in l.lower() else 'gold'
-        html = """
-    <div class="section">
-        <div class="section-title"><span>&#128161;</span> TRADING RECOMMENDATIONS (Dual Strategy)</div>
-        <p style="color:#90a4ae;font-size:13px;margin-bottom:16px;letter-spacing:0.5px;">
-            Two independent strategy recommendations based on
-            <strong style="color:#4fc3f7;">Technical Analysis</strong> and
-            <strong style="color:#ffb74d;">OI Momentum</strong>.
-        </p>
-"""
-        html += f"""
-        <div class="sb-wrap">
-            <div class="sb-header cyan"><span class="sb-h-title">1\ufe0f\u20e3 TECHNICAL ANALYSIS STRATEGY &nbsp;\u00b7&nbsp; {ts['name']}</span><span class="sb-h-badge cyan">Positional \u00b7 1\u20135 Days</span></div>
-            <div class="sb-body">
-                <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val {bias_color(ts['market_bias'])}">{ts['market_bias']}</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">{ts['type']}</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Risk</div><div class="sb-val {risk_color(ts['risk'])}">{ts['risk']}</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val {profit_color(ts['max_profit'])} small">{ts['max_profit']}</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val {loss_color(ts['max_loss'])} small">{ts['max_loss']}</div></div>
-            </div>
-            <div class="sb-footer"><span class="sf-lbl">&#128203; Setup</span><span>{ts['description']}</span><span class="sf-why">&#128161; {ts['best_for']}</span></div>
-        </div>
-"""
-        if d['recommended_oi_strategy']:
-            oi=d['recommended_oi_strategy']
-            html += f"""
-        <div class="sb-wrap">
-            <div class="sb-header gold"><span class="sb-h-title gold">2\ufe0f\u20e3 OI MOMENTUM STRATEGY &nbsp;\u00b7&nbsp; {oi['name']}</span><span class="sb-h-badge gold">{oi.get('time_horizon','Intraday')}</span></div>
-            <div class="sb-signal"><span class="sig-lbl">&#128202; OI Signal</span><span style="color:#ffffff;font-weight:500;">{oi.get('signal','Market signal detected')}</span></div>
-            <div class="sb-body">
-                <div class="sb-cell"><div class="sb-lbl">Market Bias</div><div class="sb-val {bias_color(oi['market_bias'])}">{oi['market_bias']}</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Type</div><div class="sb-val cyan">{oi['type']}</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Risk</div><div class="sb-val {risk_color(oi['risk'])}">{oi['risk']}</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Max Profit</div><div class="sb-val {profit_color(oi['max_profit'])} small">{oi['max_profit']}</div></div>
-                <div class="sb-cell"><div class="sb-lbl">Max Loss</div><div class="sb-val {loss_color(oi['max_loss'])} small">{oi['max_loss']}</div></div>
-            </div>
-            <div class="sb-footer"><span class="sf-lbl">&#128203; Setup</span><span>{oi['description']}</span><span class="sf-why">&#128161; {oi['best_for']}</span></div>
-        </div>
-"""
         return html
 
     def save_html_to_file(self, filename='index.html'):
