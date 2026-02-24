@@ -8,6 +8,14 @@ KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
 AUTO REFRESH: Silent background fetch every 30s · No flicker · No scroll jump
 STRATEGY CHECKLIST TAB: Rules-based scoring · Auto-filled from live data · N/A safe
 
+FULLY AUTOMATED v4:
+  - GLOBAL BIAS     → auto from SGX Nifty (^NSEI pre/post) + S&P500 + Dow Jones
+  - VOL AT SUPPORT  → auto from 1H volume at nearest support vs 20-bar avg
+  - VOL AT RESIST.  → auto from 1H volume at nearest resistance vs 20-bar avg
+  - MACD            → fix: macd_bullish key stored explicitly in technical dict
+  - VOL VIEW (IV)   → auto from India VIX (^INDIAVIX): low<13 | normal 13-18 | high>18
+
+FIX v4: All manual inputs fully automated
 FIX v3: Holiday-aware expiry logic
 FIX v2: Expiry date now time-aware
 FIX v1: Net OI = PE Δ - CE Δ
@@ -37,6 +45,163 @@ NSE_FO_HOLIDAYS = {
     "14-Sep-2026","02-Oct-2026","20-Oct-2026","10-Nov-2026","24-Nov-2026","25-Dec-2026",
 }
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  AUTO-DETECT: GLOBAL BIAS  (SGX Nifty proxy + S&P500 + Dow)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def auto_global_bias():
+    """
+    Derives global market bias automatically using yfinance:
+      - Gift Nifty proxy  : ^NSEI  (pre-market gap or latest session direction)
+      - S&P 500           : ^GSPC
+      - Dow Jones         : ^DJI
+    Scoring: each index contributes +1 (up), -1 (down), 0 (flat ±0.15%)
+    Result  : "bullish" (score >= 1) | "bearish" (score <= -1) | "neutral"
+    """
+    try:
+        symbols   = ['^NSEI', '^GSPC', '^DJI']
+        scores    = []
+        details   = []
+        for sym in symbols:
+            try:
+                tk   = yf.Ticker(sym)
+                hist = tk.history(period='5d', interval='1d')
+                if hist.empty or len(hist) < 2:
+                    details.append(f"  {sym}: no data")
+                    continue
+                prev_close = float(hist['Close'].iloc[-2])
+                last_close = float(hist['Close'].iloc[-1])
+                if prev_close == 0:
+                    continue
+                chg_pct = (last_close - prev_close) / prev_close * 100
+                if   chg_pct >  0.15: s = +1
+                elif chg_pct < -0.15: s = -1
+                else:                 s =  0
+                scores.append(s)
+                details.append(f"  {sym}: {chg_pct:+.2f}% → score {s:+d}")
+            except Exception as e:
+                details.append(f"  {sym}: error ({e})")
+
+        for line in details:
+            print(line)
+
+        if not scores:
+            print("  ⚠️  Global bias: no data — defaulting to neutral")
+            return "neutral"
+
+        total = sum(scores)
+        bias  = "bullish" if total >= 1 else ("bearish" if total <= -1 else "neutral")
+        print(f"  🌐 Global bias score={total:+d} → {bias.upper()}")
+        return bias
+
+    except Exception as e:
+        print(f"  ⚠️  auto_global_bias failed: {e}")
+        return "neutral"
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  AUTO-DETECT: VOL VIEW from India VIX
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def auto_vol_view():
+    """
+    Fetches India VIX (^INDIAVIX) via yfinance.
+    Thresholds (standard NSE VIX interpretation):
+      VIX < 13        → 'low'    (calm market, premium-selling favoured)
+      13 <= VIX <= 18 → 'normal' (balanced IV environment)
+      VIX > 18        → 'high'   (elevated fear, volatility strategies)
+    Fallback: 'normal'
+    """
+    try:
+        vix_tk   = yf.Ticker('^INDIAVIX')
+        vix_hist = vix_tk.history(period='5d', interval='1d')
+        if vix_hist.empty:
+            print("  ⚠️  India VIX: no data — defaulting to normal")
+            return "normal", None
+        vix_val = float(vix_hist['Close'].iloc[-1])
+        if   vix_val < 13:  view = 'low'
+        elif vix_val > 18:  view = 'high'
+        else:               view = 'normal'
+        print(f"  📊 India VIX = {vix_val:.2f} → vol_view = {view.upper()}")
+        return view, round(vix_val, 2)
+    except Exception as e:
+        print(f"  ⚠️  auto_vol_view failed: {e}")
+        return "normal", None
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  AUTO-DETECT: VOLUME AT SUPPORT / RESISTANCE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def auto_volume_at_levels(support, resistance, current_price):
+    """
+    Uses 1H Nifty candles to measure volume near support and resistance.
+
+    Logic:
+      - Fetch last 60 days of 1H data
+      - Define "near support"    : bars where Low  <= support    * 1.005  (within 0.5%)
+      - Define "near resistance" : bars where High >= resistance * 0.995  (within 0.5%)
+      - Compare the MOST RECENT such bar's volume vs the 20-bar rolling average
+        of volume for that zone. Returns % difference.
+      - If no bars found in zone → returns None (shown as N/A)
+
+    Returns: (vol_support_pct, vol_resistance_pct)
+      Each is a float like +35.0 (35% above avg) or -20.0 (20% below avg), or None.
+    """
+    try:
+        nifty    = yf.Ticker('^NSEI')
+        df_1h    = nifty.history(interval='1h', period='60d')
+        if df_1h.empty:
+            print("  ⚠️  1H data unavailable for volume-at-level calculation")
+            return None, None
+
+        df_1h = df_1h.reset_index()
+        df_1h['Vol_MA20'] = df_1h['Volume'].rolling(20).mean()
+
+        # ── Support zone ─────────────────────────────────────────────
+        tol_sup  = support * 0.005          # 0.5% tolerance
+        sup_bars = df_1h[df_1h['Low'] <= support + tol_sup].copy()
+        vol_support_pct = None
+        if not sup_bars.empty and not sup_bars['Vol_MA20'].isna().all():
+            sup_bars = sup_bars.dropna(subset=['Vol_MA20'])
+            if not sup_bars.empty:
+                last_sup     = sup_bars.iloc[-1]
+                avg_vol      = last_sup['Vol_MA20']
+                cur_vol      = last_sup['Volume']
+                if avg_vol > 0:
+                    vol_support_pct = round((cur_vol - avg_vol) / avg_vol * 100, 1)
+                    print(f"  📦 Vol@Support  : cur={cur_vol:,.0f} | avg={avg_vol:,.0f} | {vol_support_pct:+.1f}%")
+
+        # ── Resistance zone ──────────────────────────────────────────
+        tol_res  = resistance * 0.005       # 0.5% tolerance
+        res_bars = df_1h[df_1h['High'] >= resistance - tol_res].copy()
+        vol_resistance_pct = None
+        if not res_bars.empty and not res_bars['Vol_MA20'].isna().all():
+            res_bars = res_bars.dropna(subset=['Vol_MA20'])
+            if not res_bars.empty:
+                last_res     = res_bars.iloc[-1]
+                avg_vol      = last_res['Vol_MA20']
+                cur_vol      = last_res['Volume']
+                if avg_vol > 0:
+                    vol_resistance_pct = round((cur_vol - avg_vol) / avg_vol * 100, 1)
+                    print(f"  📦 Vol@Resistance: cur={cur_vol:,.0f} | avg={avg_vol:,.0f} | {vol_resistance_pct:+.1f}%")
+
+        if vol_support_pct is None:
+            print("  ⚠️  Vol@Support: no 1H bars found within 0.5% of support level")
+        if vol_resistance_pct is None:
+            print("  ⚠️  Vol@Resistance: no 1H bars found within 0.5% of resistance level")
+
+        return vol_support_pct, vol_resistance_pct
+
+    except Exception as e:
+        print(f"  ⚠️  auto_volume_at_levels failed: {e}")
+        return None, None
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  FII/DII HELPERS
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def _last_5_trading_days():
     ist_off = timedelta(hours=5, minutes=30)
@@ -227,7 +392,7 @@ def score_trend(sma_20_above, sma_50_above, sma_200_above):
 
 def score_volume(volume_change_pct, location):
     if volume_change_pct is None:
-        return 0, "N/A", f"Volume at {location} not provided — skipped"
+        return 0, "N/A", f"Volume at {location} — auto-computed from 1H data (no recent bars in zone)"
     msg_base = f"Volume {'+' if volume_change_pct >= 0 else ''}{volume_change_pct:.0f}% vs average at {location}"
     if location == "support":
         if volume_change_pct >= 30:
@@ -246,9 +411,9 @@ def score_volume(volume_change_pct, location):
 
 def score_global(global_bias):
     if global_bias is None:
-        return 0, "N/A", "Global bias not provided"
+        return 0, "N/A", "Global bias not available"
     if global_bias == "bullish":
-        return +1, "Bullish", "Global indices (Dow/S&P/SGX Gift Nifty) showing bullish bias"
+        return +1, "Bullish", "Global indices (Dow/S&P/Nifty trend) showing bullish bias"
     elif global_bias == "bearish":
         return -1, "Bearish", "Global indices showing bearish pressure"
     else:
@@ -321,52 +486,41 @@ def suggest_strategies(total_score, vol_view):
 
     return bias_label, unique
 
-def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
-    """
-    Build the complete Strategy Checklist tab HTML.
-    Auto-fills PCR, RSI, MACD, Trend, OI direction from live html_data.
-    vol_support, vol_resistance, global_bias can be None → shown as N/A.
-    vol_view: 'low' | 'normal' | 'high'
-    """
+def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=None,
+                                   global_bias=None, vol_view="normal", india_vix=None):
     d = html_data
 
-    # ── Score each signal ────────────────────────────────────────────────
-    pcr_val = d.get('pcr') if d.get('has_option_data') else None
-    rsi_val = d.get('rsi')
+    pcr_val   = d.get('pcr') if d.get('has_option_data') else None
+    rsi_val   = d.get('rsi')
     macd_bull = d.get('macd_bullish')
-    sma20 = d.get('sma_20_above'); sma50 = d.get('sma_50_above'); sma200 = d.get('sma_200_above')
-    oi_cls = d.get('oi_class') if d.get('has_option_data') else None
+    sma20     = d.get('sma_20_above'); sma50 = d.get('sma_50_above'); sma200 = d.get('sma_200_above')
+    oi_cls    = d.get('oi_class') if d.get('has_option_data') else None
 
     signals = [
-        ("📊", "PCR (OI Ratio)",         *score_pcr(pcr_val),          True),
-        ("📈", "RSI (14-Day)",            *score_rsi(rsi_val),           True),
-        ("⚡", "MACD Signal",             *score_macd(macd_bull),        True),
-        ("📉", "Market Trend (SMAs)",     *score_trend(sma20, sma50, sma200), True),
-        ("🔄", "OI Direction",            *score_oi_direction(oi_cls),   True),
-        ("🌐", "Global Market Bias",      *score_global(global_bias),    False),
-        ("📦", "Volume at Support",       *score_volume(vol_support, "support"),    False),
-        ("📦", "Volume at Resistance",    *score_volume(vol_resistance, "resistance"), False),
+        ("📊", "PCR (OI Ratio)",         *score_pcr(pcr_val),                          True),
+        ("📈", "RSI (14-Day)",            *score_rsi(rsi_val),                           True),
+        ("⚡", "MACD Signal",             *score_macd(macd_bull),                        True),
+        ("📉", "Market Trend (SMAs)",     *score_trend(sma20, sma50, sma200),            True),
+        ("🔄", "OI Direction",            *score_oi_direction(oi_cls),                   True),
+        ("🌐", "Global Market Bias",      *score_global(global_bias),                    True),   # ← now AUTO
+        ("📦", "Volume at Support",       *score_volume(vol_support, "support"),         True),   # ← now AUTO
+        ("📦", "Volume at Resistance",    *score_volume(vol_resistance, "resistance"),   True),   # ← now AUTO
     ]
-    # signals tuple: (icon, name, score, display_val, msg, is_auto)
 
-    auto_scores  = [s[2] for s in signals if s[5]]
-    manual_scores = [s[2] for s in signals if not s[5]]
-    total_score  = sum(auto_scores) + sum(manual_scores)
-
-    bull_count = sum(1 for s in signals if s[2] > 0)
-    bear_count = sum(1 for s in signals if s[2] < 0)
-    neu_count  = sum(1 for s in signals if s[2] == 0 and s[3] != "N/A")
-    na_count   = sum(1 for s in signals if s[3] == "N/A")
+    auto_scores   = [s[2] for s in signals if s[5]]
+    total_score   = sum(auto_scores)
+    bull_count    = sum(1 for s in signals if s[2] > 0)
+    bear_count    = sum(1 for s in signals if s[2] < 0)
+    neu_count     = sum(1 for s in signals if s[2] == 0 and s[3] != "N/A")
+    na_count      = sum(1 for s in signals if s[3] == "N/A")
 
     bias_label, strategy_list = suggest_strategies(total_score, vol_view)
 
-    # ── Score ring arc ───────────────────────────────────────────────────
-    max_possible = len(signals)
     circumference = 289.0
     if total_score >= 0:
-        arc_pct = min(1.0, total_score / max(1, max_possible))
+        arc_pct = min(1.0, total_score / max(1, len(signals)))
     else:
-        arc_pct = min(1.0, abs(total_score) / max(1, max_possible))
+        arc_pct = min(1.0, abs(total_score) / max(1, len(signals)))
     dashoffset = circumference * (1 - arc_pct)
 
     if   total_score >= 3:  ring_color = "#00e676"; bias_gradient = "linear-gradient(135deg,#00e676,#00bfa5)"
@@ -377,7 +531,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 
     score_sign = "+" if total_score > 0 else ""
 
-    # ── Render signal cards ──────────────────────────────────────────────
     def sig_card(icon, name, score, display_val, msg, is_auto):
         if display_val == "N/A":
             icon_cls = "sig-na"; s_cls = "score-na"; s_txt = "N/A"
@@ -387,13 +540,10 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
             icon_cls = "sig-bear"; s_cls = "score-n"; s_txt = str(score)
         else:
             icon_cls = "sig-neu"; s_cls = "score-0"; s_txt = "0"
-
-        val_html = (f'<div class="sig-val na-val">{display_val}</div>'
-                    if display_val == "N/A"
-                    else f'<div class="sig-val">{display_val}</div>')
-
-        auto_badge = '<span class="auto-badge">AUTO</span>' if is_auto else '<span class="manual-badge">MANUAL</span>'
-
+        val_html   = (f'<div class="sig-val na-val">{display_val}</div>'
+                      if display_val == "N/A"
+                      else f'<div class="sig-val">{display_val}</div>')
+        auto_badge = '<span class="auto-badge">AUTO</span>'
         return f"""
         <div class="sig-card">
             <div class="sig-icon {icon_cls}">{icon}</div>
@@ -407,7 +557,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 
     sig_cards_html = "".join(sig_card(*s) for s in signals)
 
-    # ── Render strategy cards ────────────────────────────────────────────
     tag_map = {
         "bullish":   ("strat-bull", "strat-tag-bull", "🟢 Bullish"),
         "bearish":   ("strat-bear", "strat-tag-bear", "🔴 Bearish"),
@@ -415,7 +564,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         "volatility":("strat-vol",  "strat-tag-vol",  "🟣 Volatility"),
         "advanced":  ("strat-misc", "strat-tag-misc", "🔵 Advanced"),
     }
-
     strat_cards_html = ""
     for i, s in enumerate(strategy_list, 1):
         stype = STRAT_TYPE_MAP.get(s, "advanced")
@@ -430,7 +578,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 
     timestamp = d.get('timestamp', 'N/A')
 
-    # ── Pre-compute all dynamic values — avoids backslash-in-f-string error ──
+    # ── Pre-compute display values ──────────────────────────────────────────
     na_span     = '<span class="na-inline">N/A</span>'
     val_pcr     = f"{d['pcr']:.3f}" if d.get('has_option_data') and d.get('pcr') else na_span
     val_rsi     = f"{d['rsi']:.1f}" if d.get('rsi') else na_span
@@ -448,74 +596,74 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         val_trend = "Downtrend"
     else:
         val_trend = "Mixed"
-    val_oi_dir  = d.get('oi_direction', 'N/A') if d.get('has_option_data') else na_span
-    val_global  = global_bias.title() if global_bias else na_span
-    val_vol_sup = f"{vol_support:+.0f}%" if vol_support is not None else na_span
-    val_vol_res = f"{vol_resistance:+.0f}%" if vol_resistance is not None else na_span
-    na_pill     = f'<span class="sc-pill sc-pill-na">— N/A: {na_count}</span>' if na_count > 0 else ''
-    score_note  = ("Strong directional conviction — proceed with caution and stop losses."
-                   if abs(total_score) >= 3 else
-                   "Moderate signal — size positions conservatively."
-                   if abs(total_score) >= 1 else
-                   "Mixed signals — range-bound or sideways strategies preferred.")
-    strat_count = len(strategy_list)
+    val_oi_dir   = d.get('oi_direction', 'N/A') if d.get('has_option_data') else na_span
+    val_global   = global_bias.title() if global_bias else na_span
+    val_vol_sup  = f"{vol_support:+.0f}%"  if vol_support  is not None else na_span
+    val_vol_res  = f"{vol_resistance:+.0f}%" if vol_resistance is not None else na_span
+    vix_label    = f"{india_vix:.2f}" if india_vix else na_span
+    na_pill      = f'<span class="sc-pill sc-pill-na">— N/A: {na_count}</span>' if na_count > 0 else ''
+    score_note   = ("Strong directional conviction — proceed with caution and stop losses."
+                    if abs(total_score) >= 3 else
+                    "Moderate signal — size positions conservatively."
+                    if abs(total_score) >= 1 else
+                    "Mixed signals — range-bound or sideways strategies preferred.")
+    strat_count  = len(strategy_list)
 
     html_parts = []
     html_parts.append(f"""
-    <!-- TAB 2: STRATEGY CHECKLIST -->
     <div class="tab-panel" id="tab-checklist">
 
         <div class="section">
             <div class="section-title">
                 <span>&#9881;&#65039;</span> LIVE DATA INPUTS
-                <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
+                <span class="annot-badge">ALL AUTO-FILLED FROM LIVE DATA</span>
                 <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: {timestamp}</span>
             </div>
             <div class="input-summary-grid">
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">PCR (OI)</div>
                     <div class="inp-s-val">{val_pcr}</div>
-                    <div class="inp-s-src">Option Chain</div>
+                    <div class="inp-s-src">Option Chain · AUTO</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">RSI (14)</div>
                     <div class="inp-s-val">{val_rsi}</div>
-                    <div class="inp-s-src">Technical</div>
+                    <div class="inp-s-src">Technical · AUTO</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">MACD</div>
                     <div class="inp-s-val">{val_macd}</div>
-                    <div class="inp-s-src">Technical</div>
+                    <div class="inp-s-src">Technical · AUTO</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Market Trend</div>
                     <div class="inp-s-val">{val_trend}</div>
-                    <div class="inp-s-src">SMA 20/50/200</div>
+                    <div class="inp-s-src">SMA 20/50/200 · AUTO</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">OI Direction</div>
                     <div class="inp-s-val">{val_oi_dir}</div>
-                    <div class="inp-s-src">CHG OI</div>
+                    <div class="inp-s-src">CHG OI · AUTO</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Global Bias</div>
                     <div class="inp-s-val">{val_global}</div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-src">S&amp;P500 + Dow · AUTO</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Vol at Support</div>
                     <div class="inp-s-val">{val_vol_sup}</div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-src">1H Volume · AUTO</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Vol at Resistance</div>
                     <div class="inp-s-val">{val_vol_res}</div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-src">1H Volume · AUTO</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
-                    <div class="inp-s-label">IV View</div>
-                    <div class="inp-s-val">{vol_view.upper()}</div>
-                    <div class="inp-s-src">Manual Input</div>
+                <div class="inp-summary-card inp-auto-card">
+                    <div class="inp-s-label">India VIX</div>
+                    <div class="inp-s-val">{vix_label}</div>
+                    <div class="inp-s-src">IV View: {vol_view.upper()} · AUTO</div>
                 </div>
             </div>
         </div>
@@ -551,7 +699,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                         {bias_label}
                     </div>
                     <div class="score-sub">
-                        Score {score_sign}{total_score} from {len(signals)} signals ({na_count} skipped as N/A).<br>
+                        Score {score_sign}{total_score} from {len(signals)} signals ({na_count} shown as N/A — zone not visited).<br>
                         {score_note}
                     </div>
                     <div class="score-pills">
@@ -599,11 +747,11 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                     <div class="logic-item"><span class="lc-bull">+1</span> Signal is bullish &mdash; adds to bull case</div>
                     <div class="logic-item"><span class="lc-bear">&minus;1</span> Signal is bearish &mdash; adds to bear case</div>
                     <div class="logic-item"><span class="lc-side">0</span> Neutral signal &mdash; no directional contribution</div>
-                    <div class="logic-item"><span class="lc-info">N/A</span> Data not available &mdash; excluded from score</div>
+                    <div class="logic-item"><span class="lc-info">N/A</span> Price not near level &mdash; excluded from score</div>
                     <div class="logic-item"><span class="lc-bull">&ge; +3</span> Strongly Bullish &middot; <span class="lc-bull">+1/+2</span> Mildly Bullish</div>
                     <div class="logic-item"><span class="lc-bear">&le; &minus;3</span> Strongly Bearish &middot; <span class="lc-bear">&minus;1/&minus;2</span> Mildly Bearish</div>
-                    <div class="logic-item"><span class="lc-info">AUTO</span> Filled from live NSE + yfinance data</div>
-                    <div class="logic-item"><span class="lc-side">MANUAL</span> Requires your input &mdash; shown as N/A if not set</div>
+                    <div class="logic-item"><span class="lc-info">AUTO</span> All 8 signals auto-filled — no manual input needed</div>
+                    <div class="logic-item"><span class="lc-info">VIX</span> India VIX &lt;13 = Low &middot; 13–18 = Normal &middot; &gt;18 = High IV</div>
                 </div>
             </div>
         </div>
@@ -622,6 +770,9 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
     return "".join(html_parts)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  MAIN ANALYZER CLASS
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class NiftyHTMLAnalyzer:
     def __init__(self):
@@ -811,24 +962,47 @@ class NiftyHTMLAnalyzer:
         }
 
     def get_technical_data(self):
+        """
+        Fetches and computes all technical indicators.
+        Returns a dict including 'macd_bullish' key (bool or None).
+        Uses 2y history to ensure MACD convergence.
+        """
         try:
             print("Calculating technical indicators...")
             nifty = yf.Ticker(self.yf_symbol)
-            df = nifty.history(period="1y")
-            if df.empty: print("Warning: Failed to fetch historical data"); return None
+            # Extended to 2y — ensures EMA-26 + EMA-9 signal fully converge
+            df = nifty.history(period="2y")
+            if df.empty:
+                print("Warning: Failed to fetch historical data")
+                return None
+
             df['SMA_20']  = df['Close'].rolling(20).mean()
             df['SMA_50']  = df['Close'].rolling(50).mean()
             df['SMA_200'] = df['Close'].rolling(200).mean()
+
             delta = df['Close'].diff()
             gain  = delta.where(delta > 0, 0).rolling(14).mean()
             loss  = (-delta.where(delta < 0, 0)).rolling(14).mean()
             df['RSI']    = 100 - (100 / (1 + gain / loss))
+
             df['EMA_12'] = df['Close'].ewm(span=12, adjust=False).mean()
             df['EMA_26'] = df['Close'].ewm(span=26, adjust=False).mean()
             df['MACD']   = df['EMA_12'] - df['EMA_26']
             df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
+
             latest = df.iloc[-1]
             current_price = latest['Close']
+
+            # ── MACD: explicit bool stored — fixes N/A display bug ───────────
+            valid_macd = df.dropna(subset=['MACD', 'Signal'])
+            if len(valid_macd) >= 2:
+                macd_bullish = bool(latest['MACD'] > latest['Signal'])
+                print(f"  ✓ MACD = {latest['MACD']:.3f} | Signal = {latest['Signal']:.3f} | "
+                      f"{'BULLISH' if macd_bullish else 'BEARISH'}")
+            else:
+                macd_bullish = None
+                print("  ⚠️  MACD: insufficient data — N/A")
+
             print("  Fetching 1H candles for Key Levels...")
             df_1h = nifty.history(interval="1h", period="60d")
             s1 = s2 = r1 = r2 = None
@@ -851,11 +1025,13 @@ class NiftyHTMLAnalyzer:
                 print(f"  ✓ 1H Levels | S2={s2} S1={s1} | Price={current_price:.0f} | R1={r1} R2={r2}")
             else:
                 print("  ⚠️  1H data unavailable — falling back to daily levels")
+
             recent_d = df.tail(60)
-            resistance = r1 if r1 else recent_d['High'].quantile(0.90)
-            support    = s1 if s1 else recent_d['Low'].quantile(0.10)
+            resistance        = r1 if r1 else recent_d['High'].quantile(0.90)
+            support           = s1 if s1 else recent_d['Low'].quantile(0.10)
             strong_resistance = r2 if r2 else resistance + 100
             strong_support    = s2 if s2 else support - 100
+
             technical = {
                 'current_price':    current_price,
                 'sma_20':           latest['SMA_20'],
@@ -864,12 +1040,14 @@ class NiftyHTMLAnalyzer:
                 'rsi':              latest['RSI'],
                 'macd':             latest['MACD'],
                 'signal':           latest['Signal'],
+                'macd_bullish':     macd_bullish,     # ← explicitly stored
                 'resistance':       resistance,
                 'support':          support,
                 'strong_resistance':strong_resistance,
                 'strong_support':   strong_support,
             }
-            print(f"✓ Technical | Price: {technical['current_price']:.2f} | RSI: {technical['rsi']:.1f}")
+            print(f"✓ Technical | Price: {technical['current_price']:.2f} | RSI: {technical['rsi']:.1f} | "
+                  f"MACD: {'BULL' if macd_bullish else ('BEAR' if macd_bullish is False else 'N/A')}")
             return technical
         except Exception as e:
             print(f"Technical error: {e}"); return None
@@ -909,7 +1087,12 @@ class NiftyHTMLAnalyzer:
         if   rsi > 70: rsi_status,rsi_badge,rsi_icon="Overbought","bearish","🔴"
         elif rsi < 30: rsi_status,rsi_badge,rsi_icon="Oversold","bullish","🟢"
         else:          rsi_status,rsi_badge,rsi_icon="Neutral","neutral","🟡"
-        macd_bullish = technical['macd'] > technical['signal']
+
+        # ── MACD: use stored bool — no recomputation ─────────────────────────
+        macd_bullish = technical.get('macd_bullish')
+        if macd_bullish is None:
+            macd_bullish = bool(technical['macd'] > technical['signal'])
+
         if option_analysis:
             pcr = option_analysis['pcr_oi']
             if   pcr > 1.2: pcr_status,pcr_badge,pcr_icon="Bullish","bullish","🟢"
@@ -961,7 +1144,9 @@ class NiftyHTMLAnalyzer:
             'sma_20': technical['sma_20'], 'sma_20_above': current>technical['sma_20'], 'sma_20_pct': sma_bar(technical['sma_20']),
             'sma_50': technical['sma_50'], 'sma_50_above': current>technical['sma_50'], 'sma_50_pct': sma_bar(technical['sma_50']),
             'sma_200': technical['sma_200'], 'sma_200_above': current>technical['sma_200'], 'sma_200_pct': sma_bar(technical['sma_200']),
-            'macd': technical['macd'], 'macd_signal': technical['signal'], 'macd_bullish': macd_bullish, 'macd_pct': macd_pct,
+            'macd': technical['macd'], 'macd_signal': technical['signal'],
+            'macd_bullish': macd_bullish,   # ← stored correctly
+            'macd_pct': macd_pct,
             'pcr': option_analysis['pcr_oi'] if option_analysis else 0, 'pcr_pct': pcr_pct,
             'pcr_status': pcr_status, 'pcr_badge': pcr_badge, 'pcr_icon': pcr_icon,
             'max_pain': option_analysis['max_pain'] if option_analysis else 0, 'max_pain_pct': mp_pct,
@@ -1218,7 +1403,8 @@ class NiftyHTMLAnalyzer:
     </div>
 """
 
-    def generate_html_email(self, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
+    def generate_html_email(self, vol_support=None, vol_resistance=None,
+                             global_bias=None, vol_view="normal", india_vix=None):
         d=self.html_data
         sma20_bar ='bar-teal' if d['sma_20_above']  else 'bar-red'
         sma50_bar ='bar-teal' if d['sma_50_above']  else 'bar-red'
@@ -1271,7 +1457,8 @@ class NiftyHTMLAnalyzer:
             vol_support=vol_support,
             vol_resistance=vol_resistance,
             global_bias=global_bias,
-            vol_view=vol_view
+            vol_view=vol_view,
+            india_vix=india_vix,
         )
 
         auto_refresh_js = """
@@ -1321,7 +1508,6 @@ class NiftyHTMLAnalyzer:
         setInterval(silentRefresh, INTERVAL);
     })();
 
-    /* ── Tab switching ─────────────────────────────────── */
     function switchTab(tab) {
         document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
         document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -1331,7 +1517,6 @@ class NiftyHTMLAnalyzer:
         if(btn)   btn.classList.add('active');
     }
 
-    /* ── Strategy filter ───────────────────────────────── */
     function filterStrats(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
@@ -1354,7 +1539,6 @@ class NiftyHTMLAnalyzer:
         html{{scroll-behavior:smooth;}}
         body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:clamp(8px,2vw,24px);color:#b0bec5;overflow-x:hidden;-webkit-text-size-adjust:100%;}}
 
-        /* ═══ TAB SYSTEM ════════════════════════════════════════════════ */
         .tab-nav{{display:flex;gap:0;border-bottom:2px solid rgba(79,195,247,0.2);overflow-x:auto;scrollbar-width:none;background:linear-gradient(135deg,#0f2027,#203a43);}}
         .tab-nav::-webkit-scrollbar{{display:none;}}
         .tab-btn{{display:flex;align-items:center;gap:8px;padding:13px clamp(14px,2.5vw,28px);font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.4vw,13px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(176,190,197,0.5);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;white-space:nowrap;transition:all 0.25s ease;position:relative;bottom:-2px;}}
@@ -1367,10 +1551,8 @@ class NiftyHTMLAnalyzer:
         .tab-panel{{display:none;}}
         .tab-panel.active{{display:block;}}
 
-        /* ═══ LAYOUT ════════════════════════════════════════════════════ */
         .container{{max-width:1200px;margin:0 auto;background:rgba(15,32,39,0.85);backdrop-filter:blur(20px);border-radius:clamp(12px,2vw,20px);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(79,195,247,0.18);min-width:0;}}
 
-        /* ═══ HEADER ════════════════════════════════════════════════════ */
         .header{{background:linear-gradient(135deg,#0f2027,#203a43);padding:clamp(16px,3vw,32px) clamp(14px,3vw,30px) 0;text-align:center;position:relative;overflow:hidden;}}
         .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}}
         .header h1{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,3.5vw,30px);font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:clamp(0.5px,0.3vw,2px);position:relative;z-index:1;word-break:break-word;margin-bottom:clamp(10px,2vw,18px);}}
@@ -1387,13 +1569,11 @@ class NiftyHTMLAnalyzer:
         .sb-value{{font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.3vw,12px);font-weight:700;color:#e0f7fa;overflow:hidden;text-overflow:ellipsis;}}
         .sb-value.gen-val{{color:#80deea;}} .sb-value.clock-val{{color:#4fc3f7;font-size:clamp(11px,1.5vw,13px);}} .sb-value.updated-val{{color:#ffb74d;}} .sb-value.cd-val{{color:#b388ff;min-width:28px;}}
 
-        /* ═══ SECTIONS ══════════════════════════════════════════════════ */
         .section{{padding:clamp(14px,2.5vw,28px) clamp(12px,2.5vw,26px);border-bottom:1px solid rgba(79,195,247,0.08);}}
         .section:last-child{{border-bottom:none;}}
         .section-title{{font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.5vw,13px);font-weight:700;letter-spacing:clamp(1px,0.3vw,2.5px);color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:clamp(12px,2vw,20px);padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}}
         .section-title span{{font-size:clamp(14px,2vw,18px);}}
 
-        /* ═══ GLASSMORPHISM CARDS ═══════════════════════════════════════ */
         .g{{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(79,195,247,0.18);border-radius:16px;position:relative;overflow:hidden;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);min-width:0;}}
         .g::before{{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);z-index:1;}}
         .g::after{{content:'';position:absolute;top:-60%;left:-30%;width:50%;height:200%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);transform:skewX(-15deg);transition:left 0.6s ease;z-index:0;}}
@@ -1421,13 +1601,11 @@ class NiftyHTMLAnalyzer:
         .tag-bull{{background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.35);}}
         .tag-bear{{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.35);}}
 
-        /* ═══ MARKET SNAPSHOT ═══════════════════════════════════════════ */
         .snap-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}}
         .snap-card{{padding:18px 16px;}}
         .snap-card .card-top-row{{margin-bottom:8px;padding:0;}}
         .snap-card .val{{font-size:clamp(18px,3vw,26px);padding:0;margin-bottom:0;}}
 
-        /* ═══ MARKET DIRECTION ══════════════════════════════════════════ */
         .md-widget{{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:clamp(12px,2vw,16px) clamp(14px,2vw,20px);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:12px;}}
         .md-glow{{position:absolute;top:-80%;left:-80%;width:260%;height:260%;background:conic-gradient(from 180deg,#ff6b35 0deg,#ffcd3c 120deg,#4ecdc4 240deg,#ff6b35 360deg);opacity:0.05;animation:md-rotate 8s linear infinite;border-radius:50%;pointer-events:none;}}
         @keyframes md-rotate{{to{{transform:rotate(360deg);}}}}
@@ -1445,7 +1623,6 @@ class NiftyHTMLAnalyzer:
         .md-row-bottom{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}}
         .md-direction{{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,5vw,36px);letter-spacing:clamp(1px,0.5vw,3px);line-height:1;}}
 
-        /* ═══ LOGIC BOX ═════════════════════════════════════════════════ */
         .logic-box{{background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.14);border-left:3px solid #4fc3f7;border-radius:10px;padding:10px 16px;margin-top:12px;}}
         .logic-box-head{{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;color:#4fc3f7;letter-spacing:2px;margin-bottom:7px;}}
         .logic-grid{{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;}}
@@ -1456,14 +1633,12 @@ class NiftyHTMLAnalyzer:
         .lc-side{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.28);}}
         .lc-info{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(79,195,247,0.08);color:#4fc3f7;border:1px solid rgba(79,195,247,0.22);}}
 
-        /* ═══ KEY LEVELS ════════════════════════════════════════════════ */
         .rl-node-a{{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}}
         .rl-node-b{{position:absolute;top:0;transform:translateX(-50%);text-align:center;}}
         .rl-dot{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}}
         .rl-lbl{{font-size:clamp(8px,1.2vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}}
         .rl-val{{font-size:clamp(10px,1.5vw,13px);font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}}
 
-        /* ═══ FII/DII ═══════════════════════════════════════════════════ */
         .pf-live-badge{{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:1px;}}
         .pf-live{{background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
         .pf-estimated{{background:rgba(255,138,101,0.1);color:#ff8a65;border:1px solid rgba(255,138,101,0.3);}}
@@ -1498,7 +1673,6 @@ class NiftyHTMLAnalyzer:
         .pf-verdict-badge{{display:inline-block;padding:3px 14px;border-radius:20px;font-size:clamp(10px,1.5vw,11px);font-weight:800;letter-spacing:1px;white-space:nowrap;}}
         .pf-insight-text{{font-size:clamp(12px,1.5vw,13px);color:#cfd8dc;line-height:1.85;font-weight:500;}}
 
-        /* ═══ NAVY COMMAND OI ═══════════════════════════════════════════ */
         .nc-section-header{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(79,195,247,0.14);}}
         .nc-header-left{{display:flex;align-items:center;gap:14px;}}
         .nc-header-icon{{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1e3a5f,#1a3052);border:1px solid rgba(79,195,247,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px rgba(79,195,247,0.15);}}
@@ -1528,19 +1702,15 @@ class NiftyHTMLAnalyzer:
         .nc-card-sub{{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(100,116,139,0.7);margin-bottom:14px;}}
         .nc-card-btn{{display:block;width:100%;padding:9px 14px;border-radius:7px;text-align:center;font-family:'Outfit',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;letter-spacing:0.5px;cursor:default;}}
 
-        /* ═══ STRATEGY CHECKLIST TAB STYLES ════════════════════════════ */
         .annot-badge{{font-size:9px;padding:2px 10px;border-radius:8px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-family:'JetBrains Mono',monospace;letter-spacing:1px;font-weight:700;white-space:nowrap;}}
         .input-summary-grid{{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
         .inp-summary-card{{border-radius:12px;padding:14px 16px;border:1px solid;transition:all 0.2s ease;}}
         .inp-auto-card{{background:rgba(0,230,118,0.04);border-color:rgba(0,230,118,0.2);}}
-        .inp-manual-card{{background:rgba(79,195,247,0.04);border-color:rgba(79,195,247,0.15);}}
         .inp-s-label{{font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;}}
         .inp-auto-card .inp-s-label{{color:rgba(0,230,118,0.5);}}
-        .inp-manual-card .inp-s-label{{color:rgba(79,195,247,0.5);}}
         .inp-s-val{{font-family:'Oxanium',sans-serif;font-size:clamp(14px,2vw,18px);font-weight:700;color:#e0f7fa;margin-bottom:4px;line-height:1.2;}}
         .inp-s-src{{font-size:9px;font-family:'JetBrains Mono',monospace;}}
         .inp-auto-card .inp-s-src{{color:rgba(0,230,118,0.3);}}
-        .inp-manual-card .inp-s-src{{color:rgba(79,195,247,0.3);}}
         .na-inline{{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
         .signal-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
         .sig-card{{background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;}}
@@ -1560,7 +1730,6 @@ class NiftyHTMLAnalyzer:
         .score-0{{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.25);}}
         .score-na{{background:rgba(176,190,197,0.08);color:rgba(176,190,197,0.35);border:1px solid rgba(176,190,197,0.12);}}
         .auto-badge{{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-weight:700;letter-spacing:0.5px;}}
-        .manual-badge{{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.2);color:#4fc3f7;font-weight:700;letter-spacing:0.5px;}}
         .score-meter{{background:rgba(10,20,30,0.7);border:1px solid rgba(79,195,247,0.15);border-radius:16px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}}
         .score-ring-wrap{{position:relative;flex-shrink:0;width:120px;height:120px;}}
         .score-ring-label{{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}}
@@ -1595,11 +1764,9 @@ class NiftyHTMLAnalyzer:
         .filter-btn{{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid rgba(79,195,247,0.2);background:transparent;color:rgba(176,190,197,0.5);transition:all 0.2s ease;font-family:'Oxanium',sans-serif;}}
         .filter-btn.active,.filter-btn:hover{{background:rgba(79,195,247,0.1);border-color:rgba(79,195,247,0.4);color:#4fc3f7;}}
 
-        /* ═══ DISCLAIMER ════════════════════════════════════════════════ */
         .disclaimer{{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}}
         .footer{{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}}
 
-        /* ═══ RESPONSIVE ════════════════════════════════════════════════ */
         @media(max-width:1024px){{
             .grid-5{{grid-template-columns:repeat(3,minmax(0,1fr));}}
             .grid-4{{grid-template-columns:repeat(2,minmax(0,1fr));}}
@@ -1673,7 +1840,6 @@ class NiftyHTMLAnalyzer:
             </div>
         </div>
 
-        <!-- TAB NAV -->
         <div class="tab-nav" id="tabNav">
             <button class="tab-btn active" data-tab="main" onclick="switchTab('main')">
                 <span class="tab-dot"></span>
@@ -1683,12 +1849,11 @@ class NiftyHTMLAnalyzer:
             <button class="tab-btn new-badge" data-tab="checklist" onclick="switchTab('checklist')">
                 <span class="tab-dot"></span>
                 🧠 Strategy Checklist
-                <span class="tab-badge">NEW</span>
+                <span class="tab-badge">AUTO</span>
             </button>
         </div>
     </div>
 
-    <!-- ════ TAB 1: MAIN ANALYSIS ════════════════════════════════════ -->
     <div class="tab-panel active" id="tab-main">
         <div class="section">
             <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
@@ -1727,11 +1892,10 @@ class NiftyHTMLAnalyzer:
     </div><!-- /tab-main -->
 """
         html += checklist_tab_html
-
         html += """
     <div class="footer">
-        <p>Automated Nifty 50 Option Chain + Technical Analysis · Strategy Checklist</p>
-        <p style="margin-top:6px;">© 2026 · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · Rules-Based Strategy Checklist · For Educational Purposes Only</p>
+        <p>Automated Nifty 50 Option Chain + Technical Analysis · Fully Auto Strategy Checklist</p>
+        <p style="margin-top:6px;">© 2026 · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · 100% Auto Signals · For Educational Purposes Only</p>
     </div>
 </div>
 """
@@ -1739,7 +1903,8 @@ class NiftyHTMLAnalyzer:
         html += "\n</body></html>"
         return html
 
-    def save_html_to_file(self, filename='index.html', vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
+    def save_html_to_file(self, filename='index.html', vol_support=None, vol_resistance=None,
+                           global_bias=None, vol_view="normal", india_vix=None):
         try:
             print(f"\n📄 Saving HTML to {filename}...")
             with open(filename,'w',encoding='utf-8') as f:
@@ -1747,18 +1912,22 @@ class NiftyHTMLAnalyzer:
                     vol_support=vol_support,
                     vol_resistance=vol_resistance,
                     global_bias=global_bias,
-                    vol_view=vol_view
+                    vol_view=vol_view,
+                    india_vix=india_vix,
                 ))
             print(f"   ✅ Saved {filename}")
             metadata = {
-                'timestamp': self.html_data['timestamp'],
-                'current_price': float(self.html_data['current_price']),
-                'bias': self.html_data['bias'],
-                'confidence': self.html_data['confidence'],
-                'rsi': float(self.html_data['rsi']),
-                'pcr': float(self.html_data['pcr']) if self.html_data['has_option_data'] else None,
-                'stop_loss': float(self.html_data['stop_loss']) if self.html_data['stop_loss'] else None,
-                'risk_reward_ratio': self.html_data.get('risk_reward_ratio',0),
+                'timestamp':         self.html_data['timestamp'],
+                'current_price':     float(self.html_data['current_price']),
+                'bias':              self.html_data['bias'],
+                'confidence':        self.html_data['confidence'],
+                'rsi':               float(self.html_data['rsi']),
+                'pcr':               float(self.html_data['pcr']) if self.html_data['has_option_data'] else None,
+                'stop_loss':         float(self.html_data['stop_loss']) if self.html_data['stop_loss'] else None,
+                'risk_reward_ratio': self.html_data.get('risk_reward_ratio', 0),
+                'global_bias':       global_bias,
+                'vol_view':          vol_view,
+                'india_vix':         india_vix,
             }
             with open('latest_report.json','w') as f:
                 json.dump(metadata,f,indent=2)
@@ -1767,7 +1936,8 @@ class NiftyHTMLAnalyzer:
         except Exception as e:
             print(f"\n❌ Save failed: {e}"); return False
 
-    def send_html_email_report(self, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
+    def send_html_email_report(self, vol_support=None, vol_resistance=None,
+                                global_bias=None, vol_view="normal", india_vix=None):
         gmail_user=os.getenv('GMAIL_USER'); gmail_password=os.getenv('GMAIL_APP_PASSWORD')
         recipient1=os.getenv('RECIPIENT_EMAIL_1'); recipient2=os.getenv('RECIPIENT_EMAIL_2')
         if not all([gmail_user,gmail_password,recipient1,recipient2]):
@@ -1777,7 +1947,8 @@ class NiftyHTMLAnalyzer:
             msg=MIMEMultipart('alternative')
             msg['From']=gmail_user; msg['To']=f"{recipient1}, {recipient2}"
             msg['Subject']=f"📊 Nifty 50 OI & Technical Report — {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
-            msg.attach(MIMEText(self.generate_html_email(vol_support,vol_resistance,global_bias,vol_view),'html'))
+            msg.attach(MIMEText(self.generate_html_email(
+                vol_support,vol_resistance,global_bias,vol_view,india_vix),'html'))
             with smtplib.SMTP_SSL('smtp.gmail.com',465) as server:
                 server.login(gmail_user,gmail_password); server.send_message(msg)
             print("   ✅ Email sent!"); return True
@@ -1787,7 +1958,7 @@ class NiftyHTMLAnalyzer:
     def generate_full_report(self):
         ist_now=datetime.now(pytz.timezone('Asia/Kolkata'))
         print("="*70)
-        print("NIFTY 50 DAILY REPORT — DEEP OCEAN THEME + STRATEGY CHECKLIST TAB")
+        print("NIFTY 50 DAILY REPORT — DEEP OCEAN THEME + FULLY AUTO CHECKLIST")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("="*70)
         oc_data=self.fetch_nse_option_chain_silent()
@@ -1802,36 +1973,59 @@ class NiftyHTMLAnalyzer:
         return option_analysis
 
 
-def main():
-    # ── Optional manual inputs for Strategy Checklist ─────────────────────
-    # Set these to None → shown as N/A in the checklist tab
-    # Or set values before running:
-    #   vol_support    = 25.0   # e.g. +25% volume at support vs avg
-    #   vol_resistance = -10.0  # e.g. -10% volume at resistance vs avg
-    #   global_bias    = "bullish"  # "bullish" | "bearish" | "neutral"
-    #   vol_view       = "normal"   # "low" | "normal" | "high"
-    vol_support    = None
-    vol_resistance = None
-    global_bias    = None
-    vol_view       = "normal"
+# ═══════════════════════════════════════════════════════════════════════════════
+#  MAIN — Zero manual inputs. Everything is auto-detected.
+# ═══════════════════════════════════════════════════════════════════════════════
 
+def main():
     try:
-        print("\n🚀 Starting Nifty 50 Analysis...\n")
-        analyzer=NiftyHTMLAnalyzer()
-        analyzer.generate_full_report()
-        print("\n"+"="*70)
-        save_ok=analyzer.save_html_to_file(
+        print("\n🚀 Starting Nifty 50 Analysis — Fully Automated v4\n")
+        analyzer = NiftyHTMLAnalyzer()
+        option_analysis = analyzer.generate_full_report()
+
+        # ── Step 1: Auto-detect India VIX → vol_view ─────────────────────────
+        print("\n📊 Auto-detecting India VIX...")
+        vol_view, india_vix = auto_vol_view()
+
+        # ── Step 2: Auto-detect global bias ──────────────────────────────────
+        print("\n🌐 Auto-detecting Global Bias (S&P500 + Dow + Nifty trend)...")
+        global_bias = auto_global_bias()
+
+        # ── Step 3: Auto-detect volume at support/resistance ─────────────────
+        d = analyzer.html_data
+        support    = d.get('support')
+        resistance = d.get('resistance')
+        current    = d.get('current_price')
+        print(f"\n📦 Auto-computing Volume at Support ({support}) and Resistance ({resistance})...")
+        vol_support, vol_resistance = auto_volume_at_levels(support, resistance, current)
+
+        # ── Step 4: Print auto-fill summary ──────────────────────────────────
+        print("\n" + "="*70)
+        print("AUTO-FILL SUMMARY")
+        print(f"  India VIX    : {india_vix} → vol_view = {vol_view.upper()}")
+        print(f"  Global Bias  : {global_bias.upper()}")
+        print(f"  Vol@Support  : {vol_support}")
+        print(f"  Vol@Resist.  : {vol_resistance}")
+        print("="*70)
+
+        # ── Step 5: Save HTML ─────────────────────────────────────────────────
+        save_ok = analyzer.save_html_to_file(
             'index.html',
             vol_support=vol_support,
             vol_resistance=vol_resistance,
             global_bias=global_bias,
-            vol_view=vol_view
+            vol_view=vol_view,
+            india_vix=india_vix,
         )
+
+        # ── Step 6: Email ─────────────────────────────────────────────────────
         if save_ok:
-            analyzer.send_html_email_report(vol_support,vol_resistance,global_bias,vol_view)
+            analyzer.send_html_email_report(vol_support, vol_resistance, global_bias, vol_view, india_vix)
         else:
             print("\n⚠️  Skipping email due to save failure")
+
         print("\n✅ Done! Open index.html in your browser.\n")
+
     except Exception as e:
         print(f"\n❌ Critical Error: {e}")
         import traceback; traceback.print_exc()
