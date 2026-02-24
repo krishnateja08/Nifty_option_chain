@@ -1,10 +1,13 @@
 {
-  "timestamp": "25-Feb-2026 01:19 IST",
+  "timestamp": "25-Feb-2026 01:44 IST",
   "current_price": 25424.650390625,
   "bias": "BEARISH",
   "confidence": "MEDIUM",
   "rsi": 41.96822669753927,
   "pcr": 0.747,
   "stop_loss": 25575.0,
-  "risk_reward_ratio": 0.33
+  "risk_reward_ratio": 0.33,
+  "global_bias": "bullish",
+  "vol_view": "normal",
+  "india_vix": 14.15
 }

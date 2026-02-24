@@ -10,7 +10,6 @@
         html{scroll-behavior:smooth;}
         body{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:clamp(8px,2vw,24px);color:#b0bec5;overflow-x:hidden;-webkit-text-size-adjust:100%;}
 
-        /* ═══ TAB SYSTEM ════════════════════════════════════════════════ */
         .tab-nav{display:flex;gap:0;border-bottom:2px solid rgba(79,195,247,0.2);overflow-x:auto;scrollbar-width:none;background:linear-gradient(135deg,#0f2027,#203a43);}
         .tab-nav::-webkit-scrollbar{display:none;}
         .tab-btn{display:flex;align-items:center;gap:8px;padding:13px clamp(14px,2.5vw,28px);font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.4vw,13px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(176,190,197,0.5);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;white-space:nowrap;transition:all 0.25s ease;position:relative;bottom:-2px;}
@@ -23,10 +22,8 @@
         .tab-panel{display:none;}
         .tab-panel.active{display:block;}
 
-        /* ═══ LAYOUT ════════════════════════════════════════════════════ */
         .container{max-width:1200px;margin:0 auto;background:rgba(15,32,39,0.85);backdrop-filter:blur(20px);border-radius:clamp(12px,2vw,20px);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(79,195,247,0.18);min-width:0;}
 
-        /* ═══ HEADER ════════════════════════════════════════════════════ */
         .header{background:linear-gradient(135deg,#0f2027,#203a43);padding:clamp(16px,3vw,32px) clamp(14px,3vw,30px) 0;text-align:center;position:relative;overflow:hidden;}
         .header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}
         .header h1{font-family:'Oxanium',sans-serif;font-size:clamp(16px,3.5vw,30px);font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:clamp(0.5px,0.3vw,2px);position:relative;z-index:1;word-break:break-word;margin-bottom:clamp(10px,2vw,18px);}
@@ -43,13 +40,11 @@
         .sb-value{font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.3vw,12px);font-weight:700;color:#e0f7fa;overflow:hidden;text-overflow:ellipsis;}
         .sb-value.gen-val{color:#80deea;} .sb-value.clock-val{color:#4fc3f7;font-size:clamp(11px,1.5vw,13px);} .sb-value.updated-val{color:#ffb74d;} .sb-value.cd-val{color:#b388ff;min-width:28px;}
 
-        /* ═══ SECTIONS ══════════════════════════════════════════════════ */
         .section{padding:clamp(14px,2.5vw,28px) clamp(12px,2.5vw,26px);border-bottom:1px solid rgba(79,195,247,0.08);}
         .section:last-child{border-bottom:none;}
         .section-title{font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.5vw,13px);font-weight:700;letter-spacing:clamp(1px,0.3vw,2.5px);color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:clamp(12px,2vw,20px);padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}
         .section-title span{font-size:clamp(14px,2vw,18px);}
 
-        /* ═══ GLASSMORPHISM CARDS ═══════════════════════════════════════ */
         .g{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(79,195,247,0.18);border-radius:16px;position:relative;overflow:hidden;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);min-width:0;}
         .g::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);z-index:1;}
         .g::after{content:'';position:absolute;top:-60%;left:-30%;width:50%;height:200%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);transform:skewX(-15deg);transition:left 0.6s ease;z-index:0;}
@@ -77,13 +72,11 @@
         .tag-bull{background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.35);}
         .tag-bear{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.35);}
 
-        /* ═══ MARKET SNAPSHOT ═══════════════════════════════════════════ */
         .snap-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
         .snap-card{padding:18px 16px;}
         .snap-card .card-top-row{margin-bottom:8px;padding:0;}
         .snap-card .val{font-size:clamp(18px,3vw,26px);padding:0;margin-bottom:0;}
 
-        /* ═══ MARKET DIRECTION ══════════════════════════════════════════ */
         .md-widget{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:clamp(12px,2vw,16px) clamp(14px,2vw,20px);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:12px;}
         .md-glow{position:absolute;top:-80%;left:-80%;width:260%;height:260%;background:conic-gradient(from 180deg,#ff6b35 0deg,#ffcd3c 120deg,#4ecdc4 240deg,#ff6b35 360deg);opacity:0.05;animation:md-rotate 8s linear infinite;border-radius:50%;pointer-events:none;}
         @keyframes md-rotate{to{transform:rotate(360deg);}}
@@ -101,7 +94,6 @@
         .md-row-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}
         .md-direction{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,5vw,36px);letter-spacing:clamp(1px,0.5vw,3px);line-height:1;}
 
-        /* ═══ LOGIC BOX ═════════════════════════════════════════════════ */
         .logic-box{background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.14);border-left:3px solid #4fc3f7;border-radius:10px;padding:10px 16px;margin-top:12px;}
         .logic-box-head{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;color:#4fc3f7;letter-spacing:2px;margin-bottom:7px;}
         .logic-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;}
@@ -112,14 +104,12 @@
         .lc-side{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.28);}
         .lc-info{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(79,195,247,0.08);color:#4fc3f7;border:1px solid rgba(79,195,247,0.22);}
 
-        /* ═══ KEY LEVELS ════════════════════════════════════════════════ */
         .rl-node-a{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}
         .rl-node-b{position:absolute;top:0;transform:translateX(-50%);text-align:center;}
         .rl-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}
         .rl-lbl{font-size:clamp(8px,1.2vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}
         .rl-val{font-size:clamp(10px,1.5vw,13px);font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}
 
-        /* ═══ FII/DII ═══════════════════════════════════════════════════ */
         .pf-live-badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:1px;}
         .pf-live{background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.3);}
         .pf-estimated{background:rgba(255,138,101,0.1);color:#ff8a65;border:1px solid rgba(255,138,101,0.3);}
@@ -154,7 +144,6 @@
         .pf-verdict-badge{display:inline-block;padding:3px 14px;border-radius:20px;font-size:clamp(10px,1.5vw,11px);font-weight:800;letter-spacing:1px;white-space:nowrap;}
         .pf-insight-text{font-size:clamp(12px,1.5vw,13px);color:#cfd8dc;line-height:1.85;font-weight:500;}
 
-        /* ═══ NAVY COMMAND OI ═══════════════════════════════════════════ */
         .nc-section-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(79,195,247,0.14);}
         .nc-header-left{display:flex;align-items:center;gap:14px;}
         .nc-header-icon{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1e3a5f,#1a3052);border:1px solid rgba(79,195,247,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px rgba(79,195,247,0.15);}
@@ -184,19 +173,15 @@
         .nc-card-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(100,116,139,0.7);margin-bottom:14px;}
         .nc-card-btn{display:block;width:100%;padding:9px 14px;border-radius:7px;text-align:center;font-family:'Outfit',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;letter-spacing:0.5px;cursor:default;}
 
-        /* ═══ STRATEGY CHECKLIST TAB STYLES ════════════════════════════ */
         .annot-badge{font-size:9px;padding:2px 10px;border-radius:8px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-family:'JetBrains Mono',monospace;letter-spacing:1px;font-weight:700;white-space:nowrap;}
         .input-summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:20px;}
         .inp-summary-card{border-radius:12px;padding:14px 16px;border:1px solid;transition:all 0.2s ease;}
         .inp-auto-card{background:rgba(0,230,118,0.04);border-color:rgba(0,230,118,0.2);}
-        .inp-manual-card{background:rgba(79,195,247,0.04);border-color:rgba(79,195,247,0.15);}
         .inp-s-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;}
         .inp-auto-card .inp-s-label{color:rgba(0,230,118,0.5);}
-        .inp-manual-card .inp-s-label{color:rgba(79,195,247,0.5);}
         .inp-s-val{font-family:'Oxanium',sans-serif;font-size:clamp(14px,2vw,18px);font-weight:700;color:#e0f7fa;margin-bottom:4px;line-height:1.2;}
         .inp-s-src{font-size:9px;font-family:'JetBrains Mono',monospace;}
         .inp-auto-card .inp-s-src{color:rgba(0,230,118,0.3);}
-        .inp-manual-card .inp-s-src{color:rgba(79,195,247,0.3);}
         .na-inline{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}
         .signal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px;}
         .sig-card{background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;}
@@ -216,7 +201,6 @@
         .score-0{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.25);}
         .score-na{background:rgba(176,190,197,0.08);color:rgba(176,190,197,0.35);border:1px solid rgba(176,190,197,0.12);}
         .auto-badge{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-weight:700;letter-spacing:0.5px;}
-        .manual-badge{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.2);color:#4fc3f7;font-weight:700;letter-spacing:0.5px;}
         .score-meter{background:rgba(10,20,30,0.7);border:1px solid rgba(79,195,247,0.15);border-radius:16px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
         .score-ring-wrap{position:relative;flex-shrink:0;width:120px;height:120px;}
         .score-ring-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
@@ -251,11 +235,9 @@
         .filter-btn{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid rgba(79,195,247,0.2);background:transparent;color:rgba(176,190,197,0.5);transition:all 0.2s ease;font-family:'Oxanium',sans-serif;}
         .filter-btn.active,.filter-btn:hover{background:rgba(79,195,247,0.1);border-color:rgba(79,195,247,0.4);color:#4fc3f7;}
 
-        /* ═══ DISCLAIMER ════════════════════════════════════════════════ */
         .disclaimer{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}
         .footer{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}
 
-        /* ═══ RESPONSIVE ════════════════════════════════════════════════ */
         @media(max-width:1024px){
             .grid-5{grid-template-columns:repeat(3,minmax(0,1fr));}
             .grid-4{grid-template-columns:repeat(2,minmax(0,1fr));}
@@ -310,7 +292,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">25-Feb-2026 01:19 IST</span>
+                <span class="sb-value gen-val">25-Feb-2026 01:44 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -320,7 +302,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-updated"></span>
                 <span class="sb-label">Last Updated</span>
-                <span class="sb-value updated-val" id="last-updated">25-Feb-2026 01:19 IST</span>
+                <span class="sb-value updated-val" id="last-updated">25-Feb-2026 01:44 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-cd"></span>
@@ -329,7 +311,6 @@
             </div>
         </div>
 
-        <!-- TAB NAV -->
         <div class="tab-nav" id="tabNav">
             <button class="tab-btn active" data-tab="main" onclick="switchTab('main')">
                 <span class="tab-dot"></span>
@@ -339,12 +320,11 @@
             <button class="tab-btn new-badge" data-tab="checklist" onclick="switchTab('checklist')">
                 <span class="tab-dot"></span>
                 🧠 Strategy Checklist
-                <span class="tab-badge">NEW</span>
+                <span class="tab-badge">AUTO</span>
             </button>
         </div>
     </div>
 
-    <!-- ════ TAB 1: MAIN ANALYSIS ════════════════════════════════════ -->
     <div class="tab-panel active" id="tab-main">
         <div class="section">
             <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
@@ -532,60 +512,59 @@
         </div>
     </div><!-- /tab-main -->
 
-    <!-- TAB 2: STRATEGY CHECKLIST -->
     <div class="tab-panel" id="tab-checklist">
 
         <div class="section">
             <div class="section-title">
                 <span>&#9881;&#65039;</span> LIVE DATA INPUTS
-                <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
-                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 25-Feb-2026 01:19 IST</span>
+                <span class="annot-badge">ALL AUTO-FILLED FROM LIVE DATA</span>
+                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 25-Feb-2026 01:44 IST</span>
             </div>
             <div class="input-summary-grid">
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">PCR (OI)</div>
                     <div class="inp-s-val">0.747</div>
-                    <div class="inp-s-src">Option Chain</div>
+                    <div class="inp-s-src">Option Chain · AUTO</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">RSI (14)</div>
                     <div class="inp-s-val">42.0</div>
-                    <div class="inp-s-src">Technical</div>
+                    <div class="inp-s-src">Technical · AUTO</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">MACD</div>
-                    <div class="inp-s-val"><span class="na-inline">N/A</span></div>
-                    <div class="inp-s-src">Technical</div>
+                    <div class="inp-s-val">Bearish</div>
+                    <div class="inp-s-src">Technical · AUTO</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Market Trend</div>
                     <div class="inp-s-val">Mixed</div>
-                    <div class="inp-s-src">SMA 20/50/200</div>
+                    <div class="inp-s-src">SMA 20/50/200 · AUTO</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">OI Direction</div>
                     <div class="inp-s-val">Bearish</div>
-                    <div class="inp-s-src">CHG OI</div>
+                    <div class="inp-s-src">CHG OI · AUTO</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Global Bias</div>
-                    <div class="inp-s-val"><span class="na-inline">N/A</span></div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-val">Bullish</div>
+                    <div class="inp-s-src">S&amp;P500 + Dow · AUTO</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Vol at Support</div>
                     <div class="inp-s-val"><span class="na-inline">N/A</span></div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-src">1H Volume · AUTO</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Vol at Resistance</div>
                     <div class="inp-s-val"><span class="na-inline">N/A</span></div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-src">1H Volume · AUTO</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
-                    <div class="inp-s-label">IV View</div>
-                    <div class="inp-s-val">NORMAL</div>
-                    <div class="inp-s-src">Manual Input</div>
+                <div class="inp-summary-card inp-auto-card">
+                    <div class="inp-s-label">India VIX</div>
+                    <div class="inp-s-val">14.15</div>
+                    <div class="inp-s-src">IV View: NORMAL · AUTO</div>
                 </div>
             </div>
         </div>
@@ -594,7 +573,7 @@
             <div class="section-title">
                 <span>&#128203;</span> SIGNAL CHECKLIST
                 <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-                    0 Bullish &middot; 4 Bearish &middot; 1 Neutral &middot; 3 N/A
+                    1 Bullish &middot; 4 Bearish &middot; 1 Neutral &middot; 2 N/A
                 </span>
             </div>
             <div class="signal-grid">
@@ -645,29 +624,29 @@
             <div class="sig-score score-n">-1</div>
         </div>
         <div class="sig-card">
-            <div class="sig-icon sig-na">🌐</div>
+            <div class="sig-icon sig-bull">🌐</div>
             <div class="sig-body">
-                <div class="sig-name">Global Market Bias <span class="manual-badge">MANUAL</span></div>
+                <div class="sig-name">Global Market Bias <span class="auto-badge">AUTO</span></div>
+                <div class="sig-val">Bullish</div>
+                <div class="sig-msg">Global indices (Dow/S&P/Nifty trend) showing bullish bias</div>
+            </div>
+            <div class="sig-score score-p">+1</div>
+        </div>
+        <div class="sig-card">
+            <div class="sig-icon sig-na">📦</div>
+            <div class="sig-body">
+                <div class="sig-name">Volume at Support <span class="auto-badge">AUTO</span></div>
                 <div class="sig-val na-val">N/A</div>
-                <div class="sig-msg">Global bias not provided</div>
+                <div class="sig-msg">Volume at support — auto-computed from 1H data (no recent bars in zone)</div>
             </div>
             <div class="sig-score score-na">N/A</div>
         </div>
         <div class="sig-card">
             <div class="sig-icon sig-na">📦</div>
             <div class="sig-body">
-                <div class="sig-name">Volume at Support <span class="manual-badge">MANUAL</span></div>
+                <div class="sig-name">Volume at Resistance <span class="auto-badge">AUTO</span></div>
                 <div class="sig-val na-val">N/A</div>
-                <div class="sig-msg">Volume at support not provided — skipped</div>
-            </div>
-            <div class="sig-score score-na">N/A</div>
-        </div>
-        <div class="sig-card">
-            <div class="sig-icon sig-na">📦</div>
-            <div class="sig-body">
-                <div class="sig-name">Volume at Resistance <span class="manual-badge">MANUAL</span></div>
-                <div class="sig-val na-val">N/A</div>
-                <div class="sig-msg">Volume at resistance not provided — skipped</div>
+                <div class="sig-msg">Volume at resistance — auto-computed from 1H data (no recent bars in zone)</div>
             </div>
             <div class="sig-score score-na">N/A</div>
         </div>
@@ -680,11 +659,11 @@
                             stroke="#ff5252" stroke-width="9"
                             stroke-linecap="round"
                             stroke-dasharray="289.0"
-                            stroke-dashoffset="144.5"
+                            stroke-dashoffset="180.6"
                             style="transform:rotate(-90deg);transform-origin:55px 55px;"/>
                     </svg>
                     <div class="score-ring-label">
-                        <div class="score-ring-num" style="color:#ff5252;">-4</div>
+                        <div class="score-ring-num" style="color:#ff5252;">-3</div>
                         <div class="score-ring-txt">SCORE</div>
                     </div>
                 </div>
@@ -693,14 +672,14 @@
                         STRONGLY BEARISH
                     </div>
                     <div class="score-sub">
-                        Score -4 from 8 signals (3 skipped as N/A).<br>
+                        Score -3 from 8 signals (2 shown as N/A — zone not visited).<br>
                         Strong directional conviction — proceed with caution and stop losses.
                     </div>
                     <div class="score-pills">
-                        <span class="sc-pill sc-pill-bull">&#10003; BULL: 0</span>
+                        <span class="sc-pill sc-pill-bull">&#10003; BULL: 1</span>
                         <span class="sc-pill sc-pill-bear">&#10007; BEAR: 4</span>
                         <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: 1</span>
-                        <span class="sc-pill sc-pill-na">— N/A: 3</span>
+                        <span class="sc-pill sc-pill-na">— N/A: 2</span>
                     </div>
                 </div>
             </div>
@@ -796,11 +775,11 @@
                     <div class="logic-item"><span class="lc-bull">+1</span> Signal is bullish &mdash; adds to bull case</div>
                     <div class="logic-item"><span class="lc-bear">&minus;1</span> Signal is bearish &mdash; adds to bear case</div>
                     <div class="logic-item"><span class="lc-side">0</span> Neutral signal &mdash; no directional contribution</div>
-                    <div class="logic-item"><span class="lc-info">N/A</span> Data not available &mdash; excluded from score</div>
+                    <div class="logic-item"><span class="lc-info">N/A</span> Price not near level &mdash; excluded from score</div>
                     <div class="logic-item"><span class="lc-bull">&ge; +3</span> Strongly Bullish &middot; <span class="lc-bull">+1/+2</span> Mildly Bullish</div>
                     <div class="logic-item"><span class="lc-bear">&le; &minus;3</span> Strongly Bearish &middot; <span class="lc-bear">&minus;1/&minus;2</span> Mildly Bearish</div>
-                    <div class="logic-item"><span class="lc-info">AUTO</span> Filled from live NSE + yfinance data</div>
-                    <div class="logic-item"><span class="lc-side">MANUAL</span> Requires your input &mdash; shown as N/A if not set</div>
+                    <div class="logic-item"><span class="lc-info">AUTO</span> All 8 signals auto-filled — no manual input needed</div>
+                    <div class="logic-item"><span class="lc-info">VIX</span> India VIX &lt;13 = Low &middot; 13–18 = Normal &middot; &gt;18 = High IV</div>
                 </div>
             </div>
         </div>
@@ -817,8 +796,8 @@
     </div><!-- /tab-checklist -->
 
     <div class="footer">
-        <p>Automated Nifty 50 Option Chain + Technical Analysis · Strategy Checklist</p>
-        <p style="margin-top:6px;">© 2026 · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · Rules-Based Strategy Checklist · For Educational Purposes Only</p>
+        <p>Automated Nifty 50 Option Chain + Technical Analysis · Fully Auto Strategy Checklist</p>
+        <p style="margin-top:6px;">© 2026 · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · 100% Auto Signals · For Educational Purposes Only</p>
     </div>
 </div>
 
@@ -868,7 +847,6 @@
         setInterval(silentRefresh, INTERVAL);
     })();
 
-    /* ── Tab switching ─────────────────────────────────── */
     function switchTab(tab) {
         document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
         document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -878,7 +856,6 @@
         if(btn)   btn.classList.add('active');
     }
 
-    /* ── Strategy filter ───────────────────────────────── */
     function filterStrats(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
