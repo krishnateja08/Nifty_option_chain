@@ -2,23 +2,23 @@ name: Nifty 50 Analysis + GitHub Pages
 
 on:
   schedule:
-    # Runs at 04:08, 04:35 (IST: 09:38, 10:05)
+    # All times in UTC → IST = UTC + 5:30
+    # Runs at 04:08, 04:35 UTC  (IST: 09:38, 10:05)
     - cron: '8,35 4 * * 1-5'
-    # Runs at 05:02, 05:29, 05:56 (IST: 10:32, 10:59, 11:26)
+    # Runs at 05:02, 05:29, 05:56 UTC  (IST: 10:32, 10:59, 11:26)
     - cron: '2,29,56 5 * * 1-5'
-    # Runs at 06:23, 06:50 (IST: 11:53, 12:20)
+    # Runs at 06:23, 06:50 UTC  (IST: 11:53, 12:20)
     - cron: '23,50 6 * * 1-5'
-    # Runs at 07:17, 07:44 (IST: 12:47, 13:14)
+    # Runs at 07:17, 07:44 UTC  (IST: 12:47, 13:14)
     - cron: '17,44 7 * * 1-5'
-    # Runs at 08:11, 08:38 (IST: 13:41, 14:08)
+    # Runs at 08:11, 08:38 UTC  (IST: 13:41, 14:08)
     - cron: '11,38 8 * * 1-5'
-    # Runs at 09:05, 09:32, 09:59 (IST: 14:35, 15:02, 15:29)
+    # Runs at 09:05, 09:32, 09:59 UTC  (IST: 14:35, 15:02, 15:29)
     - cron: '5,32,59 9 * * 1-5'
-    # Runs at 10:26, 10:30 (IST: 15:56, 16:00)
+    # Runs at 10:26, 10:30 UTC  (IST: 15:56, 16:00)
     - cron: '26,30 10 * * 1-5'
-  workflow_dispatch:
+  workflow_dispatch:   # Allow manual trigger from GitHub UI
 
-# Required permissions
 permissions:
   contents: write
   pages: write
@@ -27,46 +27,118 @@ permissions:
 jobs:
   analyze-and-deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout code
+      # ── 1. Checkout main branch (your source code) ──────────────────
+      - name: Checkout main branch
         uses: actions/checkout@v4
-      
-      - name: Set up Python
+        with:
+          ref: main          # or 'master' — whichever is your default branch
+          fetch-depth: 0     # full history needed so we can read gh-pages below
+
+      # ── 2. Restore oi_log.json from gh-pages ────────────────────────
+      #    This is the KEY step that prevents OI history being wiped on
+      #    every deploy. We pull the existing JSON from the gh-pages
+      #    branch BEFORE running the Python script, so log_oi_snapshot()
+      #    appends to the running history rather than starting fresh.
+      - name: Restore oi_log.json from gh-pages (preserve OI history)
+        run: |
+          git fetch origin gh-pages 2>/dev/null \
+            || echo "gh-pages branch not found yet — first run, skipping restore"
+
+          if git show origin/gh-pages:oi_log.json > oi_log.json 2>/dev/null; then
+            ENTRY_COUNT=$(python3 -c "import json,sys; d=json.load(open('oi_log.json')); print(len(d))" 2>/dev/null || echo "?")
+            echo "✅ Restored oi_log.json from gh-pages  (${ENTRY_COUNT} existing snapshots)"
+          else
+            echo "📭 No existing oi_log.json — creating empty file for first run"
+            echo "[]" > oi_log.json
+          fi
+
+      # ── 3. Python setup ─────────────────────────────────────────────
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
+      # ── 4. Install dependencies ─────────────────────────────────────
       - name: Install dependencies
         run: |
-          pip install curl_cffi pandas yfinance openpyxl beautifulsoup4
-      
-      - name: Run Analysis
+          pip install --upgrade pip
+          pip install curl_cffi pandas yfinance openpyxl beautifulsoup4 pytz
+
+      # ── 5. Run the analysis script ──────────────────────────────────
+      #    Script will:
+      #      • Fetch live NSE option chain
+      #      • Compute technicals
+      #      • Append one row to oi_log.json  (IST timestamp)
+      #      • Write index.html  (full 3-tab report)
+      #      • Write latest_report.json  (metadata)
+      #      • Send email (if credentials set)
+      - name: Run Nifty 50 Analysis
         env:
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          RECIPIENT_EMAIL_1: ${{ secrets.RECIPIENT_EMAIL_1 }}
-          RECIPIENT_EMAIL_2: ${{ secrets.RECIPIENT_EMAIL_2 }}
+          RECIPIENT_EMAIL_1:  ${{ secrets.RECIPIENT_EMAIL_1 }}
+          RECIPIENT_EMAIL_2:  ${{ secrets.RECIPIENT_EMAIL_2 }}
         run: |
           python nifty50_option_analysis.py
           echo "✅ Analysis complete"
-          ls -la index.html
-      
-      # Deploy using peaceiris/actions-gh-pages (easiest method)
+          echo ""
+          echo "── Output files ──────────────────────────────"
+          ls -lh index.html oi_log.json latest_report.json 2>/dev/null || true
+          echo ""
+          SNAP=$(python3 -c "import json; d=json.load(open('oi_log.json')); print(len(d))" 2>/dev/null || echo "?")
+          echo "📊 Total OI snapshots in log: ${SNAP}"
+          echo "🕐 Latest entry time (IST):"
+          python3 -c "
+          import json
+          d = json.load(open('oi_log.json'))
+          if d: print('   ', d[0].get('timestamp','—'), '|', d[0].get('opt_signal','—'))
+          " 2>/dev/null || true
+
+      # ── 6. Deploy to GitHub Pages ────────────────────────────────────
+      #    CRITICAL settings:
+      #      keep_files: true  → never wipe old files (including oi_log.json)
+      #      exclude_assets    → don't publish Python source to pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: .
           publish_branch: gh-pages
-          keep_files: false
-          commit_message: "📊 Update Nifty Report - ${{ github.event.head_commit.message }}"
-      
-      - name: Show URL
+          keep_files: true          # ← NEVER delete existing files on gh-pages
+          exclude_assets: >-
+            .github,
+            *.py,
+            *.yml,
+            *.yaml,
+            *.md,
+            *.txt,
+            *.sh,
+            __pycache__,
+            *.pyc,
+            .gitignore,
+            requirements.txt
+          commit_message: >-
+            📊 Nifty OI Update
+            — Run #${{ github.run_number }}
+            — ${{ github.event_name }}
+
+      # ── 7. Print live URL ────────────────────────────────────────────
+      - name: Show live report URL
         run: |
+          echo ""
           echo "=============================================="
           echo "✅ Deployed successfully!"
-          echo "=============================================="
-          echo "🔗 Your report is live at:"
-          echo "    https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo ""
+          echo "🔗 Live report:"
+          echo "   https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo ""
+          echo "📁 Files on gh-pages:"
+          echo "   index.html        ← Main 3-tab report"
+          echo "   oi_log.json       ← Intraday OI history (persists across runs)"
+          echo "   latest_report.json← Metadata snapshot"
+          echo ""
+          echo "⏱️  oi_log.json grows by 1 row per run."
+          echo "   Holds last 200 entries (~1 full trading day at current schedule)."
           echo "=============================================="
