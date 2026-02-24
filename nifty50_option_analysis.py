@@ -6,22 +6,11 @@ FII/DII SECTION: Theme 3 · Pulse Flow
 MARKET DIRECTION: Holographic Glass Widget (Compact)
 KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
 AUTO REFRESH: Silent background fetch every 30s · No flicker · No scroll jump
+STRATEGY CHECKLIST TAB: Rules-based scoring · Auto-filled from live data · N/A safe
 
 FIX v3: Holiday-aware expiry logic
-     - fetch_nse_option_chain_silent() now queries NSE live expiry list FIRST
-       (NSE itself publishes the shifted date when Tuesday is a holiday)
-     - Falls back to computed Tuesday with a backwards holiday walk:
-       Tuesday holiday → Monday, Monday holiday → Friday, etc.
-     - NSE_FO_HOLIDAYS 2026 updated to OFFICIAL NSE circular (16 holidays confirmed).
-
-FIX v2: Expiry date now time-aware:
-     - Tuesday before 4:00 PM IST  → use TODAY's expiry
-     - Tuesday after  4:00 PM IST  → roll to NEXT Tuesday
-     - Any other day               → nearest upcoming Tuesday
-
-FIX v1: Net OI = PE Δ - CE Δ (corrected from PE + CE)
-     Net label now matches actual calculation.
-     Bullish when Net > 0, Bearish when Net < 0.
+FIX v2: Expiry date now time-aware
+FIX v1: Net OI = PE Δ - CE Δ
 """
 from curl_cffi import requests
 import pandas as pd
@@ -39,46 +28,13 @@ import json
 import pytz
 warnings.filterwarnings('ignore')
 
-# ─── NSE FO Segment Trading Holidays 2025-2026 ────────────────────────────────
-# When a Tuesday falls on one of these, NSE shifts expiry to the previous
-# trading day (Monday, or Friday if Monday is also a holiday, etc.).
-# Source: NSE official holiday circular. Update this set each January.
 NSE_FO_HOLIDAYS = {
-    # ── 2025 ──────────────────────────────────────────────────────────────
-    "26-Jan-2025",  # Republic Day
-    "19-Feb-2025",  # Chhatrapati Shivaji Maharaj Jayanti
-    "14-Mar-2025",  # Holi
-    "31-Mar-2025",  # Id-Ul-Fitr (Ramzan Eid)
-    "10-Apr-2025",  # Dr. Baba Saheb Ambedkar Jayanti / Shri Ram Navami
-    "14-Apr-2025",  # Dr. Baba Saheb Ambedkar Jayanti
-    "18-Apr-2025",  # Good Friday
-    "01-May-2025",  # Maharashtra Day
-    "15-Aug-2025",  # Independence Day
-    "27-Aug-2025",  # Ganesh Chaturthi
-    "02-Oct-2025",  # Mahatma Gandhi Jayanti / Dussehra
-    "20-Oct-2025",  # Diwali - Laxmi Pujan
-    "21-Oct-2025",  # Diwali - Balipratipada
-    "05-Nov-2025",  # Prakash Gurpurb Sri Guru Nanak Dev Ji
-    "19-Nov-2025",  # Gurunanak Jayanti (alternate)
-    "25-Dec-2025",  # Christmas
-    # ── 2026 — OFFICIAL NSE TRADING HOLIDAYS (F&O Segment) ───────────────
-    # Source: NSE official circular (verified from exchange calendar)
-    "15-Jan-2026",  # Municipal Corporation Election - Maharashtra
-    "26-Jan-2026",  # Republic Day
-    "03-Mar-2026",  # Holi
-    "26-Mar-2026",  # Shri Ram Navami
-    "31-Mar-2026",  # Shri Mahavir Jayanti
-    "03-Apr-2026",  # Good Friday
-    "14-Apr-2026",  # Dr. Baba Saheb Ambedkar Jayanti
-    "01-May-2026",  # Maharashtra Day
-    "28-May-2026",  # Bakri Id
-    "26-Jun-2026",  # Muharram
-    "14-Sep-2026",  # Ganesh Chaturthi
-    "02-Oct-2026",  # Mahatma Gandhi Jayanti
-    "20-Oct-2026",  # Dussehra
-    "10-Nov-2026",  # Diwali - Balipratipada
-    "24-Nov-2026",  # Prakash Gurpurb Sri Guru Nanak Dev
-    "25-Dec-2026",  # Christmas
+    "26-Jan-2025","19-Feb-2025","14-Mar-2025","31-Mar-2025","10-Apr-2025",
+    "14-Apr-2025","18-Apr-2025","01-May-2025","15-Aug-2025","27-Aug-2025",
+    "02-Oct-2025","20-Oct-2025","21-Oct-2025","05-Nov-2025","19-Nov-2025","25-Dec-2025",
+    "15-Jan-2026","26-Jan-2026","03-Mar-2026","26-Mar-2026","31-Mar-2026",
+    "03-Apr-2026","14-Apr-2026","01-May-2026","28-May-2026","26-Jun-2026",
+    "14-Sep-2026","02-Oct-2026","20-Oct-2026","10-Nov-2026","24-Nov-2026","25-Dec-2026",
 }
 
 
@@ -100,10 +56,10 @@ def _parse_nse_fiidii(raw):
     for row in raw[:10]:
         try:
             dt_obj  = datetime.strptime(row.get("date", ""), "%d-%b-%Y")
-            fii_net = float(row.get("fiiBuyValue",  0) or 0) - float(row.get("fiiSellValue", 0) or 0)
-            dii_net = float(row.get("diiBuyValue",  0) or 0) - float(row.get("diiSellValue", 0) or 0)
+            fii_net = float(row.get("fiiBuyValue",0) or 0) - float(row.get("fiiSellValue",0) or 0)
+            dii_net = float(row.get("diiBuyValue",0) or 0) - float(row.get("diiSellValue",0) or 0)
             days.append({'date': dt_obj.strftime("%b %d"), 'day': dt_obj.strftime("%a"),
-                         'fii': round(fii_net, 2), 'dii': round(dii_net, 2)})
+                         'fii': round(fii_net,2), 'dii': round(dii_net,2)})
         except Exception:
             continue
     if len(days) < 3:
@@ -136,10 +92,10 @@ def _fetch_from_groww():
             if len(cols) < 7: continue
             try:
                 dt_obj  = datetime.strptime(cols[0], "%d %b %Y")
-                fii_net = float(cols[3].replace(",", "").replace("+", ""))
-                dii_net = float(cols[6].replace(",", "").replace("+", ""))
+                fii_net = float(cols[3].replace(",","").replace("+",""))
+                dii_net = float(cols[6].replace(",","").replace("+",""))
                 days.append({'date': dt_obj.strftime("%b %d"), 'day': dt_obj.strftime("%a"),
-                             'fii': round(fii_net, 2), 'dii': round(dii_net, 2)})
+                             'fii': round(fii_net,2), 'dii': round(dii_net,2)})
             except Exception:
                 continue
             if len(days) == 5: break
@@ -224,6 +180,440 @@ def compute_fii_dii_summary(data):
             'badge_cls': badge_cls, 'insight': insight, 'max_abs': max_abs}
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+#  STRATEGY CHECKLIST ENGINE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def score_pcr(pcr):
+    if pcr is None:
+        return 0, "N/A", "PCR not available"
+    if pcr < 0.8:
+        return -1, f"{pcr:.3f}", f"PCR {pcr:.3f} → below 0.8 — excess call writing, bearish sentiment"
+    elif pcr > 1.2:
+        return +1, f"{pcr:.3f}", f"PCR {pcr:.3f} → above 1.2 — excess put writing, bullish sentiment"
+    else:
+        return 0, f"{pcr:.3f}", f"PCR {pcr:.3f} → in 0.8–1.2 range — neutral/mixed sentiment"
+
+def score_rsi(rsi):
+    if rsi is None:
+        return 0, "N/A", "RSI not available"
+    if rsi >= 60:
+        return +1, f"{rsi:.1f}", f"RSI {rsi:.1f} → above 60 — bullish momentum building"
+    elif rsi <= 40:
+        return -1, f"{rsi:.1f}", f"RSI {rsi:.1f} → below 40 — bearish momentum, oversold"
+    else:
+        return 0, f"{rsi:.1f}", f"RSI {rsi:.1f} → 40–60 zone — neutral, no overbought/oversold signal"
+
+def score_macd(macd_bullish):
+    if macd_bullish is None:
+        return 0, "N/A", "MACD data not available"
+    if macd_bullish:
+        return +1, "Bullish Crossover", "MACD crossed above signal line — bullish momentum"
+    else:
+        return -1, "Bearish Crossover", "MACD crossed below signal line — bearish momentum"
+
+def score_trend(sma_20_above, sma_50_above, sma_200_above):
+    if sma_200_above is None:
+        return 0, "N/A", "Trend data not available"
+    above_count = sum([sma_20_above, sma_50_above, sma_200_above])
+    if above_count == 3:
+        return +1, "Strong Uptrend", "Price above all SMAs (20/50/200) — strong structural uptrend"
+    elif above_count >= 2:
+        return +1, "Uptrend", "Price above majority of SMAs — uptrend intact"
+    elif above_count == 0:
+        return -1, "Downtrend", "Price below all SMAs (20/50/200) — structural downtrend"
+    else:
+        return -1, "Weak / Mixed", "Price below majority of SMAs — trend weakening"
+
+def score_volume(volume_change_pct, location):
+    if volume_change_pct is None:
+        return 0, "N/A", f"Volume at {location} not provided — skipped"
+    msg_base = f"Volume {'+' if volume_change_pct >= 0 else ''}{volume_change_pct:.0f}% vs average at {location}"
+    if location == "support":
+        if volume_change_pct >= 30:
+            return +1, f"{volume_change_pct:+.0f}%", f"{msg_base} — buyers active, support confirmed (bullish)"
+        elif volume_change_pct <= -20:
+            return -1, f"{volume_change_pct:+.0f}%", f"{msg_base} — weak support, breakdown risk (bearish)"
+        else:
+            return 0, f"{volume_change_pct:+.0f}%", f"{msg_base} — no strong signal"
+    else:
+        if volume_change_pct >= 30:
+            return -1, f"{volume_change_pct:+.0f}%", f"{msg_base} — sellers active, resistance firm (bearish)"
+        elif volume_change_pct <= -20:
+            return +1, f"{volume_change_pct:+.0f}%", f"{msg_base} — weak resistance, breakout possible (bullish)"
+        else:
+            return 0, f"{volume_change_pct:+.0f}%", f"{msg_base} — no strong signal"
+
+def score_global(global_bias):
+    if global_bias is None:
+        return 0, "N/A", "Global bias not provided"
+    if global_bias == "bullish":
+        return +1, "Bullish", "Global indices (Dow/S&P/SGX Gift Nifty) showing bullish bias"
+    elif global_bias == "bearish":
+        return -1, "Bearish", "Global indices showing bearish pressure"
+    else:
+        return 0, "Neutral", "Global indices mixed — no directional edge"
+
+def score_oi_direction(oi_class):
+    if oi_class is None:
+        return 0, "N/A", "OI direction data not available"
+    if oi_class == "bullish":
+        return +1, "Bullish OI", "Net OI change is bullish — put build-up / call unwinding dominant"
+    elif oi_class == "bearish":
+        return -1, "Bearish OI", "Net OI change is bearish — call build-up / put unwinding dominant"
+    else:
+        return 0, "Neutral OI", "OI changes balanced — no clear directional signal"
+
+BULLISH_MILD   = ["Bull Call Spread","Bull Put Spread","Jade Lizard","The Wheel Strategy (CSP + Covered Call)"]
+BULLISH_STRONG = ["Long Call","Bull Call Spread","Bull Call Ladder","Bull Put Spread","Bull Put Ladder",
+                  "Synthetic Long","Call Ratio Backspread","Strap (Bullish Bias)"]
+BEARISH_MILD   = ["Bear Call Spread","Bear Put Spread","Reverse Jade Lizard"]
+BEARISH_STRONG = ["Long Put","Bear Put Spread","Bear Call Spread","Bear Put Ladder","Bear Call Ladder",
+                  "Synthetic Short","Put Ratio Backspread","Strip (Bearish Bias)"]
+NEUTRAL_LOW_VOL    = ["Short Straddle","Short Strangle","Iron Condor","Iron Butterfly","Condor Spread (Short)"]
+NEUTRAL_NORMAL_VOL = ["Iron Condor","Iron Butterfly","Calendar Spread","Diagonal Spread","Butterfly Spread (Short)"]
+VOLATILITY_LONG    = ["Long Straddle","Long Strangle","Long Guts","Strap (Bullish Bias)","Strip (Bearish Bias)","Butterfly Spread (Long)"]
+ADVANCED_MISC      = ["Call Ratio Spread","Put Ratio Spread","Christmas Tree Spread"]
+
+STRAT_TYPE_MAP = {
+    "Long Call":"bullish","Bull Call Spread":"bullish","Bull Call Ladder":"bullish",
+    "Bull Put Spread":"bullish","Bull Put Ladder":"bullish","Synthetic Long":"bullish",
+    "Call Ratio Backspread":"bullish","Strap (Bullish Bias)":"volatility",
+    "Jade Lizard":"bullish","The Wheel Strategy (CSP + Covered Call)":"bullish",
+    "Long Put":"bearish","Bear Put Spread":"bearish","Bear Call Spread":"bearish",
+    "Bear Put Ladder":"bearish","Bear Call Ladder":"bearish","Synthetic Short":"bearish",
+    "Put Ratio Backspread":"bearish","Strip (Bearish Bias)":"volatility",
+    "Reverse Jade Lizard":"bearish",
+    "Short Straddle":"neutral","Short Strangle":"neutral","Iron Condor":"neutral",
+    "Iron Butterfly":"neutral","Condor Spread (Short)":"neutral",
+    "Calendar Spread":"neutral","Diagonal Spread":"neutral","Butterfly Spread (Short)":"neutral",
+    "Long Straddle":"volatility","Long Strangle":"volatility","Long Guts":"volatility",
+    "Butterfly Spread (Long)":"volatility",
+    "Call Ratio Spread":"advanced","Put Ratio Spread":"advanced","Christmas Tree Spread":"advanced",
+}
+
+def suggest_strategies(total_score, vol_view):
+    if   total_score >= 3:  bias = "strong_bullish";  bias_label = "STRONGLY BULLISH"
+    elif total_score >= 1:  bias = "mild_bullish";    bias_label = "MILDLY BULLISH"
+    elif total_score <= -3: bias = "strong_bearish";  bias_label = "STRONGLY BEARISH"
+    elif total_score <= -1: bias = "mild_bearish";    bias_label = "MILDLY BEARISH"
+    else:                   bias = "neutral";          bias_label = "NEUTRAL / RANGE-BOUND"
+
+    strats = []
+    if   bias == "strong_bullish": strats.extend(BULLISH_STRONG)
+    elif bias == "mild_bullish":   strats.extend(BULLISH_MILD)
+    elif bias == "strong_bearish": strats.extend(BEARISH_STRONG)
+    elif bias == "mild_bearish":   strats.extend(BEARISH_MILD)
+    else:
+        if   vol_view == "low":  strats.extend(NEUTRAL_LOW_VOL)
+        elif vol_view == "high": strats.extend(VOLATILITY_LONG)
+        else:                    strats.extend(NEUTRAL_NORMAL_VOL)
+
+    if vol_view == "high" and bias != "neutral":
+        strats.extend(VOLATILITY_LONG)
+
+    strats.extend(ADVANCED_MISC)
+
+    seen = set(); unique = []
+    for s in strats:
+        if s not in seen:
+            seen.add(s); unique.append(s)
+
+    return bias_label, unique
+
+def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
+    """
+    Build the complete Strategy Checklist tab HTML.
+    Auto-fills PCR, RSI, MACD, Trend, OI direction from live html_data.
+    vol_support, vol_resistance, global_bias can be None → shown as N/A.
+    vol_view: 'low' | 'normal' | 'high'
+    """
+    d = html_data
+
+    # ── Score each signal ────────────────────────────────────────────────
+    pcr_val = d.get('pcr') if d.get('has_option_data') else None
+    rsi_val = d.get('rsi')
+    macd_bull = d.get('macd_bullish')
+    sma20 = d.get('sma_20_above'); sma50 = d.get('sma_50_above'); sma200 = d.get('sma_200_above')
+    oi_cls = d.get('oi_class') if d.get('has_option_data') else None
+
+    signals = [
+        ("📊", "PCR (OI Ratio)",         *score_pcr(pcr_val),          True),
+        ("📈", "RSI (14-Day)",            *score_rsi(rsi_val),           True),
+        ("⚡", "MACD Signal",             *score_macd(macd_bull),        True),
+        ("📉", "Market Trend (SMAs)",     *score_trend(sma20, sma50, sma200), True),
+        ("🔄", "OI Direction",            *score_oi_direction(oi_cls),   True),
+        ("🌐", "Global Market Bias",      *score_global(global_bias),    False),
+        ("📦", "Volume at Support",       *score_volume(vol_support, "support"),    False),
+        ("📦", "Volume at Resistance",    *score_volume(vol_resistance, "resistance"), False),
+    ]
+    # signals tuple: (icon, name, score, display_val, msg, is_auto)
+
+    auto_scores  = [s[2] for s in signals if s[5]]
+    manual_scores = [s[2] for s in signals if not s[5]]
+    total_score  = sum(auto_scores) + sum(manual_scores)
+
+    bull_count = sum(1 for s in signals if s[2] > 0)
+    bear_count = sum(1 for s in signals if s[2] < 0)
+    neu_count  = sum(1 for s in signals if s[2] == 0 and s[3] != "N/A")
+    na_count   = sum(1 for s in signals if s[3] == "N/A")
+
+    bias_label, strategy_list = suggest_strategies(total_score, vol_view)
+
+    # ── Score ring arc ───────────────────────────────────────────────────
+    max_possible = len(signals)
+    circumference = 289.0
+    if total_score >= 0:
+        arc_pct = min(1.0, total_score / max(1, max_possible))
+    else:
+        arc_pct = min(1.0, abs(total_score) / max(1, max_possible))
+    dashoffset = circumference * (1 - arc_pct)
+
+    if   total_score >= 3:  ring_color = "#00e676"; bias_gradient = "linear-gradient(135deg,#00e676,#00bfa5)"
+    elif total_score >= 1:  ring_color = "#69f0ae"; bias_gradient = "linear-gradient(135deg,#69f0ae,#00c853)"
+    elif total_score <= -3: ring_color = "#ff5252"; bias_gradient = "linear-gradient(135deg,#ff5252,#b71c1c)"
+    elif total_score <= -1: ring_color = "#ff8a65"; bias_gradient = "linear-gradient(135deg,#ff8a65,#e64a19)"
+    else:                   ring_color = "#ffb74d"; bias_gradient = "linear-gradient(135deg,#ffcd3c,#f7931e)"
+
+    score_sign = "+" if total_score > 0 else ""
+
+    # ── Render signal cards ──────────────────────────────────────────────
+    def sig_card(icon, name, score, display_val, msg, is_auto):
+        if display_val == "N/A":
+            icon_cls = "sig-na"; s_cls = "score-na"; s_txt = "N/A"
+        elif score > 0:
+            icon_cls = "sig-bull"; s_cls = "score-p"; s_txt = f"+{score}"
+        elif score < 0:
+            icon_cls = "sig-bear"; s_cls = "score-n"; s_txt = str(score)
+        else:
+            icon_cls = "sig-neu"; s_cls = "score-0"; s_txt = "0"
+
+        val_html = (f'<div class="sig-val na-val">{display_val}</div>'
+                    if display_val == "N/A"
+                    else f'<div class="sig-val">{display_val}</div>')
+
+        auto_badge = '<span class="auto-badge">AUTO</span>' if is_auto else '<span class="manual-badge">MANUAL</span>'
+
+        return f"""
+        <div class="sig-card">
+            <div class="sig-icon {icon_cls}">{icon}</div>
+            <div class="sig-body">
+                <div class="sig-name">{name} {auto_badge}</div>
+                {val_html}
+                <div class="sig-msg">{msg}</div>
+            </div>
+            <div class="sig-score {s_cls}">{s_txt}</div>
+        </div>"""
+
+    sig_cards_html = "".join(sig_card(*s) for s in signals)
+
+    # ── Render strategy cards ────────────────────────────────────────────
+    tag_map = {
+        "bullish":   ("strat-bull", "strat-tag-bull", "🟢 Bullish"),
+        "bearish":   ("strat-bear", "strat-tag-bear", "🔴 Bearish"),
+        "neutral":   ("strat-neu",  "strat-tag-neu",  "🟡 Neutral"),
+        "volatility":("strat-vol",  "strat-tag-vol",  "🟣 Volatility"),
+        "advanced":  ("strat-misc", "strat-tag-misc", "🔵 Advanced"),
+    }
+
+    strat_cards_html = ""
+    for i, s in enumerate(strategy_list, 1):
+        stype = STRAT_TYPE_MAP.get(s, "advanced")
+        card_cls, tag_cls, tag_txt = tag_map.get(stype, tag_map["advanced"])
+        rank = "PRIMARY" if i <= 4 else ("SECONDARY" if i <= 8 else "ADVANCED")
+        strat_cards_html += f"""
+        <div class="strat-card {card_cls}" data-type="{stype}">
+            <div class="strat-num">{i:02d} · {rank}</div>
+            <div class="strat-name">{s}</div>
+            <span class="strat-tag {tag_cls}">{tag_txt}</span>
+        </div>"""
+
+    timestamp = d.get('timestamp', 'N/A')
+
+    return f"""
+    <!-- ════════════════════════════════════════════════════════════
+         TAB 2: STRATEGY CHECKLIST
+    ════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-checklist">
+
+        <!-- SECTION A: AUTO-FILLED INPUTS SUMMARY -->
+        <div class="section">
+            <div class="section-title">
+                <span>⚙️</span> LIVE DATA INPUTS
+                <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
+                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: {timestamp}</span>
+            </div>
+            <div class="input-summary-grid">
+
+                <div class="inp-summary-card inp-auto-card">
+                    <div class="inp-s-label">PCR (OI)</div>
+                    <div class="inp-s-val">{ f"{d['pcr']:.3f}" if d.get('has_option_data') and d.get('pcr') else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-src">Option Chain</div>
+                </div>
+
+                <div class="inp-summary-card inp-auto-card">
+                    <div class="inp-s-label">RSI (14)</div>
+                    <div class="inp-s-val">{ f"{d['rsi']:.1f}" if d.get('rsi') else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-src">Technical</div>
+                </div>
+
+                <div class="inp-summary-card inp-auto-card">
+                    <div class="inp-s-label">MACD</div>
+                    <div class="inp-s-val">{ "Bullish" if d.get('macd_bullish') else ("Bearish" if d.get('macd_bullish') is not None else '<span class=\"na-inline\">N/A</span>') }</div>
+                    <div class="inp-s-src">Technical</div>
+                </div>
+
+                <div class="inp-summary-card inp-auto-card">
+                    <div class="inp-s-label">Market Trend</div>
+                    <div class="inp-s-val">{ "Uptrend" if (d.get('sma_200_above') and d.get('sma_50_above')) else ("Downtrend" if (not d.get('sma_200_above') and not d.get('sma_50_above')) else "Mixed") if d.get('sma_200_above') is not None else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-src">SMA 20/50/200</div>
+                </div>
+
+                <div class="inp-summary-card inp-auto-card">
+                    <div class="inp-s-label">OI Direction</div>
+                    <div class="inp-s-val">{ d.get('oi_direction','N/A') if d.get('has_option_data') else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-src">CHG OI</div>
+                </div>
+
+                <div class="inp-summary-card inp-manual-card">
+                    <div class="inp-s-label">Global Bias</div>
+                    <div class="inp-s-val">{ global_bias.title() if global_bias else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-src">Manual Input</div>
+                </div>
+
+                <div class="inp-summary-card inp-manual-card">
+                    <div class="inp-s-label">Vol at Support</div>
+                    <div class="inp-s-val">{ f"{vol_support:+.0f}%" if vol_support is not None else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-src">Manual Input</div>
+                </div>
+
+                <div class="inp-summary-card inp-manual-card">
+                    <div class="inp-s-label">Vol at Resistance</div>
+                    <div class="inp-s-val">{ f"{vol_resistance:+.0f}%" if vol_resistance is not None else '<span class=\"na-inline\">N/A</span>' }</div>
+                    <div class="inp-s-src">Manual Input</div>
+                </div>
+
+                <div class="inp-summary-card inp-manual-card">
+                    <div class="inp-s-label">IV View</div>
+                    <div class="inp-s-val">{ vol_view.upper() }</div>
+                    <div class="inp-s-src">Manual Input</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION B: SIGNAL CHECKLIST -->
+        <div class="section">
+            <div class="section-title">
+                <span>📋</span> SIGNAL CHECKLIST
+                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
+                    {bull_count} Bullish · {bear_count} Bearish · {neu_count} Neutral · {na_count} N/A
+                </span>
+            </div>
+
+            <div class="signal-grid">
+                {sig_cards_html}
+            </div>
+
+            <!-- TOTAL SCORE METER -->
+            <div class="score-meter">
+                <div class="score-ring-wrap">
+                    <svg width="120" height="120" viewBox="0 0 110 110">
+                        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(79,195,247,0.08)" stroke-width="9"/>
+                        <circle cx="55" cy="55" r="46" fill="none"
+                            stroke="{ring_color}" stroke-width="9"
+                            stroke-linecap="round"
+                            stroke-dasharray="{circumference:.1f}"
+                            stroke-dashoffset="{dashoffset:.1f}"
+                            style="transform:rotate(-90deg);transform-origin:55px 55px;"/>
+                    </svg>
+                    <div class="score-ring-label">
+                        <div class="score-ring-num" style="color:{ring_color};">{score_sign}{total_score}</div>
+                        <div class="score-ring-txt">SCORE</div>
+                    </div>
+                </div>
+                <div class="score-detail">
+                    <div class="score-bias-lbl" style="background:{bias_gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+                        {bias_label}
+                    </div>
+                    <div class="score-sub">
+                        Score {score_sign}{total_score} from {len(signals)} signals ({na_count} skipped as N/A).<br>
+                        { "Strong directional conviction — proceed with caution and stop losses." if abs(total_score) >= 3 else
+                          "Moderate signal — size positions conservatively." if abs(total_score) >= 1 else
+                          "Mixed signals — range-bound or sideways strategies preferred." }
+                    </div>
+                    <div class="score-pills">
+                        <span class="sc-pill sc-pill-bull">✅ BULL: {bull_count}</span>
+                        <span class="sc-pill sc-pill-bear">❌ BEAR: {bear_count}</span>
+                        <span class="sc-pill sc-pill-neu">⬜ NEUTRAL: {neu_count}</span>
+                        { f'<span class="sc-pill sc-pill-na">— N/A: {na_count}</span>' if na_count > 0 else '' }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION C: STRATEGY SUGGESTIONS -->
+        <div class="section">
+            <div class="section-title">
+                <span>🎯</span> SUGGESTED STRATEGY TYPES
+                <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;">
+                    For study &amp; backtesting only — NOT financial advice
+                </span>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+                <div style="font-size:12px;color:rgba(176,190,197,0.4);">
+                    IV View: <strong style="color:{ring_color};">{vol_view.upper()}</strong>
+                    &nbsp;·&nbsp; Bias: <strong style="color:{ring_color};">{bias_label}</strong>
+                    &nbsp;·&nbsp; <span style="color:rgba(128,222,234,0.4);">{len(strategy_list)} strategies found</span>
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="filter-btn active" onclick="filterStrats('all',this)">All</button>
+                    <button class="filter-btn" onclick="filterStrats('bullish',this)">🟢 Bullish</button>
+                    <button class="filter-btn" onclick="filterStrats('bearish',this)">🔴 Bearish</button>
+                    <button class="filter-btn" onclick="filterStrats('neutral',this)">🟡 Neutral</button>
+                    <button class="filter-btn" onclick="filterStrats('volatility',this)">🟣 Volatility</button>
+                    <button class="filter-btn" onclick="filterStrats('advanced',this)">🔵 Advanced</button>
+                </div>
+            </div>
+
+            <div class="strat-grid" id="stratGrid">
+                {strat_cards_html}
+            </div>
+        </div>
+
+        <!-- SECTION D: SCORING LEGEND -->
+        <div class="section">
+            <div class="section-title"><span>📖</span> SCORING LEGEND</div>
+            <div class="logic-box" style="margin-top:0;">
+                <div class="logic-box-head">HOW THE SCORE WORKS</div>
+                <div class="logic-grid">
+                    <div class="logic-item"><span class="lc-bull">+1</span> Signal is bullish — adds to bull case</div>
+                    <div class="logic-item"><span class="lc-bear">−1</span> Signal is bearish — adds to bear case</div>
+                    <div class="logic-item"><span class="lc-side">0</span> Neutral signal — no directional contribution</div>
+                    <div class="logic-item"><span class="lc-info">N/A</span> Data not available — excluded from score</div>
+                    <div class="logic-item"><span class="lc-bull">≥ +3</span> Strongly Bullish · <span class="lc-bull">+1/+2</span> Mildly Bullish</div>
+                    <div class="logic-item"><span class="lc-bear">≤ −3</span> Strongly Bearish · <span class="lc-bear">−1/−2</span> Mildly Bearish</div>
+                    <div class="logic-item"><span class="lc-info">AUTO</span> Filled from live NSE + yfinance data</div>
+                    <div class="logic-item"><span class="lc-side">MANUAL</span> Requires your input — shown as N/A if not set</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION E: DISCLAIMER -->
+        <div class="section">
+            <div class="disclaimer">
+                <strong>⚠️ DISCLAIMER</strong><br><br>
+                This checklist is for <strong>EDUCATIONAL purposes only</strong> — NOT financial advice.<br>
+                Strategy suggestions are based on a rules-based scoring model and have not been backtested.<br>
+                Always validate with your own analysis. Consult a SEBI-registered investment advisor.
+            </div>
+        </div>
+
+    </div><!-- /tab-checklist -->
+"""
+
+
 class NiftyHTMLAnalyzer:
     def __init__(self):
         self.yf_symbol  = "^NSEI"
@@ -253,53 +643,28 @@ class NiftyHTMLAnalyzer:
             print(f"  ⚠️  Session warm-up warning: {e}")
         return session, headers
 
-    # ══════════════════════════════════════════════════════════════════════
-    #  FIX v3 — HOLIDAY-AWARE EXPIRY COMPUTATION
-    # ══════════════════════════════════════════════════════════════════════
     def get_upcoming_expiry_tuesday(self):
-        """
-        Returns the correct weekly expiry date string (dd-MMM-YYYY).
-
-        ALGORITHM:
-          1. Compute the nearest upcoming Tuesday using IST 4 PM cutoff:
-             - Tuesday before 4 PM  → use today
-             - Tuesday after  4 PM  → jump to NEXT Tuesday
-             - Any other weekday    → roll forward to nearest Tuesday
-          2. Walk BACKWARDS day-by-day from that Tuesday until we reach a
-             day that is neither in NSE_FO_HOLIDAYS nor a weekend.
-             Example: Tue is Holi → try Mon → Mon is clear → use Mon.
-             Example: Tue is holiday, Mon also holiday → try Fri → use Fri.
-
-        This method is the FALLBACK path. fetch_nse_option_chain_silent()
-        first tries the live NSE API expiry list, which is always accurate.
-        """
         ist_tz      = pytz.timezone('Asia/Kolkata')
         now_ist     = datetime.now(ist_tz)
         today_ist   = now_ist.date()
-        weekday     = today_ist.weekday()          # Mon=0, Tue=1 … Sun=6
+        weekday     = today_ist.weekday()
         past_cutoff = (now_ist.hour, now_ist.minute) >= (16, 0)
-
-        # ── Step 1: find the raw Tuesday ──────────────────────────────────
         if weekday == 1 and not past_cutoff:
-            days_ahead = 0        # today IS Tuesday, market still active
+            days_ahead = 0
         elif weekday == 1 and past_cutoff:
-            days_ahead = 7        # today IS Tuesday but session done → next week
+            days_ahead = 7
         elif weekday < 1:
-            days_ahead = 1 - weekday   # Monday → 1 day ahead
+            days_ahead = 1 - weekday
         else:
-            days_ahead = 8 - weekday   # Wed=2 → 6, Thu=3 → 5, Fri=4 → 4, etc.
-
+            days_ahead = 8 - weekday
         raw_tuesday = today_ist + timedelta(days=days_ahead)
-
-        # ── Step 2: walk backwards if Tuesday is a holiday ────────────────
         candidate = raw_tuesday
-        for _ in range(6):                         # safety: max 6-day lookback
+        for _ in range(6):
             cstr       = candidate.strftime('%d-%b-%Y')
-            is_weekend = candidate.weekday() >= 5   # Sat=5, Sun=6
+            is_weekend = candidate.weekday() >= 5
             if cstr not in NSE_FO_HOLIDAYS and not is_weekend:
                 break
             candidate -= timedelta(days=1)
-
         expiry_str = candidate.strftime('%d-%b-%Y')
         holiday_shifted = (candidate != raw_tuesday)
         shift_note = f" ⚠️ HOLIDAY SHIFT from {raw_tuesday.strftime('%d-%b-%Y')}" if holiday_shifted else ""
@@ -323,27 +688,8 @@ class NiftyHTMLAnalyzer:
             print(f"  ⚠️  Could not fetch expiry list: {e}")
         return None
 
-    # ══════════════════════════════════════════════════════════════════════
-    #  FIX v3 — LIVE EXPIRY API FIRST, HOLIDAY-ADJUSTED FALLBACK SECOND
-    # ══════════════════════════════════════════════════════════════════════
     def fetch_nse_option_chain_silent(self):
-        """
-        UPDATED PRIORITY ORDER (fixes N/A expiry on holiday weeks):
-
-          Layer 1 — NSE live expiry list (fetch_available_expiries):
-            NSE's own API returns only valid trading expiries.
-            If Tuesday is Holi, NSE publishes Monday as the expiry date.
-            This is the most reliable source — use it FIRST.
-
-          Layer 2 — Computed + holiday-adjusted Tuesday:
-            If NSE API is unreachable, compute Tuesday locally and
-            walk backwards past any holidays (get_upcoming_expiry_tuesday).
-
-          Layer 3 — Retry with Layer 2 date even if Layer 1 failed differently.
-        """
         session, headers = self._make_nse_session()
-
-        # ── Layer 1: ask NSE what the real next expiry is ──────────────────
         real_expiry = self.fetch_available_expiries(session, headers)
         if real_expiry:
             print(f"  🗓️  Fetching option chain for NSE live expiry: {real_expiry}")
@@ -351,22 +697,17 @@ class NiftyHTMLAnalyzer:
             if result:
                 return result
             print(f"  ⚠️  Chain data empty for live expiry {real_expiry}. Trying fallback...")
-
-        # ── Layer 2: computed + holiday-adjusted Tuesday ───────────────────
         computed_expiry = self.get_upcoming_expiry_tuesday()
         if computed_expiry != real_expiry:
             print(f"  🔄 Fallback computed expiry: {computed_expiry}")
             result = self._fetch_chain_for_expiry(session, headers, computed_expiry)
             if result:
                 return result
-
-        # ── Layer 3: if both dates differ, try real_expiry one more time ───
         if real_expiry and real_expiry != computed_expiry:
             print(f"  🔄 Last attempt with real_expiry: {real_expiry}")
             result = self._fetch_chain_for_expiry(session, headers, real_expiry)
             if result:
                 return result
-
         print("  ❌ Option chain fetch failed after all attempts.")
         return None
 
@@ -425,10 +766,7 @@ class NiftyHTMLAnalyzer:
         pcr_vol = total_pe_vol / total_ce_vol if total_ce_vol > 0 else 0
         total_ce_oi_change = int(df['CE_OI_Change'].sum())
         total_pe_oi_change = int(df['PE_OI_Change'].sum())
-
-        # Net OI = PE Δ - CE Δ  →  Positive = Bullish, Negative = Bearish
         net_oi_change = total_pe_oi_change - total_ce_oi_change
-
         if   total_ce_oi_change > 0 and total_pe_oi_change < 0:
             oi_direction,oi_signal,oi_icon,oi_class="Strong Bearish","Call Build-up + Put Unwinding","🔴","bearish"
         elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
@@ -446,7 +784,6 @@ class NiftyHTMLAnalyzer:
             if   net_oi_change > 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bullish","Net Put Accumulation","🟢","bullish"
             elif net_oi_change < 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bearish","Net Call Accumulation","🔴","bearish"
             else:                   oi_direction,oi_signal,oi_icon,oi_class="Neutral","Balanced OI Changes","🟡","neutral"
-
         max_ce_oi_row = df.loc[df['CE_OI'].idxmax()]; max_pe_oi_row = df.loc[df['PE_OI'].idxmax()]
         df['pain']    = abs(df['CE_OI'] - df['PE_OI']); max_pain_row = df.loc[df['pain'].idxmin()]
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
@@ -660,20 +997,12 @@ class NiftyHTMLAnalyzer:
         confidence = d['confidence']
         bull_score = d['bullish_score']
         bear_score = d['bearish_score']
-        if bias == 'BULLISH':
-            dir_gradient = 'linear-gradient(135deg, #4ecdc4, #2ecc8a)'
-        elif bias == 'BEARISH':
-            dir_gradient = 'linear-gradient(135deg, #ff6b6b, #cc3333)'
-        else:
-            dir_gradient = 'linear-gradient(135deg, #ffcd3c, #f7931e)'
+        if bias == 'BULLISH':   dir_gradient = 'linear-gradient(135deg, #4ecdc4, #2ecc8a)'
+        elif bias == 'BEARISH': dir_gradient = 'linear-gradient(135deg, #ff6b6b, #cc3333)'
+        else:                   dir_gradient = 'linear-gradient(135deg, #ffcd3c, #f7931e)'
         bull_pill = f'<span class="md-pill md-pill-bull">BULL {bull_score}</span>'
         bear_pill = f'<span class="md-pill md-pill-bear">BEAR {bear_score}</span>'
-        if confidence == 'HIGH':
-            conf_cls = 'md-pill-conf-high'
-        elif confidence == 'MEDIUM':
-            conf_cls = 'md-pill-conf-med'
-        else:
-            conf_cls = 'md-pill-conf-low'
+        conf_cls = 'md-pill-conf-high' if confidence=='HIGH' else ('md-pill-conf-med' if confidence=='MEDIUM' else 'md-pill-conf-low')
         conf_pill = f'<span class="md-pill {conf_cls}">{confidence} CONFIDENCE</span>'
         return f"""
     <div class="section">
@@ -681,14 +1010,8 @@ class NiftyHTMLAnalyzer:
         <div class="md-widget">
             <div class="md-glow"></div>
             <div class="md-row-top">
-                <div class="md-label">
-                    <div class="md-live-dot"></div>
-                    MARKET DIRECTION &nbsp;·&nbsp; ALGORITHMIC
-                </div>
-                <div class="md-pills-top">
-                    {bull_pill}
-                    {bear_pill}
-                </div>
+                <div class="md-label"><div class="md-live-dot"></div>MARKET DIRECTION &nbsp;·&nbsp; ALGORITHMIC</div>
+                <div class="md-pills-top">{bull_pill}{bear_pill}</div>
             </div>
             <div class="md-row-bottom">
                 <div class="md-direction" style="background:{dir_gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{bias}</div>
@@ -719,98 +1042,52 @@ class NiftyHTMLAnalyzer:
         s_color,s_bg,s_border = badge_map.get(summ['badge_cls'],badge_map['fii-neu'])
         is_fallback = any(r.get('fallback') for r in data)
         date_range  = f"{data[0]['date']} \u2013 {data[-1]['date']}" if data else ''
-        data_src_html = (
-            '<span class="pf-live-badge pf-estimated">\u26a0 ESTIMATED</span>'
-            if is_fallback else
-            '<span class="pf-live-badge pf-live">\u25cf LIVE</span>'
-        )
+        data_src_html = ('<span class="pf-live-badge pf-estimated">\u26a0 ESTIMATED</span>'
+                         if is_fallback else '<span class="pf-live-badge pf-live">\u25cf LIVE</span>')
         max_abs = summ['max_abs'] or 1
 
         def day_card(row):
             fii_v=row['fii']; dii_v=row['dii']; net_v=fii_v+dii_v
-            fii_w=round(min(100,abs(fii_v)/max_abs*100),1)
-            dii_w=round(min(100,abs(dii_v)/max_abs*100),1)
-            fii_col  ='#00d4ff' if fii_v>=0 else '#ff4444'
-            fii_bar  ='linear-gradient(90deg,#00d4ff,#0090ff)' if fii_v>=0 else 'linear-gradient(90deg,#ff4444,#ff0055)'
-            dii_col  ='#ffb300' if dii_v>=0 else '#ff4444'
-            dii_bar  ='linear-gradient(90deg,#ffb300,#ff8f00)' if dii_v>=0 else 'linear-gradient(90deg,#ff4444,#ff0055)'
-            net_col  ='#34d399' if net_v>=0 else '#f87171'
-            fii_sign ='+' if fii_v>=0 else ''
-            dii_sign ='+' if dii_v>=0 else ''
-            net_sign ='+' if net_v>=0 else ''
-            bdr ='rgba(0,212,255,0.18)' if net_v>=0 else 'rgba(255,68,68,0.18)'
+            fii_w=round(min(100,abs(fii_v)/max_abs*100),1); dii_w=round(min(100,abs(dii_v)/max_abs*100),1)
+            fii_col='#00d4ff' if fii_v>=0 else '#ff4444'; fii_bar='linear-gradient(90deg,#00d4ff,#0090ff)' if fii_v>=0 else 'linear-gradient(90deg,#ff4444,#ff0055)'
+            dii_col='#ffb300' if dii_v>=0 else '#ff4444'; dii_bar='linear-gradient(90deg,#ffb300,#ff8f00)' if dii_v>=0 else 'linear-gradient(90deg,#ff4444,#ff0055)'
+            net_col='#34d399' if net_v>=0 else '#f87171'
+            fii_sign='+' if fii_v>=0 else ''; dii_sign='+' if dii_v>=0 else ''; net_sign='+' if net_v>=0 else ''
+            bdr='rgba(0,212,255,0.18)' if net_v>=0 else 'rgba(255,68,68,0.18)'
             topL='linear-gradient(90deg,transparent,#00d4ff,transparent)' if net_v>=0 else 'linear-gradient(90deg,transparent,#ff4444,transparent)'
-            return (
-                f'<div class="pf-card" style="border-color:{bdr};">'
-                f'<div class="pf-card-topline" style="background:{topL};"></div>'
-                f'<div class="pf-card-head">'
-                f'<span class="pf-card-date">{row["date"]}</span>'
-                f'<span class="pf-card-day">{row["day"]}</span>'
-                f'</div>'
-                f'<div class="pf-block">'
-                f'<div class="pf-block-header">'
-                f'<span class="pf-block-lbl pf-fii-lbl">FII</span>'
-                f'<span class="pf-block-val" style="color:{fii_col};">{fii_sign}{fii_v:,.0f}</span>'
-                f'</div>'
-                f'<div class="pf-bar-track"><div class="pf-bar-fill" style="width:{fii_w}%;background:{fii_bar};"></div></div>'
-                f'</div>'
-                f'<div class="pf-divider"></div>'
-                f'<div class="pf-block">'
-                f'<div class="pf-block-header">'
-                f'<span class="pf-block-lbl pf-dii-lbl">DII</span>'
-                f'<span class="pf-block-val" style="color:{dii_col};">{dii_sign}{dii_v:,.0f}</span>'
-                f'</div>'
-                f'<div class="pf-bar-track"><div class="pf-bar-fill" style="width:{dii_w}%;background:{dii_bar};"></div></div>'
-                f'</div>'
-                f'<div class="pf-card-net">'
-                f'<span class="pf-net-lbl">NET</span>'
-                f'<span class="pf-net-val" style="color:{net_col};">{net_sign}{net_v:,.0f}</span>'
-                f'</div>'
-                f'</div>'
-            )
+            return (f'<div class="pf-card" style="border-color:{bdr};">'
+                    f'<div class="pf-card-topline" style="background:{topL};"></div>'
+                    f'<div class="pf-card-head"><span class="pf-card-date">{row["date"]}</span><span class="pf-card-day">{row["day"]}</span></div>'
+                    f'<div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:{fii_col};">{fii_sign}{fii_v:,.0f}</span></div>'
+                    f'<div class="pf-bar-track"><div class="pf-bar-fill" style="width:{fii_w}%;background:{fii_bar};"></div></div></div>'
+                    f'<div class="pf-divider"></div>'
+                    f'<div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:{dii_col};">{dii_sign}{dii_v:,.0f}</span></div>'
+                    f'<div class="pf-bar-track"><div class="pf-bar-fill" style="width:{dii_w}%;background:{dii_bar};"></div></div></div>'
+                    f'<div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:{net_col};">{net_sign}{net_v:,.0f}</span></div></div>')
 
         cards_html = ''.join(day_card(r) for r in data)
         fa=summ['fii_avg']; da=summ['dii_avg']; na=summ['net_avg']
         fs='+' if fa>=0 else ''; ds='+' if da>=0 else ''; ns='+' if na>=0 else ''
-        fc='#00d4ff' if fa>=0 else '#ff4444'
-        dc='#ffb300' if da>=0 else '#ff4444'
-        nc='#c084fc' if na>=0 else '#f87171'
-        verdict_badge = (
-            f'<span class="pf-verdict-badge" style="color:{s_color};background:{s_bg};border:1px solid {s_border};">'
-            f'{summ["emoji"]} {summ["label"]}</span>'
-        )
+        fc='#00d4ff' if fa>=0 else '#ff4444'; dc='#ffb300' if da>=0 else '#ff4444'; nc='#c084fc' if na>=0 else '#f87171'
+        verdict_badge = (f'<span class="pf-verdict-badge" style="color:{s_color};background:{s_bg};border:1px solid {s_border};">'
+                         f'{summ["emoji"]} {summ["label"]}</span>')
         return (
             '\n<div class="section">\n'
             '    <div class="section-title">\n'
-            '        <span>\U0001f3e6</span> FII / DII INSTITUTIONAL FLOW\n'
+            f'        <span>\U0001f3e6</span> FII / DII INSTITUTIONAL FLOW\n'
             f'        {data_src_html}\n'
             f'        <span class="pf-date-range">Last 5 Trading Days &nbsp;\u00b7&nbsp; {date_range}</span>\n'
             '    </div>\n'
             f'    <div class="pf-grid">{cards_html}</div>\n'
             '    <div class="pf-avg-strip">\n'
-            '        <div class="pf-avg-cell">\n'
-            '            <div class="pf-avg-eyebrow">FII 5D Avg</div>\n'
-            f'            <div class="pf-avg-val" style="color:{fc};">{fs}{fa:,.0f}</div>\n'
-            '            <div class="pf-avg-unit">&#8377; Cr / day</div>\n'
-            '        </div>\n'
+            f'        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">FII 5D Avg</div><div class="pf-avg-val" style="color:{fc};">{fs}{fa:,.0f}</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>\n'
             '        <div class="pf-avg-sep"></div>\n'
-            '        <div class="pf-avg-cell">\n'
-            '            <div class="pf-avg-eyebrow">DII 5D Avg</div>\n'
-            f'            <div class="pf-avg-val" style="color:{dc};">{ds}{da:,.0f}</div>\n'
-            '            <div class="pf-avg-unit">&#8377; Cr / day</div>\n'
-            '        </div>\n'
+            f'        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">DII 5D Avg</div><div class="pf-avg-val" style="color:{dc};">{ds}{da:,.0f}</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>\n'
             '        <div class="pf-avg-sep"></div>\n'
-            '        <div class="pf-avg-cell">\n'
-            '            <div class="pf-avg-eyebrow">Net Combined</div>\n'
-            f'            <div class="pf-avg-val" style="color:{nc};">{ns}{na:,.0f}</div>\n'
-            '            <div class="pf-avg-unit">&#8377; Cr / day</div>\n'
-            '        </div>\n'
+            f'        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">Net Combined</div><div class="pf-avg-val" style="color:{nc};">{ns}{na:,.0f}</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>\n'
             '    </div>\n'
             f'    <div class="pf-insight-box" style="background:{s_bg};border:1px solid {s_border};">\n'
-            '        <div class="pf-insight-header">\n'
-            f'            <span class="pf-insight-lbl" style="color:{s_color};">&#128202; 5-DAY INSIGHT &amp; DIRECTION</span>\n'
-            f'            {verdict_badge}\n'
-            '        </div>\n'
+            f'        <div class="pf-insight-header"><span class="pf-insight-lbl" style="color:{s_color};">&#128202; 5-DAY INSIGHT &amp; DIRECTION</span>{verdict_badge}</div>\n'
             f'        <div class="pf-insight-text">{summ["insight"]}</div>\n'
             '    </div>\n'
             '</div>\n'
@@ -828,41 +1105,26 @@ class NiftyHTMLAnalyzer:
         bull_pct=round(bull_force/total_force*100) if total_force>0 else 50
         bear_pct=100-bull_pct
         if oi_cls=='bearish':
-            dir_bg='rgba(30,10,14,0.92)';dir_border='rgba(239,68,68,0.35)'
-            dir_left_bar='linear-gradient(180deg,#ef4444,#b91c1c)';dir_name_col='#fb7185';dir_desc_col='rgba(251,113,133,0.5)'
+            dir_bg='rgba(30,10,14,0.92)';dir_border='rgba(239,68,68,0.35)';dir_left_bar='linear-gradient(180deg,#ef4444,#b91c1c)';dir_name_col='#fb7185';dir_desc_col='rgba(251,113,133,0.5)'
         elif oi_cls=='bullish':
-            dir_bg='rgba(10,30,20,0.92)';dir_border='rgba(16,185,129,0.35)'
-            dir_left_bar='linear-gradient(180deg,#10b981,#047857)';dir_name_col='#34d399';dir_desc_col='rgba(52,211,153,0.5)'
+            dir_bg='rgba(10,30,20,0.92)';dir_border='rgba(16,185,129,0.35)';dir_left_bar='linear-gradient(180deg,#10b981,#047857)';dir_name_col='#34d399';dir_desc_col='rgba(52,211,153,0.5)'
         else:
-            dir_bg='rgba(20,20,10,0.92)';dir_border='rgba(251,191,36,0.3)'
-            dir_left_bar='linear-gradient(180deg,#f59e0b,#d97706)';dir_name_col='#fbbf24';dir_desc_col='rgba(251,191,36,0.5)'
-        ce_val=d['total_ce_oi_change']; pe_val=d['total_pe_oi_change']
-        net_val=d['net_oi_change']
+            dir_bg='rgba(20,20,10,0.92)';dir_border='rgba(251,191,36,0.3)';dir_left_bar='linear-gradient(180deg,#f59e0b,#d97706)';dir_name_col='#fbbf24';dir_desc_col='rgba(251,191,36,0.5)'
+        ce_val=d['total_ce_oi_change']; pe_val=d['total_pe_oi_change']; net_val=d['net_oi_change']
         ce_is_bear=ce_val>0; pe_is_bull=pe_val>0
         ce_col='#fb7185' if ce_is_bear else '#34d399'; ce_dot_col='#ef4444' if ce_is_bear else '#10b981'
-        ce_lbl='Bearish Signal' if ce_is_bear else 'Bullish Signal'
-        ce_btn_col='#ef4444' if ce_is_bear else '#10b981'
-        ce_btn_bg='rgba(239,68,68,0.12)' if ce_is_bear else 'rgba(16,185,129,0.12)'
-        ce_btn_bdr='rgba(239,68,68,0.4)' if ce_is_bear else 'rgba(16,185,129,0.4)'
+        ce_lbl='Bearish Signal' if ce_is_bear else 'Bullish Signal'; ce_btn_col='#ef4444' if ce_is_bear else '#10b981'
+        ce_btn_bg='rgba(239,68,68,0.12)' if ce_is_bear else 'rgba(16,185,129,0.12)'; ce_btn_bdr='rgba(239,68,68,0.4)' if ce_is_bear else 'rgba(16,185,129,0.4)'
         pe_col='#34d399' if pe_is_bull else '#fb7185'; pe_dot_col='#10b981' if pe_is_bull else '#ef4444'
-        pe_lbl='Bullish Signal' if pe_is_bull else 'Bearish Signal'
-        pe_btn_col='#10b981' if pe_is_bull else '#ef4444'
-        pe_btn_bg='rgba(16,185,129,0.12)' if pe_is_bull else 'rgba(239,68,68,0.12)'
-        pe_btn_bdr='rgba(16,185,129,0.4)' if pe_is_bull else 'rgba(239,68,68,0.4)'
-        if net_val > 0:
-            net_col='#34d399';net_dot_col='#10b981';net_lbl='Bullish Net'
-            net_btn_col='#10b981';net_btn_bg='rgba(16,185,129,0.12)';net_btn_bdr='rgba(16,185,129,0.4)'
-        elif net_val < 0:
-            net_col='#fb7185';net_dot_col='#ef4444';net_lbl='Bearish Net'
-            net_btn_col='#ef4444';net_btn_bg='rgba(239,68,68,0.12)';net_btn_bdr='rgba(239,68,68,0.4)'
-        else:
-            net_col='#fbbf24';net_dot_col='#f59e0b';net_lbl='Balanced'
-            net_btn_col='#f59e0b';net_btn_bg='rgba(245,158,11,0.12)';net_btn_bdr='rgba(245,158,11,0.4)'
+        pe_lbl='Bullish Signal' if pe_is_bull else 'Bearish Signal'; pe_btn_col='#10b981' if pe_is_bull else '#ef4444'
+        pe_btn_bg='rgba(16,185,129,0.12)' if pe_is_bull else 'rgba(239,68,68,0.12)'; pe_btn_bdr='rgba(16,185,129,0.4)' if pe_is_bull else 'rgba(239,68,68,0.4)'
+        if net_val > 0: net_col='#34d399';net_dot_col='#10b981';net_lbl='Bullish Net';net_btn_col='#10b981';net_btn_bg='rgba(16,185,129,0.12)';net_btn_bdr='rgba(16,185,129,0.4)'
+        elif net_val < 0: net_col='#fb7185';net_dot_col='#ef4444';net_lbl='Bearish Net';net_btn_col='#ef4444';net_btn_bg='rgba(239,68,68,0.12)';net_btn_bdr='rgba(239,68,68,0.4)'
+        else: net_col='#fbbf24';net_dot_col='#f59e0b';net_lbl='Balanced';net_btn_col='#f59e0b';net_btn_bg='rgba(245,158,11,0.12)';net_btn_bdr='rgba(245,158,11,0.4)'
 
         def nc_card(label,idc,value,val_col,sub,btn_lbl,btn_col,btn_bg,btn_bdr,icon_char):
             return (f'<div class="nc-card"><div class="nc-card-header">'
-                    f'<span class="nc-card-label">{label}</span>'
-                    f'<span style="font-size:18px;line-height:1;color:{idc};">{icon_char}</span></div>'
+                    f'<span class="nc-card-label">{label}</span><span style="font-size:18px;line-height:1;color:{idc};">{icon_char}</span></div>'
                     f'<div class="nc-card-value" style="color:{val_col};">{value:+,}</div>'
                     f'<div class="nc-card-sub">{sub}</div>'
                     f'<div class="nc-card-btn" style="color:{btn_col};background:{btn_bg};border:1px solid {btn_bdr};">{btn_lbl}</div></div>')
@@ -872,25 +1134,15 @@ class NiftyHTMLAnalyzer:
             nc_card('PUT OI CHANGE',pe_dot_col,pe_val,pe_col,'PE open interest \u0394',pe_lbl,pe_btn_col,pe_btn_bg,pe_btn_bdr,'🟢' if pe_is_bull else '🔴') +
             nc_card('NET OI CHANGE',net_dot_col,net_val,net_col,'PE \u0394 \u2212 CE \u0394',net_lbl,net_btn_col,net_btn_bg,net_btn_bdr,'\u2696\ufe0f')
         )
-
         dual_meters = (
             f'<div class="nc-meters-panel">'
-            f'<div class="nc-meter-row"><div class="nc-meter-head-row">'
-            f'<span class="nc-meter-label">\U0001f7e2 Bull Strength</span>'
-            f'<span class="nc-meter-pct" style="color:#34d399;">{bull_pct}%</span></div>'
-            f'<div class="nc-meter-track">'
-            f'<div class="nc-meter-fill" style="width:{bull_pct}%;background:linear-gradient(90deg,#10b981,#34d399);"></div>'
-            f'<div class="nc-meter-head" style="left:{bull_pct}%;background:#34d399;box-shadow:0 0 8px #34d399;"></div>'
-            f'</div></div>'
-            f'<div class="nc-meter-row"><div class="nc-meter-head-row">'
-            f'<span class="nc-meter-label">\U0001f534 Bear Strength</span>'
-            f'<span class="nc-meter-pct" style="color:#fb7185;">{bear_pct}%</span></div>'
-            f'<div class="nc-meter-track">'
-            f'<div class="nc-meter-fill" style="width:{bear_pct}%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>'
-            f'<div class="nc-meter-head" style="left:{bear_pct}%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div>'
-            f'</div></div></div>'
+            f'<div class="nc-meter-row"><div class="nc-meter-head-row"><span class="nc-meter-label">\U0001f7e2 Bull Strength</span><span class="nc-meter-pct" style="color:#34d399;">{bull_pct}%</span></div>'
+            f'<div class="nc-meter-track"><div class="nc-meter-fill" style="width:{bull_pct}%;background:linear-gradient(90deg,#10b981,#34d399);"></div>'
+            f'<div class="nc-meter-head" style="left:{bull_pct}%;background:#34d399;box-shadow:0 0 8px #34d399;"></div></div></div>'
+            f'<div class="nc-meter-row"><div class="nc-meter-head-row"><span class="nc-meter-label">\U0001f534 Bear Strength</span><span class="nc-meter-pct" style="color:#fb7185;">{bear_pct}%</span></div>'
+            f'<div class="nc-meter-track"><div class="nc-meter-fill" style="width:{bear_pct}%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>'
+            f'<div class="nc-meter-head" style="left:{bear_pct}%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div></div></div></div>'
         )
-
         return (
             '\n<div class="section">\n'
             '    <div class="nc-section-header">\n'
@@ -957,7 +1209,7 @@ class NiftyHTMLAnalyzer:
     </div>
 """
 
-    def generate_html_email(self):
+    def generate_html_email(self, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
         d=self.html_data
         sma20_bar ='bar-teal' if d['sma_20_above']  else 'bar-red'
         sma50_bar ='bar-teal' if d['sma_50_above']  else 'bar-red'
@@ -1005,65 +1257,79 @@ class NiftyHTMLAnalyzer:
                       f'<div class="rl-lbl" style="color:#ffb74d;">Max Pain</div>'
                       f'<div class="rl-val" style="color:#ffb74d;">\u20b9{d["max_pain"]:,}</div></div>')
 
+        checklist_tab_html = build_strategy_checklist_html(
+            d,
+            vol_support=vol_support,
+            vol_resistance=vol_resistance,
+            global_bias=global_bias,
+            vol_view=vol_view
+        )
+
         auto_refresh_js = """
     <script>
     (function() {
         var INTERVAL  = 30000;
         var countdown = INTERVAL / 1000;
 
-        /* ── helpers ───────────────────────────────────────────────────── */
-        function istNow() {
-            return new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
-        }
+        function istNow() { return new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'})); }
         function pad(n){ return String(n).padStart(2,'0'); }
         function fmtTime(d){ return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()); }
         function fmtDate(d){
             var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
             return pad(d.getDate())+'-'+M[d.getMonth()]+'-'+d.getFullYear();
         }
-
-        /* ── live IST clock + countdown, ticks every second ────────────── */
         function tick() {
-            var now    = istNow();
+            var now = istNow();
             var clockEl = document.getElementById('live-ist-clock');
             if (clockEl) clockEl.textContent = fmtDate(now) + '  ' + fmtTime(now) + ' IST';
-
             countdown--;
             if (countdown < 0) countdown = INTERVAL / 1000;
             var cdEl = document.getElementById('refresh-countdown');
-            if (cdEl) {
-                var s = countdown % 60;
-                var m = Math.floor(countdown / 60);
-                cdEl.textContent = (m > 0 ? m + 'm ' : '') + s + 's';
-            }
+            if (cdEl) { var s=countdown%60; var m=Math.floor(countdown/60); cdEl.textContent=(m>0?m+'m ':'')+s+'s'; }
         }
         setInterval(tick, 1000);
         tick();
 
-        /* ── silent background refresh — swap .container only ───────────── */
         function silentRefresh() {
-            fetch(window.location.href + '?_t=' + Date.now(), {cache:'no-store'})
+            fetch(window.location.href+'?_t='+Date.now(),{cache:'no-store'})
                 .then(function(r){ return r.text(); })
                 .then(function(html){
-                    var parser   = new DOMParser();
-                    var newDoc   = parser.parseFromString(html,'text/html');
-                    var newCont  = newDoc.querySelector('.container');
-                    var oldCont  = document.querySelector('.container');
-                    if (!newCont || !oldCont) return;
-                    var sy = window.scrollY || window.pageYOffset;
-                    oldCont.innerHTML = newCont.innerHTML;
-                    window.scrollTo({top:sy, behavior:'instant'});
-                    /* stamp last-updated after swap */
-                    var now   = istNow();
-                    var stamp = fmtDate(now) + '  ' + fmtTime(now) + ' IST';
-                    var el    = document.getElementById('last-updated');
-                    if (el) el.textContent = stamp;
-                    countdown = INTERVAL / 1000;
+                    var parser=new DOMParser(); var newDoc=parser.parseFromString(html,'text/html');
+                    var newCont=newDoc.querySelector('.container'); var oldCont=document.querySelector('.container');
+                    if(!newCont||!oldCont) return;
+                    var sy=window.scrollY||window.pageYOffset;
+                    var activeTab=document.querySelector('.tab-btn.active');
+                    var activeTabId=activeTab?activeTab.dataset.tab:'main';
+                    oldCont.innerHTML=newCont.innerHTML;
+                    window.scrollTo({top:sy,behavior:'instant'});
+                    switchTab(activeTabId);
+                    var now=istNow(); var stamp=fmtDate(now)+'  '+fmtTime(now)+' IST';
+                    var el=document.getElementById('last-updated'); if(el) el.textContent=stamp;
+                    countdown=INTERVAL/1000;
                 })
                 .catch(function(e){ console.warn('Refresh failed:',e); });
         }
         setInterval(silentRefresh, INTERVAL);
     })();
+
+    /* ── Tab switching ─────────────────────────────────── */
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+        document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+        var panel=document.getElementById('tab-'+tab);
+        var btn=document.querySelector('[data-tab="'+tab+'"]');
+        if(panel) panel.classList.add('active');
+        if(btn)   btn.classList.add('active');
+    }
+
+    /* ── Strategy filter ───────────────────────────────── */
+    function filterStrats(type, btn) {
+        document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.querySelectorAll('.strat-card').forEach(function(c){
+            c.style.display=(type==='all'||c.dataset.type===type)?'':'none';
+        });
+    }
     </script>
 """
 
@@ -1075,145 +1341,51 @@ class NiftyHTMLAnalyzer:
     <title>Nifty 50 Daily Report</title>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        /* ═══ RESET & BASE ══════════════════════════════════════════════════ */
         *{{margin:0;padding:0;box-sizing:border-box;}}
         html{{scroll-behavior:smooth;}}
-        body{{
-            font-family:'Rajdhani',sans-serif;
-            background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);
-            min-height:100vh;
-            padding:clamp(8px,2vw,24px);
-            color:#b0bec5;
-            /* Prevent horizontal scroll on mobile */
-            overflow-x:hidden;
-            -webkit-text-size-adjust:100%;
-        }}
-        /* ═══ LAYOUT ═════════════════════════════════════════════════════════ */
-        .container{{
-            max-width:1200px;
-            margin:0 auto;
-            background:rgba(15,32,39,0.85);
-            backdrop-filter:blur(20px);
-            border-radius:clamp(12px,2vw,20px);
-            overflow:hidden;
-            box-shadow:0 20px 60px rgba(0,0,0,0.5);
-            border:1px solid rgba(79,195,247,0.18);
-            /* Prevent content overflow from breaking layout */
-            min-width:0;
-        }}
-        /* ═══ HEADER ═════════════════════════════════════════════════════════ */
-        .header{{
-            background:linear-gradient(135deg,#0f2027,#203a43);
-            padding:clamp(16px,3vw,32px) clamp(14px,3vw,30px) clamp(14px,2vw,24px);
-            text-align:center;
-            border-bottom:2px solid rgba(79,195,247,0.3);
-            position:relative;overflow:hidden;
-        }}
+        body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:clamp(8px,2vw,24px);color:#b0bec5;overflow-x:hidden;-webkit-text-size-adjust:100%;}}
+
+        /* ═══ TAB SYSTEM ════════════════════════════════════════════════ */
+        .tab-nav{{display:flex;gap:0;border-bottom:2px solid rgba(79,195,247,0.2);overflow-x:auto;scrollbar-width:none;background:linear-gradient(135deg,#0f2027,#203a43);}}
+        .tab-nav::-webkit-scrollbar{{display:none;}}
+        .tab-btn{{display:flex;align-items:center;gap:8px;padding:13px clamp(14px,2.5vw,28px);font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.4vw,13px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(176,190,197,0.5);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;white-space:nowrap;transition:all 0.25s ease;position:relative;bottom:-2px;}}
+        .tab-btn:hover{{color:#4fc3f7;background:rgba(79,195,247,0.05);}}
+        .tab-btn.active{{color:#4fc3f7;border-bottom-color:#4fc3f7;background:rgba(79,195,247,0.08);}}
+        .tab-dot{{width:7px;height:7px;border-radius:50%;background:rgba(79,195,247,0.3);flex-shrink:0;transition:all 0.25s ease;}}
+        .tab-btn.active .tab-dot{{background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;}}
+        .tab-badge{{font-size:9px;padding:2px 7px;border-radius:10px;background:rgba(79,195,247,0.12);border:1px solid rgba(79,195,247,0.25);color:#4fc3f7;}}
+        .new-badge .tab-badge{{background:rgba(0,230,118,0.12);border-color:rgba(0,230,118,0.3);color:#00e676;}}
+        .tab-panel{{display:none;}}
+        .tab-panel.active{{display:block;}}
+
+        /* ═══ LAYOUT ════════════════════════════════════════════════════ */
+        .container{{max-width:1200px;margin:0 auto;background:rgba(15,32,39,0.85);backdrop-filter:blur(20px);border-radius:clamp(12px,2vw,20px);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(79,195,247,0.18);min-width:0;}}
+
+        /* ═══ HEADER ════════════════════════════════════════════════════ */
+        .header{{background:linear-gradient(135deg,#0f2027,#203a43);padding:clamp(16px,3vw,32px) clamp(14px,3vw,30px) 0;text-align:center;position:relative;overflow:hidden;}}
         .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}}
-        .header h1{{
-            font-family:'Oxanium',sans-serif;
-            font-size:clamp(16px,3.5vw,30px);
-            font-weight:800;color:#4fc3f7;
-            text-shadow:0 0 30px rgba(79,195,247,0.5);
-            letter-spacing:clamp(0.5px,0.3vw,2px);
-            position:relative;z-index:1;
-            word-break:break-word;
-            margin-bottom:clamp(10px,2vw,18px);
-        }}
-        /* ── Status bar: single row, all 4 items inline ─────────────────── */
-        .status-bar{{
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            flex-wrap:wrap;
-            gap:0;
-            background:rgba(0,0,0,0.30);
-            border:1px solid rgba(79,195,247,0.15);
-            border-radius:10px;
-            padding:0;
-            overflow:hidden;
-            position:relative;z-index:1;
-            /* subtle top-line */
-            box-shadow:inset 0 1px 0 rgba(79,195,247,0.12);
-        }}
-        .sb-item{{
-            display:flex;
-            align-items:center;
-            gap:8px;
-            padding:10px clamp(10px,2vw,20px);
-            flex:1 1 auto;
-            min-width:0;
-            border-right:1px solid rgba(79,195,247,0.10);
-            white-space:nowrap;
-        }}
+        .header h1{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,3.5vw,30px);font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:clamp(0.5px,0.3vw,2px);position:relative;z-index:1;word-break:break-word;margin-bottom:clamp(10px,2vw,18px);}}
+        .status-bar{{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;background:rgba(0,0,0,0.30);border:1px solid rgba(79,195,247,0.15);border-radius:10px;padding:0;overflow:hidden;position:relative;z-index:1;box-shadow:inset 0 1px 0 rgba(79,195,247,0.12);margin-bottom:16px;}}
+        .sb-item{{display:flex;align-items:center;gap:8px;padding:10px clamp(10px,2vw,20px);flex:1 1 auto;min-width:0;border-right:1px solid rgba(79,195,247,0.10);white-space:nowrap;}}
         .sb-item:last-child{{border-right:none;}}
-        .sb-dot{{
-            width:8px;height:8px;border-radius:50%;flex-shrink:0;
-        }}
-        .sb-dot-gen{{ background:#00e676;box-shadow:0 0 8px #00e676; }}
-        .sb-dot-clock{{ background:#4fc3f7;box-shadow:0 0 8px #4fc3f7; }}
-        .sb-dot-updated{{ background:#ffb74d;box-shadow:0 0 8px #ffb74d; animation:sb-pulse 2s ease-in-out infinite; }}
-        .sb-dot-cd{{ background:#b388ff;box-shadow:0 0 8px #b388ff; }}
+        .sb-dot{{width:8px;height:8px;border-radius:50%;flex-shrink:0;}}
+        .sb-dot-gen{{background:#00e676;box-shadow:0 0 8px #00e676;}}
+        .sb-dot-clock{{background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;}}
+        .sb-dot-updated{{background:#ffb74d;box-shadow:0 0 8px #ffb74d;animation:sb-pulse 2s ease-in-out infinite;}}
+        .sb-dot-cd{{background:#b388ff;box-shadow:0 0 8px #b388ff;}}
         @keyframes sb-pulse{{50%{{opacity:0.2;}}}}
-        .sb-label{{
-            font-family:'JetBrains Mono',monospace;
-            font-size:clamp(8px,1vw,9px);
-            letter-spacing:1.8px;
-            text-transform:uppercase;
-            color:rgba(128,222,234,0.40);
-            flex-shrink:0;
-        }}
-        .sb-value{{
-            font-family:'JetBrains Mono',monospace;
-            font-size:clamp(10px,1.3vw,12px);
-            font-weight:700;
-            color:#e0f7fa;
-            overflow:hidden;
-            text-overflow:ellipsis;
-        }}
-        .sb-value.gen-val{{ color:#80deea; }}
-        .sb-value.clock-val{{ color:#4fc3f7; font-size:clamp(11px,1.5vw,13px); }}
-        .sb-value.updated-val{{ color:#ffb74d; }}
-        .sb-value.cd-val{{ color:#b388ff; min-width:28px; }}
-        /* ═══ REFRESH BAR ════════════════════════════════════════════════════ */
-        .refresh-bar{{
-            display:flex;align-items:center;justify-content:center;
-            gap:clamp(8px,2vw,24px);flex-wrap:wrap;
-            margin-top:16px;padding:10px clamp(10px,2vw,20px);
-            background:rgba(0,0,0,0.25);border-radius:10px;
-            border:1px solid rgba(79,195,247,0.12);position:relative;z-index:1;
-        }}
-        .refresh-item{{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:clamp(9px,1.2vw,11px);min-width:0;}}
-        .refresh-dot{{width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:rb-pulse 2s ease-in-out infinite;flex-shrink:0;}}
-        .refresh-dot.clock-dot{{background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;animation:none;}}
-        .refresh-dot.cd-dot{{background:#ffb74d;box-shadow:0 0 8px #ffb74d;animation:none;}}
-        @keyframes rb-pulse{{50%{{opacity:0.2;}}}}
-        .refresh-label{{color:rgba(128,222,234,0.45);letter-spacing:1.5px;text-transform:uppercase;font-size:clamp(8px,1vw,9px);white-space:nowrap;}}
-        .refresh-value{{color:#e0f7fa;font-weight:700;letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;}}
-        .refresh-sep{{width:1px;height:22px;background:rgba(79,195,247,0.15);flex-shrink:0;}}
-        /* ═══ SECTIONS ═══════════════════════════════════════════════════════ */
+        .sb-label{{font-family:'JetBrains Mono',monospace;font-size:clamp(8px,1vw,9px);letter-spacing:1.8px;text-transform:uppercase;color:rgba(128,222,234,0.40);flex-shrink:0;}}
+        .sb-value{{font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.3vw,12px);font-weight:700;color:#e0f7fa;overflow:hidden;text-overflow:ellipsis;}}
+        .sb-value.gen-val{{color:#80deea;}} .sb-value.clock-val{{color:#4fc3f7;font-size:clamp(11px,1.5vw,13px);}} .sb-value.updated-val{{color:#ffb74d;}} .sb-value.cd-val{{color:#b388ff;min-width:28px;}}
+
+        /* ═══ SECTIONS ══════════════════════════════════════════════════ */
         .section{{padding:clamp(14px,2.5vw,28px) clamp(12px,2.5vw,26px);border-bottom:1px solid rgba(79,195,247,0.08);}}
         .section:last-child{{border-bottom:none;}}
-        .section-title{{
-            font-family:'Oxanium',sans-serif;
-            font-size:clamp(10px,1.5vw,13px);
-            font-weight:700;letter-spacing:clamp(1px,0.3vw,2.5px);
-            color:#4fc3f7;text-transform:uppercase;
-            display:flex;align-items:center;gap:10px;
-            margin-bottom:clamp(12px,2vw,20px);
-            padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);
-            flex-wrap:wrap;
-        }}
+        .section-title{{font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.5vw,13px);font-weight:700;letter-spacing:clamp(1px,0.3vw,2.5px);color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:clamp(12px,2vw,20px);padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}}
         .section-title span{{font-size:clamp(14px,2vw,18px);}}
-        /* ═══ GLASSMORPHISM CARDS ════════════════════════════════════════════ */
-        .g{{
-            background:rgba(255,255,255,0.04);
-            backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-            border:1px solid rgba(79,195,247,0.18);
-            border-radius:16px;position:relative;overflow:hidden;
-            transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
-            min-width:0; /* prevent overflow in grid */
-        }}
+
+        /* ═══ GLASSMORPHISM CARDS ═══════════════════════════════════════ */
+        .g{{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(79,195,247,0.18);border-radius:16px;position:relative;overflow:hidden;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);min-width:0;}}
         .g::before{{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);z-index:1;}}
         .g::after{{content:'';position:absolute;top:-60%;left:-30%;width:50%;height:200%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);transform:skewX(-15deg);transition:left 0.6s ease;z-index:0;}}
         .g:hover::after{{left:130%;}}
@@ -1221,22 +1393,13 @@ class NiftyHTMLAnalyzer:
         .g-hi{{background:rgba(79,195,247,0.09);border-color:rgba(79,195,247,0.35);}}
         .g-red{{background:rgba(244,67,54,0.06);border-color:rgba(244,67,54,0.25);}}
         .g-red:hover{{background:rgba(244,67,54,0.1);border-color:rgba(244,67,54,0.45);}}
-        /* ═══ GRID LAYOUTS ═══════════════════════════════════════════════════ */
         .card-grid{{display:grid;gap:14px;}}
         .grid-5{{grid-template-columns:repeat(5,minmax(0,1fr));}}
         .grid-4{{grid-template-columns:repeat(4,minmax(0,1fr));}}
-        /* ═══ STAT CARD INTERNALS ════════════════════════════════════════════ */
         .g .card-top-row{{display:flex;align-items:center;gap:10px;margin-bottom:10px;position:relative;z-index:2;padding:14px 16px 0;}}
         .card-ico{{font-size:clamp(16px,2vw,22px);line-height:1;flex-shrink:0;}}
         .lbl{{font-size:clamp(8px,1vw,9px);letter-spacing:2.5px;color:rgba(128,222,234,0.65);text-transform:uppercase;font-weight:600;line-height:1.3;word-break:break-word;}}
-        .val{{
-            font-family:'Oxanium',sans-serif;
-            font-size:clamp(16px,2.5vw,24px);
-            font-weight:700;color:#fff;display:block;
-            margin-bottom:10px;position:relative;z-index:2;
-            padding:0 16px;
-            word-break:break-word;overflow:hidden;text-overflow:ellipsis;
-        }}
+        .val{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,2.5vw,24px);font-weight:700;color:#fff;display:block;margin-bottom:10px;position:relative;z-index:2;padding:0 16px;word-break:break-word;overflow:hidden;text-overflow:ellipsis;}}
         .bar-wrap{{height:5px;background:rgba(0,0,0,0.35);border-radius:3px;margin:0 16px 12px;overflow:hidden;position:relative;z-index:2;}}
         .bar-fill{{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}}
         .bar-teal{{background:linear-gradient(90deg,#00bcd4,#4fc3f7);box-shadow:0 0 8px rgba(79,195,247,0.6);}}
@@ -1248,12 +1411,14 @@ class NiftyHTMLAnalyzer:
         .tag-neu{{background:rgba(255,183,77,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
         .tag-bull{{background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.35);}}
         .tag-bear{{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.35);}}
-        /* ═══ MARKET SNAPSHOT GRID ═══════════════════════════════════════════ */
+
+        /* ═══ MARKET SNAPSHOT ═══════════════════════════════════════════ */
         .snap-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}}
         .snap-card{{padding:18px 16px;}}
         .snap-card .card-top-row{{margin-bottom:8px;padding:0;}}
         .snap-card .val{{font-size:clamp(18px,3vw,26px);padding:0;margin-bottom:0;}}
-        /* ═══ MARKET DIRECTION WIDGET ════════════════════════════════════════ */
+
+        /* ═══ MARKET DIRECTION ══════════════════════════════════════════ */
         .md-widget{{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:clamp(12px,2vw,16px) clamp(14px,2vw,20px);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:12px;}}
         .md-glow{{position:absolute;top:-80%;left:-80%;width:260%;height:260%;background:conic-gradient(from 180deg,#ff6b35 0deg,#ffcd3c 120deg,#4ecdc4 240deg,#ff6b35 360deg);opacity:0.05;animation:md-rotate 8s linear infinite;border-radius:50%;pointer-events:none;}}
         @keyframes md-rotate{{to{{transform:rotate(360deg);}}}}
@@ -1270,7 +1435,8 @@ class NiftyHTMLAnalyzer:
         .md-pill-conf-low{{background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.35);color:#ff6b6b;}}
         .md-row-bottom{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}}
         .md-direction{{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,5vw,36px);letter-spacing:clamp(1px,0.5vw,3px);line-height:1;}}
-        /* ═══ LOGIC BOX ══════════════════════════════════════════════════════ */
+
+        /* ═══ LOGIC BOX ═════════════════════════════════════════════════ */
         .logic-box{{background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.14);border-left:3px solid #4fc3f7;border-radius:10px;padding:10px 16px;margin-top:12px;}}
         .logic-box-head{{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;color:#4fc3f7;letter-spacing:2px;margin-bottom:7px;}}
         .logic-grid{{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;}}
@@ -1280,18 +1446,19 @@ class NiftyHTMLAnalyzer:
         .lc-bear{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(255,82,82,0.1);color:#ff5252;border:1px solid rgba(255,82,82,0.28);}}
         .lc-side{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.28);}}
         .lc-info{{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(79,195,247,0.08);color:#4fc3f7;border:1px solid rgba(79,195,247,0.22);}}
-        /* ═══ KEY LEVELS ═════════════════════════════════════════════════════ */
+
+        /* ═══ KEY LEVELS ════════════════════════════════════════════════ */
         .rl-node-a{{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}}
         .rl-node-b{{position:absolute;top:0;transform:translateX(-50%);text-align:center;}}
         .rl-dot{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}}
         .rl-lbl{{font-size:clamp(8px,1.2vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}}
         .rl-val{{font-size:clamp(10px,1.5vw,13px);font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}}
-        /* ═══ FII/DII PULSE FLOW ════════════════════════════════════════════ */
+
+        /* ═══ FII/DII ═══════════════════════════════════════════════════ */
         .pf-live-badge{{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:1px;}}
         .pf-live{{background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
         .pf-estimated{{background:rgba(255,138,101,0.1);color:#ff8a65;border:1px solid rgba(255,138,101,0.3);}}
         .pf-date-range{{font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;}}
-        /* Default: 5-col on desktop */
         .pf-grid{{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:18px;}}
         .pf-card{{background:rgba(255,255,255,0.03);border:1px solid rgba(0,212,255,0.18);border-radius:16px;padding:16px 14px 14px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);min-width:0;}}
         .pf-card:hover{{background:rgba(255,255,255,0.06);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.35);}}
@@ -1302,8 +1469,7 @@ class NiftyHTMLAnalyzer:
         .pf-block{{display:flex;flex-direction:column;gap:5px;}}
         .pf-block-header{{display:flex;justify-content:space-between;align-items:baseline;}}
         .pf-block-lbl{{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}}
-        .pf-fii-lbl{{color:rgba(0,212,255,0.5);}}
-        .pf-dii-lbl{{color:rgba(255,179,0,0.5);}}
+        .pf-fii-lbl{{color:rgba(0,212,255,0.5);}} .pf-dii-lbl{{color:rgba(255,179,0,0.5);}}
         .pf-block-val{{font-family:'JetBrains Mono',monospace;font-size:clamp(12px,1.8vw,15px);font-weight:700;line-height:1;word-break:break-all;}}
         .pf-bar-track{{height:4px;background:rgba(0,0,0,0.35);border-radius:2px;overflow:hidden;}}
         .pf-bar-fill{{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}}
@@ -1311,7 +1477,6 @@ class NiftyHTMLAnalyzer:
         .pf-card-net{{display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);margin-top:auto;}}
         .pf-net-lbl{{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-transform:uppercase;font-weight:700;}}
         .pf-net-val{{font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.5vw,13px);font-weight:700;word-break:break-all;}}
-        /* Avg strip */
         .pf-avg-strip{{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.1);border-radius:14px;padding:18px 24px;margin-bottom:16px;}}
         .pf-avg-cell{{text-align:center;min-width:0;}}
         .pf-avg-eyebrow{{font-size:8px;letter-spacing:2.5px;color:rgba(0,229,255,0.4);text-transform:uppercase;margin-bottom:6px;font-weight:700;}}
@@ -1323,10 +1488,8 @@ class NiftyHTMLAnalyzer:
         .pf-insight-lbl{{font-size:9px;letter-spacing:2px;font-weight:700;text-transform:uppercase;}}
         .pf-verdict-badge{{display:inline-block;padding:3px 14px;border-radius:20px;font-size:clamp(10px,1.5vw,11px);font-weight:800;letter-spacing:1px;white-space:nowrap;}}
         .pf-insight-text{{font-size:clamp(12px,1.5vw,13px);color:#cfd8dc;line-height:1.85;font-weight:500;}}
-        /* ═══ DISCLAIMER & FOOTER ════════════════════════════════════════════ */
-        .disclaimer{{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}}
-        .footer{{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}}
-        /* ═══ NAVY COMMAND OI ════════════════════════════════════════════════ */
+
+        /* ═══ NAVY COMMAND OI ═══════════════════════════════════════════ */
         .nc-section-header{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(79,195,247,0.14);}}
         .nc-header-left{{display:flex;align-items:center;gap:14px;}}
         .nc-header-icon{{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#1e3a5f,#1a3052);border:1px solid rgba(79,195,247,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 4px 14px rgba(79,195,247,0.15);}}
@@ -1355,59 +1518,122 @@ class NiftyHTMLAnalyzer:
         .nc-card-value{{font-family:'Oxanium',sans-serif;font-size:clamp(20px,3.5vw,30px);font-weight:700;line-height:1;margin-bottom:6px;letter-spacing:-0.5px;word-break:break-word;}}
         .nc-card-sub{{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(100,116,139,0.7);margin-bottom:14px;}}
         .nc-card-btn{{display:block;width:100%;padding:9px 14px;border-radius:7px;text-align:center;font-family:'Outfit',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;letter-spacing:0.5px;cursor:default;}}
-        /* ═══ TABLET: 1024px ════════════════════════════════════════════════ */
+
+        /* ═══ STRATEGY CHECKLIST TAB STYLES ════════════════════════════ */
+        .annot-badge{{font-size:9px;padding:2px 10px;border-radius:8px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-family:'JetBrains Mono',monospace;letter-spacing:1px;font-weight:700;white-space:nowrap;}}
+        .input-summary-grid{{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
+        .inp-summary-card{{border-radius:12px;padding:14px 16px;border:1px solid;transition:all 0.2s ease;}}
+        .inp-auto-card{{background:rgba(0,230,118,0.04);border-color:rgba(0,230,118,0.2);}}
+        .inp-manual-card{{background:rgba(79,195,247,0.04);border-color:rgba(79,195,247,0.15);}}
+        .inp-s-label{{font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;}}
+        .inp-auto-card .inp-s-label{{color:rgba(0,230,118,0.5);}}
+        .inp-manual-card .inp-s-label{{color:rgba(79,195,247,0.5);}}
+        .inp-s-val{{font-family:'Oxanium',sans-serif;font-size:clamp(14px,2vw,18px);font-weight:700;color:#e0f7fa;margin-bottom:4px;line-height:1.2;}}
+        .inp-s-src{{font-size:9px;font-family:'JetBrains Mono',monospace;}}
+        .inp-auto-card .inp-s-src{{color:rgba(0,230,118,0.3);}}
+        .inp-manual-card .inp-s-src{{color:rgba(79,195,247,0.3);}}
+        .na-inline{{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
+        .signal-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
+        .sig-card{{background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;}}
+        .sig-icon{{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}}
+        .sig-bull{{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);}}
+        .sig-bear{{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.25);}}
+        .sig-neu{{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.25);}}
+        .sig-na{{background:rgba(176,190,197,0.06);border:1px solid rgba(176,190,197,0.12);}}
+        .sig-body{{flex:1;min-width:0;}}
+        .sig-name{{font-size:9px;letter-spacing:1.5px;color:rgba(128,222,234,0.5);text-transform:uppercase;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}}
+        .sig-val{{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;}}
+        .sig-val.na-val{{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
+        .sig-msg{{font-size:11px;color:rgba(176,190,197,0.55);line-height:1.5;}}
+        .sig-score{{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:3px 9px;border-radius:6px;flex-shrink:0;margin-top:2px;}}
+        .score-p{{background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
+        .score-n{{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.3);}}
+        .score-0{{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.25);}}
+        .score-na{{background:rgba(176,190,197,0.08);color:rgba(176,190,197,0.35);border:1px solid rgba(176,190,197,0.12);}}
+        .auto-badge{{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-weight:700;letter-spacing:0.5px;}}
+        .manual-badge{{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.2);color:#4fc3f7;font-weight:700;letter-spacing:0.5px;}}
+        .score-meter{{background:rgba(10,20,30,0.7);border:1px solid rgba(79,195,247,0.15);border-radius:16px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}}
+        .score-ring-wrap{{position:relative;flex-shrink:0;width:120px;height:120px;}}
+        .score-ring-label{{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}}
+        .score-ring-num{{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;line-height:1;}}
+        .score-ring-txt{{font-size:8px;letter-spacing:2px;color:rgba(176,190,197,0.4);text-transform:uppercase;}}
+        .score-detail{{flex:1;min-width:200px;}}
+        .score-bias-lbl{{font-family:'Orbitron',monospace;font-size:clamp(16px,3vw,24px);font-weight:900;letter-spacing:2px;margin-bottom:8px;}}
+        .score-sub{{font-size:12px;color:rgba(176,190,197,0.5);line-height:1.6;margin-bottom:8px;}}
+        .score-pills{{display:flex;gap:8px;flex-wrap:wrap;}}
+        .sc-pill{{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:1px;}}
+        .sc-pill-bull{{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);color:#00e676;}}
+        .sc-pill-bear{{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.3);color:#ff5252;}}
+        .sc-pill-neu{{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.3);color:#ffb74d;}}
+        .sc-pill-na{{background:rgba(176,190,197,0.06);border:1px solid rgba(176,190,197,0.15);color:rgba(176,190,197,0.4);}}
+        .strat-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}}
+        .strat-card{{background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);border-radius:14px;padding:16px;position:relative;overflow:hidden;transition:all 0.25s ease;}}
+        .strat-card::before{{content:'';position:absolute;top:0;left:0;right:0;height:2px;}}
+        .strat-bull::before{{background:linear-gradient(90deg,transparent,#00e676,transparent);}}
+        .strat-bear::before{{background:linear-gradient(90deg,transparent,#ff5252,transparent);}}
+        .strat-neu::before{{background:linear-gradient(90deg,transparent,#ffb74d,transparent);}}
+        .strat-vol::before{{background:linear-gradient(90deg,transparent,#7c4dff,transparent);}}
+        .strat-misc::before{{background:linear-gradient(90deg,transparent,#4fc3f7,transparent);}}
+        .strat-card:hover{{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.3);border-color:rgba(79,195,247,0.3);}}
+        .strat-num{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.25);margin-bottom:6px;letter-spacing:1px;}}
+        .strat-name{{font-family:'Oxanium',sans-serif;font-size:clamp(12px,1.5vw,15px);font-weight:700;color:#e0f7fa;margin-bottom:8px;line-height:1.3;}}
+        .strat-tag{{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;}}
+        .strat-tag-bull{{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;}}
+        .strat-tag-bear{{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.25);color:#ff5252;}}
+        .strat-tag-neu{{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.25);color:#ffb74d;}}
+        .strat-tag-vol{{background:rgba(124,77,255,0.1);border:1px solid rgba(124,77,255,0.25);color:#b388ff;}}
+        .strat-tag-misc{{background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.25);color:#4fc3f7;}}
+        .filter-btn{{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid rgba(79,195,247,0.2);background:transparent;color:rgba(176,190,197,0.5);transition:all 0.2s ease;font-family:'Oxanium',sans-serif;}}
+        .filter-btn.active,.filter-btn:hover{{background:rgba(79,195,247,0.1);border-color:rgba(79,195,247,0.4);color:#4fc3f7;}}
+
+        /* ═══ DISCLAIMER ════════════════════════════════════════════════ */
+        .disclaimer{{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}}
+        .footer{{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}}
+
+        /* ═══ RESPONSIVE ════════════════════════════════════════════════ */
         @media(max-width:1024px){{
             .grid-5{{grid-template-columns:repeat(3,minmax(0,1fr));}}
             .grid-4{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .pf-grid{{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}}
             .nc-cards-grid{{grid-template-columns:repeat(3,minmax(0,1fr));}}
             .nc-meter-track{{width:140px;}}
+            .input-summary-grid{{grid-template-columns:repeat(3,minmax(0,1fr));}}
         }}
-        /* ═══ MOBILE: 600px ════════════════════════════════════════════════ */
         @media(max-width:600px){{
-            /* Grids → single column */
             .grid-5,.grid-4{{grid-template-columns:minmax(0,1fr);}}
             .snap-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .logic-grid{{grid-template-columns:1fr;}}
-            /* FII/DII → 2 columns on mobile (readable) */
             .pf-grid{{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}}
-            /* OI cards → 1 col */
             .nc-cards-grid{{grid-template-columns:minmax(0,1fr);}}
             .nc-section-header{{flex-direction:column;align-items:flex-start;}}
             .nc-atm-badge{{align-self:flex-end;}}
             .nc-dir-name{{font-size:clamp(18px,5vw,24px);}}
-            /* Meters take full width */
             .nc-meters-panel{{min-width:unset;width:100%;}}
             .nc-meter-track{{width:100%;max-width:280px;}}
-            /* Avg strip → stacked */
             .pf-avg-strip{{grid-template-columns:1fr;gap:0;padding:14px;}}
             .pf-avg-sep{{display:none;}}
-            .pf-avg-cell{{
-                text-align:left;display:flex;
-                align-items:center;justify-content:space-between;gap:12px;
-                padding:10px 0;border-bottom:1px solid rgba(79,195,247,0.07);
-            }}
+            .pf-avg-cell{{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(79,195,247,0.07);}}
             .pf-avg-cell:last-child{{border-bottom:none;}}
             .pf-avg-eyebrow{{margin-bottom:0;}}
-            /* Direction widget */
             .md-direction{{font-size:clamp(20px,6vw,28px);}}
             .md-row-top,.md-row-bottom{{flex-direction:column;align-items:flex-start;}}
-            /* Inline style grid override for key levels distance row */
             div[style*="grid-template-columns:1fr 1fr"]{{grid-template-columns:1fr !important;}}
-            /* Status bar wraps to 2×2 on mobile */
             .status-bar{{flex-wrap:wrap;}}
             .sb-item{{flex:1 1 45%;border-right:none;border-bottom:1px solid rgba(79,195,247,0.08);}}
             .sb-item:nth-child(odd){{border-right:1px solid rgba(79,195,247,0.08);}}
             .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){{border-bottom:none;}}
-            /* Date range label hidden — saves space */
             .pf-date-range{{display:none;}}
+            .signal-grid{{grid-template-columns:1fr;}}
+            .strat-grid{{grid-template-columns:1fr;}}
+            .input-summary-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
+            .score-meter{{flex-direction:column;}}
         }}
-        /* ═══ SMALL MOBILE: 400px ═══════════════════════════════════════════ */
         @media(max-width:400px){{
             .snap-grid{{grid-template-columns:minmax(0,1fr);}}
             .pf-grid{{grid-template-columns:minmax(0,1fr);}}
             .nc-dir-name{{font-size:clamp(16px,5vw,20px);}}
             .header h1{{letter-spacing:0;}}
+            .input-summary-grid{{grid-template-columns:1fr;}}
         }}
     </style>
 </head>
@@ -1416,45 +1642,53 @@ class NiftyHTMLAnalyzer:
     <div class="header">
         <h1>&#128202; NIFTY 50 DAILY REPORT</h1>
         <div class="status-bar">
-
-            <!-- 1. DATA GENERATED (static — set when Python ran) -->
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
                 <span class="sb-value gen-val">{d['timestamp']}</span>
             </div>
-
-            <!-- 2. LIVE IST CLOCK (ticks every second via JS) -->
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
                 <span class="sb-label">IST Now</span>
                 <span class="sb-value clock-val" id="live-ist-clock">--:--:--</span>
             </div>
-
-            <!-- 3. LAST UPDATED (set after each silent refresh) -->
             <div class="sb-item">
                 <span class="sb-dot sb-dot-updated"></span>
                 <span class="sb-label">Last Updated</span>
                 <span class="sb-value updated-val" id="last-updated">{d['timestamp']}</span>
             </div>
-
-            <!-- 4. NEXT REFRESH COUNTDOWN -->
             <div class="sb-item">
                 <span class="sb-dot sb-dot-cd"></span>
                 <span class="sb-label">Next Refresh</span>
                 <span class="sb-value cd-val" id="refresh-countdown">30s</span>
             </div>
+        </div>
 
+        <!-- TAB NAV -->
+        <div class="tab-nav" id="tabNav">
+            <button class="tab-btn active" data-tab="main" onclick="switchTab('main')">
+                <span class="tab-dot"></span>
+                📈 Main Analysis
+                <span class="tab-badge">LIVE</span>
+            </button>
+            <button class="tab-btn new-badge" data-tab="checklist" onclick="switchTab('checklist')">
+                <span class="tab-dot"></span>
+                🧠 Strategy Checklist
+                <span class="tab-badge">NEW</span>
+            </button>
         </div>
     </div>
-    <div class="section">
-        <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
-        <div class="snap-grid">
-            <div class="g snap-card g-hi"><div class="card-top-row"><span class="card-ico">&#128185;</span><div class="lbl">NIFTY 50 SPOT</div></div><span class="val">&#8377;{d['current_price']:,.2f}</span></div>
-            <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#127919;</span><div class="lbl">ATM STRIKE</div></div><span class="val">&#8377;{d['atm_strike']:,}</span></div>
-            <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#128197;</span><div class="lbl">EXPIRY DATE</div></div><span class="val" style="font-size:20px">{d['expiry']}</span></div>
+
+    <!-- ════ TAB 1: MAIN ANALYSIS ════════════════════════════════════ -->
+    <div class="tab-panel active" id="tab-main">
+        <div class="section">
+            <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
+            <div class="snap-grid">
+                <div class="g snap-card g-hi"><div class="card-top-row"><span class="card-ico">&#128185;</span><div class="lbl">NIFTY 50 SPOT</div></div><span class="val">&#8377;{d['current_price']:,.2f}</span></div>
+                <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#127919;</span><div class="lbl">ATM STRIKE</div></div><span class="val">&#8377;{d['atm_strike']:,}</span></div>
+                <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#128197;</span><div class="lbl">EXPIRY DATE</div></div><span class="val" style="font-size:20px">{d['expiry']}</span></div>
+            </div>
         </div>
-    </div>
 """
         if d['has_option_data']:
             html += self._oi_navy_command_section(d)
@@ -1462,29 +1696,33 @@ class NiftyHTMLAnalyzer:
         html += self._fiidii_section_html()
         html += self._market_direction_widget_html()
         html += f"""
-    <div class="section">
-        <div class="section-title"><span>&#128269;</span> TECHNICAL INDICATORS</div>
-        <div class="card-grid grid-5">{tech_cards}</div>
-    </div>
+        <div class="section">
+            <div class="section-title"><span>&#128269;</span> TECHNICAL INDICATORS</div>
+            <div class="card-grid grid-5">{tech_cards}</div>
+        </div>
 """
         if d['has_option_data']:
             html += f"""
-    <div class="section">
-        <div class="section-title"><span>&#127919;</span> OPTION CHAIN ANALYSIS <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM \u00b110 Strikes Only)</span></div>
-        <div class="card-grid grid-4">{oc_cards}</div>
-    </div>
+        <div class="section">
+            <div class="section-title"><span>&#127919;</span> OPTION CHAIN ANALYSIS <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM \u00b110 Strikes Only)</span></div>
+            <div class="card-grid grid-4">{oc_cards}</div>
+        </div>
 """
+        html += """
+        <div class="section">
+            <div class="disclaimer"><strong>\u26a0\ufe0f DISCLAIMER</strong><br><br>
+            This report is for <strong>EDUCATIONAL purposes only</strong> \u2014 NOT financial advice.<br>
+            Always use stop losses and consult a SEBI registered investment advisor.<br>
+            Past performance does not guarantee future results.</div>
+        </div>
+    </div><!-- /tab-main -->
+"""
+        html += checklist_tab_html
 
         html += """
-    <div class="section">
-        <div class="disclaimer"><strong>\u26a0\ufe0f DISCLAIMER</strong><br><br>
-        This report is for <strong>EDUCATIONAL purposes only</strong> \u2014 NOT financial advice.<br>
-        Always use stop losses and consult a SEBI registered investment advisor.<br>
-        Past performance does not guarantee future results.</div>
-    </div>
     <div class="footer">
-        <p>Automated Nifty 50 Option Chain + Technical Analysis Report</p>
-        <p style="margin-top:6px;">\u00a9 2026 \u00b7 Glassmorphism UI \u00b7 Deep Ocean Theme \u00b7 Navy Command OI \u00b7 Pulse Flow FII/DII \u00b7 Holographic Glass Market Direction \u00b7 For Educational Purposes Only</p>
+        <p>Automated Nifty 50 Option Chain + Technical Analysis · Strategy Checklist</p>
+        <p style="margin-top:6px;">© 2026 · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · Rules-Based Strategy Checklist · For Educational Purposes Only</p>
     </div>
 </div>
 """
@@ -1492,11 +1730,16 @@ class NiftyHTMLAnalyzer:
         html += "\n</body></html>"
         return html
 
-    def save_html_to_file(self, filename='index.html'):
+    def save_html_to_file(self, filename='index.html', vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
         try:
             print(f"\n📄 Saving HTML to {filename}...")
             with open(filename,'w',encoding='utf-8') as f:
-                f.write(self.generate_html_email())
+                f.write(self.generate_html_email(
+                    vol_support=vol_support,
+                    vol_resistance=vol_resistance,
+                    global_bias=global_bias,
+                    vol_view=vol_view
+                ))
             print(f"   ✅ Saved {filename}")
             metadata = {
                 'timestamp': self.html_data['timestamp'],
@@ -1515,7 +1758,7 @@ class NiftyHTMLAnalyzer:
         except Exception as e:
             print(f"\n❌ Save failed: {e}"); return False
 
-    def send_html_email_report(self):
+    def send_html_email_report(self, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
         gmail_user=os.getenv('GMAIL_USER'); gmail_password=os.getenv('GMAIL_APP_PASSWORD')
         recipient1=os.getenv('RECIPIENT_EMAIL_1'); recipient2=os.getenv('RECIPIENT_EMAIL_2')
         if not all([gmail_user,gmail_password,recipient1,recipient2]):
@@ -1525,7 +1768,7 @@ class NiftyHTMLAnalyzer:
             msg=MIMEMultipart('alternative')
             msg['From']=gmail_user; msg['To']=f"{recipient1}, {recipient2}"
             msg['Subject']=f"📊 Nifty 50 OI & Technical Report — {ist_now.strftime('%d-%b-%Y %H:%M IST')}"
-            msg.attach(MIMEText(self.generate_html_email(),'html'))
+            msg.attach(MIMEText(self.generate_html_email(vol_support,vol_resistance,global_bias,vol_view),'html'))
             with smtplib.SMTP_SSL('smtp.gmail.com',465) as server:
                 server.login(gmail_user,gmail_password); server.send_message(msg)
             print("   ✅ Email sent!"); return True
@@ -1535,7 +1778,7 @@ class NiftyHTMLAnalyzer:
     def generate_full_report(self):
         ist_now=datetime.now(pytz.timezone('Asia/Kolkata'))
         print("="*70)
-        print("NIFTY 50 DAILY REPORT — GLASSMORPHISM UI · NAVY COMMAND OI · PULSE FLOW FII/DII · HOLOGRAPHIC MARKET DIRECTION")
+        print("NIFTY 50 DAILY REPORT — DEEP OCEAN THEME + STRATEGY CHECKLIST TAB")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("="*70)
         oc_data=self.fetch_nse_option_chain_silent()
@@ -1551,14 +1794,32 @@ class NiftyHTMLAnalyzer:
 
 
 def main():
+    # ── Optional manual inputs for Strategy Checklist ─────────────────────
+    # Set these to None → shown as N/A in the checklist tab
+    # Or set values before running:
+    #   vol_support    = 25.0   # e.g. +25% volume at support vs avg
+    #   vol_resistance = -10.0  # e.g. -10% volume at resistance vs avg
+    #   global_bias    = "bullish"  # "bullish" | "bearish" | "neutral"
+    #   vol_view       = "normal"   # "low" | "normal" | "high"
+    vol_support    = None
+    vol_resistance = None
+    global_bias    = None
+    vol_view       = "normal"
+
     try:
         print("\n🚀 Starting Nifty 50 Analysis...\n")
         analyzer=NiftyHTMLAnalyzer()
         analyzer.generate_full_report()
         print("\n"+"="*70)
-        save_ok=analyzer.save_html_to_file('index.html')
+        save_ok=analyzer.save_html_to_file(
+            'index.html',
+            vol_support=vol_support,
+            vol_resistance=vol_resistance,
+            global_bias=global_bias,
+            vol_view=vol_view
+        )
         if save_ok:
-            analyzer.send_html_email_report()
+            analyzer.send_html_email_report(vol_support,vol_resistance,global_bias,vol_view)
         else:
             print("\n⚠️  Skipping email due to save failure")
         print("\n✅ Done! Open index.html in your browser.\n")
