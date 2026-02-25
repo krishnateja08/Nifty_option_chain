@@ -2733,7 +2733,8 @@ window.addEventListener('resize', function(){
         log_oi_snapshot(option_analysis, technical)
 
         return option_analysis
-```
+
+
 def main():
     # ── Optional manual inputs for Strategy Checklist ─────────────────
     vol_support    = None
@@ -2763,3 +2764,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
