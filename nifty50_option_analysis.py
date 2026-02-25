@@ -1222,15 +1222,10 @@ def log_oi_snapshot(option_analysis, technical):
     fut_price = round(spot - 25, 2)
     try:
         import yfinance as _yf
-        fut_ticker = _yf.Ticker("NIFTY1!.NS")
-        fut_hist   = fut_ticker.history(period="1d", interval="1m")
-        if not fut_hist.empty:
-            fut_price = round(float(fut_hist['Close'].iloc[-1]), 2)
-        else:
-            gift = _yf.Ticker("^NSEMDCP50")
-            gift_hist = gift.history(period="1d", interval="1m")
-            if not gift_hist.empty:
-                fut_price = round(float(gift_hist['Close'].iloc[-1]), 2)
+        gift = _yf.Ticker("^NSEMDCP50")
+        gift_hist = gift.history(period="1d", interval="1m")
+        if not gift_hist.empty:
+            fut_price = round(float(gift_hist['Close'].iloc[-1]), 2)
     except Exception as e:
         print(f"  ⚠️  Futures price fetch failed: {e} — using spot - 25 as proxy")
 
