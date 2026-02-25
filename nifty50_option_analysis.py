@@ -74,12 +74,6 @@ NIFTY50_SYMBOLS = [
 ]
 
 # High-weightage stocks (top 15 by approximate Nifty weight)
-HIGH_WEIGHTAGE = {
-    "HDFCBANK", "ICICIBANK", "RELIANCE", "INFY", "TCS",
-    "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN",
-    "HCLTECH", "WIPRO", "M&M", "MARUTI", "ULTRACEMCO"
-}
-
 # To this (top 10 by actual Nifty weight):
 HIGH_WEIGHTAGE = {
     "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
