@@ -151,13 +151,13 @@ def build_heatmap_tab_html(heatmap_data, timestamp, advance, decline, neutral):
     # Serialize heatmap data to JSON for embedding
     hm_json = json.dumps(heatmap_data, ensure_ascii=False)
 
-    # High weightage movers sorted by abs % change
+    # High weightage movers in fixed Nifty weight order
     WEIGHT_ORDER = [
-    "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
-    "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN"
-]
-hw_lookup = {r['symbol']: r for r in heatmap_data if r['high_wt']}
-hw_sorted = [hw_lookup[sym] for sym in WEIGHT_ORDER if sym in hw_lookup]
+        "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
+        "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN"
+    ]
+    hw_lookup = {r['symbol']: r for r in heatmap_data if r['high_wt']}
+    hw_sorted = [hw_lookup[sym] for sym in WEIGHT_ORDER if sym in hw_lookup]
     hw_rows_html = ""
     for s in hw_sorted:
         chg_col = "#00e676" if s['change_pct'] >= 0 else "#ff5252"
