@@ -202,7 +202,7 @@ def fetch_volume_at_levels(technical):
         df = df.dropna(subset=['Close', 'Volume'])
         support    = technical['support']
         resistance = technical['resistance']
-        proximity  = 30  # ±30 points from level
+        proximity  = 75  # ±30 points from level
 
         # 20-bar rolling average volume
         df['vol_avg_20'] = df['Volume'].rolling(20).mean()
