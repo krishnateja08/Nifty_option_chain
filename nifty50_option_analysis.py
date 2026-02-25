@@ -2720,6 +2720,14 @@ window.addEventListener('resize', function(){
         technical=self.get_technical_data()
         self.generate_analysis_data(technical, option_analysis)
 
+        # ── Fetch Nifty 50 Heatmap data ────────────────────────────────
+        print("\n🌡️  Fetching Nifty 50 heatmap data...")
+        (self.heatmap_data,
+         self.heatmap_timestamp,
+         self.heatmap_advance,
+         self.heatmap_decline,
+         self.heatmap_neutral) = fetch_heatmap_data()
+
         # ── Log OI snapshot for Intraday OI Trend tab ─────────────────
         print("\n📊 Logging OI snapshot to oi_log.json...")
         log_oi_snapshot(option_analysis, technical)
@@ -2756,3 +2764,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
