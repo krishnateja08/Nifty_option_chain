@@ -1127,15 +1127,15 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                     <div class="inp-s-val">{val_global}</div>
                     <div class="inp-s-src">Manual Input</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card {'inp-auto-card' if vol_support is not None else 'inp-manual-card'}">
                     <div class="inp-s-label">Vol at Support</div>
                     <div class="inp-s-val">{val_vol_sup}</div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-src">{'yfinance 1H Auto' if vol_support is not None else 'Manual Input'}</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card {'inp-auto-card' if vol_resistance is not None else 'inp-manual-card'}">
                     <div class="inp-s-label">Vol at Resistance</div>
                     <div class="inp-s-val">{val_vol_res}</div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-src">{'yfinance 1H Auto' if vol_resistance is not None else 'Manual Input'}</div>
                 </div>
                 <div class="inp-summary-card inp-manual-card">
                     <div class="inp-s-label">IV View</div>
