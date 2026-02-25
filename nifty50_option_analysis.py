@@ -2704,7 +2704,7 @@ window.addEventListener('resize', function(){
         except Exception as e:
             print(f"\n❌ Email failed: {e}"); return False
 
-   def generate_full_report(self):
+    def generate_full_report(self):
         ist_now=datetime.now(pytz.timezone('Asia/Kolkata'))
         print("="*70)
         print("NIFTY 50 DAILY REPORT — DEEP OCEAN + HEATMAP + INTRADAY OI TREND")
