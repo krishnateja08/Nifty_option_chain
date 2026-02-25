@@ -2704,7 +2704,7 @@ window.addEventListener('resize', function(){
         except Exception as e:
             print(f"\n❌ Email failed: {e}"); return False
 
-    def generate_full_report(self):
+   def generate_full_report(self):
         ist_now=datetime.now(pytz.timezone('Asia/Kolkata'))
         print("="*70)
         print("NIFTY 50 DAILY REPORT — DEEP OCEAN + HEATMAP + INTRADAY OI TREND")
@@ -2720,12 +2720,19 @@ window.addEventListener('resize', function(){
         technical=self.get_technical_data()
         self.generate_analysis_data(technical, option_analysis)
 
+        # ── Fetch Nifty 50 Heatmap data ────────────────────────────────
+        print("\n🌡️  Fetching Nifty 50 heatmap data...")
+        (self.heatmap_data,
+         self.heatmap_timestamp,
+         self.heatmap_advance,
+         self.heatmap_decline,
+         self.heatmap_neutral) = fetch_heatmap_data()
+
         # ── Log OI snapshot for Intraday OI Trend tab ─────────────────
         print("\n📊 Logging OI snapshot to oi_log.json...")
         log_oi_snapshot(option_analysis, technical)
 
         return option_analysis
-
 
 def main():
     # ── Optional manual inputs for Strategy Checklist ─────────────────
