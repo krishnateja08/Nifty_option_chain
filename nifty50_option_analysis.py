@@ -185,6 +185,63 @@ def fetch_global_bias():
 
     print(f"  ✅ Global bias → {bias.upper()} (score: {score}/{len(results)})")
     return bias
+def fetch_volume_at_levels(technical):
+    """
+    Auto-calculates volume % change vs 20-period average
+    at support and resistance zones using yfinance 1H data.
+    Returns (vol_support_pct, vol_resistance_pct) or (None, None) on failure.
+    """
+    try:
+        import yfinance as _yf
+        print("  📦 Fetching volume at support/resistance levels...")
+        df = _yf.Ticker("^NSEI").history(interval="1h", period="30d")
+        if df is None or df.empty or len(df) < 25:
+            print("  ⚠️  Insufficient 1H data for volume calc")
+            return None, None
+
+        df = df.dropna(subset=['Close', 'Volume'])
+        support    = technical['support']
+        resistance = technical['resistance']
+        proximity  = 30  # ±30 points from level
+
+        # 20-bar rolling average volume
+        df['vol_avg_20'] = df['Volume'].rolling(20).mean()
+        df = df.dropna(subset=['vol_avg_20'])
+
+        # Bars where price was near support
+        near_support = df[abs(df['Close'] - support) <= proximity]
+        # Bars where price was near resistance
+        near_resistance = df[abs(df['Close'] - resistance) <= proximity]
+
+        vol_support = vol_resistance = None
+
+        if not near_support.empty:
+            avg_vol_sup  = near_support['vol_avg_20'].mean()
+            zone_vol_sup = near_support['Volume'].mean()
+            if avg_vol_sup > 0:
+                vol_support = round((zone_vol_sup - avg_vol_sup) / avg_vol_sup * 100, 1)
+                print(f"  ✅ Vol at Support ({support}): {vol_support:+.1f}% vs avg  [{len(near_support)} candles]")
+            else:
+                print(f"  ⚠️  Vol at Support: avg volume is zero")
+        else:
+            print(f"  ⚠️  No bars found near support ({support} ±30 pts) — will show N/A")
+
+        if not near_resistance.empty:
+            avg_vol_res  = near_resistance['vol_avg_20'].mean()
+            zone_vol_res = near_resistance['Volume'].mean()
+            if avg_vol_res > 0:
+                vol_resistance = round((zone_vol_res - avg_vol_res) / avg_vol_res * 100, 1)
+                print(f"  ✅ Vol at Resistance ({resistance}): {vol_resistance:+.1f}% vs avg  [{len(near_resistance)} candles]")
+            else:
+                print(f"  ⚠️  Vol at Resistance: avg volume is zero")
+        else:
+            print(f"  ⚠️  No bars found near resistance ({resistance} ±30 pts) — will show N/A")
+
+        return vol_support, vol_resistance
+
+    except Exception as e:
+        print(f"  ❌ Volume at levels fetch failed: {e}")
+        return None, None
 
 def build_heatmap_tab_html(heatmap_data, timestamp, advance, decline, neutral):
     """
@@ -2799,18 +2856,20 @@ window.addEventListener('resize', function(){
 
 
 def main():
-    # ── Optional manual inputs for Strategy Checklist ─────────────────
-    vol_support    = None
-    vol_resistance = None
-    global_bias    = fetch_global_bias()
-    vol_view       = "normal"
-
     try:
         print("\n🚀 Starting Nifty 50 Analysis...\n")
-        analyzer=NiftyHTMLAnalyzer()
+        analyzer = NiftyHTMLAnalyzer()
         analyzer.generate_full_report()
-        print("\n"+"="*70)
-        save_ok=analyzer.save_html_to_file(
+
+        # ── AUTO-calculate volume at support/resistance ────────────
+        print("\n📦 Auto-calculating volume at key levels...")
+        vol_support, vol_resistance = fetch_volume_at_levels(analyzer.html_data)
+        global_bias = fetch_global_bias()
+        vol_view    = "normal"
+        # ──────────────────────────────────────────────────────────
+
+        print("\n" + "=" * 70)
+        save_ok = analyzer.save_html_to_file(
             'index.html',
             vol_support=vol_support, vol_resistance=vol_resistance,
             global_bias=global_bias, vol_view=vol_view
