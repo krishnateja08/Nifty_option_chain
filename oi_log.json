@@ -1,5 +1,18 @@
 [
   {
+    "time": "11:00",
+    "timestamp": "25-Feb-2026 11:00 IST",
+    "call_oi_chg": 353519,
+    "put_oi_chg": 760189,
+    "diff": 406670,
+    "pcr": 1.04,
+    "opt_signal": "BUY",
+    "vwap": 25615.9,
+    "fut_price": 16818.1,
+    "spot_price": 25615.9,
+    "vwap_signal": "BUY"
+  },
+  {
     "time": "10:57",
     "timestamp": "25-Feb-2026 10:57 IST",
     "call_oi_chg": 343353,
