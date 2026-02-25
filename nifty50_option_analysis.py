@@ -183,7 +183,6 @@ def build_heatmap_tab_html(heatmap_data, timestamp, advance, decline, neutral):
       <div class="section">
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
-          <span class="annot-badge">LIVE · YFINANCE · AUTO-REFRESH 30s</span>
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
             As of: {timestamp}
           </span>
@@ -2590,11 +2589,7 @@ window.addEventListener('resize', function(){
                 <span class="sb-label">IST Now</span>
                 <span class="sb-value clock-val" id="live-ist-clock">--:--:--</span>
             </div>
-            <div class="sb-item">
-                <span class="sb-dot sb-dot-updated"></span>
-                <span class="sb-label">Last Updated</span>
-                <span class="sb-value updated-val" id="last-updated">{d['timestamp']}</span>
-            </div>
+            
             <div class="sb-item">
                 <span class="sb-dot sb-dot-cd"></span>
                 <span class="sb-label">Next Refresh</span>
