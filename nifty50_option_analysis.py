@@ -187,30 +187,35 @@ def fetch_global_bias():
     return bias
 def fetch_volume_at_levels(technical):
     """
-    Auto-calculates volume % change vs 20-period average
-    at support and resistance zones using yfinance 1H data.
-    Returns (vol_support_pct, vol_resistance_pct) or (None, None) on failure.
+    Uses NIFTYBEES.NS (Nifty ETF) for both price and volume.
+    ETF price ≈ Nifty/100, so levels are scaled down before comparison.
     """
     try:
         import yfinance as _yf
         print("  📦 Fetching volume at support/resistance levels...")
-        df = _yf.Ticker("^NSEI").history(interval="1h", period="30d")
+
+        df = _yf.Ticker("NIFTYBEES.NS").history(interval="1h", period="30d")
+
         if df is None or df.empty or len(df) < 25:
-            print("  ⚠️  Insufficient 1H data for volume calc")
+            print("  ⚠️  Insufficient NIFTYBEES 1H data")
             return None, None
 
         df = df.dropna(subset=['Close', 'Volume'])
-        support    = technical['support']
-        resistance = technical['resistance']
-        proximity  = 75  # ±75 points from level
+        df = df[df['Volume'] > 0]
 
-        # 20-bar rolling average volume
+        if len(df) < 25:
+            print("  ⚠️  Not enough non-zero volume rows in NIFTYBEES")
+            return None, None
+
+        # NIFTYBEES trades at ~Nifty/100, so scale levels down
+        support    = technical['support']    / 100
+        resistance = technical['resistance'] / 100
+        proximity  = 75 / 100  # ±0.75 on ETF scale = ±75 on Nifty scale
+
         df['vol_avg_20'] = df['Volume'].rolling(20).mean()
         df = df.dropna(subset=['vol_avg_20'])
 
-        # Bars where price was near support
-        near_support = df[abs(df['Close'] - support) <= proximity]
-        # Bars where price was near resistance
+        near_support    = df[abs(df['Close'] - support)    <= proximity]
         near_resistance = df[abs(df['Close'] - resistance) <= proximity]
 
         vol_support = vol_resistance = None
@@ -220,22 +225,22 @@ def fetch_volume_at_levels(technical):
             zone_vol_sup = near_support['Volume'].mean()
             if avg_vol_sup > 0:
                 vol_support = round((zone_vol_sup - avg_vol_sup) / avg_vol_sup * 100, 1)
-                print(f"  ✅ Vol at Support ({support}): {vol_support:+.1f}% vs avg  [{len(near_support)} candles]")
+                print(f"  ✅ Vol at Support ({technical['support']}): {vol_support:+.1f}% vs avg  [{len(near_support)} candles]")
             else:
                 print(f"  ⚠️  Vol at Support: avg volume is zero")
         else:
-            print(f"  ⚠️  No bars found near support ({support} ±30 pts) — will show N/A")
+            print(f"  ⚠️  No bars found near support ({technical['support']} ±75 pts) — will show N/A")
 
         if not near_resistance.empty:
             avg_vol_res  = near_resistance['vol_avg_20'].mean()
             zone_vol_res = near_resistance['Volume'].mean()
             if avg_vol_res > 0:
                 vol_resistance = round((zone_vol_res - avg_vol_res) / avg_vol_res * 100, 1)
-                print(f"  ✅ Vol at Resistance ({resistance}): {vol_resistance:+.1f}% vs avg  [{len(near_resistance)} candles]")
+                print(f"  ✅ Vol at Resistance ({technical['resistance']}): {vol_resistance:+.1f}% vs avg  [{len(near_resistance)} candles]")
             else:
                 print(f"  ⚠️  Vol at Resistance: avg volume is zero")
         else:
-            print(f"  ⚠️  No bars found near resistance ({resistance} ±30 pts) — will show N/A")
+            print(f"  ⚠️  No bars found near resistance ({technical['resistance']} ±75 pts) — will show N/A")
 
         return vol_support, vol_resistance
 
