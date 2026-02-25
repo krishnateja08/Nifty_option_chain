@@ -1191,6 +1191,13 @@ def log_oi_snapshot(option_analysis, technical):
     ist_tz  = pytz.timezone('Asia/Kolkata')
     ist_now = datetime.now(ist_tz)
 
+    # ── Market hours gate: only log between 09:00 and 15:30 IST ──
+    market_open  = ist_now.replace(hour=9,  minute=0,  second=0, microsecond=0)
+    market_close = ist_now.replace(hour=15, minute=30, second=0, microsecond=0)
+    if not (market_open <= ist_now <= market_close):
+        print(f"  ⏸️  OI snapshot skipped — outside market hours ({ist_now.strftime('%H:%M IST')})")
+        return
+
     ce_chg  = option_analysis.get('total_ce_oi_change', 0)
     pe_chg  = option_analysis.get('total_pe_oi_change', 0)
     diff    = pe_chg - ce_chg
@@ -1259,6 +1266,12 @@ def log_oi_snapshot(option_analysis, technical):
             entries = []
     else:
         print("  📭 oi_log.json not found — starting fresh log for today")
+
+    # ── Daily reset: clear previous day entries at market open ──
+    today_str = ist_now.strftime('%d-%b-%Y')
+    if entries and ist_now.hour == 9 and ist_now.minute <= 5:
+        entries = [e for e in entries if e.get('timestamp','').startswith(today_str)]
+        print(f"  🔄 Daily reset — cleared old entries, keeping today's only")
 
     entries.insert(0, snapshot)
     entries = entries[:200]
