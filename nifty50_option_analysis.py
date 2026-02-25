@@ -1586,7 +1586,12 @@ class NiftyHTMLAnalyzer:
             df['EMA_26'] = df['Close'].ewm(span=26, adjust=False).mean()
             df['MACD']   = df['EMA_12'] - df['EMA_26']
             df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
+
+            # ── Use last non-NaN row for MACD/Signal (handles mid-session NaN) ──
+            df_clean = df.dropna(subset=['MACD', 'Signal'])
             latest = df.iloc[-1]
+            macd_val   = float(df_clean['MACD'].iloc[-1])   if not df_clean.empty else float('nan')
+            signal_val = float(df_clean['Signal'].iloc[-1]) if not df_clean.empty else float('nan')
             current_price = latest['Close']
             print("  Fetching 1H candles for Key Levels...")
             df_1h = nifty.history(interval="1h", period="60d")
@@ -1621,8 +1626,8 @@ class NiftyHTMLAnalyzer:
                 'sma_50':           latest['SMA_50'],
                 'sma_200':          latest['SMA_200'],
                 'rsi':              latest['RSI'],
-                'macd':             latest['MACD'],
-                'signal':           latest['Signal'],
+                'macd':             macd_val,
+                'signal':           signal_val,
                 'resistance':       resistance,
                 'support':          support,
                 'strong_resistance':strong_resistance,
