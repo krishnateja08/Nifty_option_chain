@@ -147,7 +147,44 @@ def fetch_heatmap_data():
     except Exception as e:
         print(f"  ❌ Heatmap fetch failed: {e}")
         return [], "N/A", 0, 0, 0
+def fetch_global_bias():
+    """
+    Fetches DJI, NASDAQ, S&P 500 previous session data via yfinance.
+    Returns 'bullish', 'bearish', or 'neutral' based on majority direction.
+    """
+    print("  🌐 Fetching global indices bias (DJI / NASDAQ / S&P 500)...")
+    tickers = {"DJI": "^DJI", "NASDAQ": "^IXIC", "SP500": "^GSPC"}
+    score = 0
+    results = []
+    for name, sym in tickers.items():
+        try:
+            df = yf.Ticker(sym).history(period="2d", interval="1d")
+            if df is None or len(df) < 2:
+                print(f"    ⚠️  {name}: insufficient data")
+                continue
+            prev  = float(df['Close'].iloc[-2])
+            last  = float(df['Close'].iloc[-1])
+            chg   = round((last - prev) / prev * 100, 2)
+            direction = "▲" if chg >= 0 else "▼"
+            print(f"    {direction} {name}: {chg:+.2f}%")
+            score += 1 if chg >= 0 else -1
+            results.append(chg)
+        except Exception as e:
+            print(f"    ⚠️  {name} fetch failed: {e}")
 
+    if not results:
+        print("  ⚠️  Global bias: all fetches failed — defaulting to None")
+        return None
+
+    if score >= 2:
+        bias = "bullish"
+    elif score <= -2:
+        bias = "bearish"
+    else:
+        bias = "neutral"
+
+    print(f"  ✅ Global bias → {bias.upper()} (score: {score}/{len(results)})")
+    return bias
 
 def build_heatmap_tab_html(heatmap_data, timestamp, advance, decline, neutral):
     """
@@ -2745,7 +2782,7 @@ def main():
     # ── Optional manual inputs for Strategy Checklist ─────────────────
     vol_support    = None
     vol_resistance = None
-    global_bias    = None
+    global_bias    = fetch_global_bias()
     vol_view       = "normal"
 
     try:
