@@ -172,7 +172,6 @@
         .nc-card-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(100,116,139,0.7);margin-bottom:14px;}
         .nc-card-btn{display:block;width:100%;padding:9px 14px;border-radius:7px;text-align:center;font-family:'Outfit',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;letter-spacing:0.5px;cursor:default;}
 
-        /* ══ STRATEGY CHECKLIST ══════════════════════════════════════ */
         .annot-badge{font-size:9px;padding:2px 10px;border-radius:8px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-family:'JetBrains Mono',monospace;letter-spacing:1px;font-weight:700;white-space:nowrap;}
         .input-summary-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:20px;}
         .inp-summary-card{border-radius:12px;padding:14px 16px;border:1px solid;transition:all 0.2s ease;}
@@ -239,7 +238,6 @@
         .filter-btn{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid rgba(79,195,247,0.2);background:transparent;color:rgba(176,190,197,0.5);transition:all 0.2s ease;font-family:'Oxanium',sans-serif;}
         .filter-btn.active,.filter-btn:hover{background:rgba(79,195,247,0.1);border-color:rgba(79,195,247,0.4);color:#4fc3f7;}
 
-        /* ══ INTRADAY OI TREND ═══════════════════════════════════════ */
         .oi-controls{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
         .oi-interval-btns{display:flex;gap:0;border:1px solid rgba(79,195,247,0.25);border-radius:10px;overflow:hidden;}
         .oi-int-btn{padding:9px 24px;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:rgba(176,190,197,0.5);background:transparent;border:none;cursor:pointer;transition:all 0.2s ease;border-right:1px solid rgba(79,195,247,0.15);}
@@ -285,6 +283,64 @@
 
         .disclaimer{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}
         .footer{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}
+
+        
+        /* ══ NIFTY 50 HEATMAP ═══════════════════════════════════════ */
+        .hm-breadth-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;padding:20px 24px;margin-bottom:20px;}
+        .hm-bs-left{display:flex;gap:24px;align-items:center;}
+        .hm-bs-stat{text-align:center;}
+        .hm-bs-num{font-family:'Orbitron',monospace;font-size:clamp(26px,4vw,36px);font-weight:900;line-height:1;}
+        .hm-bs-adv .hm-bs-num{color:#00e676;text-shadow:0 0 20px rgba(0,230,118,0.5);}
+        .hm-bs-dec .hm-bs-num{color:#ff5252;text-shadow:0 0 20px rgba(255,82,82,0.5);}
+        .hm-bs-neu .hm-bs-num{color:#78909c;}
+        .hm-bs-lbl{font-size:9px;letter-spacing:2.5px;color:rgba(176,190,197,0.4);text-transform:uppercase;font-weight:700;margin-top:4px;}
+        .hm-bs-donut-wrap{position:relative;width:110px;height:110px;flex-shrink:0;}
+        .hm-bs-donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+        .hm-bs-donut-num{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#e0f7fa;}
+        .hm-bs-donut-sub{font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;}
+        .hm-bs-right{flex:1;min-width:200px;}
+        .hm-breadth-label{font-size:11px;color:rgba(128,222,234,0.5);margin-bottom:8px;letter-spacing:1px;}
+        .hm-breadth-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+        .hm-br-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+        .hm-br-label{font-size:10px;color:rgba(176,190,197,0.5);width:70px;flex-shrink:0;}
+        .hm-br-bar-wrap{flex:1;height:4px;background:rgba(0,0,0,0.35);border-radius:2px;overflow:hidden;}
+        .hm-br-bar{height:100%;border-radius:2px;transition:width 1s ease;}
+        .hm-br-val{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;width:20px;text-align:right;flex-shrink:0;}
+        .hm-grid{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;margin-bottom:16px;}
+        .hm-cell{border-radius:10px;padding:10px 8px;cursor:default;transition:all 0.2s ease;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:72px;text-align:center;}
+        .hm-cell:hover{transform:scale(1.06);z-index:10;box-shadow:0 8px 24px rgba(0,0,0,0.5);filter:brightness(1.15);}
+        .hm-cell-sym{font-family:'Oxanium',sans-serif;font-size:clamp(8px,1.2vw,11px);font-weight:700;letter-spacing:0.3px;line-height:1.2;word-break:break-word;}
+        .hm-cell-price{font-family:'JetBrains Mono',monospace;font-size:clamp(7px,0.9vw,9px);opacity:0.75;margin-top:3px;font-weight:600;}
+        .hm-cell-chg{font-family:'Oxanium',sans-serif;font-size:clamp(9px,1.2vw,12px);font-weight:800;margin-top:2px;letter-spacing:0.3px;}
+        .hm-legend{display:flex;flex-direction:column;align-items:center;margin-bottom:4px;}
+        .hm-legend-bar{display:flex;align-items:center;gap:12px;width:100%;max-width:400px;}
+        .hm-leg-gradient{flex:1;height:10px;border-radius:5px;background:linear-gradient(90deg,#b91c1c,#ef4444,#374151,#10b981,#065f46);}
+        .hm-leg-txt{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;}
+        .hm-mover-wrap{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:12px;overflow:hidden;}
+        .hm-mover-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}
+        .hm-mover-table thead th{padding:10px 14px;font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.45);text-transform:uppercase;font-weight:700;text-align:right;border-bottom:1px solid rgba(79,195,247,0.15);background:rgba(79,195,247,0.05);}
+        .hm-mover-table thead th:first-child{text-align:left;}
+        .hm-mover-table tbody tr{border-bottom:1px solid rgba(79,195,247,0.06);transition:background 0.15s;}
+        .hm-mover-table tbody tr:hover{background:rgba(79,195,247,0.05);}
+        .hm-mover-table tbody td{padding:9px 14px;font-size:12px;text-align:right;color:#b0bec5;}
+        .hm-mover-sym{text-align:left!important;color:#e0f7fa!important;font-weight:700;}
+        .hm-mover-prev{color:#546e7a!important;}
+        .hm-mover-price{color:#4fc3f7!important;font-weight:600;}
+        .hm-mover-chg{font-weight:700;}
+        .hm-oi-chart-wrap{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:12px;padding:14px;overflow:hidden;}
+        .hm-idx-btn{padding:7px 18px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(176,190,197,0.5);background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:8px;cursor:pointer;transition:all 0.2s ease;}
+        .hm-idx-btn:hover{color:#4fc3f7;border-color:rgba(79,195,247,0.5);background:rgba(79,195,247,0.08);}
+        .hm-idx-btn.active{color:#00e5ff;border-color:rgba(79,195,247,0.6);background:rgba(79,195,247,0.15);box-shadow:0 0 10px rgba(79,195,247,0.1);}
+        @media(max-width:900px){.hm-grid{grid-template-columns:repeat(7,minmax(0,1fr));}}
+        @media(max-width:600px){
+          .hm-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;}
+          .hm-cell{min-height:58px;padding:8px 4px;}
+          .hm-breadth-strip{flex-direction:column;align-items:flex-start;}
+          div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;}
+          .hm-bs-donut-wrap{align-self:center;}
+        }
+        @media(max-width:400px){.hm-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
+
 
         @media(max-width:1024px){
             .grid-5{grid-template-columns:repeat(3,minmax(0,1fr));}
@@ -344,7 +400,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">25-Feb-2026 16:43 IST</span>
+                <span class="sb-value gen-val">25-Feb-2026 22:05 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -354,7 +410,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-updated"></span>
                 <span class="sb-label">Last Updated</span>
-                <span class="sb-value updated-val" id="last-updated">25-Feb-2026 16:43 IST</span>
+                <span class="sb-value updated-val" id="last-updated">25-Feb-2026 22:05 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-cd"></span>
@@ -365,6 +421,9 @@
         <div class="tab-nav" id="tabNav">
             <button class="tab-btn active" data-tab="main" onclick="switchTab('main')">
                 <span class="tab-dot"></span> &#128200; Main Analysis <span class="tab-badge">LIVE</span>
+            </button>
+            <button class="tab-btn" data-tab="heatmap" onclick="switchTab('heatmap')">
+                <span class="tab-dot"></span> &#127956; Heatmap <span class="tab-badge">LIVE</span>
             </button>
             <button class="tab-btn" data-tab="oi-trend" onclick="switchTab('oi-trend')">
                 <span class="tab-dot"></span> &#128202; Intraday OI Trend <span class="tab-badge">IST</span>
@@ -402,11 +461,11 @@
                     <div class="nc-dir-name" style="color:#fbbf24;">Neutral (High Vol)</div>
                     <div class="nc-dir-signal" style="color:rgba(251,191,36,0.5);">Both Calls & Puts Building</div>
                 </div>
-                <div class="nc-meters-panel"><div class="nc-meter-row"><div class="nc-meter-head-row"><span class="nc-meter-label">🟢 Bull Strength</span><span class="nc-meter-pct" style="color:#34d399;">42%</span></div><div class="nc-meter-track"><div class="nc-meter-fill" style="width:42%;background:linear-gradient(90deg,#10b981,#34d399);"></div><div class="nc-meter-head" style="left:42%;background:#34d399;box-shadow:0 0 8px #34d399;"></div></div></div><div class="nc-meter-row"><div class="nc-meter-head-row"><span class="nc-meter-label">🔴 Bear Strength</span><span class="nc-meter-pct" style="color:#fb7185;">58%</span></div><div class="nc-meter-track"><div class="nc-meter-fill" style="width:58%;background:linear-gradient(90deg,#ef4444,#f97316);"></div><div class="nc-meter-head" style="left:58%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div></div></div></div>
+                <div class="nc-meters-panel"><div class="nc-meter-row"><div class="nc-meter-head-row"><span class="nc-meter-label">🟢 Bull Strength</span><span class="nc-meter-pct" style="color:#34d399;">43%</span></div><div class="nc-meter-track"><div class="nc-meter-fill" style="width:43%;background:linear-gradient(90deg,#10b981,#34d399);"></div><div class="nc-meter-head" style="left:43%;background:#34d399;box-shadow:0 0 8px #34d399;"></div></div></div><div class="nc-meter-row"><div class="nc-meter-head-row"><span class="nc-meter-label">🔴 Bear Strength</span><span class="nc-meter-pct" style="color:#fb7185;">57%</span></div><div class="nc-meter-track"><div class="nc-meter-fill" style="width:57%;background:linear-gradient(90deg,#ef4444,#f97316);"></div><div class="nc-meter-head" style="left:57%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div></div></div></div>
             </div>
         </div>
     </div>
-    <div class="nc-cards-grid"><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">CALL OI CHANGE</span><span style="font-size:18px;line-height:1;color:#ef4444;">🔴</span></div><div class="nc-card-value" style="color:#fb7185;">+381,910</div><div class="nc-card-sub">CE open interest Δ</div><div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">Bearish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">PUT OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">🟢</span></div><div class="nc-card-value" style="color:#34d399;">+278,347</div><div class="nc-card-sub">PE open interest Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">NET OI CHANGE</span><span style="font-size:18px;line-height:1;color:#ef4444;">⚖️</span></div><div class="nc-card-value" style="color:#fb7185;">-103,563</div><div class="nc-card-sub">PE Δ − CE Δ</div><div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">Bearish Net</div></div></div>
+    <div class="nc-cards-grid"><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">CALL OI CHANGE</span><span style="font-size:18px;line-height:1;color:#ef4444;">🔴</span></div><div class="nc-card-value" style="color:#fb7185;">+354,860</div><div class="nc-card-sub">CE open interest Δ</div><div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">Bearish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">PUT OI CHANGE</span><span style="font-size:18px;line-height:1;color:#10b981;">🟢</span></div><div class="nc-card-value" style="color:#34d399;">+263,012</div><div class="nc-card-sub">PE open interest Δ</div><div class="nc-card-btn" style="color:#10b981;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);">Bullish Signal</div></div><div class="nc-card"><div class="nc-card-header"><span class="nc-card-label">NET OI CHANGE</span><span style="font-size:18px;line-height:1;color:#ef4444;">⚖️</span></div><div class="nc-card-value" style="color:#fb7185;">-91,848</div><div class="nc-card-sub">PE Δ − CE Δ</div><div class="nc-card-btn" style="color:#ef4444;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);">Bearish Net</div></div></div>
     <div class="logic-box" style="margin-top:16px;">
         <div class="logic-box-head">📖 HOW TO READ</div>
         <div class="logic-grid">
@@ -531,8 +590,8 @@
             <div class="card-grid grid-4">
             <div class="g g-red">
                 <div class="card-top-row"><span class="card-ico">🔴</span><div class="lbl">PCR Ratio (OI)</div></div>
-                <span class="val">0.656</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:32.8%"></div></div>
+                <span class="val">0.659</span>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:33.0%"></div></div>
                 <div class="card-foot"><div class="sub">Put/Call OI ratio</div><span class="tag tag-bear">Bearish</span></div>
             </div>
             <div class="g ">
@@ -544,13 +603,13 @@
             <div class="g g-red">
                 <div class="card-top-row"><span class="card-ico">🔴</span><div class="lbl">Max Call OI</div></div>
                 <span class="val">₹25,600</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:60.4%"></div></div>
+                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:60.3%"></div></div>
                 <div class="card-foot"><div class="sub">CE wall</div><span class="tag tag-bear">Resistance</span></div>
             </div>
             <div class="g g-hi">
                 <div class="card-top-row"><span class="card-ico">🟢</span><div class="lbl">Max Put OI</div></div>
                 <span class="val">₹25,500</span>
-                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:39.6%"></div></div>
+                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:39.7%"></div></div>
                 <div class="card-foot"><div class="sub">PE floor</div><span class="tag tag-bull">Support</span></div>
             </div></div>
         </div>
@@ -563,7 +622,135 @@
         </div>
     </div><!-- /tab-main -->
 
-    <!-- TAB 3: INTRADAY OI TREND -->
+    <!-- TAB 4: NIFTY 50 HEATMAP -->
+    <div class="tab-panel" id="tab-heatmap">
+      <div class="section">
+        <div class="section-title">
+          <span>🟩</span> NIFTY 50 HEATMAP
+          <span class="annot-badge">LIVE · YFINANCE · AUTO-REFRESH 30s</span>
+          <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
+            As of: N/A
+          </span>
+        </div>
+
+        <!-- Breadth Strip -->
+        <div class="hm-breadth-strip">
+          <div class="hm-bs-left">
+            <div class="hm-bs-stat hm-bs-adv">
+              <div class="hm-bs-num" id="hmAdvCount">0</div>
+              <div class="hm-bs-lbl">ADVANCE</div>
+            </div>
+            <div class="hm-bs-stat hm-bs-dec">
+              <div class="hm-bs-num" id="hmDecCount">0</div>
+              <div class="hm-bs-lbl">DECLINE</div>
+            </div>
+            <div class="hm-bs-stat hm-bs-neu">
+              <div class="hm-bs-num" id="hmNeuCount">0</div>
+              <div class="hm-bs-lbl">NEUTRAL</div>
+            </div>
+          </div>
+          <div class="hm-bs-donut-wrap">
+            <canvas id="hmDonutCanvas" width="110" height="110"></canvas>
+            <div class="hm-bs-donut-center">
+              <div class="hm-bs-donut-num">50</div>
+              <div class="hm-bs-donut-sub">STOCKS</div>
+            </div>
+          </div>
+          <div class="hm-bs-right">
+            <div class="hm-breadth-label" style="font-size:11px;color:rgba(128,222,234,0.5);margin-bottom:8px;letter-spacing:1px;">MARKET BREADTH</div>
+            <div class="hm-breadth-row">
+              <span class="hm-br-dot" style="background:#00e676;"></span>
+              <span class="hm-br-label">Advancing</span>
+              <div class="hm-br-bar-wrap"><div class="hm-br-bar" style="width:0.0%;background:linear-gradient(90deg,#00e676,#00bfa5);"></div></div>
+              <span class="hm-br-val" style="color:#00e676;">0</span>
+            </div>
+            <div class="hm-breadth-row">
+              <span class="hm-br-dot" style="background:#ff5252;"></span>
+              <span class="hm-br-label">Declining</span>
+              <div class="hm-br-bar-wrap"><div class="hm-br-bar" style="width:0.0%;background:linear-gradient(90deg,#ff5252,#d50000);"></div></div>
+              <span class="hm-br-val" style="color:#ff5252;">0</span>
+            </div>
+            <div class="hm-breadth-row">
+              <span class="hm-br-dot" style="background:#78909c;"></span>
+              <span class="hm-br-label">Neutral</span>
+              <div class="hm-br-bar-wrap"><div class="hm-br-bar" style="width:2%;background:#546e7a;"></div></div>
+              <span class="hm-br-val" style="color:#78909c;">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Heatmap Grid -->
+        <div class="hm-grid" id="hmGrid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Color Legend -->
+        <div class="hm-legend">
+          <div style="font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;margin-bottom:8px;">COLOR SCALE</div>
+          <div class="hm-legend-bar">
+            <span class="hm-leg-txt" style="color:#d50000;">≤ -2%</span>
+            <div class="hm-leg-gradient"></div>
+            <span class="hm-leg-txt" style="color:#00e676;">≥ +2%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- High Weightage Movers + OI Chart (2-col) -->
+      <div class="section">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+          <!-- High Weightage Movers Table -->
+          <div>
+            <div class="section-title" style="border-bottom:1px solid rgba(79,195,247,0.18);padding-bottom:10px;margin-bottom:14px;">
+              <span>⚖️</span> HIGH WEIGHTAGE MOVERS
+            </div>
+            <div class="hm-mover-wrap">
+              <table class="hm-mover-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;">SYMBOL</th>
+                    <th>PREV CLOSE</th>
+                    <th>PRICE</th>
+                    <th>% CHG</th>
+                  </tr>
+                </thead>
+                <tbody id="hmMoverBody">
+                  
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Intraday OI Change Chart (mini) -->
+          <div>
+            <div class="section-title" style="border-bottom:1px solid rgba(79,195,247,0.18);padding-bottom:10px;margin-bottom:14px;">
+              <span>⚡</span> INTRADAY OI CHANGE
+              <span id="hmOIPCR" style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(128,222,234,0.5);">PCR: —</span>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:8px;">
+              <button class="hm-idx-btn active" id="hmBtnNifty" onclick="setHMIndex('nifty',this)">NIFTY</button>
+              <button class="hm-idx-btn" id="hmBtnBankNifty" onclick="setHMIndex('banknifty',this)">BANKNIFTY</button>
+            </div>
+            <div class="hm-oi-chart-wrap">
+              <canvas id="hmOICanvas" width="420" height="200"></canvas>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:8px;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:rgba(176,190,197,0.5);">
+                <span style="display:inline-block;width:24px;height:2px;background:#ef4444;border-radius:1px;"></span> Call OI Change
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:rgba(176,190,197,0.5);">
+                <span style="display:inline-block;width:24px;height:2px;background:#10b981;border-radius:1px;"></span> Put OI Change
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Heatmap data embedded as JSON for JS rendering -->
+      <script id="hmDataScript" type="application/json">[]</script>
+    </div><!-- /tab-heatmap -->
+
+    <!-- TAB: INTRADAY OI TREND -->
     <div class="tab-panel" id="tab-oi-trend">
       <div class="section">
         <div class="section-title">
@@ -573,8 +760,6 @@
             Source: <code style="color:#4fc3f7;font-family:'JetBrains Mono',monospace;">oi_log.json</code>
           </span>
         </div>
-
-        <!-- Controls Row -->
         <div class="oi-controls">
           <div class="oi-interval-btns">
             <button class="oi-int-btn active" id="btn3" onclick="setOIInterval(3,this)">3 Min</button>
@@ -586,8 +771,6 @@
             <div id="oiLastFetch" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.3);letter-spacing:1px;">Last fetch: —</div>
           </div>
         </div>
-
-        <!-- Summary Strip -->
         <div class="oi-summary-strip">
           <div class="oi-sum-card">
             <div class="oi-sum-label">Latest PCR</div>
@@ -606,8 +789,6 @@
             <div class="oi-sum-val" id="oiLatestSignal">—</div>
           </div>
         </div>
-
-        <!-- Sparkline Chart -->
         <div class="oi-chart-wrap">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             <div class="oi-chart-label">NET OI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
@@ -615,8 +796,6 @@
           </div>
           <canvas id="oiSparklineCanvas" style="width:100%;height:110px;display:block;"></canvas>
         </div>
-
-        <!-- Table -->
         <div class="oi-table-wrap">
           <table class="oi-table">
             <thead>
@@ -638,8 +817,6 @@
             </tbody>
           </table>
         </div>
-
-        <!-- How to Read -->
         <div class="logic-box" style="margin-top:16px;">
           <div class="logic-box-head">&#128214; HOW TO READ THIS TABLE</div>
           <div class="logic-grid">
@@ -659,12 +836,12 @@
             <div class="section-title">
                 <span>&#9881;&#65039;</span> LIVE DATA INPUTS
                 <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
-                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 25-Feb-2026 16:43 IST</span>
+                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 25-Feb-2026 22:05 IST</span>
             </div>
             <div class="input-summary-grid">
                 <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">PCR (OI)</div>
-                    <div class="inp-s-val">0.656</div>
+                    <div class="inp-s-val">0.659</div>
                     <div class="inp-s-src">Option Chain</div>
                 </div>
                 <div class="inp-summary-card inp-auto-card">
@@ -721,8 +898,8 @@
             <div class="sig-icon sig-bear">📊</div>
             <div class="sig-body">
                 <div class="sig-name">PCR (OI Ratio) <span class="auto-badge">AUTO</span></div>
-                <div class="sig-val">0.656</div>
-                <div class="sig-msg">PCR 0.656 → below 0.8 — excess call writing, bearish sentiment</div>
+                <div class="sig-val">0.659</div>
+                <div class="sig-msg">PCR 0.659 → below 0.8 — excess call writing, bearish sentiment</div>
             </div>
             <div class="sig-score score-n">-1</div>
         </div>
@@ -926,14 +1103,13 @@
     </div>
 
     <div class="footer">
-        <p>Automated Nifty 50 · Option Chain + Technical + Intraday OI Trend + Strategy Checklist</p>
+        <p>Automated Nifty 50 · Option Chain + Technical + Heatmap + Intraday OI Trend + Strategy Checklist</p>
         <p style="margin-top:6px;">&#169; 2026 · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · IST Timestamps · For Educational Purposes Only</p>
     </div>
 </div>
 
 <script>
 (function() {
-    /* ── Silent page refresh every 30s ─────────────────────────── */
     var INTERVAL  = 30000;
     var countdown = INTERVAL / 1000;
 
@@ -973,13 +1149,13 @@
                 var el=document.getElementById('last-updated'); if(el) el.textContent=stamp;
                 countdown=INTERVAL/1000;
                 if(activeTabId==='oi-trend') loadOILog();
+                if(activeTabId==='heatmap') { window.renderHeatmap && window.renderHeatmap(); }
             })
             .catch(function(e){ console.warn('Refresh failed:',e); });
     }
     setInterval(silentRefresh, INTERVAL);
 })();
 
-/* ── Tab switching ─────────────────────────────────────────────── */
 function switchTab(tab) {
     document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
     document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
@@ -988,9 +1164,9 @@ function switchTab(tab) {
     if(panel) panel.classList.add('active');
     if(btn)   btn.classList.add('active');
     if(tab==='oi-trend') loadOILog();
+    if(tab==='heatmap') { window.renderHeatmap && window.renderHeatmap(); }
 }
 
-/* ── Strategy filter ───────────────────────────────────────────── */
 function filterStrats(type, btn) {
     document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
@@ -999,11 +1175,6 @@ function filterStrats(type, btn) {
     });
 }
 
-/* ════════════════════════════════════════════════════════════════
-   INTRADAY OI TREND — complete client-side engine
-   Reads oi_log.json · Filters 3/5/15 min · Sparkline via Canvas
-   All timestamps are IST (written by Python with pytz Asia/Kolkata)
-   ════════════════════════════════════════════════════════════════ */
 var _oiInterval = 3;
 var _oiData     = [];
 
@@ -1014,7 +1185,6 @@ function setOIInterval(mins, btn) {
     renderOITable(_oiData);
 }
 
-/* Format large Indian numbers: 5,70,43,740 → "+5.70 Cr" */
 function fmtIN(n) {
     var abs = Math.abs(n);
     var sign = n < 0 ? '-' : '+';
@@ -1039,7 +1209,6 @@ function vsigHtml(sig) {
         : '<span class="oi-vsig-sell">SELL</span>';
 }
 
-/* Aggregate raw (3-min) data into 5-min or 15-min slots */
 function filterByInterval(data, mins) {
     if (mins === 3) return data;
     var grouped = {};
@@ -1052,7 +1221,6 @@ function filterByInterval(data, mins) {
         if (!grouped[key]) grouped[key] = [];
         grouped[key].push(row);
     });
-    /* Sort keys descending (newest first, matching 3-min order) */
     var keys = Object.keys(grouped).sort().reverse();
     return keys.map(function(key) {
         var rows    = grouped[key];
@@ -1070,7 +1238,7 @@ function filterByInterval(data, mins) {
             fut_price:   last.fut_price,
             spot_price:  last.spot_price,
             vwap_signal: last.vwap_signal,
-            _isLive:     rows[0]._isLive,   /* first in slot = newest */
+            _isLive:     rows[0]._isLive,
         };
     });
 }
@@ -1078,53 +1246,28 @@ function filterByInterval(data, mins) {
 function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
-
     if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="oi-empty-state">' +
-            '&#128218; No data yet.<br>' +
-            '<small style="opacity:0.5;">oi_log.json will populate when the script runs during market hours.</small>' +
-            '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="oi-empty-state">&#128218; No data yet.</td></tr>';
         return;
     }
-
     var filtered = filterByInterval(data, _oiInterval);
-
-    /* Update summary strip from latest row */
     var latest = filtered[0];
     if (latest) {
         var el;
-        el = document.getElementById('oiLatestPCR');
-        if (el) el.textContent = latest.pcr || '—';
-
+        el = document.getElementById('oiLatestPCR'); if (el) el.textContent = latest.pcr || '—';
         el = document.getElementById('oiLatestDiff');
-        if (el) {
-            el.textContent  = fmtIN(latest.diff || 0);
-            el.className    = 'oi-sum-val ' + ((latest.diff||0) >= 0 ? 'oi-diff-pos' : 'oi-diff-neg');
-        }
-        el = document.getElementById('oiLatestSpot');
-        if (el) el.textContent = '₹' + ((latest.spot_price||0).toLocaleString('en-IN'));
-
-        el = document.getElementById('oiLatestSignal');
-        if (el) el.innerHTML = signalHtml(latest.opt_signal);
+        if (el) { el.textContent = fmtIN(latest.diff || 0); el.className = 'oi-sum-val ' + ((latest.diff||0) >= 0 ? 'oi-diff-pos' : 'oi-diff-neg'); }
+        el = document.getElementById('oiLatestSpot'); if (el) el.textContent = '₹' + ((latest.spot_price||0).toLocaleString('en-IN'));
+        el = document.getElementById('oiLatestSignal'); if (el) el.innerHTML = signalHtml(latest.opt_signal);
     }
-
-    /* Chart entries count */
     var ce = document.getElementById('oiChartEntries');
     if (ce) ce.textContent = filtered.length + ' candles';
-
-    /* Draw sparkline */
     drawSparkline(filtered);
-
-    /* Render table rows */
     var html = '';
     filtered.forEach(function(row) {
         var isLive   = !!row._isLive;
         var diffCls  = (row.diff||0) >= 0 ? 'oi-diff-pos' : 'oi-diff-neg';
-        var timeCell = isLive
-            ? '<div class="oi-time-cell">' + (row.time||'') +
-              '&nbsp;<span class="oi-live-ind">LIVE</span></div>'
-            : (row.time||'');
-
+        var timeCell = isLive ? '<div class="oi-time-cell">' + (row.time||'') + '&nbsp;<span class="oi-live-ind">LIVE</span></div>' : (row.time||'');
         html += '<tr class="' + (isLive ? 'oi-live-row' : '') + '">'
             + '<td>' + timeCell + '</td>'
             + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
@@ -1147,133 +1290,292 @@ function drawSparkline(data) {
     var ctx = canvas.getContext('2d');
     var W   = canvas.parentElement ? (canvas.parentElement.clientWidth - 32) : 600;
     var H   = 110;
-    canvas.width  = W;
-    canvas.height = H;
-
-    /* Reverse for left→right time order in chart */
+    canvas.width  = W; canvas.height = H;
     var reversed = data.slice().reverse();
     var diffs    = reversed.map(function(r){ return r.diff || 0; });
-    if (diffs.length < 2) {
-        ctx.clearRect(0,0,W,H);
-        ctx.fillStyle = 'rgba(128,222,234,0.2)';
-        ctx.font = '12px JetBrains Mono, monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText('Waiting for data…', W/2, H/2);
-        return;
-    }
-
+    if (diffs.length < 2) { ctx.clearRect(0,0,W,H); return; }
     var minV  = Math.min.apply(null, diffs);
     var maxV  = Math.max.apply(null, diffs);
     var range = (maxV - minV) || 1;
     var pad   = 10;
-
     function toX(i) { return (i / (diffs.length-1)) * (W - 2*pad) + pad; }
     function toY(v) { return H - ((v - minV) / range) * (H - 2*pad) - pad; }
-
     ctx.clearRect(0, 0, W, H);
-
-    /* Zero line */
     var zeroY = toY(0);
-    ctx.save();
-    ctx.strokeStyle = 'rgba(79,195,247,0.18)';
-    ctx.lineWidth   = 1;
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath(); ctx.moveTo(pad, zeroY); ctx.lineTo(W-pad, zeroY); ctx.stroke();
-    ctx.restore();
-
-    /* Colour by last diff value */
+    ctx.save(); ctx.strokeStyle = 'rgba(79,195,247,0.18)'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(pad, zeroY); ctx.lineTo(W-pad, zeroY); ctx.stroke(); ctx.restore();
     var lastDiff  = diffs[diffs.length-1];
     var lineColor = lastDiff >= 0 ? '#10b981' : '#ef4444';
     var gradTop   = lastDiff >= 0 ? 'rgba(16,185,129,0.35)' : 'rgba(239,68,68,0.35)';
-
-    /* Area fill */
     var grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, gradTop);
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.beginPath();
-    ctx.moveTo(toX(0), H);
+    grad.addColorStop(0, gradTop); grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.moveTo(toX(0), H);
     diffs.forEach(function(v,i){ ctx.lineTo(toX(i), toY(v)); });
-    ctx.lineTo(toX(diffs.length-1), H);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    /* Line */
-    ctx.strokeStyle = lineColor;
-    ctx.lineWidth   = 2.5;
-    ctx.lineJoin    = 'round';
-    ctx.beginPath();
-    diffs.forEach(function(v,i){
-        i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v));
-    });
+    ctx.lineTo(toX(diffs.length-1), H); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+    ctx.strokeStyle = lineColor; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.beginPath();
+    diffs.forEach(function(v,i){ i===0 ? ctx.moveTo(toX(i),toY(v)) : ctx.lineTo(toX(i),toY(v)); });
     ctx.stroke();
-
-    /* Data-point dots */
-    diffs.forEach(function(v,i){
-        ctx.beginPath();
-        ctx.arc(toX(i), toY(v), 2.5, 0, Math.PI*2);
-        ctx.fillStyle = lineColor;
-        ctx.globalAlpha = 0.7;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-    });
-
-    /* Latest dot (highlighted) */
-    var lx = toX(diffs.length-1);
-    var ly = toY(diffs[diffs.length-1]);
-    ctx.beginPath(); ctx.arc(lx, ly, 5, 0, Math.PI*2);
-    ctx.fillStyle = lineColor; ctx.fill();
-    ctx.beginPath(); ctx.arc(lx, ly, 9, 0, Math.PI*2);
-    ctx.strokeStyle = lastDiff >= 0 ? 'rgba(52,211,153,0.35)' : 'rgba(248,113,113,0.35)';
-    ctx.lineWidth = 2; ctx.stroke();
+    var lx = toX(diffs.length-1); var ly = toY(diffs[diffs.length-1]);
+    ctx.beginPath(); ctx.arc(lx, ly, 5, 0, Math.PI*2); ctx.fillStyle = lineColor; ctx.fill();
 }
 
-/* Fetch oi_log.json from same directory as index.html */
 function loadOILog() {
     var url = 'oi_log.json?_t=' + Date.now();
     fetch(url, {cache:'no-store'})
-        .then(function(r){
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.json();
-        })
+        .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(function(data) {
             if (Array.isArray(data) && data.length > 0) {
-                data[0]._isLive = true;      /* Mark newest row as LIVE */
+                data[0]._isLive = true;
                 _oiData = data;
+                window._oiData = data;
                 renderOITable(data);
-                /* Update last fetch time in IST */
                 var now = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
                 var el  = document.getElementById('oiLastFetch');
-                if (el) el.textContent = 'Last fetch: ' +
-                    String(now.getHours()).padStart(2,'0') + ':' +
-                    String(now.getMinutes()).padStart(2,'0') + ':' +
-                    String(now.getSeconds()).padStart(2,'0') + ' IST';
+                if (el) el.textContent = 'Last fetch: ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0') + ' IST';
             }
         })
         .catch(function(e) {
-            console.warn('OI log fetch failed:', e);
             var tbody = document.getElementById('oiTableBody');
-            if (tbody) tbody.innerHTML =
-                '<tr><td colspan="10" class="oi-empty-state">' +
-                '&#9888; Could not load oi_log.json<br>' +
-                '<small style="opacity:0.5;">Ensure the file is deployed to gh-pages alongside index.html</small>' +
-                '</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
         });
 }
 
-/* Load OI log when page loads (handles direct URL to tab) */
 window.addEventListener('load', function(){
     if (window.location.hash === '#oi-trend') { switchTab('oi-trend'); }
-    else { loadOILog(); }   /* pre-load silently even on main tab */
+    else { loadOILog(); }
 });
 
-/* Also refresh OI log every 30s independently */
 setInterval(loadOILog, 30000);
-
-/* Redraw sparkline on window resize */
 window.addEventListener('resize', function(){
     if (_oiData.length > 0) drawSparkline(filterByInterval(_oiData, _oiInterval));
 });
+</script>
+
+<script>
+
+/* ════════════════════════════════════════════════════════════════
+   NIFTY 50 HEATMAP — client-side rendering engine
+   Data loaded from embedded JSON, refreshed on silent page reload
+   ════════════════════════════════════════════════════════════════ */
+(function() {
+    var _hmIndex = 'nifty';
+
+    function getColor(pct) {
+        var capped = Math.max(-3, Math.min(3, pct));
+        if (pct === 0) return { bg: 'rgba(55,65,81,0.8)', border: 'rgba(100,116,139,0.4)', text: '#94a3b8' };
+        if (pct > 0) {
+            var intensity = Math.min(1, pct / 2.5);
+            var r = Math.round(0   + (0   - 0)   * intensity);
+            var g = Math.round(180 + (230 - 180) * intensity);
+            var b = Math.round(80  + (118 - 80)  * intensity);
+            var a = 0.25 + intensity * 0.55;
+            return {
+                bg:     'rgba(' + r + ',' + g + ',' + b + ',' + a + ')',
+                border: 'rgba(' + r + ',' + g + ',' + b + ',0.5)',
+                text:   pct > 1.5 ? '#fff' : '#a7f3d0'
+            };
+        } else {
+            var intensity = Math.min(1, Math.abs(pct) / 2.5);
+            var r = Math.round(220 + (239 - 220) * intensity);
+            var g = Math.round(50  + (68  - 50)  * intensity);
+            var b = Math.round(50  + (68  - 50)  * intensity);
+            var a = 0.25 + intensity * 0.55;
+            return {
+                bg:     'rgba(' + r + ',' + g + ',' + b + ',' + a + ')',
+                border: 'rgba(' + r + ',' + g + ',' + b + ',0.5)',
+                text:   Math.abs(pct) > 1.5 ? '#fff' : '#fca5a5'
+            };
+        }
+    }
+
+    function renderHeatmap() {
+        var el = document.getElementById('hmDataScript');
+        var grid = document.getElementById('hmGrid');
+        if (!el || !grid) return;
+        var data;
+        try { data = JSON.parse(el.textContent || el.innerHTML); }
+        catch(e) { console.warn('HM parse error:', e); return; }
+
+        var html = '';
+        data.forEach(function(s) {
+            var c    = getColor(s.change_pct);
+            var sign = s.change_pct >= 0 ? '+' : '';
+            var hwBorder = s.high_wt ? '2px solid rgba(79,195,247,0.6)' : ('1px solid ' + c.border);
+            var priceStr = s.price > 0 ? '₹' + s.price.toLocaleString('en-IN') : '—';
+            html += '<div class="hm-cell" style="background:' + c.bg + ';border:' + hwBorder + ';color:' + c.text + ';"'
+                  + ' title="' + s.symbol + ' | Prev: ₹' + s.prev_close + ' | Price: ₹' + s.price + ' | Chg: ' + sign + s.change_pct + '%">'
+                  + '<div class="hm-cell-sym">' + s.symbol + '</div>'
+                  + '<div class="hm-cell-price">' + priceStr + '</div>'
+                  + '<div class="hm-cell-chg">' + sign + s.change_pct.toFixed(2) + '%</div>'
+                  + '</div>';
+        });
+        grid.innerHTML = html;
+
+        // Update breadth counters
+        var adv = data.filter(function(s){ return s.change_pct > 0; }).length;
+        var dec = data.filter(function(s){ return s.change_pct < 0; }).length;
+        var neu = data.filter(function(s){ return s.change_pct === 0; }).length;
+        var e;
+        e = document.getElementById('hmAdvCount'); if(e) e.textContent = adv;
+        e = document.getElementById('hmDecCount'); if(e) e.textContent = dec;
+        e = document.getElementById('hmNeuCount'); if(e) e.textContent = neu;
+
+        // Update mover table
+        var hwStocks = data.filter(function(s){ return s.high_wt; });
+        hwStocks.sort(function(a,b){ return Math.abs(b.change_pct) - Math.abs(a.change_pct); });
+        hwStocks = hwStocks.slice(0, 10);
+        var moverBody = document.getElementById('hmMoverBody');
+        if (moverBody) {
+            var mhtml = '';
+            hwStocks.forEach(function(s) {
+                var col  = s.change_pct >= 0 ? '#00e676' : '#ff5252';
+                var sign = s.change_pct >= 0 ? '+' : '';
+                mhtml += '<tr>'
+                       + '<td class="hm-mover-sym">' + s.symbol + '</td>'
+                       + '<td class="hm-mover-prev">₹' + s.prev_close.toLocaleString('en-IN') + '</td>'
+                       + '<td class="hm-mover-price">₹' + s.price.toLocaleString('en-IN') + '</td>'
+                       + '<td class="hm-mover-chg" style="color:' + col + ';">' + sign + s.change_pct.toFixed(2) + '%</td>'
+                       + '</tr>';
+            });
+            moverBody.innerHTML = mhtml;
+        }
+
+        drawDonut(adv, dec, neu);
+    }
+
+    function drawDonut(adv, dec, neu) {
+        var canvas = document.getElementById('hmDonutCanvas');
+        if (!canvas || !canvas.getContext) return;
+        var ctx = canvas.getContext('2d');
+        var cx = 55, cy = 55, r = 40, lw = 10;
+        ctx.clearRect(0, 0, 110, 110);
+        var total = adv + dec + neu || 1;
+        var slices = [
+            { val: adv, color: '#00e676' },
+            { val: dec, color: '#ef4444' },
+            { val: neu, color: '#546e7a' },
+        ];
+        var start = -Math.PI / 2;
+        slices.forEach(function(sl) {
+            if (!sl.val) return;
+            var sweep = (sl.val / total) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, start, start + sweep);
+            ctx.strokeStyle = sl.color;
+            ctx.lineWidth = lw;
+            ctx.stroke();
+            start += sweep;
+        });
+        // center text handled by CSS overlay
+    }
+
+    /* ── OI Chart from oi_log.json ────────────────────────────── */
+    function drawHMOIChart(data) {
+        var canvas = document.getElementById('hmOICanvas');
+        if (!canvas || !canvas.getContext) return;
+        var ctx = canvas.getContext('2d');
+        var W = canvas.parentElement ? canvas.parentElement.clientWidth - 32 : 420;
+        var H = 200;
+        canvas.width = W; canvas.height = H;
+        ctx.clearRect(0, 0, W, H);
+        if (!data || data.length < 2) {
+            ctx.fillStyle = 'rgba(128,222,234,0.2)';
+            ctx.font = '11px JetBrains Mono, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('Loading OI data…', W/2, H/2);
+            return;
+        }
+        var reversed = data.slice().reverse();
+        var ceArr    = reversed.map(function(r){ return r.call_oi_chg || 0; });
+        var peArr    = reversed.map(function(r){ return r.put_oi_chg  || 0; });
+        var allVals  = ceArr.concat(peArr);
+        var minV = Math.min.apply(null, allVals);
+        var maxV = Math.max.apply(null, allVals);
+        var range = (maxV - minV) || 1;
+        var pad = 14;
+        function toX(i) { return (i / (ceArr.length - 1)) * (W - 2*pad) + pad; }
+        function toY(v) { return H - ((v - minV) / range) * (H - 2*pad) - pad; }
+
+        // Zero line
+        ctx.save();
+        ctx.strokeStyle = 'rgba(79,195,247,0.12)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        var zy = toY(0);
+        ctx.beginPath(); ctx.moveTo(pad, zy); ctx.lineTo(W-pad, zy); ctx.stroke();
+        ctx.restore();
+
+        // Draw CE (red)
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ceArr.forEach(function(v, i){ i===0 ? ctx.moveTo(toX(i),toY(v)) : ctx.lineTo(toX(i),toY(v)); });
+        ctx.stroke();
+
+        // Draw PE (green)
+        ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+        ctx.beginPath();
+        peArr.forEach(function(v, i){ i===0 ? ctx.moveTo(toX(i),toY(v)) : ctx.lineTo(toX(i),toY(v)); });
+        ctx.stroke();
+
+        // Time labels on x-axis (every ~5th point)
+        ctx.fillStyle = 'rgba(128,222,234,0.3)';
+        ctx.font = '8px JetBrains Mono, monospace';
+        ctx.textAlign = 'center';
+        var step = Math.max(1, Math.floor(reversed.length / 6));
+        for (var i = 0; i < reversed.length; i += step) {
+            ctx.fillText(reversed[i].time || '', toX(i), H - 2);
+        }
+    }
+
+    window.setHMIndex = function(idx, btn) {
+        _hmIndex = idx;
+        document.querySelectorAll('.hm-idx-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        // Re-draw with same data (different index would need separate fetch)
+        if (window._oiData && window._oiData.length) drawHMOIChart(window._oiData);
+    };
+
+    /* Called on tab switch or page load */
+    window.renderHeatmap = renderHeatmap;
+
+    window.addEventListener('load', function() {
+        renderHeatmap();
+        // Draw OI chart using same oi_log.json loaded by main tab
+        setTimeout(function() {
+            if (window._oiData && window._oiData.length) drawHMOIChart(window._oiData);
+        }, 800);
+    });
+
+    // Hook into loadOILog to also refresh OI chart
+    var _origRenderOI = window.renderOITable;
+
+    /* After oi_log loads, also draw heatmap OI chart */
+    var _origLoad = window.loadOILog;
+    function patchedLoadOILog() {
+        fetch('oi_log.json?_t=' + Date.now(), {cache:'no-store'})
+            .then(function(r){ return r.json(); })
+            .then(function(data) {
+                if (Array.isArray(data) && data.length) {
+                    window._oiData = data;
+                    drawHMOIChart(data);
+                    var pcr = data[0] && data[0].pcr ? data[0].pcr : null;
+                    var el = document.getElementById('hmOIPCR');
+                    if (el && pcr) el.textContent = 'PCR: ' + pcr;
+                }
+            })
+            .catch(function(){});
+    }
+
+    // Run OI chart draw periodically
+    setInterval(function() {
+        patchedLoadOILog();
+        renderHeatmap();
+    }, 30000);
+
+    // Initial draw
+    setTimeout(patchedLoadOILog, 1200);
+})();
+
 </script>
 
 </body></html>
