@@ -66,7 +66,7 @@ NIFTY50_SYMBOLS = [
     ("ONGC",      "ONGC.NS"),       ("POWERGRID",   "POWERGRID.NS"),
     ("RELIANCE",  "RELIANCE.NS"),   ("SBILIFE",     "SBILIFE.NS"),
     ("SBIN",      "SBIN.NS"),       ("SHRIRAMFIN",  "SHRIRAMFIN.NS"),
-    ("SUNPHARMA", "SUNPHARMA.NS"),  ("TATAMOTORS",  "TMCV.NS"),
+    ("SUNPHARMA", "SUNPHARMA.NS"),  ("TATAMOTORS",  "TATAMOTORS.NS"),
     ("TATACONSUM","TATACONSUM.NS"), ("TATASTEEL",   "TATASTEEL.NS"),
     ("TCS",       "TCS.NS"),        ("TECHM",       "TECHM.NS"),
     ("TITAN",     "TITAN.NS"),      ("TRENT",       "TRENT.NS"),
@@ -74,11 +74,12 @@ NIFTY50_SYMBOLS = [
 ]
 
 # High-weightage stocks (top 15 by approximate Nifty weight)
-# To this (top 10 by actual Nifty weight):
 HIGH_WEIGHTAGE = {
-    "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
-    "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN"
+    "HDFCBANK", "ICICIBANK", "RELIANCE", "INFY", "TCS",
+    "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN",
+    "HCLTECH", "WIPRO", "M&M", "MARUTI", "ULTRACEMCO"
 }
+
 def fetch_heatmap_data():
     """
     Fetches live % change data for all 50 Nifty stocks using yfinance.
@@ -151,13 +152,9 @@ def build_heatmap_tab_html(heatmap_data, timestamp, advance, decline, neutral):
     # Serialize heatmap data to JSON for embedding
     hm_json = json.dumps(heatmap_data, ensure_ascii=False)
 
-    # High weightage movers in fixed Nifty weight order
-    WEIGHT_ORDER = [
-        "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
-        "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN"
-    ]
-    hw_lookup = {r['symbol']: r for r in heatmap_data if r['high_wt']}
-    hw_sorted = [hw_lookup[sym] for sym in WEIGHT_ORDER if sym in hw_lookup]
+    # High weightage movers sorted by abs % change
+    hw_stocks = [r for r in heatmap_data if r['high_wt']]
+    hw_sorted = sorted(hw_stocks, key=lambda x: abs(x['change_pct']), reverse=True)[:10]
     hw_rows_html = ""
     for s in hw_sorted:
         chg_col = "#00e676" if s['change_pct'] >= 0 else "#ff5252"
@@ -376,13 +373,9 @@ def get_heatmap_javascript():
         e = document.getElementById('hmNeuCount'); if(e) e.textContent = neu;
 
         // Update mover table
-        var WEIGHT_ORDER = [
-    "RELIANCE","HDFCBANK","ICICIBANK","INFY","TCS",
-    "BHARTIARTL","LT","AXISBANK","KOTAKBANK","SBIN"
-];
-var hwLookup = {};
-data.forEach(function(s){ if(s.high_wt) hwLookup[s.symbol] = s; });
-var hwStocks = WEIGHT_ORDER.map(function(sym){ return hwLookup[sym]; }).filter(Boolean);
+        var hwStocks = data.filter(function(s){ return s.high_wt; });
+        hwStocks.sort(function(a,b){ return Math.abs(b.change_pct) - Math.abs(a.change_pct); });
+        hwStocks = hwStocks.slice(0, 10);
         var moverBody = document.getElementById('hmMoverBody');
         if (moverBody) {
             var mhtml = '';
@@ -2771,5 +2764,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
