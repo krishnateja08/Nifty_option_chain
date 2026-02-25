@@ -1268,10 +1268,17 @@ def log_oi_snapshot(option_analysis, technical):
         print("  📭 oi_log.json not found — starting fresh log for today")
 
     # ── Daily reset: clear previous day entries at market open ──
-    today_str = ist_now.strftime('%d-%b-%Y')
-    if entries and ist_now.hour == 9 and ist_now.minute <= 5:
+    today_str  = ist_now.strftime('%d-%b-%Y')
+    is_weekday = ist_now.weekday() < 5  # Mon=0 to Fri=4
+    is_holiday = today_str in NSE_FO_HOLIDAYS
+    is_trading_day = is_weekday and not is_holiday
+
+    if entries and is_trading_day and ist_now.hour == 9 and ist_now.minute <= 5:
         entries = [e for e in entries if e.get('timestamp','').startswith(today_str)]
-        print(f"  🔄 Daily reset — cleared old entries, keeping today's only")
+        print(f"  🔄 Daily reset — trading day confirmed, cleared old entries")
+    elif not is_trading_day:
+        print(f"  ⏸️  OI snapshot skipped — not a trading day ({today_str})")
+        return
 
     entries.insert(0, snapshot)
     entries = entries[:200]
