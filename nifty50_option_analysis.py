@@ -194,7 +194,7 @@ def fetch_volume_at_levels(technical):
         import yfinance as _yf
         print("  📦 Fetching volume at support/resistance levels...")
 
-        df = _yf.Ticker("NIFTYBEES.NS").history(interval="1h", period="30d")
+        df = _yf.Ticker("NIFTYBEES.NS").history(interval="1h", period="60d")
 
         if df is None or df.empty or len(df) < 25:
             print("  ⚠️  Insufficient NIFTYBEES 1H data")
@@ -210,7 +210,7 @@ def fetch_volume_at_levels(technical):
         # NIFTYBEES trades at ~Nifty/100, so scale levels down
         support    = technical['support']    / 100
         resistance = technical['resistance'] / 100
-        proximity  = 75 / 100  # ±0.75 on ETF scale = ±75 on Nifty scale
+        proximity  = 200 / 100  # ±2.0 on ETF scale = ±200 on Nifty scale
 
         df['vol_avg_20'] = df['Volume'].rolling(20).mean()
         df = df.dropna(subset=['vol_avg_20'])
