@@ -7,13 +7,13 @@
     "diff": 114648,
     "pcr": 0.75,
     "opt_signal": "BUY",
-    "vwap": 25531.0,
-    "fut_price": 16954.5,
-    "spot_price": 25531.0,
+    "vwap": 25532.35,
+    "fut_price": 16957.1,
+    "spot_price": 25532.35,
     "vwap_signal": "BUY",
     "nearest_level": 25625,
     "nearest_label": "R1",
-    "distance_pts": 94.0
+    "distance_pts": 92.7
   },
   {
     "time": "10:37",
