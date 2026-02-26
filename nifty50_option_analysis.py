@@ -2173,28 +2173,10 @@ class NiftyHTMLAnalyzer:
     tick();
 
     function silentRefresh() {
-        fetch(window.location.href+'?_t='+Date.now(),{cache:'no-store'})
-            .then(function(r){ return r.text(); })
-            .then(function(html){
-                var parser=new DOMParser(); var newDoc=parser.parseFromString(html,'text/html');
-                var newCont=newDoc.querySelector('.container'); var oldCont=document.querySelector('.container');
-                if(!newCont||!oldCont) return;
-                var sy=window.scrollY||window.pageYOffset;
-                var activeTab=document.querySelector('.tab-btn.active');
-                var activeTabId=activeTab?activeTab.dataset.tab:'main';
-                oldCont.innerHTML=newCont.innerHTML;
-                window.scrollTo({top:sy,behavior:'instant'});
-                switchTab(activeTabId);
-                var now=istNow(); var stamp=fmtDate(now)+'  '+fmtTime(now)+' IST';
-                var el=document.getElementById('last-updated'); if(el) el.textContent=stamp;
-                countdown=INTERVAL/1000;
-                if(activeTabId==='oi-trend') loadOILog();
-                if(activeTabId==='heatmap') {
-                    setTimeout(function(){ window.renderHeatmap && window.renderHeatmap(); }, 300);
-                }
-                setTimeout(function(){ window.renderHeatmap && window.renderHeatmap(); }, 500);
-            })
-            .catch(function(e){ console.warn('Refresh failed:',e); });
+        // Only refresh live data feeds — NO DOM rebuild, NO flicker
+        loadOILog();
+        if (typeof window.renderHeatmap === 'function') window.renderHeatmap();
+        countdown = INTERVAL / 1000;
     }
     setInterval(silentRefresh, INTERVAL);
 })();
