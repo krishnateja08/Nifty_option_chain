@@ -107,27 +107,42 @@ def fetch_heatmap_data():
                 else:
                     df = data[sym] if sym in data.columns.get_level_values(0) else None
                 if df is None or df.empty or len(df) < 2:
-    try:
-        df_fallback = yf.download(sym, period="5d", interval="1d",
-                                   auto_adjust=True, progress=False)
-        if not df_fallback.empty and len(df_fallback) >= 2:
-            df = df_fallback
-        else:
-            results.append({
-                'symbol': name, 'ticker': sym,
-                'price': 0, 'prev_close': 0,
-                'change_pct': 0, 'change_abs': 0,
-                'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
-            })
-            continue
-    except Exception:
-        results.append({
-            'symbol': name, 'ticker': sym,
-            'price': 0, 'prev_close': 0,
-            'change_pct': 0, 'change_abs': 0,
-            'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
-        })
-        continue
+                    try:
+                        df_fallback = yf.download(sym, period="5d", interval="1d",
+                                                   auto_adjust=True, progress=False)
+                        if not df_fallback.empty and len(df_fallback) >= 2:
+                            df = df_fallback
+                        else:
+                            results.append({
+                                'symbol': name, 'ticker': sym,
+                                'price': 0, 'prev_close': 0,
+                                'change_pct': 0, 'change_abs': 0,
+                                'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
+                            })
+                            continue
+                    except Exception:
+                        results.append({
+                            'symbol': name, 'ticker': sym,
+                            'price': 0, 'prev_close': 0,
+                            'change_pct': 0, 'change_abs': 0,
+                            'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
+                        })
+                        continue
+```
+
+---
+
+## Why this happened
+
+The indentation levels in this function are:
+```
+def fetch_heatmap_data():          ← 0 spaces
+    try:                           ← 4 spaces
+        for name, sym in ...:     ← 8 spaces
+            try:                  ← 12 spaces
+                if df is None...: ← 16 spaces
+                    try:          ← 20 spaces  ← THIS is where your fallback goes
+                        ...       ← 24 spaces
                 today   = df.iloc[-1]
                 prev    = df.iloc[-2]
                 price   = float(today['Close'])
