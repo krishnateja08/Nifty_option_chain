@@ -1271,7 +1271,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 #  INTRADAY OI TREND — OI LOG HELPER
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def log_oi_snapshot(option_analysis, technical):
+def log_oi_snapshot(option_analysis, technical, key_levels=None):
     if not option_analysis or not technical:
         print("  ⚠️  OI snapshot skipped — missing option_analysis or technical data")
         return
@@ -1326,18 +1326,35 @@ def log_oi_snapshot(option_analysis, technical):
 
     vwap_signal = "BUY" if spot >= vwap else "SELL"
 
+    # ── Nearest level & distance based on signal direction ──
+    nearest_level = None
+    distance_pts  = None
+    nearest_label = None
+    if key_levels:
+        if opt_signal in ("BUY", "STRONG BUY"):
+            nearest_level = key_levels.get("resistance")
+            nearest_label = "R1"
+        elif opt_signal in ("SELL", "STRONG SELL"):
+            nearest_level = key_levels.get("support")
+            nearest_label = "S1"
+        if nearest_level is not None:
+            distance_pts = round(abs(nearest_level - spot), 1)
+
     snapshot = {
-        "time":        ist_now.strftime("%H:%M"),
-        "timestamp":   ist_now.strftime("%d-%b-%Y %H:%M IST"),
-        "call_oi_chg": ce_chg,
-        "put_oi_chg":  pe_chg,
-        "diff":        diff,
-        "pcr":         pcr,
-        "opt_signal":  opt_signal,
-        "vwap":        vwap,
-        "fut_price":   fut_price,
-        "spot_price":  spot,
-        "vwap_signal": vwap_signal,
+        "time":          ist_now.strftime("%H:%M"),
+        "timestamp":     ist_now.strftime("%d-%b-%Y %H:%M IST"),
+        "call_oi_chg":   ce_chg,
+        "put_oi_chg":    pe_chg,
+        "diff":          diff,
+        "pcr":           pcr,
+        "opt_signal":    opt_signal,
+        "vwap":          vwap,
+        "fut_price":     fut_price,
+        "spot_price":    spot,
+        "vwap_signal":   vwap_signal,
+        "nearest_level": nearest_level,
+        "nearest_label": nearest_label,
+        "distance_pts":  distance_pts,
     }
 
     log_file = "oi_log.json"
@@ -1450,9 +1467,9 @@ def build_intraday_oi_tab_html():
                 <th>PCR</th>
                 <th>OPTION SIGNAL</th>
                 <th>VWAP</th>
-                <th>FUT PRICE</th>
                 <th>SPOT PRICE</th>
-                <th>VWAP SIGNAL</th>
+                <th>NEAREST LEVEL</th>
+                <th>DISTANCE</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
@@ -2253,17 +2270,18 @@ function filterByInterval(data, mins) {
         var totalCE = rows.reduce(function(a,r){ return a+(r.call_oi_chg||0); }, 0);
         var totalPE = rows.reduce(function(a,r){ return a+(r.put_oi_chg||0); }, 0);
         return {
-            time:        key + ' IST',
-            call_oi_chg: totalCE,
-            put_oi_chg:  totalPE,
-            diff:        totalPE - totalCE,
-            pcr:         last.pcr,
-            opt_signal:  last.opt_signal,
-            vwap:        last.vwap,
-            fut_price:   last.fut_price,
-            spot_price:  last.spot_price,
-            vwap_signal: last.vwap_signal,
-            _isLive:     rows[0]._isLive,
+            time:          key + ' IST',
+            call_oi_chg:   totalCE,
+            put_oi_chg:    totalPE,
+            diff:          totalPE - totalCE,
+            pcr:           last.pcr,
+            opt_signal:    last.opt_signal,
+            vwap:          last.vwap,
+            spot_price:    last.spot_price,
+            nearest_level: last.nearest_level,
+            nearest_label: last.nearest_label,
+            distance_pts:  last.distance_pts,
+            _isLive:       rows[0]._isLive,
         };
     });
 }
@@ -2318,6 +2336,18 @@ function renderOITable(data) {
             var timeCell = isLive
                 ? '<div class="oi-time-cell">' + t + '&nbsp;<span class="oi-live-ind">LIVE</span></div>'
                 : t;
+            var isBuy = (row.opt_signal||'').toUpperCase().indexOf('BUY') >= 0;
+            var isSell = (row.opt_signal||'').toUpperCase().indexOf('SELL') >= 0;
+            var nlabel = row.nearest_label || (isBuy ? 'R1' : isSell ? 'S1' : '—');
+            var nval   = row.nearest_level ? '₹' + row.nearest_level.toLocaleString('en-IN') : '—';
+            var nlevelHtml = row.nearest_level
+                ? '<span class="oi-nlevel-badge ' + (isBuy ? 'oi-nlevel-res' : 'oi-nlevel-sup') + '">'
+                  + nlabel + ' &nbsp;' + nval + '</span>'
+                : '<span style="color:rgba(176,190,197,0.3);">—</span>';
+            var distHtml = row.distance_pts != null
+                ? '<span class="oi-dist-val ' + (isBuy ? 'oi-dist-res' : 'oi-dist-sup') + '">'
+                  + (isBuy ? '+' : '-') + row.distance_pts + ' pts</span>'
+                : '<span style="color:rgba(176,190,197,0.3);">—</span>';
             newRowsHtml += '<tr class="' + (isLive ? 'oi-live-row' : '') + '" data-time="' + t + '">'
                 + '<td>' + timeCell + '</td>'
                 + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
@@ -2326,9 +2356,9 @@ function renderOITable(data) {
                 + '<td class="oi-pcr-val">'  + (row.pcr||'—') + '</td>'
                 + '<td>' + signalHtml(row.opt_signal) + '</td>'
                 + '<td class="oi-vwap-cell">'+ (row.vwap ? row.vwap.toFixed(2) : '—') + '</td>'
-                + '<td class="oi-fut-cell">' + (row.fut_price ? row.fut_price.toFixed(2) : '—') + '</td>'
                 + '<td class="oi-spot-cell">'+ (row.spot_price ? row.spot_price.toFixed(2) : '—') + '</td>'
-                + '<td>' + vsigHtml(row.vwap_signal) + '</td>'
+                + '<td>' + nlevelHtml + '</td>'
+                + '<td>' + distHtml + '</td>'
                 + '</tr>';
         } else if (idx === 0) {
             // Mark existing top row as LIVE
@@ -2702,8 +2732,14 @@ window.addEventListener('resize', function(){
         .oi-vwap-cell{{color:#93c5fd;font-weight:600;}}
         .oi-fut-cell{{color:#c4b5fd;}}
         .oi-spot-cell{{color:#e0f7fa;font-weight:700;}}
-        .oi-vsig-sell{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
-        .oi-vsig-buy{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}}
+        .oi-vsig-sell{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}
+        .oi-vsig-buy{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}
+        .oi-nlevel-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}
+        .oi-nlevel-res{background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}
+        .oi-nlevel-sup{background:rgba(0,188,212,0.12);color:#67e8f9;border:1px solid rgba(0,188,212,0.3);}
+        .oi-dist-val{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+        .oi-dist-res{background:rgba(239,68,68,0.08);color:#f87171;}
+        .oi-dist-sup{background:rgba(0,188,212,0.08);color:#22d3ee;}
         .oi-empty-state{{text-align:center;padding:60px 20px;color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
 
         .disclaimer{{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}}
@@ -2923,7 +2959,13 @@ window.addEventListener('resize', function(){
 
         # ── Log OI snapshot for Intraday OI Trend tab ─────────────────
         print("\n📊 Logging OI snapshot to oi_log.json...")
-        log_oi_snapshot(option_analysis, technical)
+        key_levels = {
+            "support":          analyzer.html_data.get("support"),
+            "resistance":       analyzer.html_data.get("resistance"),
+            "strong_support":   analyzer.html_data.get("strong_support"),
+            "strong_resistance":analyzer.html_data.get("strong_resistance"),
+        }
+        log_oi_snapshot(option_analysis, technical, key_levels=key_levels)
 
         return option_analysis
 
