@@ -128,13 +128,7 @@ def fetch_heatmap_data():
                             'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
                         })
                         continue
-def fetch_heatmap_data():  
-    try:                   
-        for name, sym in ...:  
-            try:               
-                if df is None...: 
-                    try:         
-                        ...      
+   
                 today   = df.iloc[-1]
                 prev    = df.iloc[-2]
                 price   = float(today['Close'])
