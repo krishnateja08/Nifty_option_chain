@@ -1489,6 +1489,7 @@ def build_intraday_oi_tab_html():
           <canvas id="oiSparklineCanvas" style="width:100%;height:110px;display:block;"></canvas>
         </div>
         <div class="oi-table-wrap">
+          <div class="oi-table-scroll-hint">&#8596; Scroll to see all columns</div>
           <table class="oi-table">
             <thead>
               <tr>
@@ -2095,31 +2096,47 @@ class NiftyHTMLAnalyzer:
         )
 
     def _key_levels_visual_section(self, d, _pct_cp, _pts_to_res, _pts_to_sup, _mp_node):
+        mp_row = f'<tr><td style="color:#ffb74d;">&#127919; Max Pain</td><td style="color:#ffb74d;">&#8377;{d["max_pain"]:,}</td></tr>' if d['has_option_data'] else ''
         return f"""
     <div class="section">
         <div class="section-title"><span>&#128202;</span> KEY LEVELS</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-            <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">&#9668; SUPPORT ZONE</span>
-            <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE &#9658;</span>
+
+        <!-- Desktop/Tablet: visual bar (hidden on mobile <520px) -->
+        <div class="kl-bar-section">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                <span style="font-size:11px;color:#26c6da;font-weight:700;letter-spacing:1px;">&#9668; SUPPORT ZONE</span>
+                <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE &#9658;</span>
+            </div>
+            <div style="position:relative;height:62px;">
+                <div class="rl-node-a" style="left:3%;"><div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div><div class="rl-val" style="color:#26c6da;">&#8377;{d['strong_support']:,.0f}</div><div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div></div>
+                <div class="rl-node-a" style="left:22%;"><div class="rl-lbl" style="color:#00bcd4;">Support</div><div class="rl-val" style="color:#00bcd4;">&#8377;{d['support']:,.0f}</div><div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div></div>
+                <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;box-shadow:0 0 16px rgba(79,195,247,0.7);">&#9660; NOW &nbsp;&#8377;{d['current_price']:,.0f}</div>
+                <div class="rl-node-a" style="left:75%;"><div class="rl-lbl" style="color:#ff7043;">Resistance</div><div class="rl-val" style="color:#ff7043;">&#8377;{d['resistance']:,.0f}</div><div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div></div>
+                <div class="rl-node-a" style="left:95%;"><div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div><div class="rl-val" style="color:#f44336;">&#8377;{d['strong_resistance']:,.0f}</div><div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div></div>
+            </div>
+            <div style="position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);box-shadow:0 2px 14px rgba(0,0,0,0.5);">
+                <div style="position:absolute;left:{_pct_cp}%;top:50%;transform:translate(-50%,-50%);width:4px;height:22px;background:#fff;border-radius:2px;box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
+            </div>
+            <div style="position:relative;height:58px;">{_mp_node}</div>
         </div>
-        <div style="position:relative;height:62px;">
-            <div class="rl-node-a" style="left:3%;"><div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div><div class="rl-val" style="color:#26c6da;">&#8377;{d['strong_support']:,.0f}</div><div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div></div>
-            <div class="rl-node-a" style="left:22%;"><div class="rl-lbl" style="color:#00bcd4;">Support</div><div class="rl-val" style="color:#00bcd4;">&#8377;{d['support']:,.0f}</div><div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div></div>
-            <div style="position:absolute;left:{_pct_cp}%;transform:translateX(-50%);bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;box-shadow:0 0 16px rgba(79,195,247,0.7);">&#9660; NOW &nbsp;&#8377;{d['current_price']:,.0f}</div>
-            <div class="rl-node-a" style="left:75%;"><div class="rl-lbl" style="color:#ff7043;">Resistance</div><div class="rl-val" style="color:#ff7043;">&#8377;{d['resistance']:,.0f}</div><div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div></div>
-            <div class="rl-node-a" style="left:95%;"><div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div><div class="rl-val" style="color:#f44336;">&#8377;{d['strong_resistance']:,.0f}</div><div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div></div>
-        </div>
-        <div style="position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);box-shadow:0 2px 14px rgba(0,0,0,0.5);">
-            <div style="position:absolute;left:{_pct_cp}%;top:50%;transform:translate(-50%,-50%);width:4px;height:22px;background:#fff;border-radius:2px;box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
-        </div>
-        <div style="position:relative;height:58px;">{_mp_node}</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
-            <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:12px;color:#b0bec5;">&#128205; Distance to Resistance</span>
+
+        <!-- Mobile: compact table (shown only on <520px) -->
+        <table class="kl-mobile-table">
+            <tr><td style="color:#26c6da;">&#9660; Strong Support</td><td style="color:#26c6da;">&#8377;{d['strong_support']:,.0f}</td></tr>
+            <tr><td style="color:#00bcd4;">&#9660; Support (S1)</td><td style="color:#00bcd4;">&#8377;{d['support']:,.0f}</td></tr>
+            <tr><td style="color:#4fc3f7;font-weight:700;">&#9654; NOW</td><td style="color:#4fc3f7;font-weight:700;">&#8377;{d['current_price']:,.0f}</td></tr>
+            {mp_row}
+            <tr><td style="color:#ff7043;">&#9650; Resistance (R1)</td><td style="color:#ff7043;">&#8377;{d['resistance']:,.0f}</td></tr>
+            <tr><td style="color:#f44336;">&#9650; Strong Resistance</td><td style="color:#f44336;">&#8377;{d['strong_resistance']:,.0f}</td></tr>
+        </table>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
+            <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
+                <span style="font-size:12px;color:#b0bec5;">&#128205; To Resistance</span>
                 <span style="font-size:15px;font-weight:700;color:#f44336;">+{_pts_to_res:,} pts</span>
             </div>
-            <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:12px;color:#b0bec5;">&#128205; Distance to Support</span>
+            <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
+                <span style="font-size:12px;color:#b0bec5;">&#128205; To Support</span>
                 <span style="font-size:15px;font-weight:700;color:#00bcd4;">\u2212{_pts_to_sup:,} pts</span>
             </div>
         </div>
@@ -2597,8 +2614,17 @@ window.addEventListener('resize', function(){
         .rl-node-a{{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}}
         .rl-node-b{{position:absolute;top:0;transform:translateX(-50%);text-align:center;}}
         .rl-dot{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}}
-        .rl-lbl{{font-size:clamp(8px,1.2vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:0.6px;line-height:1.4;white-space:nowrap;color:#b0bec5;}}
-        .rl-val{{font-size:clamp(10px,1.5vw,13px);font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}}
+        .rl-lbl{{font-size:clamp(7px,1vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;line-height:1.3;white-space:nowrap;color:#b0bec5;}}
+        .rl-val{{font-size:clamp(9px,1.3vw,13px);font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}}
+        /* Mobile key levels: hide absolute labels, show compact table instead */
+        .kl-mobile-table{{display:none;width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px;margin-top:10px;}}
+        .kl-mobile-table td{{padding:6px 10px;border-bottom:1px solid rgba(79,195,247,0.08);}}
+        .kl-mobile-table td:last-child{{text-align:right;font-weight:700;}}
+        .kl-bar-section{{display:block;}}
+        @media(max-width:520px){{
+            .kl-bar-section{{display:none;}}
+            .kl-mobile-table{{display:table;}}
+        }}
 
         .pf-live-badge{{display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:1px;}}
         .pf-live{{background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
@@ -2743,8 +2769,9 @@ window.addEventListener('resize', function(){
         .oi-sum-val{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,2.5vw,22px);font-weight:700;line-height:1;}}
         .oi-chart-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;padding:16px;margin-bottom:20px;}}
         .oi-chart-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;}}
-        .oi-table-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;overflow:hidden;}}
-        .oi-table{{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}}
+        .oi-table-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}}
+        .oi-table{{width:100%;min-width:780px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}}
+        .oi-table-scroll-hint{{display:none;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(79,195,247,0.4);padding:6px 14px 0;text-transform:uppercase;}}
         .oi-table thead th{{padding:11px 14px;font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.45);text-transform:uppercase;font-weight:700;text-align:right;border-bottom:1px solid rgba(79,195,247,0.15);background:rgba(79,195,247,0.05);white-space:nowrap;}}
         .oi-table thead th:first-child{{text-align:left;}}
         .oi-table tbody tr{{border-bottom:1px solid rgba(79,195,247,0.06);transition:background 0.15s ease;}}
@@ -2792,11 +2819,18 @@ window.addEventListener('resize', function(){
             .input-summary-grid{{grid-template-columns:repeat(3,minmax(0,1fr));}}
             .oi-summary-strip{{grid-template-columns:repeat(2,minmax(0,1fr));}}
         }}
+        @media(max-width:768px){{
+            .snap-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
+            .logic-grid{{grid-template-columns:1fr;}}
+            .strat-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
+            .nc-cards-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
+            .pf-grid{{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}}
+            .input-summary-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
+            .signal-grid{{grid-template-columns:1fr;}}
+        }}
         @media(max-width:600px){{
             .grid-5,.grid-4{{grid-template-columns:minmax(0,1fr);}}
             .snap-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
-            .logic-grid{{grid-template-columns:1fr;}}
-            .pf-grid{{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}}
             .nc-cards-grid{{grid-template-columns:minmax(0,1fr);}}
             .nc-section-header{{flex-direction:column;align-items:flex-start;}}
             .nc-atm-badge{{align-self:flex-end;}}
@@ -2816,13 +2850,12 @@ window.addEventListener('resize', function(){
             .sb-item:nth-child(odd){{border-right:1px solid rgba(79,195,247,0.08);}}
             .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){{border-bottom:none;}}
             .pf-date-range{{display:none;}}
-            .signal-grid{{grid-template-columns:1fr;}}
             .strat-grid{{grid-template-columns:1fr;}}
-            .input-summary-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .score-meter{{flex-direction:column;}}
             .oi-summary-strip{{grid-template-columns:1fr 1fr;}}
-            .oi-table thead th,.oi-table tbody td{{padding:8px 8px;font-size:10px;}}
+            .oi-table thead th,.oi-table tbody td{{padding:6px 6px;font-size:9px;}}
             .oi-int-btn{{padding:8px 14px;font-size:10px;}}
+            .oi-table-scroll-hint{{display:flex;}}
         }}
         @media(max-width:400px){{
             .snap-grid{{grid-template-columns:minmax(0,1fr);}}
