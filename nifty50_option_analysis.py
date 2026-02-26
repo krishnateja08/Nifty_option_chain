@@ -46,87 +46,44 @@ NSE_FO_HOLIDAYS = {
 # ═══════════════════════════════════════════════════════════════════════════════
 
 NIFTY50_SYMBOLS = [
-    # ── Ordered by Nifty 50 weightage: DESCENDING (highest % → lowest %) ──
-    # Source: NSE Feb 2026
-    ("RELIANCE",  "RELIANCE.NS"),   # 9.49%
-    ("HDFCBANK",  "HDFCBANK.NS"),   # 6.87%
-    ("BHARTIARTL","BHARTIARTL.NS"), # 5.80%
-    ("SBIN",      "SBIN.NS"),       # 5.54%
-    ("ICICIBANK", "ICICIBANK.NS"),  # 4.86%
-    ("TCS",       "TCS.NS"),        # 4.57%
-    ("BAJFINANCE","BAJFINANCE.NS"), # 3.12%
-    ("LT",        "LT.NS"),         # 2.87%
-    ("HINDUNILVR","HINDUNILVR.NS"), # 2.72%
-    ("INFY",      "INFY.NS"),       # 2.54%
-    ("MARUTI",    "MARUTI.NS"),     # 2.30%
-    ("AXISBANK",  "AXISBANK.NS"),   # 2.11%
-    ("M&M",       "M&M.NS"),        # 2.09%
-    ("KOTAKBANK", "KOTAKBANK.NS"),  # 2.08%
-    ("SUNPHARMA", "SUNPHARMA.NS"),  # 2.04%
-    ("ITC",       "ITC.NS"),        # 1.99%
-    ("ULTRACEMCO","ULTRACEMCO.NS"), # 1.87%
-    ("TITAN",     "TITAN.NS"),      # 1.87%
-    ("NTPC",      "NTPC.NS"),       # 1.82%
-    ("HCLTECH",   "HCLTECH.NS"),    # 1.78%
-    ("ADANIPORTS","ADANIPORTS.NS"), # 1.76%
-    ("ONGC",      "ONGC.NS"),       # 1.71%
-    ("BAJAJFINSV","BAJAJFINSV.NS"), # 1.61%
-    ("BEL",       "BEL.NS"),        # 1.56%
-    ("JSWSTEEL",  "JSWSTEEL.NS"),   # 1.50%
-    ("POWERGRID", "POWERGRID.NS"),  # 1.39%
-    ("BAJAJ-AUTO","BAJAJ-AUTO.NS"), # 1.35%
-    ("COALINDIA", "COALINDIA.NS"),  # 1.30%
-    ("TATASTEEL", "TATASTEEL.NS"),  # 1.28%
-    ("NESTLEIND", "NESTLEIND.NS"),  # 1.25%
-    ("ETERNAL",   "ETERNAL.NS"),    # 1.20% (Zomato)
-    ("ASIANPAINT","ASIANPAINT.NS"), # 1.13%
-    ("EICHERMOT", "EICHERMOT.NS"),  # 1.07%
-    ("WIPRO",     "WIPRO.NS"),      # 1.03%
-    ("SBILIFE",   "SBILIFE.NS"),    # 1.02%
-    ("HINDALCO",  "HINDALCO.NS"),   # 1.02%
-    ("SHRIRAMFIN","SHRIRAMFIN.NS"), # 0.98%
-    ("GRASIM",    "GRASIM.NS"),     # 0.96%
-    ("INDIGO",    "INDIGO.NS"),     # 0.92%
-    ("JIOFIN",    "JIOFIN.NS"),     # 0.80%
-    ("HDFCLIFE",  "HDFCLIFE.NS"),   # 0.78%
-    ("TRENT",     "TRENT.NS"),      # 0.69%
-    ("TATAMOTORS","TMCV.NS"),       # 0.68% (CV)
-    ("TATAMOTORS","TMPV.NS"),       # 0.68% (PV)
-    ("TECHM",     "TECHM.NS"),      # 0.65%
-    ("TATACONSUM","TATACONSUM.NS"), # 0.57%
-    ("APOLLOHOSP","APOLLOHOSP.NS"), # 0.54%
-    ("DRREDDY",   "DRREDDY.NS"),    # 0.53%
-    ("CIPLA",     "CIPLA.NS"),      # 0.53%
-    ("MAXHEALTH", "MAXHEALTH.NS"),  # 0.52%
-    ("HEROMOTOCO","HEROMOTOCO.NS"), # 0.47%
+    ("ADANIPORTS", "ADANIPORTS.NS"), ("APOLLOHOSP", "APOLLOHOSP.NS"),
+    ("ASIANPAINT", "ASIANPAINT.NS"), ("AXISBANK",   "AXISBANK.NS"),
+    ("BAJAJ-AUTO","BAJAJ-AUTO.NS"),  ("BAJAJFINSV", "BAJAJFINSV.NS"),
+    ("BAJFINANCE","BAJFINANCE.NS"),  ("BEL",        "BEL.NS"),
+    ("BHARTIARTL","BHARTIARTL.NS"), ("CIPLA",       "CIPLA.NS"),
+    ("COALINDIA", "COALINDIA.NS"),  ("DRREDDY",     "DRREDDY.NS"),
+    ("EICHERMOT", "EICHERMOT.NS"),  ("ETERNAL",     "ETERNAL.NS"),
+    ("GRASIM",    "GRASIM.NS"),     ("HCLTECH",     "HCLTECH.NS"),
+    ("HDFCBANK",  "HDFCBANK.NS"),   ("HDFCLIFE",    "HDFCLIFE.NS"),
+    ("HEROMOTOCO","HEROMOTOCO.NS"), ("HINDALCO",    "HINDALCO.NS"),
+    ("HINDUNILVR","HINDUNILVR.NS"), ("ICICIBANK",   "ICICIBANK.NS"),
+    ("INDIGO",    "INDIGO.NS"),     ("INFY",        "INFY.NS"),
+    ("ITC",       "ITC.NS"),        ("JIOFIN",      "JIOFIN.NS"),
+    ("JSWSTEEL",  "JSWSTEEL.NS"),   ("KOTAKBANK",   "KOTAKBANK.NS"),
+    ("LT",        "LT.NS"),         ("M&M",         "M&M.NS"),
+    ("MARUTI",    "MARUTI.NS"),     ("MAXHEALTH",   "MAXHEALTH.NS"),
+    ("NESTLEIND", "NESTLEIND.NS"),  ("NTPC",        "NTPC.NS"),
+    ("ONGC",      "ONGC.NS"),       ("POWERGRID",   "POWERGRID.NS"),
+    ("RELIANCE",  "RELIANCE.NS"),   ("SBILIFE",     "SBILIFE.NS"),
+    ("SBIN",      "SBIN.NS"),       ("SHRIRAMFIN",  "SHRIRAMFIN.NS"),
+    ("SUNPHARMA", "SUNPHARMA.NS"),  ("TATAMOTORS",  "TMCV.NS"),
+    ("TATAMOTORS",  "TMPV.NS"),
+    ("TATACONSUM","TATACONSUM.NS"), ("TATASTEEL",   "TATASTEEL.NS"),
+    ("TCS",       "TCS.NS"),        ("TECHM",       "TECHM.NS"),
+    ("TITAN",     "TITAN.NS"),      ("TRENT",       "TRENT.NS"),
+    ("ULTRACEMCO","ULTRACEMCO.NS"), ("WIPRO",       "WIPRO.NS"),
 ]
 
-# High-weightage stocks — Top 10 by actual NSE weight (Feb 2026)
+# High-weightage stocks (top 15 by approximate Nifty weight)
 HIGH_WEIGHTAGE = {
-    "RELIANCE",   # 9.49%
-    "HDFCBANK",   # 6.87%
-    "BHARTIARTL", # 5.80%
-    "SBIN",       # 5.54%
-    "ICICIBANK",  # 4.86%
-    "TCS",        # 4.57%
-    "BAJFINANCE", # 3.12%
-    "LT",         # 2.87%
-    "HINDUNILVR", # 2.72%
-    "INFY",       # 2.54%
+    "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
+    "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN"
 }
 
-# Display order for High Weightage Movers table (descending by weight)
+# Fixed display order by Nifty index weight
 HIGH_WEIGHTAGE_ORDER = [
-    "RELIANCE",   # 9.49%
-    "HDFCBANK",   # 6.87%
-    "BHARTIARTL", # 5.80%
-    "SBIN",       # 5.54%
-    "ICICIBANK",  # 4.86%
-    "TCS",        # 4.57%
-    "BAJFINANCE", # 3.12%
-    "LT",         # 2.87%
-    "HINDUNILVR", # 2.72%
-    "INFY",       # 2.54%
+    "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
+    "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN"
 ]
 
 def fetch_heatmap_data():
@@ -1370,18 +1327,50 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
     vwap_signal = "BUY" if spot >= vwap else "SELL"
 
     # ── Nearest level & distance based on signal direction ──
+    # SELL: target is S1 if spot > S1 (not yet reached), else switch to S2 (already broke S1)
+    # BUY:  target is R1 if spot < R1 (not yet reached), else switch to R2 (already broke R1)
+    # Distance is always stored as a POSITIVE number (how far to next target)
     nearest_level = None
     distance_pts  = None
     nearest_label = None
     if key_levels:
-        if opt_signal in ("BUY", "STRONG BUY"):
-            nearest_level = key_levels.get("resistance")
-            nearest_label = "R1"
-        elif opt_signal in ("SELL", "STRONG SELL"):
-            nearest_level = key_levels.get("support")
-            nearest_label = "S1"
-        if nearest_level is not None:
-            distance_pts = round(abs(nearest_level - spot), 1)
+        if opt_signal in ("SELL", "STRONG SELL"):
+            s1 = key_levels.get("support")
+            s2 = key_levels.get("strong_support")
+            if s1 is not None and spot > s1:
+                # Spot still above S1 — S1 is the next downside target
+                nearest_level = s1
+                nearest_label = "S1"
+                distance_pts  = round(spot - s1, 1)          # positive: how far to fall
+            elif s2 is not None:
+                # Spot has crossed/touched S1 — next target is S2
+                nearest_level = s2
+                nearest_label = "S2"
+                distance_pts  = round(max(spot - s2, 0), 1)  # positive: how far to S2
+            elif s1 is not None:
+                # No S2 available, fallback to S1
+                nearest_level = s1
+                nearest_label = "S1"
+                distance_pts  = round(abs(spot - s1), 1)
+
+        elif opt_signal in ("BUY", "STRONG BUY"):
+            r1 = key_levels.get("resistance")
+            r2 = key_levels.get("strong_resistance")
+            if r1 is not None and spot < r1:
+                # Spot still below R1 — R1 is the next upside target
+                nearest_level = r1
+                nearest_label = "R1"
+                distance_pts  = round(r1 - spot, 1)          # positive: how far to rise
+            elif r2 is not None:
+                # Spot has crossed/touched R1 — next target is R2
+                nearest_level = r2
+                nearest_label = "R2"
+                distance_pts  = round(max(r2 - spot, 0), 1)  # positive: how far to R2
+            elif r1 is not None:
+                # No R2 available, fallback to R1
+                nearest_level = r1
+                nearest_label = "R1"
+                distance_pts  = round(abs(r1 - spot), 1)
 
     snapshot = {
         "time":          ist_now.strftime("%H:%M"),
@@ -2389,7 +2378,11 @@ function renderOITable(data) {
                 : '<span style="color:rgba(176,190,197,0.3);">—</span>';
             var distHtml = row.distance_pts != null
                 ? '<span class="oi-dist-val ' + (isBuy ? 'oi-dist-res' : 'oi-dist-sup') + '">'
-                  + (isBuy ? '+' : '-') + row.distance_pts + ' pts</span>'
+                  + (isBuy ? '+' : '-') + Math.abs(row.distance_pts) + ' pts'
+                  + (row.nearest_label === 'S2' || row.nearest_label === 'R2'
+                      ? ' <span style="font-size:8px;opacity:0.6;">(to ' + (row.nearest_label||'') + ')</span>'
+                      : '')
+                  + '</span>'
                 : '<span style="color:rgba(176,190,197,0.3);">—</span>';
             newRowsHtml += '<tr class="' + (isLive ? 'oi-live-row' : '') + '" data-time="' + t + '">'
                 + '<td>' + timeCell + '</td>'
