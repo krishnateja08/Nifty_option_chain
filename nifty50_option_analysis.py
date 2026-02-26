@@ -1499,14 +1499,13 @@ def build_intraday_oi_tab_html():
                 <th>DIFF</th>
                 <th>PCR</th>
                 <th>OPTION SIGNAL</th>
-                <th>VWAP</th>
                 <th>SPOT PRICE</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
-              <tr><td colspan="10" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
+              <tr><td colspan="9" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
             </tbody>
           </table>
         </div>
@@ -2339,7 +2338,7 @@ function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
     if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="oi-empty-state">&#128218; No data yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="oi-empty-state">&#128218; No data yet.</td></tr>';
         return;
     }
     var filtered = filterByInterval(data, _oiInterval);
@@ -2408,7 +2407,6 @@ function renderOITable(data) {
                 + '<td class="' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
                 + '<td class="oi-pcr-val">'  + (row.pcr||'—') + '</td>'
                 + '<td>' + signalHtml(row.opt_signal) + '</td>'
-                + '<td class="oi-vwap-cell">'+ (row.vwap ? row.vwap.toFixed(2) : '—') + '</td>'
                 + '<td class="oi-spot-cell">'+ (row.spot_price ? row.spot_price.toFixed(2) : '—') + '</td>'
                 + '<td>' + nlevelHtml + '</td>'
                 + '<td>' + distHtml + '</td>'
@@ -2490,7 +2488,7 @@ function loadOILog() {
         })
         .catch(function(e) {
             var tbody = document.getElementById('oiTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="10" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
         });
 }
 
