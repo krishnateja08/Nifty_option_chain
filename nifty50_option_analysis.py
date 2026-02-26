@@ -46,44 +46,87 @@ NSE_FO_HOLIDAYS = {
 # ═══════════════════════════════════════════════════════════════════════════════
 
 NIFTY50_SYMBOLS = [
-    ("ADANIPORTS", "ADANIPORTS.NS"), ("APOLLOHOSP", "APOLLOHOSP.NS"),
-    ("ASIANPAINT", "ASIANPAINT.NS"), ("AXISBANK",   "AXISBANK.NS"),
-    ("BAJAJ-AUTO","BAJAJ-AUTO.NS"),  ("BAJAJFINSV", "BAJAJFINSV.NS"),
-    ("BAJFINANCE","BAJFINANCE.NS"),  ("BEL",        "BEL.NS"),
-    ("BHARTIARTL","BHARTIARTL.NS"), ("CIPLA",       "CIPLA.NS"),
-    ("COALINDIA", "COALINDIA.NS"),  ("DRREDDY",     "DRREDDY.NS"),
-    ("EICHERMOT", "EICHERMOT.NS"),  ("ETERNAL",     "ETERNAL.NS"),
-    ("GRASIM",    "GRASIM.NS"),     ("HCLTECH",     "HCLTECH.NS"),
-    ("HDFCBANK",  "HDFCBANK.NS"),   ("HDFCLIFE",    "HDFCLIFE.NS"),
-    ("HEROMOTOCO","HEROMOTOCO.NS"), ("HINDALCO",    "HINDALCO.NS"),
-    ("HINDUNILVR","HINDUNILVR.NS"), ("ICICIBANK",   "ICICIBANK.NS"),
-    ("INDIGO",    "INDIGO.NS"),     ("INFY",        "INFY.NS"),
-    ("ITC",       "ITC.NS"),        ("JIOFIN",      "JIOFIN.NS"),
-    ("JSWSTEEL",  "JSWSTEEL.NS"),   ("KOTAKBANK",   "KOTAKBANK.NS"),
-    ("LT",        "LT.NS"),         ("M&M",         "M&M.NS"),
-    ("MARUTI",    "MARUTI.NS"),     ("MAXHEALTH",   "MAXHEALTH.NS"),
-    ("NESTLEIND", "NESTLEIND.NS"),  ("NTPC",        "NTPC.NS"),
-    ("ONGC",      "ONGC.NS"),       ("POWERGRID",   "POWERGRID.NS"),
-    ("RELIANCE",  "RELIANCE.NS"),   ("SBILIFE",     "SBILIFE.NS"),
-    ("SBIN",      "SBIN.NS"),       ("SHRIRAMFIN",  "SHRIRAMFIN.NS"),
-    ("SUNPHARMA", "SUNPHARMA.NS"),  ("TATAMOTORS",  "TMCV.NS"),
-    ("TATAMOTORS",  "TMPV.NS"),
-    ("TATACONSUM","TATACONSUM.NS"), ("TATASTEEL",   "TATASTEEL.NS"),
-    ("TCS",       "TCS.NS"),        ("TECHM",       "TECHM.NS"),
-    ("TITAN",     "TITAN.NS"),      ("TRENT",       "TRENT.NS"),
-    ("ULTRACEMCO","ULTRACEMCO.NS"), ("WIPRO",       "WIPRO.NS"),
+    # ── Ordered by Nifty 50 weightage: DESCENDING (highest % → lowest %) ──
+    # Source: NSE Feb 2026
+    ("RELIANCE",  "RELIANCE.NS"),   # 9.49%
+    ("HDFCBANK",  "HDFCBANK.NS"),   # 6.87%
+    ("BHARTIARTL","BHARTIARTL.NS"), # 5.80%
+    ("SBIN",      "SBIN.NS"),       # 5.54%
+    ("ICICIBANK", "ICICIBANK.NS"),  # 4.86%
+    ("TCS",       "TCS.NS"),        # 4.57%
+    ("BAJFINANCE","BAJFINANCE.NS"), # 3.12%
+    ("LT",        "LT.NS"),         # 2.87%
+    ("HINDUNILVR","HINDUNILVR.NS"), # 2.72%
+    ("INFY",      "INFY.NS"),       # 2.54%
+    ("MARUTI",    "MARUTI.NS"),     # 2.30%
+    ("AXISBANK",  "AXISBANK.NS"),   # 2.11%
+    ("M&M",       "M&M.NS"),        # 2.09%
+    ("KOTAKBANK", "KOTAKBANK.NS"),  # 2.08%
+    ("SUNPHARMA", "SUNPHARMA.NS"),  # 2.04%
+    ("ITC",       "ITC.NS"),        # 1.99%
+    ("ULTRACEMCO","ULTRACEMCO.NS"), # 1.87%
+    ("TITAN",     "TITAN.NS"),      # 1.87%
+    ("NTPC",      "NTPC.NS"),       # 1.82%
+    ("HCLTECH",   "HCLTECH.NS"),    # 1.78%
+    ("ADANIPORTS","ADANIPORTS.NS"), # 1.76%
+    ("ONGC",      "ONGC.NS"),       # 1.71%
+    ("BAJAJFINSV","BAJAJFINSV.NS"), # 1.61%
+    ("BEL",       "BEL.NS"),        # 1.56%
+    ("JSWSTEEL",  "JSWSTEEL.NS"),   # 1.50%
+    ("POWERGRID", "POWERGRID.NS"),  # 1.39%
+    ("BAJAJ-AUTO","BAJAJ-AUTO.NS"), # 1.35%
+    ("COALINDIA", "COALINDIA.NS"),  # 1.30%
+    ("TATASTEEL", "TATASTEEL.NS"),  # 1.28%
+    ("NESTLEIND", "NESTLEIND.NS"),  # 1.25%
+    ("ETERNAL",   "ETERNAL.NS"),    # 1.20% (Zomato)
+    ("ASIANPAINT","ASIANPAINT.NS"), # 1.13%
+    ("EICHERMOT", "EICHERMOT.NS"),  # 1.07%
+    ("WIPRO",     "WIPRO.NS"),      # 1.03%
+    ("SBILIFE",   "SBILIFE.NS"),    # 1.02%
+    ("HINDALCO",  "HINDALCO.NS"),   # 1.02%
+    ("SHRIRAMFIN","SHRIRAMFIN.NS"), # 0.98%
+    ("GRASIM",    "GRASIM.NS"),     # 0.96%
+    ("INDIGO",    "INDIGO.NS"),     # 0.92%
+    ("JIOFIN",    "JIOFIN.NS"),     # 0.80%
+    ("HDFCLIFE",  "HDFCLIFE.NS"),   # 0.78%
+    ("TRENT",     "TRENT.NS"),      # 0.69%
+    ("TATAMOTORS","TMCV.NS"),       # 0.68% (CV)
+    ("TATAMOTORS","TMPV.NS"),       # 0.68% (PV)
+    ("TECHM",     "TECHM.NS"),      # 0.65%
+    ("TATACONSUM","TATACONSUM.NS"), # 0.57%
+    ("APOLLOHOSP","APOLLOHOSP.NS"), # 0.54%
+    ("DRREDDY",   "DRREDDY.NS"),    # 0.53%
+    ("CIPLA",     "CIPLA.NS"),      # 0.53%
+    ("MAXHEALTH", "MAXHEALTH.NS"),  # 0.52%
+    ("HEROMOTOCO","HEROMOTOCO.NS"), # 0.47%
 ]
 
-# High-weightage stocks (top 15 by approximate Nifty weight)
+# High-weightage stocks — Top 10 by actual NSE weight (Feb 2026)
 HIGH_WEIGHTAGE = {
-    "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
-    "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN"
+    "RELIANCE",   # 9.49%
+    "HDFCBANK",   # 6.87%
+    "BHARTIARTL", # 5.80%
+    "SBIN",       # 5.54%
+    "ICICIBANK",  # 4.86%
+    "TCS",        # 4.57%
+    "BAJFINANCE", # 3.12%
+    "LT",         # 2.87%
+    "HINDUNILVR", # 2.72%
+    "INFY",       # 2.54%
 }
 
-# Fixed display order by Nifty index weight
+# Display order for High Weightage Movers table (descending by weight)
 HIGH_WEIGHTAGE_ORDER = [
-    "RELIANCE", "HDFCBANK", "ICICIBANK", "INFY", "TCS",
-    "BHARTIARTL", "LT", "AXISBANK", "KOTAKBANK", "SBIN"
+    "RELIANCE",   # 9.49%
+    "HDFCBANK",   # 6.87%
+    "BHARTIARTL", # 5.80%
+    "SBIN",       # 5.54%
+    "ICICIBANK",  # 4.86%
+    "TCS",        # 4.57%
+    "BAJFINANCE", # 3.12%
+    "LT",         # 2.87%
+    "HINDUNILVR", # 2.72%
+    "INFY",       # 2.54%
 ]
 
 def fetch_heatmap_data():
@@ -3001,4 +3044,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
