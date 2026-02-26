@@ -95,8 +95,8 @@ def fetch_heatmap_data():
     results = []
     tickers_str = " ".join([sym for _, sym in NIFTY50_SYMBOLS])
     try:
-        data = yf.download(tickers_str, period="2d", interval="1d",
-                           group_by="ticker", auto_adjust=True, progress=False)
+        data = yf.download(tickers_str, period="5d", interval="1d",
+                   group_by="ticker", auto_adjust=True, progress=False)
         ist_tz = pytz.timezone('Asia/Kolkata')
         timestamp = datetime.now(ist_tz).strftime('%d-%b-%Y %H:%M IST')
 
@@ -107,13 +107,28 @@ def fetch_heatmap_data():
                 else:
                     df = data[sym] if sym in data.columns.get_level_values(0) else None
                 if df is None or df.empty or len(df) < 2:
-                    results.append({
-                        'symbol': name, 'ticker': sym,
-                        'price': 0, 'prev_close': 0,
-                        'change_pct': 0, 'change_abs': 0,
-                        'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
-                    })
-                    continue
+                    try:
+                        df_fallback = yf.download(sym, period="5d", interval="1d",
+                                                   auto_adjust=True, progress=False)
+                        if not df_fallback.empty and len(df_fallback) >= 2:
+                            df = df_fallback
+                        else:
+                            results.append({
+                                'symbol': name, 'ticker': sym,
+                                'price': 0, 'prev_close': 0,
+                                'change_pct': 0, 'change_abs': 0,
+                                'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
+                            })
+                            continue
+                    except Exception:
+                        results.append({
+                            'symbol': name, 'ticker': sym,
+                            'price': 0, 'prev_close': 0,
+                            'change_pct': 0, 'change_abs': 0,
+                            'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
+                        })
+                        continue
+   
                 today   = df.iloc[-1]
                 prev    = df.iloc[-2]
                 price   = float(today['Close'])
@@ -445,12 +460,20 @@ def get_heatmap_javascript():
     }
 
     function renderHeatmap() {
-        var el = document.getElementById('hmDataScript');
-        var grid = document.getElementById('hmGrid');
-        if (!el || !grid) return;
-        var data;
-        try { data = JSON.parse(el.textContent || el.innerHTML); }
-        catch(e) { console.warn('HM parse error:', e); return; }
+    var el = document.getElementById('hmDataScript');
+    var grid = document.getElementById('hmGrid');
+    if (!el || !grid) {
+        console.warn('HM: elements missing after refresh');
+        return;
+    }
+    var rawText = el.textContent || el.innerHTML || el.innerText || '';
+    if (!rawText || rawText.trim() === '') {
+        console.warn('HM: empty data script');
+        return;
+    }
+    var data;
+    try { data = JSON.parse(rawText); }
+    catch(e) { console.warn('HM parse error:', e); return; }
 
         var html = '';
         data.forEach(function(s) {
@@ -600,12 +623,13 @@ def get_heatmap_javascript():
     window.renderHeatmap = renderHeatmap;
 
     window.addEventListener('load', function() {
-        renderHeatmap();
-        // Draw OI chart using same oi_log.json loaded by main tab
-        setTimeout(function() {
-            if (window._oiData && window._oiData.length) drawHMOIChart(window._oiData);
-        }, 800);
-    });
+    setTimeout(renderHeatmap, 100);
+    setTimeout(renderHeatmap, 500);
+    setTimeout(renderHeatmap, 1500);
+    setTimeout(function() {
+        if (window._oiData && window._oiData.length) drawHMOIChart(window._oiData);
+    }, 800);
+});
 
     // Hook into loadOILog to also refresh OI chart
     var _origRenderOI = window.renderOITable;
@@ -629,12 +653,14 @@ def get_heatmap_javascript():
 
     // Run OI chart draw periodically
     setInterval(function() {
-        patchedLoadOILog();
-        renderHeatmap();
-    }, 30000);
+    patchedLoadOILog();
+    renderHeatmap();
+}, 30000);
 
-    // Initial draw
-    setTimeout(patchedLoadOILog, 1200);
+// Initial draw
+setTimeout(patchedLoadOILog, 1200);
+setTimeout(renderHeatmap, 800);
+setTimeout(renderHeatmap, 2000);
 })();
 """
 
@@ -2152,7 +2178,10 @@ class NiftyHTMLAnalyzer:
                 var el=document.getElementById('last-updated'); if(el) el.textContent=stamp;
                 countdown=INTERVAL/1000;
                 if(activeTabId==='oi-trend') loadOILog();
-                if(activeTabId==='heatmap') { window.renderHeatmap && window.renderHeatmap(); }
+                if(activeTabId==='heatmap') {
+                    setTimeout(function(){ window.renderHeatmap && window.renderHeatmap(); }, 300);
+                }
+                setTimeout(function(){ window.renderHeatmap && window.renderHeatmap(); }, 500);
             })
             .catch(function(e){ console.warn('Refresh failed:',e); });
     }
