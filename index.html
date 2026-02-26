@@ -262,7 +262,7 @@
         .oi-chart-wrap{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;padding:16px;margin-bottom:20px;}
         .oi-chart-label{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;}
         .oi-table-wrap{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}
-        .oi-table{width:100%;min-width:780px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}
+        .oi-table{width:100%;min-width:1080px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}
         .oi-table-scroll-hint{display:none;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(79,195,247,0.4);padding:6px 14px 0;text-transform:uppercase;}
         .oi-table thead th{padding:11px 14px;font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.45);text-transform:uppercase;font-weight:700;text-align:right;border-bottom:1px solid rgba(79,195,247,0.15);background:rgba(79,195,247,0.05);white-space:nowrap;}
         .oi-table thead th:first-child{text-align:left;}
@@ -296,6 +296,31 @@
         .oi-dist-res{background:rgba(239,68,68,0.08);color:#f87171;}
         .oi-dist-sup{background:rgba(0,188,212,0.08);color:#22d3ee;}
         .oi-empty-state{text-align:center;padding:60px 20px;color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}
+        /* ── Spot Δ ── */
+        .oi-sdelta{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+        .oi-sdelta-up{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.25);}
+        .oi-sdelta-dn{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);}
+        .oi-sdelta-fl{background:rgba(100,116,139,0.1);color:#64748b;border:1px solid rgba(100,116,139,0.2);}
+        /* ── VWAP Bias ── */
+        .oi-vwap-bias{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.8px;white-space:nowrap;}
+        .oi-vwap-above{background:rgba(16,185,129,0.1);color:#6ee7b7;border:1px solid rgba(16,185,129,0.28);}
+        .oi-vwap-below{background:rgba(239,68,68,0.1);color:#fca5a5;border:1px solid rgba(239,68,68,0.28);}
+        .oi-vwap-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+        .oi-vwap-above .oi-vwap-dot{background:#10b981;box-shadow:0 0 5px #10b981;}
+        .oi-vwap-below .oi-vwap-dot{background:#ef4444;box-shadow:0 0 5px #ef4444;}
+        /* ── Signal Streak ── */
+        .oi-streak{display:inline-flex;align-items:center;gap:6px;}
+        .oi-streak-num{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:800;line-height:1;}
+        .oi-streak-sell .oi-streak-num{color:#f87171;}
+        .oi-streak-buy  .oi-streak-num{color:#34d399;}
+        .oi-streak-neu  .oi-streak-num{color:#fbbf24;}
+        .oi-streak-lbl{font-size:8px;letter-spacing:0.8px;color:rgba(176,190,197,0.35);text-transform:uppercase;line-height:1.4;}
+        .oi-pips{display:flex;gap:3px;align-items:center;}
+        .oi-pip{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+        .oi-pip-sell{background:#f87171;box-shadow:0 0 3px #f87171;}
+        .oi-pip-buy{background:#34d399;box-shadow:0 0 3px #34d399;}
+        .oi-pip-neu{background:#fbbf24;}
+        .oi-pip-old{background:rgba(100,116,139,0.3);}
 
         .disclaimer{background:rgba(255,183,77,0.1);backdrop-filter:blur(8px);padding:22px;border-radius:12px;border-left:4px solid #ffb74d;font-size:clamp(11px,1.5vw,13px);color:#ffb74d;line-height:1.8;}
         .footer{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}
@@ -422,7 +447,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">27-Feb-2026 01:51 IST</span>
+                <span class="sb-value gen-val">27-Feb-2026 02:04 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -661,7 +686,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-            As of: 27-Feb-2026 01:51 IST
+            As of: 27-Feb-2026 02:04 IST
           </span>
         </div>
 
@@ -900,23 +925,28 @@
                 <th>PCR</th>
                 <th>OPTION SIGNAL</th>
                 <th>SPOT PRICE</th>
+                <th>SPOT &#916;</th>
+                <th>VWAP BIAS</th>
+                <th>STREAK</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
-              <tr><td colspan="9" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
+              <tr><td colspan="12" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="logic-box" style="margin-top:16px;">
+          <div class="logic-box" style="margin-top:16px;">
           <div class="logic-box-head">&#128214; HOW TO READ THIS TABLE</div>
           <div class="logic-grid">
             <div class="logic-item"><span class="lc-bear">Call OI +</span> Writers adding calls &#8594; Bearish pressure</div>
             <div class="logic-item"><span class="lc-bull">Put OI +</span> Writers adding puts &#8594; Bullish support</div>
             <div class="logic-item"><span class="lc-info">DIFF</span> = PE &#916; &#8722; CE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
             <div class="logic-item"><span class="lc-info">3/5/15 Min</span> filters raw rows or aggregates into time slots</div>
-            <div class="logic-item"><span class="lc-info">VWAP Signal</span> BUY = Spot &ge; VWAP &nbsp;&middot;&nbsp; SELL = Spot &lt; VWAP</div>
+            <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
+            <div class="logic-item"><span class="lc-bull">VWAP BIAS</span> ABOVE = Spot &ge; Session VWAP (bullish anchor) &nbsp;&middot;&nbsp; BELOW = Bearish</div>
+            <div class="logic-item"><span class="lc-bull">STREAK</span> Consecutive snapshots with same signal &nbsp;&middot;&nbsp; &#215;1 = just flipped &nbsp;&middot;&nbsp; &#215;5+ = strong trend</div>
             <div class="logic-item"><span class="lc-info">Timestamps</span> All times shown in IST (Asia/Kolkata)</div>
           </div>
         </div>
@@ -928,7 +958,7 @@
             <div class="section-title">
                 <span>&#9881;&#65039;</span> LIVE DATA INPUTS
                 <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
-                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 27-Feb-2026 01:51 IST</span>
+                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 27-Feb-2026 02:04 IST</span>
             </div>
             <div class="input-summary-grid">
                 <div class="inp-summary-card inp-auto-card">
@@ -1313,9 +1343,11 @@ function filterByInterval(data, mins) {
             opt_signal:    last.opt_signal,
             vwap:          last.vwap,
             spot_price:    last.spot_price,
+            vwap_bias:     last.vwap_bias,
             nearest_level: last.nearest_level,
             nearest_label: last.nearest_label,
             distance_pts:  last.distance_pts,
+            vwap_signal:   last.vwap_signal,
             _isLive:       rows[0]._isLive,
         };
     });
@@ -1325,7 +1357,7 @@ function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
     if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="oi-empty-state">&#128218; No data yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" class="oi-empty-state">&#128218; No data yet.</td></tr>';
         return;
     }
     var filtered = filterByInterval(data, _oiInterval);
@@ -1387,6 +1419,52 @@ function renderOITable(data) {
                       : '')
                   + '</span>'
                 : '<span style="color:rgba(176,190,197,0.3);">—</span>';
+
+            // ── Spot Δ ──
+            var prevRow = filtered[idx + 1];
+            var spotDelta = (prevRow && prevRow.spot_price && row.spot_price)
+                ? Math.round((row.spot_price - prevRow.spot_price) * 10) / 10
+                : null;
+            var spotDeltaHtml;
+            if (spotDelta === null) {
+                spotDeltaHtml = '<span style="color:rgba(176,190,197,0.2);">—</span>';
+            } else if (Math.abs(spotDelta) < 0.5) {
+                spotDeltaHtml = '<span class="oi-sdelta oi-sdelta-fl">→ 0.0</span>';
+            } else if (spotDelta > 0) {
+                spotDeltaHtml = '<span class="oi-sdelta oi-sdelta-up">▲ +' + spotDelta.toFixed(1) + '</span>';
+            } else {
+                spotDeltaHtml = '<span class="oi-sdelta oi-sdelta-dn">▼ ' + spotDelta.toFixed(1) + '</span>';
+            }
+
+            // ── VWAP Bias ──
+            var vsig = (row.vwap_bias || (row.vwap_signal === 'BUY' ? 'ABOVE' : row.vwap_signal === 'SELL' ? 'BELOW' : '')).toUpperCase();
+            var vwapBiasHtml = vsig === 'ABOVE'
+                ? '<span class="oi-vwap-bias oi-vwap-above"><span class="oi-vwap-dot"></span>ABOVE</span>'
+                : vsig === 'BELOW'
+                    ? '<span class="oi-vwap-bias oi-vwap-below"><span class="oi-vwap-dot"></span>BELOW</span>'
+                    : '<span style="color:rgba(176,190,197,0.2);">—</span>';
+
+            // ── Signal Streak ──
+            var streakCount = 1;
+            var curSig = (row.opt_signal || '').toUpperCase();
+            for (var si = idx + 1; si < filtered.length; si++) {
+                if ((filtered[si].opt_signal || '').toUpperCase() === curSig) streakCount++;
+                else break;
+            }
+            var streakCls = isBuy ? 'oi-streak-buy' : isSell ? 'oi-streak-sell' : 'oi-streak-neu';
+            var streakLbl = streakCount === 1 ? 'NEW<br>signal' : 'streak';
+            var pips = '';
+            for (var pi = 0; pi < 6; pi++) {
+                var pipIdx = idx + pi;
+                var pipSig = pipIdx < filtered.length ? (filtered[pipIdx].opt_signal || '').toUpperCase() : '';
+                var pipCls = pipSig.indexOf('BUY') >= 0 ? 'oi-pip-buy' : pipSig.indexOf('SELL') >= 0 ? 'oi-pip-sell' : pipSig ? 'oi-pip-neu' : 'oi-pip-old';
+                pips += '<div class="oi-pip ' + pipCls + '"></div>';
+            }
+            var streakHtml = '<div class="oi-streak ' + streakCls + '">'
+                + '<div><div class="oi-streak-num">×' + streakCount + '</div><div class="oi-streak-lbl">' + streakLbl + '</div></div>'
+                + '<div class="oi-pips">' + pips + '</div>'
+                + '</div>';
+
             newRowsHtml += '<tr class="' + (isLive ? 'oi-live-row' : '') + '" data-time="' + t + '">'
                 + '<td>' + timeCell + '</td>'
                 + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
@@ -1395,6 +1473,9 @@ function renderOITable(data) {
                 + '<td class="oi-pcr-val">'  + (row.pcr||'—') + '</td>'
                 + '<td>' + signalHtml(row.opt_signal) + '</td>'
                 + '<td class="oi-spot-cell">'+ (row.spot_price ? row.spot_price.toFixed(2) : '—') + '</td>'
+                + '<td>' + spotDeltaHtml + '</td>'
+                + '<td>' + vwapBiasHtml + '</td>'
+                + '<td>' + streakHtml + '</td>'
                 + '<td>' + nlevelHtml + '</td>'
                 + '<td>' + distHtml + '</td>'
                 + '</tr>';
@@ -1475,7 +1556,7 @@ function loadOILog() {
         })
         .catch(function(e) {
             var tbody = document.getElementById('oiTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="12" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
         });
 }
 
