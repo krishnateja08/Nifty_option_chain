@@ -2960,10 +2960,10 @@ window.addEventListener('resize', function(){
         # ── Log OI snapshot for Intraday OI Trend tab ─────────────────
         print("\n📊 Logging OI snapshot to oi_log.json...")
         key_levels = {
-            "support":          analyzer.html_data.get("support"),
-            "resistance":       analyzer.html_data.get("resistance"),
-            "strong_support":   analyzer.html_data.get("strong_support"),
-            "strong_resistance":analyzer.html_data.get("strong_resistance"),
+            "support":           self.html_data.get("support"),
+            "resistance":        self.html_data.get("resistance"),
+            "strong_support":    self.html_data.get("strong_support"),
+            "strong_resistance": self.html_data.get("strong_resistance"),
         }
         log_oi_snapshot(option_analysis, technical, key_levels=key_levels)
 
