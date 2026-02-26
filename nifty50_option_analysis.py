@@ -2277,6 +2277,8 @@ function renderOITable(data) {
     }
     var filtered = filterByInterval(data, _oiInterval);
     var latest = filtered[0];
+
+    // ── Update summary cards (text only, no DOM rebuild) ──
     if (latest) {
         var el;
         el = document.getElementById('oiLatestPCR'); if (el) el.textContent = latest.pcr || '—';
@@ -2287,26 +2289,70 @@ function renderOITable(data) {
     }
     var ce = document.getElementById('oiChartEntries');
     if (ce) ce.textContent = filtered.length + ' candles';
+
+    // ── Redraw sparkline (canvas, no flicker) ──
     drawSparkline(filtered);
-    var html = '';
-    filtered.forEach(function(row) {
-        var isLive   = !!row._isLive;
-        var diffCls  = (row.diff||0) >= 0 ? 'oi-diff-pos' : 'oi-diff-neg';
-        var timeCell = isLive ? '<div class="oi-time-cell">' + (row.time||'') + '&nbsp;<span class="oi-live-ind">LIVE</span></div>' : (row.time||'');
-        html += '<tr class="' + (isLive ? 'oi-live-row' : '') + '">'
-            + '<td>' + timeCell + '</td>'
-            + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
-            + '<td class="oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
-            + '<td class="' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
-            + '<td class="oi-pcr-val">'  + (row.pcr||'—') + '</td>'
-            + '<td>' + signalHtml(row.opt_signal) + '</td>'
-            + '<td class="oi-vwap-cell">'+ (row.vwap ? row.vwap.toFixed(2) : '—') + '</td>'
-            + '<td class="oi-fut-cell">' + (row.fut_price ? row.fut_price.toFixed(2) : '—') + '</td>'
-            + '<td class="oi-spot-cell">'+ (row.spot_price ? row.spot_price.toFixed(2) : '—') + '</td>'
-            + '<td>' + vsigHtml(row.vwap_signal) + '</td>'
-            + '</tr>';
+
+    // ── Smart table update: add new rows only, no full rebuild ──
+    var existingRows = tbody.querySelectorAll('tr[data-time]');
+    var existingTimes = {};
+    existingRows.forEach(function(r){ existingTimes[r.getAttribute('data-time')] = r; });
+
+    // Remove LIVE badge from previous live row
+    var prevLive = tbody.querySelector('.oi-live-row');
+    if (prevLive) {
+        prevLive.classList.remove('oi-live-row');
+        var liveInd = prevLive.querySelector('.oi-live-ind');
+        if (liveInd) liveInd.remove();
+        var td = prevLive.querySelector('td:first-child');
+        if (td) { var div = td.querySelector('.oi-time-cell'); if (div) td.textContent = div.textContent.replace('LIVE','').trim(); }
+    }
+
+    // Build new rows for times not yet in table, prepend them
+    var newRowsHtml = '';
+    filtered.forEach(function(row, idx) {
+        var t = row.time || '';
+        if (!existingTimes[t]) {
+            var isLive  = (idx === 0);
+            var diffCls = (row.diff||0) >= 0 ? 'oi-diff-pos' : 'oi-diff-neg';
+            var timeCell = isLive
+                ? '<div class="oi-time-cell">' + t + '&nbsp;<span class="oi-live-ind">LIVE</span></div>'
+                : t;
+            newRowsHtml += '<tr class="' + (isLive ? 'oi-live-row' : '') + '" data-time="' + t + '">'
+                + '<td>' + timeCell + '</td>'
+                + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
+                + '<td class="oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
+                + '<td class="' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
+                + '<td class="oi-pcr-val">'  + (row.pcr||'—') + '</td>'
+                + '<td>' + signalHtml(row.opt_signal) + '</td>'
+                + '<td class="oi-vwap-cell">'+ (row.vwap ? row.vwap.toFixed(2) : '—') + '</td>'
+                + '<td class="oi-fut-cell">' + (row.fut_price ? row.fut_price.toFixed(2) : '—') + '</td>'
+                + '<td class="oi-spot-cell">'+ (row.spot_price ? row.spot_price.toFixed(2) : '—') + '</td>'
+                + '<td>' + vsigHtml(row.vwap_signal) + '</td>'
+                + '</tr>';
+        } else if (idx === 0) {
+            // Mark existing top row as LIVE
+            var r = existingTimes[t];
+            r.classList.add('oi-live-row');
+            var td = r.querySelector('td:first-child');
+            if (td && !td.querySelector('.oi-live-ind')) {
+                td.innerHTML = '<div class="oi-time-cell">' + t + '&nbsp;<span class="oi-live-ind">LIVE</span></div>';
+            }
+        }
     });
-    tbody.innerHTML = html;
+
+    if (newRowsHtml) {
+        // Save scroll position, insert rows at top, restore scroll
+        var scrollEl = tbody.closest('.oi-table-wrap') || window;
+        var sy = scrollEl === window ? window.scrollY : scrollEl.scrollTop;
+        tbody.insertAdjacentHTML('afterbegin', newRowsHtml);
+        if (scrollEl === window) window.scrollTo({top: sy, behavior: 'instant'});
+        else scrollEl.scrollTop = sy;
+    }
+
+    // Remove empty state row if present
+    var emptyRow = tbody.querySelector('.oi-empty-state');
+    if (emptyRow) emptyRow.closest('tr').remove();
 }
 
 function drawSparkline(data) {
