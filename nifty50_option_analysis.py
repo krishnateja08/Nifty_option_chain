@@ -2732,8 +2732,8 @@ window.addEventListener('resize', function(){
         .oi-vwap-cell{{color:#93c5fd;font-weight:600;}}
         .oi-fut-cell{{color:#c4b5fd;}}
         .oi-spot-cell{{color:#e0f7fa;font-weight:700;}}
-        .oi-vsig-sell{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}
-        .oi-vsig-buy{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}
+        .oi-vsig-sell{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
+        .oi-vsig-buy{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}}
         .oi-nlevel-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}
         .oi-nlevel-res{background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}
         .oi-nlevel-sup{background:rgba(0,188,212,0.12);color:#67e8f9;border:1px solid rgba(0,188,212,0.3);}
