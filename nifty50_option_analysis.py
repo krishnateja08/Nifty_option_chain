@@ -128,21 +128,13 @@ def fetch_heatmap_data():
                             'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
                         })
                         continue
-```
-
----
-
-## Why this happened
-
-The indentation levels in this function are:
-```
-def fetch_heatmap_data():          ← 0 spaces
-    try:                           ← 4 spaces
-        for name, sym in ...:     ← 8 spaces
-            try:                  ← 12 spaces
-                if df is None...: ← 16 spaces
-                    try:          ← 20 spaces  ← THIS is where your fallback goes
-                        ...       ← 24 spaces
+def fetch_heatmap_data():  
+    try:                   
+        for name, sym in ...:  
+            try:               
+                if df is None...: 
+                    try:         
+                        ...      
                 today   = df.iloc[-1]
                 prev    = df.iloc[-2]
                 price   = float(today['Close'])
