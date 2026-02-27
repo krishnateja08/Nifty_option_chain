@@ -200,6 +200,22 @@ def fetch_global_bias():
 
     print(f"  ✅ Global bias → {bias.upper()} (score: {score}/{len(results)})")
     return bias
+ def fetch_india_vix():
+    """Fetches India VIX from yfinance."""
+    try:
+        print("  🌡️ Fetching India VIX...")
+        df = yf.Ticker("^INDIAVIX").history(period="5d", interval="1d")
+        if df is None or df.empty or len(df) < 2:
+            print("  ⚠️  India VIX: insufficient data")
+            return None, None
+        vix_today = float(df['Close'].iloc[-1])
+        vix_prev  = float(df['Close'].iloc[-2])
+        vix_trend = "rising" if vix_today > vix_prev else "falling"
+        print(f"  ✅ India VIX: {vix_today:.2f} ({vix_trend})")
+        return round(vix_today, 2), vix_trend
+    except Exception as e:
+        print(f"  ⚠️  India VIX fetch failed: {e}")
+        return None, None   
 def fetch_volume_at_levels(technical):
     """
     Uses NIFTYBEES.NS (Nifty ETF) for both price and volume.
@@ -941,7 +957,21 @@ def score_global(global_bias):
         return -1, "Bearish", "Global indices showing bearish pressure"
     else:
         return 0, "Neutral", "Global indices mixed — no directional edge"
-
+        
+def score_vix(vix, trend):
+    if vix is None:
+        return 0, "N/A", "India VIX not available"
+    if vix > 20:
+        return -1, f"{vix:.1f} ({trend})", f"VIX {vix:.1f} above 20 — high fear, bearish/volatile market"
+    elif vix < 13:
+        return +1, f"{vix:.1f} ({trend})", f"VIX {vix:.1f} below 13 — low fear, complacency, bullish bias"
+    elif 13 <= vix <= 16:
+        score = +1 if trend == "falling" else 0
+        return score, f"{vix:.1f} ({trend})", f"VIX {vix:.1f} in normal range — {trend}"
+    else:  # 16–20
+        score = -1 if trend == "rising" else 0
+        return score, f"{vix:.1f} ({trend})", f"VIX {vix:.1f} elevated — {'rising, caution' if trend == 'rising' else 'stable watch zone'}"
+        
 def score_oi_direction(oi_class):
     if oi_class is None:
         return 0, "N/A", "OI direction data not available"
@@ -1004,7 +1034,7 @@ def suggest_strategies(total_score, vol_view):
             seen.add(s); unique.append(s)
     return bias_label, unique
 
-def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
+def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal", vix_val=None, vix_trend=None):
     d = html_data
     pcr_val = d.get('pcr') if d.get('has_option_data') else None
     rsi_val = d.get('rsi')
@@ -1018,6 +1048,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         ("📉", "Market Trend (SMAs)",     *score_trend(sma20, sma50, sma200), True),
         ("🔄", "OI Direction",            *score_oi_direction(oi_cls),   True),
         ("🌐", "Global Market Bias",      *score_global(global_bias),    True),
+        ("🌡️", "India VIX",              *score_vix(vix_val, vix_trend), True),
         ("📦", "Volume at Support",       *score_volume(vol_support, "support"),    True),
         ("📦", "Volume at Resistance",    *score_volume(vol_resistance, "resistance"), True),
     ]
@@ -1157,6 +1188,11 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                     <div class="inp-s-label">Global Bias</div>
                     <div class="inp-s-val">{val_global}</div>
                     <div class="inp-s-src">yfinance Auto (DJI/NASDAQ/S&P)</div>
+                </div>
+                <div class="inp-summary-card inp-auto-card">
+                    <div class="inp-s-label">India VIX</div>
+                    <div class="inp-s-val">{f"{vix_val:.1f}" if vix_val is not None else '<span class="na-inline">N/A</span>'}</div>
+                    <div class="inp-s-src">yfinance Auto (^INDIAVIX)</div>
                 </div>
                 <div class="inp-summary-card {'inp-auto-card' if vol_support is not None else 'inp-manual-card'}">
                     <div class="inp-s-label">Vol at Support</div>
@@ -2198,7 +2234,8 @@ class NiftyHTMLAnalyzer:
 
         checklist_tab_html = build_strategy_checklist_html(
             d, vol_support=vol_support, vol_resistance=vol_resistance,
-            global_bias=global_bias, vol_view=vol_view
+            global_bias=global_bias, vol_view=vol_view,
+            vix_val=d.get('vix_val'), vix_trend=d.get('vix_trend')
         )
         intraday_oi_tab_html = build_intraday_oi_tab_html()
 
@@ -3116,6 +3153,11 @@ window.addEventListener('resize', function(){
         }
         log_oi_snapshot(option_analysis, technical, key_levels=key_levels)
 
+        # Fetch India VIX and store in html_data
+        vix_val, vix_trend = fetch_india_vix()
+        self.html_data['vix_val']   = vix_val
+        self.html_data['vix_trend'] = vix_trend
+        
         return option_analysis
 
 
