@@ -200,7 +200,7 @@ def fetch_global_bias():
 
     print(f"  ✅ Global bias → {bias.upper()} (score: {score}/{len(results)})")
     return bias
-  def fetch_india_vix():
+def fetch_india_vix():
     """Fetches India VIX from yfinance."""
     try:
         print("  🌡️ Fetching India VIX...")
