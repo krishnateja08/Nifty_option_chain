@@ -1017,9 +1017,9 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         ("⚡", "MACD Signal",             *score_macd(macd_bull),        True),
         ("📉", "Market Trend (SMAs)",     *score_trend(sma20, sma50, sma200), True),
         ("🔄", "OI Direction",            *score_oi_direction(oi_cls),   True),
-        ("🌐", "Global Market Bias",      *score_global(global_bias),    False),
-        ("📦", "Volume at Support",       *score_volume(vol_support, "support"),    False),
-        ("📦", "Volume at Resistance",    *score_volume(vol_resistance, "resistance"), False),
+        ("🌐", "Global Market Bias",      *score_global(global_bias),    True),
+        ("📦", "Volume at Support",       *score_volume(vol_support, "support"),    True),
+        ("📦", "Volume at Resistance",    *score_volume(vol_resistance, "resistance"), True),
     ]
     auto_scores  = [s[2] for s in signals if s[5]]
     manual_scores = [s[2] for s in signals if not s[5]]
@@ -1153,10 +1153,10 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                     <div class="inp-s-val">{val_oi_dir}</div>
                     <div class="inp-s-src">CHG OI</div>
                 </div>
-                <div class="inp-summary-card inp-manual-card">
+                <div class="inp-summary-card inp-auto-card">
                     <div class="inp-s-label">Global Bias</div>
                     <div class="inp-s-val">{val_global}</div>
-                    <div class="inp-s-src">Manual Input</div>
+                    <div class="inp-s-src">yfinance Auto (DJI/NASDAQ/S&P)</div>
                 </div>
                 <div class="inp-summary-card {'inp-auto-card' if vol_support is not None else 'inp-manual-card'}">
                     <div class="inp-s-label">Vol at Support</div>
