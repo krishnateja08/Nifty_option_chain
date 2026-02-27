@@ -1990,14 +1990,15 @@ class NiftyHTMLAnalyzer:
     def _stat_card(self, icon, label, value, badge_text, badge_class, bar_pct, bar_type, sub_text=""):
         tag_map = {'bullish':('tag-bull','#00e5ff'),'bearish':('tag-bear','#ff5252'),'neutral':('tag-neu','#ffb74d')}
         tag_cls,_ = tag_map.get(badge_class,tag_map['neutral'])
-        hi_cls = 'g-hi' if badge_class=='bullish' else ('g-red' if badge_class=='bearish' else '')
-        sub_html = f'<div class="sub">{sub_text}</div>' if sub_text else ''
+        border_color = {'bullish':'rgba(0,229,255,0.35)','bearish':'rgba(255,82,82,0.35)'}.get(badge_class,'rgba(255,183,77,0.25)')
+        top_color = {'bullish':'#00e5ff','bearish':'#ff5252'}.get(badge_class,'#ffb74d')
         return f"""
-            <div class="g {hi_cls}">
-                <div class="card-top-row"><span class="card-ico">{icon}</span><div class="lbl">{label}</div></div>
-                <span class="val">{value}</span>
-                <div class="bar-wrap"><div class="bar-fill {bar_type}" style="width:{bar_pct:.1f}%"></div></div>
-                <div class="card-foot">{sub_html}<span class="tag {tag_cls}">{badge_text}</span></div>
+            <div class="g-compact" style="border-color:{border_color};">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,{top_color},transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">{icon}</span><div class="cc-lbl">{label}</div><span class="tag {tag_cls}">{badge_text}</span></div>
+                <div class="cc-val">{value}</div>
+                {f'<div class="cc-sub">{sub_text}</div>' if sub_text else ''}
+                <div class="cc-bar"><div class="cc-bar-fill {bar_type}" style="width:{bar_pct:.1f}%"></div></div>
             </div>"""
 
     def _market_direction_widget_html(self):
@@ -2869,6 +2870,21 @@ window.addEventListener('resize', function(){
         .section-title{{font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.5vw,13px);font-weight:700;letter-spacing:clamp(1px,0.3vw,2.5px);color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:clamp(12px,2vw,20px);padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}}
         .section-title span{{font-size:clamp(14px,2vw,18px);}}
 
+
+        /* ── COMPACT STAT CARDS ─────────────────────────────────── */
+        .g-compact{{background:#111827;border:1px solid #1e2a3a;border-radius:8px;padding:8px 10px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}}
+        .g-compact:hover{{transform:translateY(-2px);border-color:rgba(79,195,247,0.4)!important;}}
+        .cc-top{{display:flex;align-items:center;gap:6px;margin-bottom:4px;}}
+        .cc-ico{{font-size:13px;line-height:1;flex-shrink:0;}}
+        .cc-lbl{{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#8896b3;font-weight:600;flex:1;}}
+        .cc-val{{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;line-height:1;color:#e2e8f8;margin-bottom:4px;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
+        .cc-sub{{font-size:8px;color:#4a5578;margin-bottom:3px;font-family:'JetBrains Mono',monospace;}}
+        .cc-bar{{height:2px;background:#1e2a3a;border-radius:1px;overflow:hidden;}}
+        .cc-bar-fill{{height:100%;border-radius:1px;}}
+        .cc-bar-fill.bar-teal{{background:linear-gradient(90deg,#00bcd4,#4fc3f7);}}
+        .cc-bar-fill.bar-red{{background:linear-gradient(90deg,#f44336,#ff5722);}}
+        .cc-bar-fill.bar-gold{{background:linear-gradient(90deg,#ffb74d,#ffd54f);}}
+        .g-compact .tag{{font-size:8px;padding:1px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0;}}
         .g{{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(79,195,247,0.18);border-radius:16px;position:relative;overflow:hidden;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);min-width:0;}}
         .g::before{{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);z-index:1;}}
         .g::after{{content:'';position:absolute;top:-60%;left:-30%;width:50%;height:200%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);transform:skewX(-15deg);transition:left 0.6s ease;z-index:0;}}
@@ -2877,7 +2893,7 @@ window.addEventListener('resize', function(){
         .g-hi{{background:rgba(79,195,247,0.09);border-color:rgba(79,195,247,0.35);}}
         .g-red{{background:rgba(244,67,54,0.06);border-color:rgba(244,67,54,0.25);}}
         .g-red:hover{{background:rgba(244,67,54,0.1);border-color:rgba(244,67,54,0.45);}}
-        .card-grid{{display:grid;gap:14px;}}
+        .card-grid{{display:grid;gap:6px;}}
         .grid-5{{grid-template-columns:repeat(5,minmax(0,1fr));}}
         .grid-4{{grid-template-columns:repeat(4,minmax(0,1fr));}}
         .g .card-top-row{{display:flex;align-items:center;gap:10px;margin-bottom:10px;position:relative;z-index:2;padding:14px 16px 0;}}
