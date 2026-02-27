@@ -44,6 +44,21 @@
         .section-title{font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.5vw,13px);font-weight:700;letter-spacing:clamp(1px,0.3vw,2.5px);color:#4fc3f7;text-transform:uppercase;display:flex;align-items:center;gap:10px;margin-bottom:clamp(12px,2vw,20px);padding-bottom:12px;border-bottom:1px solid rgba(79,195,247,0.18);flex-wrap:wrap;}
         .section-title span{font-size:clamp(14px,2vw,18px);}
 
+
+        /* ── COMPACT STAT CARDS ─────────────────────────────────── */
+        .g-compact{background:#111827;border:1px solid #1e2a3a;border-radius:8px;padding:8px 10px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
+        .g-compact:hover{transform:translateY(-2px);border-color:rgba(79,195,247,0.4)!important;}
+        .cc-top{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+        .cc-ico{font-size:13px;line-height:1;flex-shrink:0;}
+        .cc-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#8896b3;font-weight:600;flex:1;}
+        .cc-val{font-family:'JetBrains Mono',monospace;font-size:19px;font-weight:700;line-height:1;color:#e2e8f8;margin-bottom:4px;letter-spacing:-.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+        .cc-sub{font-size:8px;color:#4a5578;margin-bottom:3px;font-family:'JetBrains Mono',monospace;}
+        .cc-bar{height:2px;background:#1e2a3a;border-radius:1px;overflow:hidden;}
+        .cc-bar-fill{height:100%;border-radius:1px;}
+        .cc-bar-fill.bar-teal{background:linear-gradient(90deg,#00bcd4,#4fc3f7);}
+        .cc-bar-fill.bar-red{background:linear-gradient(90deg,#f44336,#ff5722);}
+        .cc-bar-fill.bar-gold{background:linear-gradient(90deg,#ffb74d,#ffd54f);}
+        .g-compact .tag{font-size:8px;padding:1px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0;}
         .g{background:rgba(255,255,255,0.04);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(79,195,247,0.18);border-radius:16px;position:relative;overflow:hidden;transition:all 0.35s cubic-bezier(0.4,0,0.2,1);min-width:0;}
         .g::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);z-index:1;}
         .g::after{content:'';position:absolute;top:-60%;left:-30%;width:50%;height:200%;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.04),transparent);transform:skewX(-15deg);transition:left 0.6s ease;z-index:0;}
@@ -52,7 +67,7 @@
         .g-hi{background:rgba(79,195,247,0.09);border-color:rgba(79,195,247,0.35);}
         .g-red{background:rgba(244,67,54,0.06);border-color:rgba(244,67,54,0.25);}
         .g-red:hover{background:rgba(244,67,54,0.1);border-color:rgba(244,67,54,0.45);}
-        .card-grid{display:grid;gap:14px;}
+        .card-grid{display:grid;gap:6px;}
         .grid-5{grid-template-columns:repeat(5,minmax(0,1fr));}
         .grid-4{grid-template-columns:repeat(4,minmax(0,1fr));}
         .g .card-top-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;position:relative;z-index:2;padding:14px 16px 0;}
@@ -461,7 +476,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">27-Feb-2026 23:26 IST</span>
+                <span class="sb-value gen-val">28-Feb-2026 00:39 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -625,64 +640,73 @@
         <div class="section">
             <div class="section-title"><span>&#128269;</span> TECHNICAL INDICATORS</div>
             <div class="card-grid grid-5">
-            <div class="g ">
-                <div class="card-top-row"><span class="card-ico">🟡</span><div class="lbl">RSI (14)</div></div>
-                <span class="val">34.5</span>
-                <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:34.5%"></div></div>
-                <div class="card-foot"><div class="sub">14-period momentum</div><span class="tag tag-neu">Neutral</span></div>
+            <div class="g-compact" style="border-color:rgba(255,183,77,0.25);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ffb74d,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">🟡</span><div class="cc-lbl">RSI (14)</div><span class="tag tag-neu">Neutral</span></div>
+                <div class="cc-val">34.5</div>
+                <div class="cc-sub">14-period momentum</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-gold" style="width:34.5%"></div></div>
             </div>
-            <div class="g g-red">
-                <div class="card-top-row"><span class="card-ico">❌</span><div class="lbl">SMA 20</div></div>
-                <span class="val">₹25,626</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:32.6%"></div></div>
-                <div class="card-foot"><div class="sub">20-day average</div><span class="tag tag-bear">Below</span></div>
+            <div class="g-compact" style="border-color:rgba(255,82,82,0.35);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ff5252,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">❌</span><div class="cc-lbl">SMA 20</div><span class="tag tag-bear">Below</span></div>
+                <div class="cc-val">₹25,626</div>
+                <div class="cc-sub">20-day average</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:32.6%"></div></div>
             </div>
-            <div class="g g-red">
-                <div class="card-top-row"><span class="card-ico">❌</span><div class="lbl">SMA 50</div></div>
-                <span class="val">₹25,714</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:29.2%"></div></div>
-                <div class="card-foot"><div class="sub">50-day average</div><span class="tag tag-bear">Below</span></div>
+            <div class="g-compact" style="border-color:rgba(255,82,82,0.35);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ff5252,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">❌</span><div class="cc-lbl">SMA 50</div><span class="tag tag-bear">Below</span></div>
+                <div class="cc-val">₹25,714</div>
+                <div class="cc-sub">50-day average</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:29.2%"></div></div>
             </div>
-            <div class="g g-red">
-                <div class="card-top-row"><span class="card-ico">❌</span><div class="lbl">SMA 200</div></div>
-                <span class="val">₹25,348</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:43.3%"></div></div>
-                <div class="card-foot"><div class="sub">200-day average</div><span class="tag tag-bear">Below</span></div>
+            <div class="g-compact" style="border-color:rgba(255,82,82,0.35);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ff5252,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">❌</span><div class="cc-lbl">SMA 200</div><span class="tag tag-bear">Below</span></div>
+                <div class="cc-val">₹25,348</div>
+                <div class="cc-sub">200-day average</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:43.3%"></div></div>
             </div>
-            <div class="g g-red">
-                <div class="card-top-row"><span class="card-ico">🔴</span><div class="lbl">MACD</div></div>
-                <span class="val">-67.66</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:0.0%"></div></div>
-                <div class="card-foot"><div class="sub">Signal: -30.63</div><span class="tag tag-bear">Bearish</span></div>
+            <div class="g-compact" style="border-color:rgba(255,82,82,0.35);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ff5252,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">🔴</span><div class="cc-lbl">MACD</div><span class="tag tag-bear">Bearish</span></div>
+                <div class="cc-val">-67.66</div>
+                <div class="cc-sub">Signal: -30.63</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:0.0%"></div></div>
             </div></div>
         </div>
 
         <div class="section">
             <div class="section-title"><span>&#127919;</span> OPTION CHAIN ANALYSIS <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Strikes Only)</span></div>
             <div class="card-grid grid-4">
-            <div class="g g-red">
-                <div class="card-top-row"><span class="card-ico">🔴</span><div class="lbl">PCR Ratio (OI)</div></div>
-                <span class="val">0.534</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:26.7%"></div></div>
-                <div class="card-foot"><div class="sub">Put/Call OI ratio</div><span class="tag tag-bear">Bearish</span></div>
+            <div class="g-compact" style="border-color:rgba(255,82,82,0.35);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ff5252,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">🔴</span><div class="cc-lbl">PCR Ratio (OI)</div><span class="tag tag-bear">Bearish</span></div>
+                <div class="cc-val">0.534</div>
+                <div class="cc-sub">Put/Call OI ratio</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:26.7%"></div></div>
             </div>
-            <div class="g ">
-                <div class="card-top-row"><span class="card-ico">🎯</span><div class="lbl">Max Pain</div></div>
-                <span class="val">₹25,250</span>
-                <div class="bar-wrap"><div class="bar-fill bar-gold" style="width:52.3%"></div></div>
-                <div class="card-foot"><div class="sub">Price gravity level</div><span class="tag tag-neu">Expiry Magnet</span></div>
+            <div class="g-compact" style="border-color:rgba(255,183,77,0.25);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ffb74d,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">🎯</span><div class="cc-lbl">Max Pain</div><span class="tag tag-neu">Expiry Magnet</span></div>
+                <div class="cc-val">₹25,250</div>
+                <div class="cc-sub">Price gravity level</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-gold" style="width:52.3%"></div></div>
             </div>
-            <div class="g g-red">
-                <div class="card-top-row"><span class="card-ico">🔴</span><div class="lbl">Max Call OI</div></div>
-                <span class="val">₹25,500</span>
-                <div class="bar-wrap"><div class="bar-fill bar-red" style="width:65.2%"></div></div>
-                <div class="card-foot"><div class="sub">CE wall</div><span class="tag tag-bear">Resistance</span></div>
+            <div class="g-compact" style="border-color:rgba(255,82,82,0.35);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#ff5252,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">🔴</span><div class="cc-lbl">Max Call OI</div><span class="tag tag-bear">Resistance</span></div>
+                <div class="cc-val">₹25,500</div>
+                <div class="cc-sub">CE wall</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:65.2%"></div></div>
             </div>
-            <div class="g g-hi">
-                <div class="card-top-row"><span class="card-ico">🟢</span><div class="lbl">Max Put OI</div></div>
-                <span class="val">₹25,000</span>
-                <div class="bar-wrap"><div class="bar-fill bar-teal" style="width:34.8%"></div></div>
-                <div class="card-foot"><div class="sub">PE floor</div><span class="tag tag-bull">Support</span></div>
+            <div class="g-compact" style="border-color:rgba(0,229,255,0.35);">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,#00e5ff,transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">🟢</span><div class="cc-lbl">Max Put OI</div><span class="tag tag-bull">Support</span></div>
+                <div class="cc-val">₹25,000</div>
+                <div class="cc-sub">PE floor</div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-teal" style="width:34.8%"></div></div>
             </div></div>
         </div>
 
@@ -700,7 +724,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-            As of: 27-Feb-2026 23:26 IST
+            As of: 28-Feb-2026 00:39 IST
           </span>
         </div>
 
@@ -1030,7 +1054,7 @@
             <div class="section-title">
                 <span>&#9881;&#65039;</span> LIVE DATA INPUTS
                 <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
-                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 27-Feb-2026 23:26 IST</span>
+                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 28-Feb-2026 00:39 IST</span>
             </div>
             <div class="input-summary-grid">
                 <div class="inp-summary-card inp-auto-card">
