@@ -1506,12 +1506,70 @@ def build_intraday_oi_tab_html():
             <div class="oi-sum-val" id="oiLatestSignal">—</div>
           </div>
         </div>
+        <!-- OI Stat Boxes -->
+        <div class="oi-stat-strip">
+          <div class="oi-stat-box">
+            <div class="oi-stat-label">LATEST DIFF</div>
+            <div class="oi-stat-val" id="oiStatLatest">—</div>
+            <div class="oi-stat-sub">PE &#916; &#8722; CE &#916;</div>
+          </div>
+          <div class="oi-stat-box">
+            <div class="oi-stat-label">SESSION HIGH</div>
+            <div class="oi-stat-val oi-stat-pos" id="oiStatHigh">—</div>
+            <div class="oi-stat-sub">Most bullish</div>
+          </div>
+          <div class="oi-stat-box">
+            <div class="oi-stat-label">SESSION LOW</div>
+            <div class="oi-stat-val oi-stat-neg" id="oiStatLow">—</div>
+            <div class="oi-stat-sub">Most bearish</div>
+          </div>
+          <div class="oi-stat-box">
+            <div class="oi-stat-label">TREND SIGNAL</div>
+            <div class="oi-stat-val" id="oiStatSignal">—</div>
+            <div class="oi-stat-sub" id="oiStatSignalSub">Calculating...</div>
+          </div>
+        </div>
+
+        <!-- Signal History Bar -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.3);text-transform:uppercase;white-space:nowrap;font-family:'JetBrains Mono',monospace;">SIGNAL HISTORY</span>
+          <div id="oiSignalBar" style="flex:1;display:flex;gap:3px;height:6px;border-radius:4px;overflow:hidden;"></div>
+        </div>
+
         <div class="oi-chart-wrap">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <div class="oi-chart-label">NET OI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
             <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.3);letter-spacing:1px;"></div>
           </div>
-          <canvas id="oiSparklineCanvas" style="width:100%;height:110px;display:block;"></canvas>
+          <!-- Chart: Y-labels + Canvas + Crosshair + Tooltip -->
+          <div style="display:flex;gap:0;position:relative;">
+            <div id="oiYLabels" style="width:58px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;flex-shrink:0;"></div>
+            <div style="flex:1;position:relative;min-width:0;">
+              <canvas id="oiSparklineCanvas" style="width:100%;height:200px;display:block;"></canvas>
+              <div id="oiCrosshair" style="position:absolute;top:0;bottom:0;width:1px;background:rgba(79,195,247,0.3);pointer-events:none;display:none;z-index:10;"></div>
+              <div id="oiChartTooltip" style="position:absolute;pointer-events:none;background:rgba(6,13,20,0.97);border:1px solid rgba(79,195,247,0.35);border-radius:8px;padding:9px 13px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#e0f7fa;display:none;z-index:20;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.6);min-width:160px;">
+                <div id="oiTTTime" style="font-size:9px;color:rgba(128,222,234,0.45);letter-spacing:1px;margin-bottom:5px;"></div>
+                <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">NET DIFF</span><span id="oiTTDiff" style="font-weight:700;"></span></div>
+                <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">CE &#916;</span><span id="oiTTCE" style="font-weight:700;color:#f87171;"></span></div>
+                <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">PE &#916;</span><span id="oiTTPE" style="font-weight:700;color:#34d399;"></span></div>
+                <div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:rgba(176,190,197,0.5);">SIGNAL</span><span id="oiTTSignal" style="font-weight:700;"></span></div>
+              </div>
+            </div>
+          </div>
+          <!-- X-axis time labels -->
+          <div id="oiXLabels" style="display:flex;justify-content:space-between;padding:4px 0 0 60px;"></div>
+          <!-- Legend -->
+          <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid rgba(79,195,247,0.08);">
+            <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
+              <span style="display:inline-block;width:24px;height:2px;background:linear-gradient(90deg,#10b981,#34d399);border-radius:1px;"></span> Bullish Zone
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
+              <span style="display:inline-block;width:24px;height:2px;background:linear-gradient(90deg,#ef4444,#f97316);border-radius:1px;"></span> Bearish Zone
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
+              <span style="display:inline-block;width:24px;height:2px;border-top:1px dashed rgba(79,195,247,0.5);"></span> Zero Line
+            </div>
+          </div>
         </div>
         <div class="oi-table-wrap">
           <div class="oi-table-scroll-hint">&#8596; Scroll to see all columns</div>
@@ -2914,6 +2972,20 @@ window.addEventListener('resize', function(){
         .footer{{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}}
 
         {heatmap_css}
+
+
+        /* ══ OI CHART ENHANCEMENTS ══════════════════════════════════ */
+        .oi-stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+        .oi-stat-box{background:rgba(255,255,255,0.025);border:1px solid rgba(79,195,247,0.1);border-radius:10px;padding:10px 14px;text-align:center;}
+        .oi-stat-label{font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.35);text-transform:uppercase;font-weight:700;margin-bottom:4px;font-family:'JetBrains Mono',monospace;}
+        .oi-stat-val{font-family:'Oxanium',monospace;font-size:clamp(14px,2vw,18px);font-weight:700;line-height:1.2;color:#e0f7fa;}
+        .oi-stat-pos{color:#34d399!important;}
+        .oi-stat-neg{color:#f87171!important;}
+        .oi-stat-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.3);margin-top:3px;}
+        .oi-y-label{font-family:'JetBrains Mono',monospace;font-size:9px;text-align:right;padding-right:6px;line-height:1;color:rgba(128,222,234,0.25);}
+        .oi-x-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.2);}
+        @media(max-width:600px){.oi-stat-strip{grid-template-columns:repeat(2,1fr);}}
+        @media(max-width:380px){.oi-stat-strip{grid-template-columns:1fr;}}
 
         @media(max-width:1024px){{
             .grid-5{{grid-template-columns:repeat(3,minmax(0,1fr));}}
