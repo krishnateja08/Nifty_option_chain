@@ -1049,8 +1049,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         ("🔄", "OI Direction",            *score_oi_direction(oi_cls),   True),
         ("🌐", "Global Market Bias",      *score_global(global_bias),    True),
         ("🌡️", "India VIX",              *score_vix(vix_val, vix_trend), True),
-        ("📦", "Volume at Support",       *score_volume(vol_support, "support"),    True),
-        ("📦", "Volume at Resistance",    *score_volume(vol_resistance, "resistance"), True),
+
     ]
     auto_scores  = [s[2] for s in signals if s[5]]
     manual_scores = [s[2] for s in signals if not s[5]]
@@ -1139,8 +1138,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         val_trend = "Mixed"
     val_oi_dir  = d.get('oi_direction', 'N/A') if d.get('has_option_data') else na_span
     val_global  = global_bias.title() if global_bias else na_span
-    val_vol_sup = f"{vol_support:+.0f}%" if vol_support is not None else na_span
-    val_vol_res = f"{vol_resistance:+.0f}%" if vol_resistance is not None else na_span
     na_pill     = f'<span class="sc-pill sc-pill-na">— N/A: {na_count}</span>' if na_count > 0 else ''
     score_note  = ("Strong directional conviction — proceed with caution and stop losses."
                    if abs(total_score) >= 3 else
@@ -1194,16 +1191,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                     <div class="inp-s-val">{f"{vix_val:.1f}" if vix_val is not None else '<span class="na-inline">N/A</span>'}</div>
                     <div class="inp-s-src">yfinance Auto (^INDIAVIX)</div>
                 </div>
-                <div class="inp-summary-card {'inp-auto-card' if vol_support is not None else 'inp-manual-card'}">
-                    <div class="inp-s-label">Vol at Support</div>
-                    <div class="inp-s-val">{val_vol_sup}</div>
-                    <div class="inp-s-src">{'yfinance 1H Auto' if vol_support is not None else 'Manual Input'}</div>
-                </div>
-                <div class="inp-summary-card {'inp-auto-card' if vol_resistance is not None else 'inp-manual-card'}">
-                    <div class="inp-s-label">Vol at Resistance</div>
-                    <div class="inp-s-val">{val_vol_res}</div>
-                    <div class="inp-s-src">{'yfinance 1H Auto' if vol_resistance is not None else 'Manual Input'}</div>
-                </div>
+
                 <div class="inp-summary-card inp-manual-card">
                     <div class="inp-s-label">IV View</div>
                     <div class="inp-s-val">{vol_view.upper()}</div>
