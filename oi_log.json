@@ -7,14 +7,14 @@
     "diff": -1073674,
     "pcr": 0.57,
     "opt_signal": "SELL",
-    "vwap": 25295.75,
-    "fut_price": 16832.35,
-    "spot_price": 25295.75,
+    "vwap": 25293.75,
+    "fut_price": 16830.4,
+    "spot_price": 25293.75,
     "vwap_signal": "BUY",
     "vwap_bias": "ABOVE",
     "nearest_level": 25275,
     "nearest_label": "S1",
-    "distance_pts": 20.8
+    "distance_pts": 18.8
   },
   {
     "time": "13:24",
