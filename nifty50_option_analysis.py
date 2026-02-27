@@ -2566,7 +2566,7 @@ window.addEventListener('resize', function(){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <h1>&#128202; NIFTY 50 OPEN INTEREST (OI) ANALYSIS &amp; DAILY SENTIMENT REPORT</h1>
+    <title>Nifty 50 OI Analysis</title>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <style>
         *{{margin:0;padding:0;box-sizing:border-box;}}
