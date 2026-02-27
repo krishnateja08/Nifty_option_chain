@@ -2566,7 +2566,7 @@ window.addEventListener('resize', function(){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nifty 50 Daily Report</title>
+    <h1>&#128202; NIFTY 50 OPEN INTEREST (OI) ANALYSIS &amp; DAILY SENTIMENT REPORT</h1>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <style>
         *{{margin:0;padding:0;box-sizing:border-box;}}
@@ -2949,7 +2949,7 @@ window.addEventListener('resize', function(){
 <body>
 <div class="container">
     <div class="header">
-        <h1>&#128202; NIFTY 50 DAILY REPORT</h1>
+        <h1>&#128202; NIFTY 50 OPEN INTEREST (OI) ANALYSIS &amp; DAILY SENTIMENT REPORT</h1>
         <div class="status-bar">
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
@@ -3085,7 +3085,7 @@ window.addEventListener('resize', function(){
     def generate_full_report(self):
         ist_now=datetime.now(pytz.timezone('Asia/Kolkata'))
         print("="*70)
-        print("NIFTY 50 DAILY REPORT — DEEP OCEAN + HEATMAP + INTRADAY OI TREND")
+        print("Nifty 50 Open Interest (OI) Analysis & Daily Sentiment Report")
         print(f"Generated: {ist_now.strftime('%d-%b-%Y %H:%M IST')}")
         print("="*70)
         oc_data=self.fetch_nse_option_chain_silent()
