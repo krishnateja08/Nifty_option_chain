@@ -212,34 +212,38 @@
         .inp-auto-card .inp-s-src{color:rgba(0,230,118,0.3);}
         .inp-manual-card .inp-s-src{color:rgba(79,195,247,0.3);}
         .na-inline{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}
-        .signal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px;}
-        .sig-card{background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;}
-        .sig-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-        .sig-bull{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);}
-        .sig-bear{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.25);}
-        .sig-neu{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.25);}
-        .sig-na{background:rgba(176,190,197,0.06);border:1px solid rgba(176,190,197,0.12);}
-        .sig-body{flex:1;min-width:0;}
-        .sig-name{font-size:9px;letter-spacing:1.5px;color:rgba(128,222,234,0.5);text-transform:uppercase;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-        .sig-val{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;}
-        .sig-val.na-val{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}
-        .sig-msg{font-size:11px;color:rgba(176,190,197,0.55);line-height:1.5;}
-        .sig-score{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:3px 9px;border-radius:6px;flex-shrink:0;margin-top:2px;}
-        .score-p{background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.3);}
-        .score-n{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.3);}
-        .score-0{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.25);}
-        .score-na{background:rgba(176,190,197,0.08);color:rgba(176,190,197,0.35);border:1px solid rgba(176,190,197,0.12);}
+        .o5-wrap{border-radius:16px;overflow:hidden;border:1px solid rgba(239,68,68,0.2);background:rgba(6,10,18,0.97);margin-bottom:0;}
+        .o5-top-banner{background:linear-gradient(90deg,rgba(239,68,68,0.12),rgba(185,28,28,0.06),transparent);border-bottom:1px solid rgba(239,68,68,0.12);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+        .o5-banner-left{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+        .o5-score-circle{width:62px;height:62px;border-radius:50%;background:rgba(239,68,68,0.08);border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+        .o5-score-num{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;line-height:1;}
+        .o5-score-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.5;margin-top:2px;}
+        .o5-verdict{font-family:'Orbitron',monospace;font-size:clamp(15px,2.2vw,21px);font-weight:900;letter-spacing:2px;}
+        .o5-sub{font-size:11px;color:rgba(148,163,184,0.45);margin-top:4px;line-height:1.5;max-width:520px;}
+        .o5-pills{display:flex;gap:8px;flex-wrap:wrap;}
+        .o5-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,0.04);}
+        .o5-tile{padding:16px 16px 18px;position:relative;overflow:hidden;transition:filter 0.2s;}
+        .o5-tile:hover{filter:brightness(1.2);}
+        .o5-bear{background:rgba(14,4,6,0.97);}
+        .o5-bull{background:rgba(4,14,10,0.97);}
+        .o5-neu{background:rgba(14,12,4,0.97);}
+        .o5-na{background:rgba(8,10,14,0.97);}
+        .o5-tile-bar{position:absolute;bottom:0;left:0;right:0;height:2px;}
+        .o5-tile-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
+        .o5-tile-label{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;line-height:1.5;flex:1;}
+        .o5-bear .o5-tile-label{color:rgba(248,113,113,0.5);}
+        .o5-bull .o5-tile-label{color:rgba(52,211,153,0.5);}
+        .o5-neu  .o5-tile-label{color:rgba(251,191,36,0.5);}
+        .o5-na   .o5-tile-label{color:rgba(148,163,184,0.35);}
+        .o5-chip{font-family:'Orbitron',monospace;font-size:11px;font-weight:900;min-width:28px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 6px;}
+        .o5-chip-bear{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);}
+        .o5-chip-bull{background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);}
+        .o5-chip-neu{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);}
+        .o5-chip-na{background:rgba(100,116,139,0.1);color:rgba(148,163,184,0.4);border:1px solid rgba(100,116,139,0.18);font-size:9px;}
+        .o5-val{font-family:'Oxanium',sans-serif;font-size:clamp(13px,1.8vw,17px);font-weight:700;line-height:1;margin-bottom:6px;}
+        .o5-msg{font-size:9.5px;color:rgba(100,116,139,0.55);line-height:1.4;font-family:'JetBrains Mono',monospace;}
         .auto-badge{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-weight:700;letter-spacing:0.5px;}
         .manual-badge{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.2);color:#4fc3f7;font-weight:700;letter-spacing:0.5px;}
-        .score-meter{background:rgba(10,20,30,0.7);border:1px solid rgba(79,195,247,0.15);border-radius:16px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
-        .score-ring-wrap{position:relative;flex-shrink:0;width:120px;height:120px;}
-        .score-ring-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
-        .score-ring-num{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;line-height:1;}
-        .score-ring-txt{font-size:8px;letter-spacing:2px;color:rgba(176,190,197,0.4);text-transform:uppercase;}
-        .score-detail{flex:1;min-width:200px;}
-        .score-bias-lbl{font-family:'Orbitron',monospace;font-size:clamp(16px,3vw,24px);font-weight:900;letter-spacing:2px;margin-bottom:8px;}
-        .score-sub{font-size:12px;color:rgba(176,190,197,0.5);line-height:1.6;margin-bottom:8px;}
-        .score-pills{display:flex;gap:8px;flex-wrap:wrap;}
         .sc-pill{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:1px;}
         .sc-pill-bull{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);color:#00e676;}
         .sc-pill-bear{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.3);color:#ff5252;}
@@ -437,7 +441,7 @@
             .nc-cards-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
             .pf-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
             .input-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
-            .signal-grid{grid-template-columns:1fr;}
+            .o5-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
         }
         @media(max-width:600px){
             .grid-5,.grid-4{grid-template-columns:minmax(0,1fr);}
@@ -462,7 +466,8 @@
             .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){border-bottom:none;}
             .pf-date-range{display:none;}
             .strat-grid{grid-template-columns:1fr;}
-            .score-meter{flex-direction:column;}
+            .o5-grid{grid-template-columns:1fr;}
+            .o5-top-banner{flex-direction:column;align-items:flex-start;}
             .oi-summary-strip{grid-template-columns:1fr 1fr;}
             .oi-table thead th,.oi-table tbody td{padding:6px 6px;font-size:9px;}
             .oi-int-btn{padding:8px 14px;font-size:10px;}
@@ -485,7 +490,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">01-Mar-2026 03:08 IST</span>
+                <span class="sb-value gen-val">01-Mar-2026 03:33 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -1007,7 +1012,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-            As of: 01-Mar-2026 03:08 IST
+            As of: 01-Mar-2026 03:33 IST
           </span>
         </div>
 
@@ -1337,7 +1342,7 @@
             <div class="section-title">
                 <span>&#9881;&#65039;</span> LIVE DATA INPUTS
                 <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
-                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 01-Mar-2026 03:08 IST</span>
+                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: 01-Mar-2026 03:33 IST</span>
             </div>
             <div class="input-summary-grid">
                 <div class="inp-summary-card inp-auto-card">
@@ -1384,105 +1389,89 @@
             </div>
         </div>
         <div class="section">
-            <div class="section-title">
-                <span>&#128203;</span> SIGNAL CHECKLIST
-                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-                    0 Bullish &middot; 6 Bearish &middot; 1 Neutral &middot; 0 N/A
-                </span>
-            </div>
-            <div class="signal-grid">
-        <div class="sig-card">
-            <div class="sig-icon sig-bear">📊</div>
-            <div class="sig-body">
-                <div class="sig-name">PCR (OI Ratio) <span class="auto-badge">AUTO</span></div>
-                <div class="sig-val">0.536</div>
-                <div class="sig-msg">PCR 0.536 → below 0.8 — excess call writing, bearish sentiment</div>
-            </div>
-            <div class="sig-score score-n">-1</div>
-        </div>
-        <div class="sig-card">
-            <div class="sig-icon sig-bear">📈</div>
-            <div class="sig-body">
-                <div class="sig-name">RSI (14-Day) <span class="auto-badge">AUTO</span></div>
-                <div class="sig-val">34.5</div>
-                <div class="sig-msg">RSI 34.5 → below 40 — bearish momentum, oversold</div>
-            </div>
-            <div class="sig-score score-n">-1</div>
-        </div>
-        <div class="sig-card">
-            <div class="sig-icon sig-bear">⚡</div>
-            <div class="sig-body">
-                <div class="sig-name">MACD Signal <span class="auto-badge">AUTO</span></div>
-                <div class="sig-val">Bearish Crossover</div>
-                <div class="sig-msg">MACD crossed below signal line — bearish momentum</div>
-            </div>
-            <div class="sig-score score-n">-1</div>
-        </div>
-        <div class="sig-card">
-            <div class="sig-icon sig-bear">📉</div>
-            <div class="sig-body">
-                <div class="sig-name">Market Trend (SMAs) <span class="auto-badge">AUTO</span></div>
-                <div class="sig-val">Downtrend</div>
-                <div class="sig-msg">Price below all SMAs (20/50/200) — structural downtrend</div>
-            </div>
-            <div class="sig-score score-n">-1</div>
-        </div>
-        <div class="sig-card">
-            <div class="sig-icon sig-bear">🔄</div>
-            <div class="sig-body">
-                <div class="sig-name">OI Direction <span class="auto-badge">AUTO</span></div>
-                <div class="sig-val">Bearish OI</div>
-                <div class="sig-msg">Net OI change is bearish — call build-up / put unwinding dominant</div>
-            </div>
-            <div class="sig-score score-n">-1</div>
-        </div>
-        <div class="sig-card">
-            <div class="sig-icon sig-bear">🌐</div>
-            <div class="sig-body">
-                <div class="sig-name">Global Market Bias <span class="auto-badge">AUTO</span></div>
-                <div class="sig-val">Bearish</div>
-                <div class="sig-msg">Global indices showing bearish pressure</div>
-            </div>
-            <div class="sig-score score-n">-1</div>
-        </div>
-        <div class="sig-card">
-            <div class="sig-icon sig-neu">🌡️</div>
-            <div class="sig-body">
-                <div class="sig-name">India VIX <span class="auto-badge">AUTO</span></div>
-                <div class="sig-val">13.7 (rising)</div>
-                <div class="sig-msg">VIX 13.7 in normal range — rising</div>
-            </div>
-            <div class="sig-score score-0">0</div>
-        </div></div>
-            <div class="score-meter">
-                <div class="score-ring-wrap">
-                    <svg width="120" height="120" viewBox="0 0 110 110">
-                        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(79,195,247,0.08)" stroke-width="9"/>
-                        <circle cx="55" cy="55" r="46" fill="none"
-                            stroke="#ff5252" stroke-width="9"
-                            stroke-linecap="round"
-                            stroke-dasharray="289.0"
-                            stroke-dashoffset="41.3"
-                            style="transform:rotate(-90deg);transform-origin:55px 55px;"/>
-                    </svg>
-                    <div class="score-ring-label">
-                        <div class="score-ring-num" style="color:#ff5252;">-6</div>
-                        <div class="score-ring-txt">SCORE</div>
+            <div class="o5-wrap">
+                <div class="o5-top-banner">
+                    <div class="o5-banner-left">
+                        <div class="o5-score-circle" style="border-color:#ff5252;box-shadow:0 0 20px #ff525244,inset 0 0 16px #ff525211;">
+                            <div class="o5-score-num" style="color:#ff5252;">-6</div>
+                            <div class="o5-score-lbl">SCORE</div>
+                        </div>
+                        <div>
+                            <div class="o5-verdict" style="color:#ff5252;text-shadow:0 0 20px #ff525266;">STRONGLY BEARISH</div>
+                            <div class="o5-sub">Score -6 from 7 signals (0 skipped as N/A). Strong directional conviction — proceed with caution and stop losses.</div>
+                        </div>
                     </div>
-                </div>
-                <div class="score-detail">
-                    <div class="score-bias-lbl" style="background:linear-gradient(135deg,#ff5252,#b71c1c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">STRONGLY BEARISH</div>
-                    <div class="score-sub">
-                        Score -6 from 7 signals (0 skipped as N/A).<br>
-                        Strong directional conviction — proceed with caution and stop losses.
-                    </div>
-                    <div class="score-pills">
+                    <div class="o5-pills">
                         <span class="sc-pill sc-pill-bull">&#10003; BULL: 0</span>
                         <span class="sc-pill sc-pill-bear">&#10007; BEAR: 6</span>
                         <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: 1</span>
                         
                     </div>
                 </div>
+                <div class="o5-grid">
+        <div class="o5-tile o5-bear">
+            <div class="o5-tile-top">
+                <span class="o5-tile-label">PCR (OI Ratio) <span class="auto-badge">AUTO</span></span>
+                <div class="o5-chip o5-chip-bear">-1</div>
+            </div>
+            <div class="o5-val" style="color:#f87171;">0.536</div>
+            <div class="o5-msg">PCR 0.536 → below 0.8 — excess call writing, bearish sentiment</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
+        </div>
+        <div class="o5-tile o5-bear">
+            <div class="o5-tile-top">
+                <span class="o5-tile-label">RSI (14-Day) <span class="auto-badge">AUTO</span></span>
+                <div class="o5-chip o5-chip-bear">-1</div>
+            </div>
+            <div class="o5-val" style="color:#f87171;">34.5</div>
+            <div class="o5-msg">RSI 34.5 → below 40 — bearish momentum, oversold</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
+        </div>
+        <div class="o5-tile o5-bear">
+            <div class="o5-tile-top">
+                <span class="o5-tile-label">MACD Signal <span class="auto-badge">AUTO</span></span>
+                <div class="o5-chip o5-chip-bear">-1</div>
+            </div>
+            <div class="o5-val" style="color:#f87171;">Bearish Crossover</div>
+            <div class="o5-msg">MACD crossed below signal line — bearish momentum</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
+        </div>
+        <div class="o5-tile o5-bear">
+            <div class="o5-tile-top">
+                <span class="o5-tile-label">Market Trend (SMAs) <span class="auto-badge">AUTO</span></span>
+                <div class="o5-chip o5-chip-bear">-1</div>
+            </div>
+            <div class="o5-val" style="color:#f87171;">Downtrend</div>
+            <div class="o5-msg">Price below all SMAs (20/50/200) — structural downtrend</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
+        </div>
+        <div class="o5-tile o5-bear">
+            <div class="o5-tile-top">
+                <span class="o5-tile-label">OI Direction <span class="auto-badge">AUTO</span></span>
+                <div class="o5-chip o5-chip-bear">-1</div>
+            </div>
+            <div class="o5-val" style="color:#f87171;">Bearish OI</div>
+            <div class="o5-msg">Net OI change is bearish — call build-up / put unwinding dominant</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
+        </div>
+        <div class="o5-tile o5-bear">
+            <div class="o5-tile-top">
+                <span class="o5-tile-label">Global Market Bias <span class="auto-badge">AUTO</span></span>
+                <div class="o5-chip o5-chip-bear">-1</div>
+            </div>
+            <div class="o5-val" style="color:#f87171;">Bearish</div>
+            <div class="o5-msg">Global indices showing bearish pressure</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
+        </div>
+        <div class="o5-tile o5-neu">
+            <div class="o5-tile-top">
+                <span class="o5-tile-label">India VIX <span class="auto-badge">AUTO</span></span>
+                <div class="o5-chip o5-chip-neu">0</div>
+            </div>
+            <div class="o5-val" style="color:#fbbf24;">13.7 (rising)</div>
+            <div class="o5-msg">VIX 13.7 in normal range — rising</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#f59e0b,transparent);"></div>
+        </div></div>
             </div>
         </div>
         <div class="section">

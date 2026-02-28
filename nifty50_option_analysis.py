@@ -1075,26 +1075,31 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 
     def sig_card(icon, name, score, display_val, msg, is_auto):
         if display_val == "N/A":
-            icon_cls = "sig-na"; s_cls = "score-na"; s_txt = "N/A"
+            tile_cls = "o5-tile o5-na"; chip_cls = "o5-chip o5-chip-na"; s_txt = "N/A"
+            val_color = "color:rgba(176,190,197,0.3);"
+            bar_style = "background:linear-gradient(90deg,transparent,rgba(176,190,197,0.15),transparent);"
         elif score > 0:
-            icon_cls = "sig-bull"; s_cls = "score-p"; s_txt = f"+{score}"
+            tile_cls = "o5-tile o5-bull"; chip_cls = "o5-chip o5-chip-bull"; s_txt = f"+{score}"
+            val_color = "color:#34d399;"
+            bar_style = "background:linear-gradient(90deg,transparent,#10b981,transparent);"
         elif score < 0:
-            icon_cls = "sig-bear"; s_cls = "score-n"; s_txt = str(score)
+            tile_cls = "o5-tile o5-bear"; chip_cls = "o5-chip o5-chip-bear"; s_txt = str(score)
+            val_color = "color:#f87171;"
+            bar_style = "background:linear-gradient(90deg,transparent,#ef4444,transparent);"
         else:
-            icon_cls = "sig-neu"; s_cls = "score-0"; s_txt = "0"
-        val_html = (f'<div class="sig-val na-val">{display_val}</div>'
-                    if display_val == "N/A"
-                    else f'<div class="sig-val">{display_val}</div>')
+            tile_cls = "o5-tile o5-neu"; chip_cls = "o5-chip o5-chip-neu"; s_txt = "0"
+            val_color = "color:#fbbf24;"
+            bar_style = "background:linear-gradient(90deg,transparent,#f59e0b,transparent);"
         auto_badge = '<span class="auto-badge">AUTO</span>' if is_auto else '<span class="manual-badge">MANUAL</span>'
         return f"""
-        <div class="sig-card">
-            <div class="sig-icon {icon_cls}">{icon}</div>
-            <div class="sig-body">
-                <div class="sig-name">{name} {auto_badge}</div>
-                {val_html}
-                <div class="sig-msg">{msg}</div>
+        <div class="{tile_cls}">
+            <div class="o5-tile-top">
+                <span class="o5-tile-label">{name} {auto_badge}</span>
+                <div class="{chip_cls}">{s_txt}</div>
             </div>
-            <div class="sig-score {s_cls}">{s_txt}</div>
+            <div class="o5-val" style="{val_color}">{display_val}</div>
+            <div class="o5-msg">{msg}</div>
+            <div class="o5-tile-bar" style="{bar_style}"></div>
         </div>"""
 
     sig_cards_html = "".join(sig_card(*s) for s in signals)
@@ -1200,42 +1205,26 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
             </div>
         </div>
         <div class="section">
-            <div class="section-title">
-                <span>&#128203;</span> SIGNAL CHECKLIST
-                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-                    {bull_count} Bullish &middot; {bear_count} Bearish &middot; {neu_count} Neutral &middot; {na_count} N/A
-                </span>
-            </div>
-            <div class="signal-grid">{sig_cards_html}</div>
-            <div class="score-meter">
-                <div class="score-ring-wrap">
-                    <svg width="120" height="120" viewBox="0 0 110 110">
-                        <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(79,195,247,0.08)" stroke-width="9"/>
-                        <circle cx="55" cy="55" r="46" fill="none"
-                            stroke="{ring_color}" stroke-width="9"
-                            stroke-linecap="round"
-                            stroke-dasharray="{circumference:.1f}"
-                            stroke-dashoffset="{dashoffset:.1f}"
-                            style="transform:rotate(-90deg);transform-origin:55px 55px;"/>
-                    </svg>
-                    <div class="score-ring-label">
-                        <div class="score-ring-num" style="color:{ring_color};">{score_sign}{total_score}</div>
-                        <div class="score-ring-txt">SCORE</div>
+            <div class="o5-wrap">
+                <div class="o5-top-banner">
+                    <div class="o5-banner-left">
+                        <div class="o5-score-circle" style="border-color:{ring_color};box-shadow:0 0 20px {ring_color}44,inset 0 0 16px {ring_color}11;">
+                            <div class="o5-score-num" style="color:{ring_color};">{score_sign}{total_score}</div>
+                            <div class="o5-score-lbl">SCORE</div>
+                        </div>
+                        <div>
+                            <div class="o5-verdict" style="color:{ring_color};text-shadow:0 0 20px {ring_color}66;">{bias_label}</div>
+                            <div class="o5-sub">Score {score_sign}{total_score} from {len(signals)} signals ({na_count} skipped as N/A). {score_note}</div>
+                        </div>
                     </div>
-                </div>
-                <div class="score-detail">
-                    <div class="score-bias-lbl" style="background:{bias_gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{bias_label}</div>
-                    <div class="score-sub">
-                        Score {score_sign}{total_score} from {len(signals)} signals ({na_count} skipped as N/A).<br>
-                        {score_note}
-                    </div>
-                    <div class="score-pills">
+                    <div class="o5-pills">
                         <span class="sc-pill sc-pill-bull">&#10003; BULL: {bull_count}</span>
                         <span class="sc-pill sc-pill-bear">&#10007; BEAR: {bear_count}</span>
                         <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: {neu_count}</span>
                         {na_pill}
                     </div>
                 </div>
+                <div class="o5-grid">{sig_cards_html}</div>
             </div>
         </div>
         <div class="section">
@@ -3433,34 +3422,38 @@ window.addEventListener('resize', function(){
         .inp-auto-card .inp-s-src{{color:rgba(0,230,118,0.3);}}
         .inp-manual-card .inp-s-src{{color:rgba(79,195,247,0.3);}}
         .na-inline{{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
-        .signal-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
-        .sig-card{{background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:14px;}}
-        .sig-icon{{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}}
-        .sig-bull{{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);}}
-        .sig-bear{{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.25);}}
-        .sig-neu{{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.25);}}
-        .sig-na{{background:rgba(176,190,197,0.06);border:1px solid rgba(176,190,197,0.12);}}
-        .sig-body{{flex:1;min-width:0;}}
-        .sig-name{{font-size:9px;letter-spacing:1.5px;color:rgba(128,222,234,0.5);text-transform:uppercase;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}}
-        .sig-val{{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:3px;}}
-        .sig-val.na-val{{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
-        .sig-msg{{font-size:11px;color:rgba(176,190,197,0.55);line-height:1.5;}}
-        .sig-score{{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;padding:3px 9px;border-radius:6px;flex-shrink:0;margin-top:2px;}}
-        .score-p{{background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
-        .score-n{{background:rgba(255,82,82,0.12);color:#ff5252;border:1px solid rgba(255,82,82,0.3);}}
-        .score-0{{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.25);}}
-        .score-na{{background:rgba(176,190,197,0.08);color:rgba(176,190,197,0.35);border:1px solid rgba(176,190,197,0.12);}}
+        .o5-wrap{{border-radius:16px;overflow:hidden;border:1px solid rgba(239,68,68,0.2);background:rgba(6,10,18,0.97);margin-bottom:0;}}
+        .o5-top-banner{{background:linear-gradient(90deg,rgba(239,68,68,0.12),rgba(185,28,28,0.06),transparent);border-bottom:1px solid rgba(239,68,68,0.12);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}}
+        .o5-banner-left{{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}}
+        .o5-score-circle{{width:62px;height:62px;border-radius:50%;background:rgba(239,68,68,0.08);border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}}
+        .o5-score-num{{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;line-height:1;}}
+        .o5-score-lbl{{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.5;margin-top:2px;}}
+        .o5-verdict{{font-family:'Orbitron',monospace;font-size:clamp(15px,2.2vw,21px);font-weight:900;letter-spacing:2px;}}
+        .o5-sub{{font-size:11px;color:rgba(148,163,184,0.45);margin-top:4px;line-height:1.5;max-width:520px;}}
+        .o5-pills{{display:flex;gap:8px;flex-wrap:wrap;}}
+        .o5-grid{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,0.04);}}
+        .o5-tile{{padding:16px 16px 18px;position:relative;overflow:hidden;transition:filter 0.2s;}}
+        .o5-tile:hover{{filter:brightness(1.2);}}
+        .o5-bear{{background:rgba(14,4,6,0.97);}}
+        .o5-bull{{background:rgba(4,14,10,0.97);}}
+        .o5-neu{{background:rgba(14,12,4,0.97);}}
+        .o5-na{{background:rgba(8,10,14,0.97);}}
+        .o5-tile-bar{{position:absolute;bottom:0;left:0;right:0;height:2px;}}
+        .o5-tile-top{{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}}
+        .o5-tile-label{{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;line-height:1.5;flex:1;}}
+        .o5-bear .o5-tile-label{{color:rgba(248,113,113,0.5);}}
+        .o5-bull .o5-tile-label{{color:rgba(52,211,153,0.5);}}
+        .o5-neu  .o5-tile-label{{color:rgba(251,191,36,0.5);}}
+        .o5-na   .o5-tile-label{{color:rgba(148,163,184,0.35);}}
+        .o5-chip{{font-family:'Orbitron',monospace;font-size:11px;font-weight:900;min-width:28px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0 6px;}}
+        .o5-chip-bear{{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);}}
+        .o5-chip-bull{{background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.3);}}
+        .o5-chip-neu{{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);}}
+        .o5-chip-na{{background:rgba(100,116,139,0.1);color:rgba(148,163,184,0.4);border:1px solid rgba(100,116,139,0.18);font-size:9px;}}
+        .o5-val{{font-family:'Oxanium',sans-serif;font-size:clamp(13px,1.8vw,17px);font-weight:700;line-height:1;margin-bottom:6px;}}
+        .o5-msg{{font-size:9.5px;color:rgba(100,116,139,0.55);line-height:1.4;font-family:'JetBrains Mono',monospace;}}
         .auto-badge{{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-weight:700;letter-spacing:0.5px;}}
         .manual-badge{{font-size:8px;padding:1px 6px;border-radius:4px;background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.2);color:#4fc3f7;font-weight:700;letter-spacing:0.5px;}}
-        .score-meter{{background:rgba(10,20,30,0.7);border:1px solid rgba(79,195,247,0.15);border-radius:16px;padding:22px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}}
-        .score-ring-wrap{{position:relative;flex-shrink:0;width:120px;height:120px;}}
-        .score-ring-label{{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}}
-        .score-ring-num{{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;line-height:1;}}
-        .score-ring-txt{{font-size:8px;letter-spacing:2px;color:rgba(176,190,197,0.4);text-transform:uppercase;}}
-        .score-detail{{flex:1;min-width:200px;}}
-        .score-bias-lbl{{font-family:'Orbitron',monospace;font-size:clamp(16px,3vw,24px);font-weight:900;letter-spacing:2px;margin-bottom:8px;}}
-        .score-sub{{font-size:12px;color:rgba(176,190,197,0.5);line-height:1.6;margin-bottom:8px;}}
-        .score-pills{{display:flex;gap:8px;flex-wrap:wrap;}}
         .sc-pill{{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:1px;}}
         .sc-pill-bull{{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);color:#00e676;}}
         .sc-pill-bear{{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.3);color:#ff5252;}}
@@ -3602,7 +3595,7 @@ window.addEventListener('resize', function(){
             .nc-cards-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .pf-grid{{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}}
             .input-summary-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
-            .signal-grid{{grid-template-columns:1fr;}}
+            .o5-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
         }}
         @media(max-width:600px){{
             .grid-5,.grid-4{{grid-template-columns:minmax(0,1fr);}}
@@ -3627,7 +3620,8 @@ window.addEventListener('resize', function(){
             .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){{border-bottom:none;}}
             .pf-date-range{{display:none;}}
             .strat-grid{{grid-template-columns:1fr;}}
-            .score-meter{{flex-direction:column;}}
+            .o5-grid{{grid-template-columns:1fr;}}
+            .o5-top-banner{{flex-direction:column;align-items:flex-start;}}
             .oi-summary-strip{{grid-template-columns:1fr 1fr;}}
             .oi-table thead th,.oi-table tbody td{{padding:6px 6px;font-size:9px;}}
             .oi-int-btn{{padding:8px 14px;font-size:10px;}}
