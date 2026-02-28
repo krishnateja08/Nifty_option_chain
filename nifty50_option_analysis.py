@@ -1214,6 +1214,9 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
     pe_wall     = d.get('max_pe_oi', atm_strike - 200 if atm_strike else 0)
     has_strikes = atm_strike > 0
 
+    # Base R:R from market analysis — needed before card loop
+    rr_ratio = d.get('risk_reward_ratio', 0) or 0
+
     # Per-strategy R:R multipliers relative to base market R:R
     # Spreads cap both profit AND loss → better RR than naked. Ratio backspread = high reward/unlimited.
     STRAT_RR_MULT = {
@@ -1312,7 +1315,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
     stop_loss_val = d.get('stop_loss', None)
     target_1_val  = d.get('target_1', resistance)
     target_2_val  = d.get('target_2', 0)
-    rr_ratio      = d.get('risk_reward_ratio', 0)
     expiry_date   = d.get('expiry', 'N/A')
 
     if stop_loss_val:
