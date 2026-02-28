@@ -1989,45 +1989,444 @@ class NiftyHTMLAnalyzer:
 
     def _stat_card(self, icon, label, value, badge_text, badge_class, bar_pct, bar_type, sub_text=""):
         tag_map = {'bullish':('tag-bull','#00e5ff'),'bearish':('tag-bear','#ff5252'),'neutral':('tag-neu','#ffb74d')}
-        tag_cls,_ = tag_map.get(badge_class,tag_map['neutral'])
+        tag_cls,_ = tag_map.get(badge_class, tag_map['neutral'])
         border_color = {'bullish':'rgba(0,229,255,0.35)','bearish':'rgba(255,82,82,0.35)'}.get(badge_class,'rgba(255,183,77,0.25)')
         top_color = {'bullish':'#00e5ff','bearish':'#ff5252'}.get(badge_class,'#ffb74d')
+
+        # ── RSI: circular ring gauge ─────────────────────────────────────────
+        if label.startswith('RSI'):
+            try:    rsi_num = float(value)
+            except: rsi_num = 50.0
+            circumf = 138.2
+            offset  = circumf * (1 - rsi_num / 100)
+            ring_col = '#ff5252' if rsi_num > 70 else ('#00e676' if rsi_num < 30 else '#ffb74d')
+            extra_visual = f"""
+            <div style="display:flex;justify-content:center;margin:6px 0 8px;">
+              <div style="position:relative;width:56px;height:56px;">
+                <svg viewBox="0 0 56 56" style="width:100%;height:100%;">
+                  <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
+                  <circle cx="28" cy="28" r="22" fill="none" stroke="{ring_col}" stroke-width="7"
+                    stroke-linecap="round" stroke-dasharray="{circumf:.1f}" stroke-dashoffset="{offset:.1f}"
+                    style="transform:rotate(-90deg);transform-origin:28px 28px;" opacity="0.85"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+                  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:{ring_col};">{rsi_num:.0f}</div>
+              </div>
+            </div>"""
+        # ── MACD: mini histogram bars ────────────────────────────────────────
+        elif label.startswith('MACD'):
+            bar_color = '#ff5252' if badge_class == 'bearish' else '#00e676'
+            heights = [30,45,55,68,78,88,95,100] if badge_class == 'bearish' else [100,90,75,60,48,35,22,12]
+            hist_bars = ''.join(
+                f'<div style="flex:1;height:{h}%;background:{bar_color};opacity:{0.4+i*0.075:.2f};'
+                f'border-radius:2px 2px 0 0;min-width:3px;"></div>'
+                for i,h in enumerate(heights)
+            )
+            extra_visual = f"""
+            <div style="display:flex;align-items:flex-end;gap:2px;height:36px;padding:0 2px;margin:6px 0 8px;">
+              {hist_bars}
+            </div>"""
+        # ── SMA: mini sparkline trend line ───────────────────────────────────
+        elif label.startswith('SMA'):
+            line_color = '#ff5252' if badge_class == 'bearish' else '#00e676'
+            pts = "0,28 12,24 22,20 30,22 40,26 50,18 60,14 70,10 80,12 90,8 100,6" if badge_class == 'bullish' else "0,8 12,10 22,14 30,12 40,9 50,18 60,22 70,26 80,24 90,28 100,30"
+            extra_visual = f"""
+            <div style="height:32px;margin:6px 0 8px;position:relative;">
+              <svg viewBox="0 0 100 32" preserveAspectRatio="none" style="width:100%;height:100%;overflow:visible;">
+                <polyline points="{pts}" fill="none" stroke="{line_color}" stroke-width="1.8"
+                  stroke-linejoin="round" opacity="0.7"/>
+              </svg>
+            </div>"""
+        else:
+            extra_visual = ''
+
+        bg_map = {'bullish':'linear-gradient(145deg,rgba(10,30,20,0.9),rgba(4,14,10,0.95))',
+                  'bearish':'linear-gradient(145deg,rgba(30,10,14,0.9),rgba(12,4,8,0.95))',
+                  'neutral':'linear-gradient(145deg,rgba(28,22,8,0.9),rgba(12,10,4,0.95))'}
+        card_bg = bg_map.get(badge_class, '#111827')
+
         return f"""
-            <div class="g-compact" style="border-color:{border_color};">
-                <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,{top_color},transparent);"></div>
-                <div class="cc-top"><span class="cc-ico">{icon}</span><div class="cc-lbl">{label}</div><span class="tag {tag_cls}">{badge_text}</span></div>
+            <div class="g-compact" style="border-color:{border_color};background:{card_bg};">
+                <div style="position:absolute;top:0;left:0;right:0;height:1px;
+                  background:linear-gradient(90deg,transparent,{top_color},transparent);"></div>
+                <div class="cc-top"><span class="cc-ico">{icon}</span><div class="cc-lbl">{label}</div>
+                  <span class="tag {tag_cls}">{badge_text}</span></div>
+                {extra_visual}
                 <div class="cc-val">{value}</div>
                 {f'<div class="cc-sub">{sub_text}</div>' if sub_text else ''}
                 <div class="cc-bar"><div class="cc-bar-fill {bar_type}" style="width:{bar_pct:.1f}%"></div></div>
             </div>"""
 
-    def _market_direction_widget_html(self):
+    def _build_enhanced_oc_cards(self):
+        """Enhanced Option Chain cards: PCR needle meter, Max Pain zone bar, CE/PE OI battle bars."""
         d = self.html_data
+        if not d['has_option_data']:
+            return '<div style="color:#80deea;padding:20px;">Option chain data unavailable</div>'
+
+        pcr     = d['pcr']
+        max_pain= d['max_pain']
+        max_ce  = d['max_ce_oi']
+        max_pe  = d['max_pe_oi']
+        spot    = d['current_price']
+        ce_pct  = d['ce_oi_pct']
+        pe_pct  = d['pe_oi_pct']
+
+        pcr_tag    = 'Bearish' if pcr < 0.7 else ('Bullish' if pcr > 1.2 else 'Neutral')
+        pcr_col    = '#ff5252' if pcr < 0.7 else ('#00e676' if pcr > 1.2 else '#ffb74d')
+        pcr_border = 'rgba(255,82,82,0.35)' if pcr < 0.7 else ('rgba(0,230,118,0.35)' if pcr > 1.2 else 'rgba(255,183,77,0.3)')
+        pcr_tag_cls= 'tag-bear' if pcr < 0.7 else ('tag-bull' if pcr > 1.2 else 'tag-neu')
+        pcr_needle_pct = round(min(97, max(3, pcr / 2.0 * 100)), 1)
+
+        level_min = min(spot, max_pain) - 200
+        level_max = max(spot, max_pain) + 200
+        rng = level_max - level_min or 1
+        spot_pct  = round((spot - level_min) / rng * 100, 1)
+        pain_pct  = round((max_pain - level_min) / rng * 100, 1)
+        pain_diff = int(max_pain - spot)
+        pain_sign = '+' if pain_diff >= 0 else ''
+        pain_col  = '#00e676' if pain_diff > 0 else '#ff5252'
+
+        ce_oi_chg   = d.get('total_ce_oi_change', 0)
+        pe_oi_chg   = d.get('total_pe_oi_change', 0)
+        total_abs   = abs(ce_oi_chg) + abs(pe_oi_chg) or 1
+        ce_bar_pct  = round(abs(ce_oi_chg) / total_abs * 100, 1)
+        pe_bar_pct  = round(abs(pe_oi_chg) / total_abs * 100, 1)
+        ce_chg_col  = '#ff5252' if ce_oi_chg > 0 else '#00e676'
+        pe_chg_col  = '#00e676' if pe_oi_chg > 0 else '#ff5252'
+
+        return f"""
+        <!-- ── PCR Card ──────────────────────────────────────────────── -->
+        <div class="g-compact" style="border-color:{pcr_border};background:linear-gradient(145deg,rgba(12,4,8,0.95),rgba(8,4,6,0.98));position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;
+            background:linear-gradient(90deg,transparent,{pcr_col},transparent);"></div>
+          <div class="cc-top">
+            <span class="cc-ico">&#128308;</span>
+            <div class="cc-lbl">PCR Ratio (OI)</div>
+            <span class="tag {pcr_tag_cls}">{pcr_tag}</span>
+          </div>
+          <div class="cc-val" style="color:{pcr_col};">{pcr:.3f}</div>
+          <div class="cc-sub">Put/Call OI Ratio</div>
+          <div style="position:relative;margin:8px 0 4px;">
+            <div style="height:8px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,0.4);position:relative;">
+              <div style="position:absolute;inset:0;border-radius:4px;
+                background:linear-gradient(90deg,#ff3355 0%,#ff9900 35%,#ffcc00 50%,#88dd00 65%,#00e676 100%);opacity:0.75;"></div>
+              <div style="position:absolute;left:35%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.4);"></div>
+              <div style="position:absolute;left:60%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.4);"></div>
+              <div style="position:absolute;top:-3px;left:{pcr_needle_pct}%;
+                transform:translateX(-50%);width:3px;height:14px;
+                background:white;border-radius:1.5px;box-shadow:0 0 8px white;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px;
+              font-family:'JetBrains Mono',monospace;font-size:8px;">
+              <span style="color:#ff5252;">&#60;0.7 Bear</span>
+              <span style="color:rgba(180,210,230,0.35);">Neutral</span>
+              <span style="color:#00e676;">&#62;1.2 Bull</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Max Pain Card ─────────────────────────────────────────── -->
+        <div class="g-compact" style="border-color:rgba(255,183,77,0.3);background:linear-gradient(145deg,rgba(28,22,8,0.9),rgba(12,10,4,0.95));position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;
+            background:linear-gradient(90deg,transparent,#ffb74d,transparent);"></div>
+          <div class="cc-top">
+            <span class="cc-ico">&#127919;</span>
+            <div class="cc-lbl">Max Pain</div>
+            <span class="tag tag-neu">Expiry Magnet</span>
+          </div>
+          <div class="cc-val" style="color:#ffb74d;">&#8377;{max_pain:,}</div>
+          <div class="cc-sub">Price gravity level</div>
+          <div style="position:relative;height:20px;border-radius:6px;overflow:hidden;
+            background:linear-gradient(90deg,rgba(0,230,118,0.1),rgba(255,183,77,0.2),rgba(255,82,82,0.1));
+            margin:8px 0 4px;">
+            <div style="position:absolute;left:{pain_pct}%;top:50%;
+              transform:translate(-50%,-50%);width:3px;height:16px;
+              background:#ffb74d;box-shadow:0 0 8px #ffb74d;border-radius:1.5px;"></div>
+            <div style="position:absolute;left:{spot_pct}%;top:50%;
+              transform:translate(-50%,-50%);width:3px;height:16px;
+              background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;border-radius:1.5px;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:8px;">
+            <span style="color:#4fc3f7;">&#9632; Now &#8377;{spot:,.0f}</span>
+            <span style="color:{pain_col};">{pain_sign}{pain_diff:,} pts to pain</span>
+            <span style="color:#ffb74d;">&#9632; Pain &#8377;{max_pain:,}</span>
+          </div>
+        </div>
+
+        <!-- ── Max CE OI (Resistance Wall) ──────────────────────────── -->
+        <div class="g-compact" style="border-color:rgba(255,82,82,0.28);background:linear-gradient(145deg,rgba(30,10,14,0.9),rgba(12,4,8,0.95));position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;
+            background:linear-gradient(90deg,transparent,#ff5252,transparent);"></div>
+          <div class="cc-top">
+            <span class="cc-ico">&#128308;</span>
+            <div class="cc-lbl">Max Call OI</div>
+            <span class="tag tag-bear">Resistance</span>
+          </div>
+          <div class="cc-val" style="color:#ff8899;">&#8377;{max_ce:,}</div>
+          <div class="cc-sub">CE wall</div>
+          <div style="margin-top:8px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;
+              color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:6px;">OI Change Today</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:{ce_chg_col};width:22px;">CE</span>
+                <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:{ce_bar_pct}%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
+                </div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:{ce_chg_col};width:30px;text-align:right;">{ce_bar_pct:.0f}%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:{pe_chg_col};width:22px;">PE</span>
+                <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:{pe_bar_pct}%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
+                </div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:{pe_chg_col};width:30px;text-align:right;">{pe_bar_pct:.0f}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Max PE OI (Support Floor) ────────────────────────────── -->
+        <div class="g-compact" style="border-color:rgba(0,230,118,0.25);background:linear-gradient(145deg,rgba(10,30,20,0.9),rgba(4,14,10,0.95));position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:1px;
+            background:linear-gradient(90deg,transparent,#00e676,transparent);"></div>
+          <div class="cc-top">
+            <span class="cc-ico">&#128994;</span>
+            <div class="cc-lbl">Max Put OI</div>
+            <span class="tag tag-bull">Support</span>
+          </div>
+          <div class="cc-val" style="color:#44ffaa;">&#8377;{max_pe:,}</div>
+          <div class="cc-sub">PE floor</div>
+          <div style="margin-top:8px;">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;
+              color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:6px;">Total OI Ratio</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff8899;width:22px;">CE</span>
+                <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:{ce_pct:.1f}%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
+                </div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff8899;width:30px;text-align:right;">{ce_pct:.0f}%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#44ffaa;width:22px;">PE</span>
+                <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
+                  <div style="height:100%;width:{pe_pct:.1f}%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
+                </div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#44ffaa;width:30px;text-align:right;">{pe_pct:.0f}%</span>
+              </div>
+            </div>
+          </div>
+        </div>"""
+
+    def _market_direction_widget_html(self):
+        d          = self.html_data
         bias       = d['bias']
         confidence = d['confidence']
         bull_score = d['bullish_score']
         bear_score = d['bearish_score']
-        if bias == 'BULLISH':   dir_gradient = 'linear-gradient(135deg, #4ecdc4, #2ecc8a)'
-        elif bias == 'BEARISH': dir_gradient = 'linear-gradient(135deg, #ff6b6b, #cc3333)'
-        else:                   dir_gradient = 'linear-gradient(135deg, #ffcd3c, #f7931e)'
-        bull_pill = f'<span class="md-pill md-pill-bull">BULL {bull_score}</span>'
-        bear_pill = f'<span class="md-pill md-pill-bear">BEAR {bear_score}</span>'
-        conf_cls = 'md-pill-conf-high' if confidence=='HIGH' else ('md-pill-conf-med' if confidence=='MEDIUM' else 'md-pill-conf-low')
-        conf_pill = f'<span class="md-pill {conf_cls}">{confidence} CONFIDENCE</span>'
+
+        if bias == 'BULLISH':
+            dir_gradient  = 'linear-gradient(135deg,#00ff88,#00d4ff)'
+            needle_rotate = '-60'
+            widget_border = 'rgba(0,255,136,0.3)'
+            top_line      = 'rgba(0,255,136,0.8)'
+            pulse_color   = '#00ff88'
+            score_color   = '#00ff88'
+        elif bias == 'BEARISH':
+            dir_gradient  = 'linear-gradient(135deg,#ff3355,#ff9900)'
+            needle_rotate = '60'
+            widget_border = 'rgba(255,51,85,0.3)'
+            top_line      = 'rgba(255,51,85,0.8)'
+            pulse_color   = '#ff3355'
+            score_color   = '#ff5252'
+        else:
+            dir_gradient  = 'linear-gradient(135deg,#ffcd3c,#f7931e)'
+            needle_rotate = '0'
+            widget_border = 'rgba(255,183,77,0.3)'
+            top_line      = 'rgba(255,183,77,0.8)'
+            pulse_color   = '#ffb74d'
+            score_color   = '#ffb74d'
+
+        total_score = bull_score - bear_score
+        score_sign  = '+' if total_score > 0 else ''
+        conf_cls    = ('md-pill-conf-high' if confidence == 'HIGH' else
+                       'md-pill-conf-med'  if confidence == 'MEDIUM' else 'md-pill-conf-low')
+
+        # ── Signal breakdown rows ────────────────────────────────────────────
+        signals_meta = [
+            ('SMA 20',  d.get('sma_20_above'),  'sma'),
+            ('SMA 50',  d.get('sma_50_above'),  'sma'),
+            ('SMA 200', d.get('sma_200_above'), 'sma'),
+            ('RSI',     None,                   'rsi'),
+            ('MACD',    d.get('macd_bullish'),  'macd'),
+            ('PCR',     None,                   'pcr'),
+        ]
+        sig_rows_html = ''
+        for name, is_bull, kind in signals_meta:
+            if kind == 'rsi':
+                rsi = d.get('rsi', 50)
+                is_bull = rsi < 40; is_bear = rsi > 70
+                score_val = '+1' if is_bull else ('-1' if is_bear else '0')
+                bar_w = 45 if not is_bull and not is_bear else 80
+                bar_cls = 'bull' if is_bull else ('bear' if is_bear else 'neutral')
+                val_col = '#00ff88' if is_bull else ('#ff5252' if is_bear else '#ffb74d')
+            elif kind == 'pcr':
+                pcr = d.get('pcr', 1.0)
+                is_bull = pcr > 1.2; is_bear = pcr < 0.7
+                score_val = '+1' if is_bull else ('-1' if is_bear else '0')
+                bar_w = 45 if not is_bull and not is_bear else 85
+                bar_cls = 'bull' if is_bull else ('bear' if is_bear else 'neutral')
+                val_col = '#00ff88' if is_bull else ('#ff5252' if is_bear else '#ffb74d')
+            else:
+                score_val = '+1' if is_bull else '-1'
+                bar_w = 80; bar_cls = 'bull' if is_bull else 'bear'
+                val_col = '#00ff88' if is_bull else '#ff5252'
+            bar_color_css = (
+                'linear-gradient(90deg,#00ff88,#00d4ff)' if bar_cls == 'bull' else
+                'linear-gradient(90deg,#ff3355,#ff6680)' if bar_cls == 'bear' else
+                'linear-gradient(90deg,#ffb74d,#ffdd66)'
+            )
+            sig_rows_html += f"""
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:9px;letter-spacing:1px;color:rgba(180,210,230,0.5);width:52px;text-align:right;flex-shrink:0;">{name}</span>
+              <div style="flex:1;height:6px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
+                <div style="height:100%;width:{bar_w}%;border-radius:3px;background:{bar_color_css};"></div>
+              </div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:{val_col};width:24px;flex-shrink:0;">{score_val}</span>
+            </div>"""
+
+        # ── SVG needle angle: bear_score−bull_score mapped to ±80deg ────────
+        max_s       = max(bull_score + bear_score, 1)
+        needle_deg  = round(max(-80, min(80, (bear_score - bull_score) / max_s * 80)))
+
+        # ── Confidence dots ──────────────────────────────────────────────────
+        filled = 5 if confidence == 'HIGH' else 3 if confidence == 'MEDIUM' else 1
+        dots_html = (
+            ''.join(f'<div style="width:9px;height:9px;border-radius:50%;background:{pulse_color};box-shadow:0 0 6px {pulse_color};"></div>' for _ in range(filled)) +
+            ''.join(f'<div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);"></div>' for _ in range(5 - filled))
+        )
+
         return f"""
     <div class="section">
         <div class="section-title"><span>&#129517;</span> MARKET DIRECTION (Algorithmic)</div>
-        <div class="md-widget">
+
+        <!-- Price Ticker Strip -->
+        <div style="background:linear-gradient(135deg,rgba(8,24,44,0.95),rgba(4,14,26,0.98));
+          border:1px solid {widget_border};border-radius:14px;padding:16px 22px;
+          display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+          margin-bottom:16px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;
+            background:linear-gradient(90deg,transparent,{top_line},transparent);"></div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2.5px;
+              color:rgba(120,160,180,0.45);text-transform:uppercase;margin-bottom:4px;">NIFTY 50 · SPOT PRICE</div>
+            <div style="display:flex;align-items:baseline;gap:12px;">
+              <span style="font-family:'Orbitron',monospace;font-size:clamp(26px,4vw,38px);font-weight:900;
+                color:{score_color};line-height:1;">&#8377;{d['current_price']:,.2f}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(180,210,230,0.5);">
+                ATM &#8377;{d['atm_strike']:,} &nbsp;·&nbsp; {d.get('expiry','N/A')}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            {''.join([
+              f'<div style="text-align:center;">'
+              f'<div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;'
+              f'color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">{lbl}</div>'
+              f'<div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:{col};">{val}</div>'
+              f'</div>'
+              for lbl, val, col in [
+                ('PCR (OI)', f"{d.get('pcr',0):.3f}" if d.get('has_option_data') else 'N/A',
+                 '#ff5252' if d.get('pcr',1)<0.7 else '#00e676' if d.get('pcr',1)>1.2 else '#ffb74d'),
+                ('Max Pain', f"&#8377;{d.get('max_pain',0):,}" if d.get('has_option_data') else 'N/A', '#ffb74d'),
+                ('RSI (14)', f"{d.get('rsi',0):.1f}", '#ffb74d'),
+                ('MACD', 'Bullish' if d.get('macd_bullish') else 'Bearish',
+                 '#00e676' if d.get('macd_bullish') else '#ff5252'),
+              ]
+            ])}
+          </div>
+        </div>
+
+        <!-- Main Direction Widget -->
+        <div class="md-widget" style="border-color:{widget_border};">
             <div class="md-glow"></div>
             <div class="md-row-top">
-                <div class="md-label"><div class="md-live-dot"></div>MARKET DIRECTION &nbsp;·&nbsp; ALGORITHMIC</div>
-                <div class="md-pills-top">{bull_pill}{bear_pill}</div>
+                <div class="md-label">
+                  <div class="md-live-dot" style="background:{pulse_color};box-shadow:0 0 8px {pulse_color};"></div>
+                  MARKET DIRECTION &nbsp;·&nbsp; ALGORITHMIC
+                </div>
+                <div class="md-pills-top">
+                  <span class="md-pill md-pill-bull">BULL {bull_score}</span>
+                  <span class="md-pill md-pill-bear">BEAR {bear_score}</span>
+                  <span class="md-pill {conf_cls}">{confidence} CONFIDENCE</span>
+                </div>
             </div>
-            <div class="md-row-bottom">
-                <div class="md-direction" style="background:{dir_gradient};-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">{bias}</div>
-                {conf_pill}
+
+            <!-- Direction + Dial + Signals grid -->
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:28px;align-items:center;margin-top:16px;">
+
+              <!-- Left: Direction label + score + confidence dots -->
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="md-direction" style="background:{dir_gradient};
+                  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+                  {bias}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(180,210,230,0.4);">
+                  Score: <span style="color:{score_color};font-weight:700;">{score_sign}{total_score}</span>
+                  / {bull_score + bear_score} signals
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
+                    color:rgba(120,160,180,0.35);text-transform:uppercase;">Conf</span>
+                  {dots_html}
+                </div>
+              </div>
+
+              <!-- Centre: SVG Sentiment Dial -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
+                  color:rgba(120,160,180,0.35);text-transform:uppercase;">Sentiment Dial</div>
+                <svg width="150" height="90" viewBox="0 0 160 95" style="overflow:visible;">
+                  <defs>
+                    <linearGradient id="gaugeGradMD" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#00ff88"/>
+                      <stop offset="45%" stop-color="#ffaa00"/>
+                      <stop offset="100%" stop-color="#ff3355"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M 15 82 A 65 65 0 0 1 145 82" fill="none"
+                    stroke="rgba(255,255,255,0.06)" stroke-width="10" stroke-linecap="round"/>
+                  <path d="M 15 82 A 65 65 0 0 1 145 82" fill="none"
+                    stroke="url(#gaugeGradMD)" stroke-width="10" stroke-linecap="round" opacity="0.65"/>
+                  <g style="transform:rotate({needle_deg}deg);transform-origin:80px 82px;">
+                    <line x1="80" y1="82" x2="80" y2="28" stroke="{score_color}"
+                      stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="80" cy="82" r="6" fill="{score_color}"
+                      stroke="rgba(2,12,20,0.9)" stroke-width="2"/>
+                    <circle cx="80" cy="82" r="2.5" fill="white"/>
+                  </g>
+                  <text x="10" y="96" fill="#00ff88" font-size="8"
+                    font-family="JetBrains Mono" font-weight="700">BULL</text>
+                  <text x="126" y="96" fill="#ff3355" font-size="8"
+                    font-family="JetBrains Mono" font-weight="700">BEAR</text>
+                </svg>
+                <div style="text-align:center;margin-top:-4px;">
+                  <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:900;
+                    color:{score_color};">{score_sign}{total_score}</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
+                    color:rgba(120,160,180,0.35);text-transform:uppercase;">Total Score</div>
+                </div>
+              </div>
+
+              <!-- Right: Signal breakdown bars -->
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
+                  color:rgba(120,160,180,0.35);text-transform:uppercase;margin-bottom:4px;">
+                  Signal Breakdown</div>
+                {sig_rows_html}
+              </div>
             </div>
         </div>
+
         <div class="logic-box" style="margin-top:14px;">
             <div class="logic-box-head">&#128202; SCORING LOGIC</div>
             <div class="logic-grid">
@@ -2257,15 +2656,7 @@ class NiftyHTMLAnalyzer:
             self._stat_card(sma200_ico,'SMA 200',f"\u20b9{d['sma_200']:,.0f}",sma200_lbl,sma200_badge,d['sma_200_pct'],sma200_bar,'200-day average')+
             self._stat_card(macd_ico,'MACD',f"{d['macd']:.2f}",macd_lbl,macd_badge,d['macd_pct'],macd_bar,f"Signal: {d['macd_signal']:.2f}")
         )
-        if d['has_option_data']:
-            oc_cards=(
-                self._stat_card(d['pcr_icon'],'PCR Ratio (OI)',f"{d['pcr']:.3f}",d['pcr_status'],d['pcr_badge'],d['pcr_pct'],pcr_bar,'Put/Call OI ratio')+
-                self._stat_card('\U0001f3af','Max Pain',f"\u20b9{d['max_pain']:,}",'Expiry Magnet','neutral',d['max_pain_pct'],'bar-gold','Price gravity level')+
-                self._stat_card('\U0001f534','Max Call OI',f"\u20b9{d['max_ce_oi']:,}",'Resistance','bearish',d['ce_oi_pct'],'bar-red','CE wall')+
-                self._stat_card('\U0001f7e2','Max Put OI',f"\u20b9{d['max_pe_oi']:,}",'Support','bullish',d['pe_oi_pct'],'bar-teal','PE floor')
-            )
-        else:
-            oc_cards='<div style="color:#80deea;padding:20px;">Option chain data unavailable</div>'
+        oc_cards = self._build_enhanced_oc_cards()
         _ss=d['strong_support']; _sr=d['strong_resistance']
         _rng=_sr-_ss if _sr!=_ss else 1
         def _pct_real(val): return round(max(3,min(97,(val-_ss)/_rng*100)),2)
@@ -2874,6 +3265,9 @@ window.addEventListener('resize', function(){
         /* ── COMPACT STAT CARDS ─────────────────────────────────── */
         .g-compact{{background:#111827;border:1px solid #1e2a3a;border-radius:8px;padding:8px 10px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}}
         .g-compact:hover{{transform:translateY(-2px);border-color:rgba(79,195,247,0.4)!important;}}
+        /* ── ENHANCED STAT CARDS ──────────────────────────────────── */
+        .g-compact{{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;}}
+        .g-compact:hover{{transform:translateY(-4px)!important;box-shadow:0 16px 40px rgba(0,0,0,0.45)!important;}}
         .cc-top{{display:flex;align-items:center;gap:6px;margin-bottom:4px;}}
         .cc-ico{{font-size:13px;line-height:1;flex-shrink:0;}}
         .cc-lbl{{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#8896b3;font-weight:600;flex:1;}}
