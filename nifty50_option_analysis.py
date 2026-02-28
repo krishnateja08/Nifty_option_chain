@@ -1155,56 +1155,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
     html_parts.append(f"""
     <div class="tab-panel" id="tab-checklist">
         <div class="section">
-            <div class="section-title">
-                <span>&#9881;&#65039;</span> LIVE DATA INPUTS
-                <span class="annot-badge">AUTO-FILLED FROM LIVE NSE DATA</span>
-                <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">As of: {timestamp}</span>
-            </div>
-            <div class="input-summary-grid">
-                <div class="inp-summary-card inp-auto-card">
-                    <div class="inp-s-label">PCR (OI)</div>
-                    <div class="inp-s-val">{val_pcr}</div>
-                    <div class="inp-s-src">Option Chain</div>
-                </div>
-                <div class="inp-summary-card inp-auto-card">
-                    <div class="inp-s-label">RSI (14)</div>
-                    <div class="inp-s-val">{val_rsi}</div>
-                    <div class="inp-s-src">Technical</div>
-                </div>
-                <div class="inp-summary-card inp-auto-card">
-                    <div class="inp-s-label">MACD</div>
-                    <div class="inp-s-val">{val_macd}</div>
-                    <div class="inp-s-src">Technical</div>
-                </div>
-                <div class="inp-summary-card inp-auto-card">
-                    <div class="inp-s-label">Market Trend</div>
-                    <div class="inp-s-val">{val_trend}</div>
-                    <div class="inp-s-src">SMA 20/50/200</div>
-                </div>
-                <div class="inp-summary-card inp-auto-card">
-                    <div class="inp-s-label">OI Direction</div>
-                    <div class="inp-s-val">{val_oi_dir}</div>
-                    <div class="inp-s-src">CHG OI</div>
-                </div>
-                <div class="inp-summary-card inp-auto-card">
-                    <div class="inp-s-label">Global Bias</div>
-                    <div class="inp-s-val">{val_global}</div>
-                    <div class="inp-s-src">yfinance Auto (DJI/NASDAQ/S&P)</div>
-                </div>
-                <div class="inp-summary-card inp-auto-card">
-                    <div class="inp-s-label">India VIX</div>
-                    <div class="inp-s-val">{f"{vix_val:.1f}" if vix_val is not None else '<span class="na-inline">N/A</span>'}</div>
-                    <div class="inp-s-src">yfinance Auto (^INDIAVIX)</div>
-                </div>
-
-                <div class="inp-summary-card inp-manual-card">
-                    <div class="inp-s-label">IV View</div>
-                    <div class="inp-s-val">{vol_view.upper()}</div>
-                    <div class="inp-s-src">Manual Input</div>
-                </div>
-            </div>
-        </div>
-        <div class="section">
             <div class="o5-wrap">
                 <div class="o5-top-banner">
                     <div class="o5-banner-left">
@@ -3410,17 +3360,6 @@ window.addEventListener('resize', function(){
         .nc-card-btn{{display:block;width:100%;padding:9px 14px;border-radius:7px;text-align:center;font-family:'Outfit',sans-serif;font-size:clamp(11px,1.5vw,13px);font-weight:700;letter-spacing:0.5px;cursor:default;}}
 
         .annot-badge{{font-size:9px;padding:2px 10px;border-radius:8px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;font-family:'JetBrains Mono',monospace;letter-spacing:1px;font-weight:700;white-space:nowrap;}}
-        .input-summary-grid{{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
-        .inp-summary-card{{border-radius:12px;padding:14px 16px;border:1px solid;transition:all 0.2s ease;}}
-        .inp-auto-card{{background:rgba(0,230,118,0.04);border-color:rgba(0,230,118,0.2);}}
-        .inp-manual-card{{background:rgba(79,195,247,0.04);border-color:rgba(79,195,247,0.15);}}
-        .inp-s-label{{font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;}}
-        .inp-auto-card .inp-s-label{{color:rgba(0,230,118,0.5);}}
-        .inp-manual-card .inp-s-label{{color:rgba(79,195,247,0.5);}}
-        .inp-s-val{{font-family:'Oxanium',sans-serif;font-size:clamp(14px,2vw,18px);font-weight:700;color:#e0f7fa;margin-bottom:4px;line-height:1.2;}}
-        .inp-s-src{{font-size:9px;font-family:'JetBrains Mono',monospace;}}
-        .inp-auto-card .inp-s-src{{color:rgba(0,230,118,0.3);}}
-        .inp-manual-card .inp-s-src{{color:rgba(79,195,247,0.3);}}
         .na-inline{{color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
         .o5-wrap{{border-radius:16px;overflow:hidden;border:1px solid rgba(239,68,68,0.2);background:rgba(6,10,18,0.97);margin-bottom:0;}}
         .o5-top-banner{{background:linear-gradient(90deg,rgba(239,68,68,0.12),rgba(185,28,28,0.06),transparent);border-bottom:1px solid rgba(239,68,68,0.12);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}}
@@ -3585,7 +3524,6 @@ window.addEventListener('resize', function(){
             .pf-grid{{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}}
             .nc-cards-grid{{grid-template-columns:repeat(3,minmax(0,1fr));}}
             .nc-meter-track{{width:140px;}}
-            .input-summary-grid{{grid-template-columns:repeat(3,minmax(0,1fr));}}
             .oi-summary-strip{{grid-template-columns:repeat(2,minmax(0,1fr));}}
         }}
         @media(max-width:768px){{
@@ -3594,7 +3532,6 @@ window.addEventListener('resize', function(){
             .strat-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .nc-cards-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .pf-grid{{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}}
-            .input-summary-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .o5-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
         }}
         @media(max-width:600px){{
@@ -3631,7 +3568,6 @@ window.addEventListener('resize', function(){
             .snap-grid{{grid-template-columns:minmax(0,1fr);}}
             .pf-grid{{grid-template-columns:minmax(0,1fr);}}
             .header h1{{letter-spacing:0;}}
-            .input-summary-grid{{grid-template-columns:1fr;}}
             .oi-summary-strip{{grid-template-columns:1fr;}}
         }}
     </style>
