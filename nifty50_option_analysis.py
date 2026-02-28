@@ -1010,6 +1010,103 @@ STRAT_TYPE_MAP = {
     "Call Ratio Spread":"advanced","Put Ratio Spread":"advanced","Christmas Tree Spread":"advanced",
 }
 
+def get_strike_suggestion(strategy_name, atm, ce_wall, pe_wall):
+    """
+    Returns a concise strike recommendation string for each strategy.
+    atm      = ATM strike (nearest to spot)
+    ce_wall  = Strike with max CE OI (acts as resistance)
+    pe_wall  = Strike with max PE OI (acts as support)
+    All strikes rounded to nearest 50.
+    """
+    atm_p50  = atm + 50    # 1 strike OTM call
+    atm_m50  = atm - 50    # 1 strike OTM put
+    atm_p100 = atm + 100
+    atm_p150 = atm + 150
+    atm_m100 = atm - 100
+    atm_m150 = atm - 150
+
+    recs = {
+        # ── BULLISH ───────────────────────────────────────────────────────────
+        "Long Call":
+            f"BUY {atm}CE (ATM) or {atm_p50}CE (slight OTM)",
+        "Bull Call Spread":
+            f"BUY {atm}CE  +  SELL {ce_wall}CE (call wall)",
+        "Bull Call Ladder":
+            f"BUY {atm}CE  +  SELL {atm_p50}CE  +  SELL {atm_p100}CE",
+        "Bull Put Spread":
+            f"SELL {atm_m50}PE  +  BUY {pe_wall}PE (put wall hedge)",
+        "Bull Put Ladder":
+            f"SELL {atm}PE  +  BUY {atm_m50}PE  +  BUY {atm_m100}PE",
+        "Synthetic Long":
+            f"BUY {atm}CE  +  SELL {atm}PE  (same expiry)",
+        "Call Ratio Backspread":
+            f"SELL 1× {atm}CE  +  BUY 2× {atm_p50}CE",
+        "Strap (Bullish Bias)":
+            f"BUY 2× {atm}CE  +  BUY 1× {atm}PE  (same strike & expiry)",
+        "Jade Lizard":
+            f"SELL {atm_p50}CE  +  SELL {atm_m50}/{atm_m100}PE spread",
+        "The Wheel Strategy (CSP + Covered Call)":
+            f"SELL {pe_wall}PE (cash-secured); on assignment SELL {ce_wall}CE",
+
+        # ── BEARISH ───────────────────────────────────────────────────────────
+        "Long Put":
+            f"BUY {atm}PE (ATM) or {atm_m50}PE (slight OTM)",
+        "Bear Put Spread":
+            f"BUY {atm}PE  +  SELL {pe_wall}PE (put wall)",
+        "Bear Call Spread":
+            f"SELL {atm_p50}CE  +  BUY {ce_wall}CE (call wall hedge)",
+        "Bear Put Ladder":
+            f"BUY {atm}PE  +  SELL {atm_m50}PE  +  SELL {atm_m100}PE",
+        "Bear Call Ladder":
+            f"SELL {atm}CE  +  BUY {atm_p50}CE  +  BUY {atm_p100}CE",
+        "Synthetic Short":
+            f"SELL {atm}CE  +  BUY {atm}PE  (same expiry)",
+        "Put Ratio Backspread":
+            f"SELL 1× {atm}PE  +  BUY 2× {atm_m50}PE",
+        "Strip (Bearish Bias)":
+            f"BUY 1× {atm}CE  +  BUY 2× {atm}PE  (same strike & expiry)",
+        "Reverse Jade Lizard":
+            f"SELL {atm_m50}PE  +  SELL {atm_p50}/{atm_p100}CE spread",
+
+        # ── NEUTRAL ───────────────────────────────────────────────────────────
+        "Short Straddle":
+            f"SELL {atm}CE  +  SELL {atm}PE  (same ATM strike)",
+        "Short Strangle":
+            f"SELL {atm_p50}CE  +  SELL {atm_m50}PE  (OTM both sides)",
+        "Iron Condor":
+            f"SELL {atm_p50}CE / BUY {ce_wall}CE  +  SELL {atm_m50}PE / BUY {pe_wall}PE",
+        "Iron Butterfly":
+            f"SELL {atm}CE + SELL {atm}PE  |  BUY {atm_p100}CE + BUY {atm_m100}PE",
+        "Condor Spread (Short)":
+            f"SELL {atm_p50}CE + SELL {atm_m50}PE  +  BUY {atm_p100}CE + BUY {atm_m100}PE",
+        "Calendar Spread":
+            f"SELL near-expiry {atm}CE/PE  +  BUY next-expiry {atm}CE/PE",
+        "Diagonal Spread":
+            f"SELL near-expiry {atm_p50}CE  +  BUY next-expiry {atm}CE",
+        "Butterfly Spread (Short)":
+            f"SELL {atm_m50}CE + SELL {atm_p50}CE  +  BUY 2× {atm}CE",
+
+        # ── VOLATILITY ────────────────────────────────────────────────────────
+        "Long Straddle":
+            f"BUY {atm}CE  +  BUY {atm}PE  (same ATM strike & expiry)",
+        "Long Strangle":
+            f"BUY {atm_p50}CE  +  BUY {atm_m50}PE  (OTM both sides)",
+        "Long Guts":
+            f"BUY {atm}CE  +  BUY {atm}PE  (ITM both sides, 1 strike apart)",
+        "Butterfly Spread (Long)":
+            f"BUY {atm_m50}CE  +  SELL 2× {atm}CE  +  BUY {atm_p50}CE",
+
+        # ── ADVANCED ─────────────────────────────────────────────────────────
+        "Call Ratio Spread":
+            f"BUY 1× {atm}CE  +  SELL 2× {atm_p50}CE",
+        "Put Ratio Spread":
+            f"BUY 1× {atm}PE  +  SELL 2× {atm_m50}PE",
+        "Christmas Tree Spread":
+            f"BUY {atm}PE  +  SELL {atm_m50}PE  +  SELL {atm_m150}PE  (step-down strikes)",
+    }
+    return recs.get(strategy_name, f"ATM: ₹{atm:,} | CE Wall: ₹{ce_wall:,} | PE Wall: ₹{pe_wall:,}")
+
+
 def suggest_strategies(total_score, vol_view):
     if   total_score >= 3:  bias = "strong_bullish";  bias_label = "STRONGLY BULLISH"
     elif total_score >= 1:  bias = "mild_bullish";    bias_label = "MILDLY BULLISH"
@@ -1111,16 +1208,24 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         "volatility":("strat-vol",  "strat-tag-vol",  "🟣 Volatility"),
         "advanced":  ("strat-misc", "strat-tag-misc", "🔵 Advanced"),
     }
+    # ── Strike data for recommendations ──────────────────────────────────
+    atm_strike  = d.get('atm_strike', 0)
+    ce_wall     = d.get('max_ce_oi', atm_strike + 200 if atm_strike else 0)
+    pe_wall     = d.get('max_pe_oi', atm_strike - 200 if atm_strike else 0)
+    has_strikes = atm_strike > 0
+
     strat_cards_html = ""
     for i, s in enumerate(strategy_list, 1):
         stype = STRAT_TYPE_MAP.get(s, "advanced")
         card_cls, tag_cls, tag_txt = tag_map.get(stype, tag_map["advanced"])
         rank = "PRIMARY" if i <= 4 else ("SECONDARY" if i <= 8 else "ADVANCED")
+        strike_rec = get_strike_suggestion(s, atm_strike, ce_wall, pe_wall) if has_strikes else "Strike data unavailable"
         strat_cards_html += f"""
         <div class="strat-card {card_cls}" data-type="{stype}">
             <div class="strat-num">{i:02d} · {rank}</div>
             <div class="strat-name">{s}</div>
             <span class="strat-tag {tag_cls}">{tag_txt}</span>
+            <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> {strike_rec}</div>
         </div>"""
 
     timestamp = d.get('timestamp', 'N/A')
@@ -3415,6 +3520,8 @@ window.addEventListener('resize', function(){
         .strat-tag-neu{{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.25);color:#ffb74d;}}
         .strat-tag-vol{{background:rgba(124,77,255,0.1);border:1px solid rgba(124,77,255,0.25);color:#b388ff;}}
         .strat-tag-misc{{background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.25);color:#4fc3f7;}}
+        .strat-strike-rec{{margin-top:10px;padding:8px 10px;background:rgba(0,0,0,0.25);border-left:3px solid rgba(79,195,247,0.4);border-radius:0 8px 8px 0;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(176,190,197,0.75);line-height:1.6;word-break:break-word;}}
+        .strat-strike-lbl{{color:#80deea;font-weight:700;letter-spacing:0.5px;}}
         .filter-btn{{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid rgba(79,195,247,0.2);background:transparent;color:rgba(176,190,197,0.5);transition:all 0.2s ease;font-family:'Oxanium',sans-serif;}}
         .filter-btn.active,.filter-btn:hover{{background:rgba(79,195,247,0.1);border-color:rgba(79,195,247,0.4);color:#4fc3f7;}}
 
