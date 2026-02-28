@@ -1394,12 +1394,12 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                     </div>
                     <div class="tp-rules">
                         <div class="tp-rules-title">&#128736; PRE-TRADE CHECKLIST</div>
-                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is R:R ratio &ge; 1.5? If not, skip this trade.</div>
-                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is current price too close to resistance (bearish) or support (bullish)? If yes, wait.</div>
-                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Have I written down all 3 exit conditions above?</div>
-                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Am I risking &le; 2% of total capital on this trade?</div>
-                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is there a major event (RBI, earnings, expiry) before my time exit?</div>
-                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> If halfway to target and stalled — take 50% profits and reassess.</div>
+                        <div class="tp-rule-item tp-rule-red"><span class="tp-rule-chk tp-chk-red">&#9744;</span><span>Is R:R ratio &ge; 1.5? <strong>If not, skip this trade.</strong></span></div>
+                        <div class="tp-rule-item tp-rule-orange"><span class="tp-rule-chk tp-chk-orange">&#9744;</span><span>Is current price too close to <strong>resistance (bearish)</strong> or <strong>support (bullish)</strong>? If yes, wait.</span></div>
+                        <div class="tp-rule-item tp-rule-yellow"><span class="tp-rule-chk tp-chk-yellow">&#9744;</span><span>Have I <strong>written down all 3 exit conditions</strong> above?</span></div>
+                        <div class="tp-rule-item tp-rule-cyan"><span class="tp-rule-chk tp-chk-cyan">&#9744;</span><span>Am I risking <strong>&le; 2% of total capital</strong> on this trade?</span></div>
+                        <div class="tp-rule-item tp-rule-purple"><span class="tp-rule-chk tp-chk-purple">&#9744;</span><span>Is there a <strong>major event</strong> (RBI, earnings, expiry) before my time exit?</span></div>
+                        <div class="tp-rule-item tp-rule-green"><span class="tp-rule-chk tp-chk-green">&#9744;</span><span>If halfway to target and stalled — <strong>take 50% profits and reassess.</strong></span></div>
                     </div>
                 </div>
 
@@ -3663,11 +3663,24 @@ window.addEventListener('resize', function(){
         .tp-rr-label{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.35);letter-spacing:2px;}}
         .tp-rr-val{{font-family:'Oxanium',sans-serif;font-size:28px;font-weight:900;}}
         .tp-rr-verdict{{font-size:10px;font-weight:700;letter-spacing:1px;}}
-        .tp-rules{{background:rgba(0,0,0,0.15);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px 20px;}}
-        .tp-rules-title{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.5);letter-spacing:2px;margin-bottom:10px;}}
-        .tp-rule-item{{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:rgba(176,190,197,0.65);padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);line-height:1.4;}}
-        .tp-rule-item:last-child{{border-bottom:none;}}
-        .tp-rule-chk{{font-size:14px;color:rgba(128,222,234,0.4);flex-shrink:0;margin-top:1px;}}
+        .tp-rules{{background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;}}
+        .tp-rules-title{{font-family:'JetBrains Mono',monospace;font-size:10px;color:#80deea;letter-spacing:2px;margin-bottom:12px;text-shadow:0 0 10px rgba(128,222,234,0.5);}}
+        .tp-rule-item{{display:flex;align-items:flex-start;gap:10px;font-size:12px;font-weight:500;padding:8px 10px;border-radius:8px;margin-bottom:5px;line-height:1.5;border-left:3px solid;}}
+        .tp-rule-item:last-child{{margin-bottom:0;}}
+        .tp-rule-item strong{{font-weight:800;}}
+        .tp-rule-red{{background:rgba(255,82,82,0.1);border-color:#ff5252;color:#ff8a80;}}
+        .tp-rule-orange{{background:rgba(255,152,0,0.1);border-color:#ff9800;color:#ffcc80;}}
+        .tp-rule-yellow{{background:rgba(255,235,59,0.08);border-color:#ffee58;color:#fff59d;}}
+        .tp-rule-cyan{{background:rgba(0,229,255,0.08);border-color:#00e5ff;color:#80deea;}}
+        .tp-rule-purple{{background:rgba(179,136,255,0.1);border-color:#b388ff;color:#ce93d8;}}
+        .tp-rule-green{{background:rgba(0,230,118,0.08);border-color:#00e676;color:#69f0ae;}}
+        .tp-rule-chk{{font-size:16px;flex-shrink:0;margin-top:1px;}}
+        .tp-chk-red{{color:#ff5252;text-shadow:0 0 8px #ff525299;}}
+        .tp-chk-orange{{color:#ff9800;text-shadow:0 0 8px #ff980099;}}
+        .tp-chk-yellow{{color:#ffee58;text-shadow:0 0 8px #ffee5899;}}
+        .tp-chk-cyan{{color:#00e5ff;text-shadow:0 0 8px #00e5ff99;}}
+        .tp-chk-purple{{color:#b388ff;text-shadow:0 0 8px #b388ff99;}}
+        .tp-chk-green{{color:#00e676;text-shadow:0 0 8px #00e67699;}}
         .tp-mindset{{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(79,195,247,0.06),rgba(124,77,255,0.06));border:1px solid rgba(79,195,247,0.15);border-radius:14px;padding:16px 20px;}}
         .tp-mindset-icon{{font-size:24px;flex-shrink:0;}}
         .tp-mindset-text{{font-size:12px;color:rgba(176,190,197,0.7);line-height:1.7;}}
