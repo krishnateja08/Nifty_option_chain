@@ -247,6 +247,16 @@
         .strat-vol::before{background:linear-gradient(90deg,transparent,#7c4dff,transparent);}
         .strat-misc::before{background:linear-gradient(90deg,transparent,#4fc3f7,transparent);}
         .strat-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.3);border-color:rgba(79,195,247,0.3);}
+        .strat-card{cursor:pointer;}
+        .strat-selected{border-color:#00e5ff !important;box-shadow:0 0 0 2px #00e5ff55, 0 12px 32px rgba(0,229,255,0.2) !important;transform:translateY(-3px);background:rgba(0,229,255,0.07) !important;}
+        .strat-selected .strat-select-hint{display:none;}
+        .strat-select-hint{font-size:9px;color:rgba(128,222,234,0.35);margin-top:8px;letter-spacing:0.5px;font-family:'JetBrains Mono',monospace;}
+        .tp-rank-badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+        .tp-rank-primary{background:rgba(0,230,118,0.15);border:1px solid rgba(0,230,118,0.4);color:#00e676;}
+        .tp-rank-secondary{background:rgba(255,183,77,0.15);border:1px solid rgba(255,183,77,0.4);color:#ffb74d;}
+        .tp-rank-advanced{background:rgba(179,136,255,0.15);border:1px solid rgba(179,136,255,0.4);color:#b388ff;}
+        @keyframes tpFlash{0%{box-shadow:0 0 0 0 rgba(0,229,255,0.6);} 50%{box-shadow:0 0 0 8px rgba(0,229,255,0);} 100%{box-shadow:none;}}
+        .tp-banner-flash{animation:tpFlash 0.6s ease-out;}
         .strat-num{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.25);margin-bottom:6px;letter-spacing:1px;}
         .strat-name{font-family:'Oxanium',sans-serif;font-size:clamp(12px,1.5vw,15px);font-weight:700;color:#e0f7fa;margin-bottom:8px;line-height:1.3;}
         .strat-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;}
@@ -535,7 +545,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">01-Mar-2026 04:15 IST</span>
+                <span class="sb-value gen-val">01-Mar-2026 04:21 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -1057,7 +1067,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-            As of: 01-Mar-2026 04:15 IST
+            As of: 01-Mar-2026 04:21 IST
           </span>
         </div>
 
@@ -1492,88 +1502,100 @@
                 </div>
             </div>
             <div class="strat-grid" id="stratGrid">
-        <div class="strat-card strat-bear" data-type="bearish">
+        <div class="strat-card strat-bear" data-type="bearish" data-strat="Long Put" onclick="selectStrat(this)">
             <div class="strat-num">01 · PRIMARY</div>
             <div class="strat-name">Long Put</div>
             <span class="strat-tag strat-tag-bear">🔴 Bearish</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> BUY 25200PE (ATM) or 25150PE (slight OTM)</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-bear" data-type="bearish">
+        <div class="strat-card strat-bear" data-type="bearish" data-strat="Bear Put Spread" onclick="selectStrat(this)">
             <div class="strat-num">02 · PRIMARY</div>
             <div class="strat-name">Bear Put Spread</div>
             <span class="strat-tag strat-tag-bear">🔴 Bearish</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> BUY 25200PE  +  SELL 25000PE (put wall)</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-bear" data-type="bearish">
+        <div class="strat-card strat-bear" data-type="bearish" data-strat="Bear Call Spread" onclick="selectStrat(this)">
             <div class="strat-num">03 · PRIMARY</div>
             <div class="strat-name">Bear Call Spread</div>
             <span class="strat-tag strat-tag-bear">🔴 Bearish</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> SELL 25250CE  +  BUY 25500CE (call wall hedge)</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-bear" data-type="bearish">
+        <div class="strat-card strat-bear" data-type="bearish" data-strat="Bear Put Ladder" onclick="selectStrat(this)">
             <div class="strat-num">04 · PRIMARY</div>
             <div class="strat-name">Bear Put Ladder</div>
             <span class="strat-tag strat-tag-bear">🔴 Bearish</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> BUY 25200PE  +  SELL 25150PE  +  SELL 25100PE</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-bear" data-type="bearish">
+        <div class="strat-card strat-bear" data-type="bearish" data-strat="Bear Call Ladder" onclick="selectStrat(this)">
             <div class="strat-num">05 · SECONDARY</div>
             <div class="strat-name">Bear Call Ladder</div>
             <span class="strat-tag strat-tag-bear">🔴 Bearish</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> SELL 25200CE  +  BUY 25250CE  +  BUY 25300CE</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-bear" data-type="bearish">
+        <div class="strat-card strat-bear" data-type="bearish" data-strat="Synthetic Short" onclick="selectStrat(this)">
             <div class="strat-num">06 · SECONDARY</div>
             <div class="strat-name">Synthetic Short</div>
             <span class="strat-tag strat-tag-bear">🔴 Bearish</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> SELL 25200CE  +  BUY 25200PE  (same expiry)</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-bear" data-type="bearish">
+        <div class="strat-card strat-bear" data-type="bearish" data-strat="Put Ratio Backspread" onclick="selectStrat(this)">
             <div class="strat-num">07 · SECONDARY</div>
             <div class="strat-name">Put Ratio Backspread</div>
             <span class="strat-tag strat-tag-bear">🔴 Bearish</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> SELL 1× 25200PE  +  BUY 2× 25150PE</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-vol" data-type="volatility">
+        <div class="strat-card strat-vol" data-type="volatility" data-strat="Strip (Bearish Bias)" onclick="selectStrat(this)">
             <div class="strat-num">08 · SECONDARY</div>
             <div class="strat-name">Strip (Bearish Bias)</div>
             <span class="strat-tag strat-tag-vol">🟣 Volatility</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> BUY 1× 25200CE  +  BUY 2× 25200PE  (same strike & expiry)</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-misc" data-type="advanced">
+        <div class="strat-card strat-misc" data-type="advanced" data-strat="Call Ratio Spread" onclick="selectStrat(this)">
             <div class="strat-num">09 · ADVANCED</div>
             <div class="strat-name">Call Ratio Spread</div>
             <span class="strat-tag strat-tag-misc">🔵 Advanced</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> BUY 1× 25200CE  +  SELL 2× 25250CE</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-misc" data-type="advanced">
+        <div class="strat-card strat-misc" data-type="advanced" data-strat="Put Ratio Spread" onclick="selectStrat(this)">
             <div class="strat-num">10 · ADVANCED</div>
             <div class="strat-name">Put Ratio Spread</div>
             <span class="strat-tag strat-tag-misc">🔵 Advanced</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> BUY 1× 25200PE  +  SELL 2× 25150PE</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>
-        <div class="strat-card strat-misc" data-type="advanced">
+        <div class="strat-card strat-misc" data-type="advanced" data-strat="Christmas Tree Spread" onclick="selectStrat(this)">
             <div class="strat-num">11 · ADVANCED</div>
             <div class="strat-name">Christmas Tree Spread</div>
             <span class="strat-tag strat-tag-misc">🔵 Advanced</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> BUY 25200PE  +  SELL 25150PE  +  SELL 25050PE  (step-down strikes)</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div></div>
         </div>
         <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
+        <script id="stratDataMap" type="application/json">{"Long Put": {"strike": "BUY 25200PE (ATM) or 25150PE (slight OTM)", "type": "bearish", "rank": "PRIMARY"}, "Bear Put Spread": {"strike": "BUY 25200PE  +  SELL 25000PE (put wall)", "type": "bearish", "rank": "PRIMARY"}, "Bear Call Spread": {"strike": "SELL 25250CE  +  BUY 25500CE (call wall hedge)", "type": "bearish", "rank": "PRIMARY"}, "Bear Put Ladder": {"strike": "BUY 25200PE  +  SELL 25150PE  +  SELL 25100PE", "type": "bearish", "rank": "PRIMARY"}, "Bear Call Ladder": {"strike": "SELL 25200CE  +  BUY 25250CE  +  BUY 25300CE", "type": "bearish", "rank": "SECONDARY"}, "Synthetic Short": {"strike": "SELL 25200CE  +  BUY 25200PE  (same expiry)", "type": "bearish", "rank": "SECONDARY"}, "Put Ratio Backspread": {"strike": "SELL 1× 25200PE  +  BUY 2× 25150PE", "type": "bearish", "rank": "SECONDARY"}, "Strip (Bearish Bias)": {"strike": "BUY 1× 25200CE  +  BUY 2× 25200PE  (same strike & expiry)", "type": "volatility", "rank": "SECONDARY"}, "Call Ratio Spread": {"strike": "BUY 1× 25200CE  +  SELL 2× 25250CE", "type": "advanced", "rank": "ADVANCED"}, "Put Ratio Spread": {"strike": "BUY 1× 25200PE  +  SELL 2× 25150PE", "type": "advanced", "rank": "ADVANCED"}, "Christmas Tree Spread": {"strike": "BUY 25200PE  +  SELL 25150PE  +  SELL 25050PE  (step-down strikes)", "type": "advanced", "rank": "ADVANCED"}}</script>
         <div class="section">
             <div class="section-title"><span>&#128203;</span> TRADE PLAN — AUTO FILLED
                 <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;margin-left:auto;">
-                    Define exits BEFORE you enter — not after
+                    Click any strategy card above to update this plan
                 </span>
             </div>
             <div class="tp-wrap">
 
                 <!-- Row 1: Primary strategy banner -->
-                <div class="tp-banner">
+                <div class="tp-banner" id="tp-banner">
                     <div class="tp-banner-left">
-                        <div class="tp-banner-label">PRIMARY STRATEGY</div>
-                        <div class="tp-banner-strat">Long Put</div>
-                        <div class="tp-banner-strike">&#127919; BUY 25200PE (ATM) or 25150PE (slight OTM)</div>
+                        <div class="tp-banner-label">SELECTED STRATEGY <span id="tp-rank-badge" class="tp-rank-badge">PRIMARY</span></div>
+                        <div class="tp-banner-strat" id="tp-strat-name">Long Put</div>
+                        <div class="tp-banner-strike" id="tp-strike-rec">&#127919; BUY 25200PE (ATM) or 25150PE (slight OTM)</div>
                     </div>
                     <div class="tp-banner-right">
                         <div class="tp-banner-label">EXPIRY</div>
@@ -1726,6 +1748,46 @@ function filterStrats(type, btn) {
     document.querySelectorAll('.strat-card').forEach(function(c){
         c.style.display=(type==='all'||c.dataset.type===type)?'':'none';
     });
+}
+
+function selectStrat(card) {
+    // Remove selected state from all cards
+    document.querySelectorAll('.strat-card').forEach(function(c){
+        c.classList.remove('strat-selected');
+    });
+    card.classList.add('strat-selected');
+
+    var stratName = card.dataset.strat;
+    var rankTxt   = card.querySelector('.strat-num') ? card.querySelector('.strat-num').textContent : '';
+
+    // Lookup strike rec from embedded data
+    var mapEl = document.getElementById('stratDataMap');
+    var stratMap = {};
+    try { stratMap = JSON.parse(mapEl.textContent || mapEl.innerHTML); } catch(e){}
+    var info = stratMap[stratName] || {};
+    var strikeRec = info.strike || 'N/A';
+    var rank      = info.rank   || 'SELECTED';
+
+    // Update banner
+    var nameEl   = document.getElementById('tp-strat-name');
+    var strikeEl = document.getElementById('tp-strike-rec');
+    var rankEl   = document.getElementById('tp-rank-badge');
+    var bannerEl = document.getElementById('tp-banner');
+
+    if (nameEl)   { nameEl.textContent   = stratName; }
+    if (strikeEl) { strikeEl.innerHTML   = '&#127919; ' + strikeRec; }
+    if (rankEl)   { rankEl.textContent   = rank;
+                    rankEl.className     = 'tp-rank-badge tp-rank-' + rank.toLowerCase(); }
+
+    // Flash the banner to draw attention
+    if (bannerEl) {
+        bannerEl.classList.add('tp-banner-flash');
+        setTimeout(function(){ bannerEl.classList.remove('tp-banner-flash'); }, 600);
+    }
+
+    // Scroll trade plan into view smoothly
+    var tpSection = bannerEl ? bannerEl.closest('.section') : null;
+    if (tpSection) { tpSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 }
 
 var _oiInterval = 3;
@@ -2188,6 +2250,9 @@ function loadOILog() {
 window.addEventListener('load', function(){
     if (window.location.hash === '#oi-trend') { switchTab('oi-trend'); }
     else { loadOILog(); }
+    // Auto-select first strategy card so Trade Plan is pre-filled
+    var firstCard = document.querySelector('.strat-card');
+    if (firstCard) { selectStrat(firstCard); }
 });
 
 setInterval(loadOILog, 30000);
