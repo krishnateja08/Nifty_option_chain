@@ -1215,18 +1215,26 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
     has_strikes = atm_strike > 0
 
     strat_cards_html = ""
+    strat_data_js = {}  # for JS lookup
     for i, s in enumerate(strategy_list, 1):
         stype = STRAT_TYPE_MAP.get(s, "advanced")
         card_cls, tag_cls, tag_txt = tag_map.get(stype, tag_map["advanced"])
         rank = "PRIMARY" if i <= 4 else ("SECONDARY" if i <= 8 else "ADVANCED")
         strike_rec = get_strike_suggestion(s, atm_strike, ce_wall, pe_wall) if has_strikes else "Strike data unavailable"
+        safe_name = s.replace('"', '&quot;').replace("'", "\\'")
+        strat_data_js[s] = {"strike": strike_rec, "type": stype, "rank": rank}
         strat_cards_html += f"""
-        <div class="strat-card {card_cls}" data-type="{stype}">
+        <div class="strat-card {card_cls}" data-type="{stype}" data-strat="{safe_name}" onclick="selectStrat(this)">
             <div class="strat-num">{i:02d} · {rank}</div>
             <div class="strat-name">{s}</div>
             <span class="strat-tag {tag_cls}">{tag_txt}</span>
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> {strike_rec}</div>
+            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
         </div>"""
+
+    # Build JS strategy data map
+    import json as _json
+    strat_js_map = _json.dumps(strat_data_js, ensure_ascii=False)
 
     timestamp = d.get('timestamp', 'N/A')
     na_span     = '<span class="na-inline">N/A</span>'
@@ -1337,20 +1345,21 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
             <div class="strat-grid" id="stratGrid">{strat_cards_html}</div>
         </div>
         <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
+        <script id="stratDataMap" type="application/json">{strat_js_map}</script>
         <div class="section">
             <div class="section-title"><span>&#128203;</span> TRADE PLAN — AUTO FILLED
                 <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;margin-left:auto;">
-                    Define exits BEFORE you enter — not after
+                    Click any strategy card above to update this plan
                 </span>
             </div>
             <div class="tp-wrap">
 
                 <!-- Row 1: Primary strategy banner -->
-                <div class="tp-banner">
+                <div class="tp-banner" id="tp-banner">
                     <div class="tp-banner-left">
-                        <div class="tp-banner-label">PRIMARY STRATEGY</div>
-                        <div class="tp-banner-strat">{primary_strat}</div>
-                        <div class="tp-banner-strike">&#127919; {primary_strike_rec}</div>
+                        <div class="tp-banner-label">SELECTED STRATEGY <span id="tp-rank-badge" class="tp-rank-badge">PRIMARY</span></div>
+                        <div class="tp-banner-strat" id="tp-strat-name">{primary_strat}</div>
+                        <div class="tp-banner-strike" id="tp-strike-rec">&#127919; {primary_strike_rec}</div>
                     </div>
                     <div class="tp-banner-right">
                         <div class="tp-banner-label">EXPIRY</div>
@@ -2905,6 +2914,46 @@ function filterStrats(type, btn) {
     });
 }
 
+function selectStrat(card) {
+    // Remove selected state from all cards
+    document.querySelectorAll('.strat-card').forEach(function(c){
+        c.classList.remove('strat-selected');
+    });
+    card.classList.add('strat-selected');
+
+    var stratName = card.dataset.strat;
+    var rankTxt   = card.querySelector('.strat-num') ? card.querySelector('.strat-num').textContent : '';
+
+    // Lookup strike rec from embedded data
+    var mapEl = document.getElementById('stratDataMap');
+    var stratMap = {};
+    try { stratMap = JSON.parse(mapEl.textContent || mapEl.innerHTML); } catch(e){}
+    var info = stratMap[stratName] || {};
+    var strikeRec = info.strike || 'N/A';
+    var rank      = info.rank   || 'SELECTED';
+
+    // Update banner
+    var nameEl   = document.getElementById('tp-strat-name');
+    var strikeEl = document.getElementById('tp-strike-rec');
+    var rankEl   = document.getElementById('tp-rank-badge');
+    var bannerEl = document.getElementById('tp-banner');
+
+    if (nameEl)   { nameEl.textContent   = stratName; }
+    if (strikeEl) { strikeEl.innerHTML   = '&#127919; ' + strikeRec; }
+    if (rankEl)   { rankEl.textContent   = rank;
+                    rankEl.className     = 'tp-rank-badge tp-rank-' + rank.toLowerCase(); }
+
+    // Flash the banner to draw attention
+    if (bannerEl) {
+        bannerEl.classList.add('tp-banner-flash');
+        setTimeout(function(){ bannerEl.classList.remove('tp-banner-flash'); }, 600);
+    }
+
+    // Scroll trade plan into view smoothly
+    var tpSection = bannerEl ? bannerEl.closest('.section') : null;
+    if (tpSection) { tpSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+
 var _oiInterval = 3;
 var _oiData     = [];
 
@@ -3365,6 +3414,9 @@ function loadOILog() {
 window.addEventListener('load', function(){
     if (window.location.hash === '#oi-trend') { switchTab('oi-trend'); }
     else { loadOILog(); }
+    // Auto-select first strategy card so Trade Plan is pre-filled
+    var firstCard = document.querySelector('.strat-card');
+    if (firstCard) { selectStrat(firstCard); }
 });
 
 setInterval(loadOILog, 30000);
@@ -3623,6 +3675,16 @@ window.addEventListener('resize', function(){
         .strat-vol::before{{background:linear-gradient(90deg,transparent,#7c4dff,transparent);}}
         .strat-misc::before{{background:linear-gradient(90deg,transparent,#4fc3f7,transparent);}}
         .strat-card:hover{{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.3);border-color:rgba(79,195,247,0.3);}}
+        .strat-card{{cursor:pointer;}}
+        .strat-selected{{border-color:#00e5ff !important;box-shadow:0 0 0 2px #00e5ff55, 0 12px 32px rgba(0,229,255,0.2) !important;transform:translateY(-3px);background:rgba(0,229,255,0.07) !important;}}
+        .strat-selected .strat-select-hint{{display:none;}}
+        .strat-select-hint{{font-size:9px;color:rgba(128,222,234,0.35);margin-top:8px;letter-spacing:0.5px;font-family:'JetBrains Mono',monospace;}}
+        .tp-rank-badge{{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}}
+        .tp-rank-primary{{background:rgba(0,230,118,0.15);border:1px solid rgba(0,230,118,0.4);color:#00e676;}}
+        .tp-rank-secondary{{background:rgba(255,183,77,0.15);border:1px solid rgba(255,183,77,0.4);color:#ffb74d;}}
+        .tp-rank-advanced{{background:rgba(179,136,255,0.15);border:1px solid rgba(179,136,255,0.4);color:#b388ff;}}
+        @keyframes tpFlash{{0%{{box-shadow:0 0 0 0 rgba(0,229,255,0.6);}} 50%{{box-shadow:0 0 0 8px rgba(0,229,255,0);}} 100%{{box-shadow:none;}}}}
+        .tp-banner-flash{{animation:tpFlash 0.6s ease-out;}}
         .strat-num{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.25);margin-bottom:6px;letter-spacing:1px;}}
         .strat-name{{font-family:'Oxanium',sans-serif;font-size:clamp(12px,1.5vw,15px);font-weight:700;color:#e0f7fa;margin-bottom:8px;line-height:1.3;}}
         .strat-tag{{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;}}
