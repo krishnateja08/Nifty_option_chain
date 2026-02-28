@@ -1214,6 +1214,45 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
     pe_wall     = d.get('max_pe_oi', atm_strike - 200 if atm_strike else 0)
     has_strikes = atm_strike > 0
 
+    # Per-strategy R:R multipliers relative to base market R:R
+    # Spreads cap both profit AND loss → better RR than naked. Ratio backspread = high reward/unlimited.
+    STRAT_RR_MULT = {
+        "Long Call":                           1.0,
+        "Long Put":                            1.0,
+        "Bull Call Spread":                    1.4,
+        "Bull Put Spread":                     1.3,
+        "Bear Put Spread":                     1.4,
+        "Bear Call Spread":                    1.3,
+        "Bull Call Ladder":                    1.2,
+        "Bull Put Ladder":                     1.1,
+        "Bear Put Ladder":                     1.2,
+        "Bear Call Ladder":                    1.1,
+        "Synthetic Long":                      1.0,
+        "Synthetic Short":                     1.0,
+        "Call Ratio Backspread":               1.8,
+        "Put Ratio Backspread":                1.8,
+        "Strap (Bullish Bias)":                1.3,
+        "Strip (Bearish Bias)":                1.3,
+        "Jade Lizard":                         1.5,
+        "Reverse Jade Lizard":                 1.5,
+        "The Wheel Strategy (CSP + Covered Call)": 1.6,
+        "Short Straddle":                      0.6,
+        "Short Strangle":                      0.7,
+        "Iron Condor":                         0.9,
+        "Iron Butterfly":                      0.8,
+        "Condor Spread (Short)":               0.9,
+        "Calendar Spread":                     1.1,
+        "Diagonal Spread":                     1.2,
+        "Butterfly Spread (Short)":            0.8,
+        "Long Straddle":                       1.2,
+        "Long Strangle":                       1.1,
+        "Long Guts":                           1.0,
+        "Butterfly Spread (Long)":             1.5,
+        "Call Ratio Spread":                   1.3,
+        "Put Ratio Spread":                    1.3,
+        "Christmas Tree Spread":               1.4,
+    }
+
     strat_cards_html = ""
     strat_data_js = {}  # for JS lookup
     for i, s in enumerate(strategy_list, 1):
@@ -1222,7 +1261,9 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         rank = "PRIMARY" if i <= 4 else ("SECONDARY" if i <= 8 else "ADVANCED")
         strike_rec = get_strike_suggestion(s, atm_strike, ce_wall, pe_wall) if has_strikes else "Strike data unavailable"
         safe_name = s.replace('"', '&quot;').replace("'", "\\'")
-        strat_data_js[s] = {"strike": strike_rec, "type": stype, "rank": rank}
+        rr_mult   = STRAT_RR_MULT.get(s, 1.0)
+        strat_rr  = round(rr_ratio * rr_mult, 2)
+        strat_data_js[s] = {"strike": strike_rec, "type": stype, "rank": rank, "rr": strat_rr}
         strat_cards_html += f"""
         <div class="strat-card {card_cls}" data-type="{stype}" data-strat="{safe_name}" onclick="selectStrat(this)">
             <div class="strat-num">{i:02d} · {rank}</div>
@@ -1398,8 +1439,8 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                 <div class="tp-bottom">
                     <div class="tp-rr-box">
                         <div class="tp-rr-label">RISK : REWARD</div>
-                        <div class="tp-rr-val" style="color:{rr_color};">1 : {rr_ratio}</div>
-                        <div class="tp-rr-verdict" style="color:{rr_color};">{rr_label}</div>
+                        <div class="tp-rr-val" id="tp-rr-val" style="color:{rr_color};">1 : {rr_ratio}</div>
+                        <div class="tp-rr-verdict" id="tp-rr-verdict" style="color:{rr_color};">{rr_label}</div>
                     </div>
                     <div class="tp-rules">
                         <div class="tp-rules-title">&#128736; PRE-TRADE CHECKLIST</div>
@@ -2922,26 +2963,51 @@ function selectStrat(card) {
     card.classList.add('strat-selected');
 
     var stratName = card.dataset.strat;
-    var rankTxt   = card.querySelector('.strat-num') ? card.querySelector('.strat-num').textContent : '';
 
-    // Lookup strike rec from embedded data
+    // Lookup strike rec and RR from embedded data
     var mapEl = document.getElementById('stratDataMap');
     var stratMap = {};
     try { stratMap = JSON.parse(mapEl.textContent || mapEl.innerHTML); } catch(e){}
     var info = stratMap[stratName] || {};
     var strikeRec = info.strike || 'N/A';
     var rank      = info.rank   || 'SELECTED';
+    var rr        = typeof info.rr === 'number' ? info.rr : 0;
 
     // Update banner
     var nameEl   = document.getElementById('tp-strat-name');
     var strikeEl = document.getElementById('tp-strike-rec');
     var rankEl   = document.getElementById('tp-rank-badge');
     var bannerEl = document.getElementById('tp-banner');
+    if (nameEl)   { nameEl.textContent = stratName; }
+    if (strikeEl) { strikeEl.innerHTML = '&#127919; ' + strikeRec; }
+    if (rankEl)   {
+        rankEl.textContent = rank;
+        rankEl.className   = 'tp-rank-badge tp-rank-' + rank.toLowerCase();
+    }
 
-    if (nameEl)   { nameEl.textContent   = stratName; }
-    if (strikeEl) { strikeEl.innerHTML   = '&#127919; ' + strikeRec; }
-    if (rankEl)   { rankEl.textContent   = rank;
-                    rankEl.className     = 'tp-rank-badge tp-rank-' + rank.toLowerCase(); }
+    // Update R:R dynamically with color + label
+    var rrValEl     = document.getElementById('tp-rr-val');
+    var rrVerdictEl = document.getElementById('tp-rr-verdict');
+    if (rrValEl && rrVerdictEl) {
+        var rrColor, rrLabel;
+        if (rr >= 2)      { rrColor = '#00e676'; rrLabel = '✓ Good'; }
+        else if (rr >= 1) { rrColor = '#ffb74d'; rrLabel = '⚠ Acceptable'; }
+        else              { rrColor = '#ff5252'; rrLabel = '✕ Poor — consider skipping'; }
+
+        // Animate: fade out → update → fade in
+        rrValEl.style.transition     = 'opacity 0.15s';
+        rrVerdictEl.style.transition = 'opacity 0.15s';
+        rrValEl.style.opacity        = '0';
+        rrVerdictEl.style.opacity    = '0';
+        setTimeout(function() {
+            rrValEl.textContent     = '1 : ' + rr.toFixed(2);
+            rrValEl.style.color     = rrColor;
+            rrVerdictEl.textContent = rrLabel;
+            rrVerdictEl.style.color = rrColor;
+            rrValEl.style.opacity   = '1';
+            rrVerdictEl.style.opacity = '1';
+        }, 150);
+    }
 
     // Flash the banner to draw attention
     if (bannerEl) {
