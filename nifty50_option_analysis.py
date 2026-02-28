@@ -1256,6 +1256,36 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                    "Mixed signals — range-bound or sideways strategies preferred.")
     strat_count = len(strategy_list)
 
+    # ── Trade Plan auto-values ────────────────────────────────────────────────
+    current_price = d.get('current_price', 0)
+    support       = d.get('support', 0)
+    resistance    = d.get('resistance', 0)
+    stop_loss_val = d.get('stop_loss', None)
+    target_1_val  = d.get('target_1', resistance)
+    target_2_val  = d.get('target_2', 0)
+    rr_ratio      = d.get('risk_reward_ratio', 0)
+    expiry_date   = d.get('expiry', 'N/A')
+
+    if stop_loss_val:
+        sl_display = f"&#8377;{int(stop_loss_val):,}"
+        sl_pts     = abs(int(current_price - stop_loss_val))
+    else:
+        sl_pts     = int(current_price * 0.005) if current_price else 50
+        sl_display = f"~&#8377;{int(current_price - sl_pts):,} (0.5% below spot)"
+
+    if target_1_val:
+        tgt1_display = f"&#8377;{int(target_1_val):,}"
+        reward_pts   = abs(int(target_1_val - current_price))
+    else:
+        tgt1_display = "N/A"
+        reward_pts   = 0
+
+    tgt2_display = f"&#8377;{int(target_2_val):,}" if target_2_val else "N/A (CE/PE wall)"
+    rr_color     = "#00e676" if rr_ratio >= 2 else ("#ffb74d" if rr_ratio >= 1 else "#ff5252")
+    rr_label     = "&#10003; Good" if rr_ratio >= 2 else ("&#9888; Acceptable" if rr_ratio >= 1 else "&#10005; Poor — consider skipping")
+    primary_strat        = strategy_list[0] if strategy_list else "N/A"
+    primary_strike_rec   = get_strike_suggestion(primary_strat, atm_strike, ce_wall, pe_wall) if has_strikes and strategy_list else "N/A"
+
     html_parts = []
     html_parts.append(f"""
     <div class="tab-panel" id="tab-checklist">
@@ -1306,6 +1336,87 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
             </div>
             <div class="strat-grid" id="stratGrid">{strat_cards_html}</div>
         </div>
+        <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
+        <div class="section">
+            <div class="section-title"><span>&#128203;</span> TRADE PLAN — AUTO FILLED
+                <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;margin-left:auto;">
+                    Define exits BEFORE you enter — not after
+                </span>
+            </div>
+            <div class="tp-wrap">
+
+                <!-- Row 1: Primary strategy banner -->
+                <div class="tp-banner">
+                    <div class="tp-banner-left">
+                        <div class="tp-banner-label">PRIMARY STRATEGY</div>
+                        <div class="tp-banner-strat">{primary_strat}</div>
+                        <div class="tp-banner-strike">&#127919; {primary_strike_rec}</div>
+                    </div>
+                    <div class="tp-banner-right">
+                        <div class="tp-banner-label">EXPIRY</div>
+                        <div class="tp-banner-exp">{expiry_date}</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: The 3 exit conditions -->
+                <div class="tp-exits">
+                    <div class="tp-exit tp-exit-profit">
+                        <div class="tp-exit-icon">&#9989;</div>
+                        <div class="tp-exit-title">PROFIT EXIT</div>
+                        <div class="tp-exit-val">{tgt1_display}</div>
+                        <div class="tp-exit-sub">Target 1 · {reward_pts} pts from spot</div>
+                        <div class="tp-exit-val2">{tgt2_display}</div>
+                        <div class="tp-exit-sub">Target 2 (CE/PE wall)</div>
+                        <div class="tp-exit-rule">&#128161; Take 50–60% profits at Target 1. Let the rest run to Target 2.</div>
+                    </div>
+                    <div class="tp-exit tp-exit-loss">
+                        <div class="tp-exit-icon">&#10060;</div>
+                        <div class="tp-exit-title">STOP LOSS EXIT</div>
+                        <div class="tp-exit-val">{sl_display}</div>
+                        <div class="tp-exit-sub">Hard stop · {sl_pts} pts from spot</div>
+                        <div class="tp-exit-rule">&#128161; Exit immediately when hit — no averaging down. Max 2% of capital at risk per trade.</div>
+                    </div>
+                    <div class="tp-exit tp-exit-time">
+                        <div class="tp-exit-icon">&#9200;</div>
+                        <div class="tp-exit-title">TIME EXIT</div>
+                        <div class="tp-exit-val">40% DTE Rule</div>
+                        <div class="tp-exit-sub">Exit if target not reached by 40% of expiry elapsed</div>
+                        <div class="tp-exit-rule">&#128161; Theta decay accelerates after 40% DTE. A stalled trade is a losing trade — exit and preserve capital.</div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Risk/Reward + Rules summary -->
+                <div class="tp-bottom">
+                    <div class="tp-rr-box">
+                        <div class="tp-rr-label">RISK : REWARD</div>
+                        <div class="tp-rr-val" style="color:{rr_color};">1 : {rr_ratio}</div>
+                        <div class="tp-rr-verdict" style="color:{rr_color};">{rr_label}</div>
+                    </div>
+                    <div class="tp-rules">
+                        <div class="tp-rules-title">&#128736; PRE-TRADE CHECKLIST</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is R:R ratio &ge; 1.5? If not, skip this trade.</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is current price too close to resistance (bearish) or support (bullish)? If yes, wait.</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Have I written down all 3 exit conditions above?</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Am I risking &le; 2% of total capital on this trade?</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is there a major event (RBI, earnings, expiry) before my time exit?</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> If halfway to target and stalled — take 50% profits and reassess.</div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Mindset reminder -->
+                <div class="tp-mindset">
+                    <span class="tp-mindset-icon">&#129504;</span>
+                    <span class="tp-mindset-text">
+                        A loss that follows your rules is <strong>not a failure</strong>.
+                        A loss without rules <strong>is</strong>. &nbsp;·&nbsp;
+                        Your job is not to be right — it is to <strong>manage risk</strong>.
+                    </span>
+                </div>
+
+            </div>
+        </div>
+        <!-- ══════════════ END TRADE PLAN ══════════════ -->
+
         <div class="section">
             <div class="section-title"><span>&#128218;</span> SCORING LEGEND</div>
             <div class="logic-box" style="margin-top:0;">
@@ -3522,6 +3633,50 @@ window.addEventListener('resize', function(){
         .strat-tag-misc{{background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.25);color:#4fc3f7;}}
         .strat-strike-rec{{margin-top:10px;padding:8px 10px;background:rgba(0,0,0,0.25);border-left:3px solid rgba(79,195,247,0.4);border-radius:0 8px 8px 0;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(176,190,197,0.75);line-height:1.6;word-break:break-word;}}
         .strat-strike-lbl{{color:#80deea;font-weight:700;letter-spacing:0.5px;}}
+
+        /* ── TRADE PLAN ─────────────────────────────────────────────── */
+        .tp-wrap{{display:flex;flex-direction:column;gap:16px;}}
+        .tp-banner{{display:flex;justify-content:space-between;align-items:flex-start;background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.2);border-radius:14px;padding:18px 22px;gap:16px;}}
+        .tp-banner-left{{flex:1;}}
+        .tp-banner-label{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.4);letter-spacing:2px;margin-bottom:6px;}}
+        .tp-banner-strat{{font-family:'Oxanium',sans-serif;font-size:clamp(15px,2vw,20px);font-weight:800;color:#80deea;margin-bottom:6px;}}
+        .tp-banner-strike{{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(176,190,197,0.7);}}
+        .tp-banner-right{{text-align:right;}}
+        .tp-banner-exp{{font-family:'Oxanium',sans-serif;font-size:16px;font-weight:700;color:#ffb74d;margin-top:6px;}}
+        .tp-exits{{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}}
+        .tp-exit{{border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;}}
+        .tp-exit::before{{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}}
+        .tp-exit-profit{{background:rgba(0,230,118,0.05);border:1px solid rgba(0,230,118,0.2);}}
+        .tp-exit-profit::before{{background:linear-gradient(90deg,#00e676,#00bfa5);}}
+        .tp-exit-loss{{background:rgba(255,82,82,0.05);border:1px solid rgba(255,82,82,0.2);}}
+        .tp-exit-loss::before{{background:linear-gradient(90deg,#ff5252,#b71c1c);}}
+        .tp-exit-time{{background:rgba(255,183,77,0.05);border:1px solid rgba(255,183,77,0.2);}}
+        .tp-exit-time::before{{background:linear-gradient(90deg,#ffb74d,#f57c00);}}
+        .tp-exit-icon{{font-size:20px;}}
+        .tp-exit-title{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(176,190,197,0.4);margin-bottom:2px;}}
+        .tp-exit-val{{font-family:'Oxanium',sans-serif;font-size:clamp(14px,1.8vw,18px);font-weight:800;color:#e0f7fa;}}
+        .tp-exit-val2{{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;color:rgba(224,247,250,0.6);margin-top:4px;}}
+        .tp-exit-sub{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.4);}}
+        .tp-exit-rule{{margin-top:8px;font-size:10px;color:rgba(176,190,197,0.55);line-height:1.5;border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;}}
+        .tp-bottom{{display:grid;grid-template-columns:160px 1fr;gap:12px;}}
+        .tp-rr-box{{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;}}
+        .tp-rr-label{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.35);letter-spacing:2px;}}
+        .tp-rr-val{{font-family:'Oxanium',sans-serif;font-size:28px;font-weight:900;}}
+        .tp-rr-verdict{{font-size:10px;font-weight:700;letter-spacing:1px;}}
+        .tp-rules{{background:rgba(0,0,0,0.15);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px 20px;}}
+        .tp-rules-title{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.5);letter-spacing:2px;margin-bottom:10px;}}
+        .tp-rule-item{{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:rgba(176,190,197,0.65);padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);line-height:1.4;}}
+        .tp-rule-item:last-child{{border-bottom:none;}}
+        .tp-rule-chk{{font-size:14px;color:rgba(128,222,234,0.4);flex-shrink:0;margin-top:1px;}}
+        .tp-mindset{{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(79,195,247,0.06),rgba(124,77,255,0.06));border:1px solid rgba(79,195,247,0.15);border-radius:14px;padding:16px 20px;}}
+        .tp-mindset-icon{{font-size:24px;flex-shrink:0;}}
+        .tp-mindset-text{{font-size:12px;color:rgba(176,190,197,0.7);line-height:1.7;}}
+        @media(max-width:768px){{
+            .tp-exits{{grid-template-columns:1fr;}}
+            .tp-bottom{{grid-template-columns:1fr;}}
+            .tp-banner{{flex-direction:column;}}
+            .tp-banner-right{{text-align:left;}}
+        }}
         .filter-btn{{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid rgba(79,195,247,0.2);background:transparent;color:rgba(176,190,197,0.5);transition:all 0.2s ease;font-family:'Oxanium',sans-serif;}}
         .filter-btn.active,.filter-btn:hover{{background:rgba(79,195,247,0.1);border-color:rgba(79,195,247,0.4);color:#4fc3f7;}}
 

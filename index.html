@@ -257,6 +257,50 @@
         .strat-tag-misc{background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.25);color:#4fc3f7;}
         .strat-strike-rec{margin-top:10px;padding:8px 10px;background:rgba(0,0,0,0.25);border-left:3px solid rgba(79,195,247,0.4);border-radius:0 8px 8px 0;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(176,190,197,0.75);line-height:1.6;word-break:break-word;}
         .strat-strike-lbl{color:#80deea;font-weight:700;letter-spacing:0.5px;}
+
+        /* ── TRADE PLAN ─────────────────────────────────────────────── */
+        .tp-wrap{display:flex;flex-direction:column;gap:16px;}
+        .tp-banner{display:flex;justify-content:space-between;align-items:flex-start;background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.2);border-radius:14px;padding:18px 22px;gap:16px;}
+        .tp-banner-left{flex:1;}
+        .tp-banner-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.4);letter-spacing:2px;margin-bottom:6px;}
+        .tp-banner-strat{font-family:'Oxanium',sans-serif;font-size:clamp(15px,2vw,20px);font-weight:800;color:#80deea;margin-bottom:6px;}
+        .tp-banner-strike{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(176,190,197,0.7);}
+        .tp-banner-right{text-align:right;}
+        .tp-banner-exp{font-family:'Oxanium',sans-serif;font-size:16px;font-weight:700;color:#ffb74d;margin-top:6px;}
+        .tp-exits{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+        .tp-exit{border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden;}
+        .tp-exit::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+        .tp-exit-profit{background:rgba(0,230,118,0.05);border:1px solid rgba(0,230,118,0.2);}
+        .tp-exit-profit::before{background:linear-gradient(90deg,#00e676,#00bfa5);}
+        .tp-exit-loss{background:rgba(255,82,82,0.05);border:1px solid rgba(255,82,82,0.2);}
+        .tp-exit-loss::before{background:linear-gradient(90deg,#ff5252,#b71c1c);}
+        .tp-exit-time{background:rgba(255,183,77,0.05);border:1px solid rgba(255,183,77,0.2);}
+        .tp-exit-time::before{background:linear-gradient(90deg,#ffb74d,#f57c00);}
+        .tp-exit-icon{font-size:20px;}
+        .tp-exit-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(176,190,197,0.4);margin-bottom:2px;}
+        .tp-exit-val{font-family:'Oxanium',sans-serif;font-size:clamp(14px,1.8vw,18px);font-weight:800;color:#e0f7fa;}
+        .tp-exit-val2{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;color:rgba(224,247,250,0.6);margin-top:4px;}
+        .tp-exit-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.4);}
+        .tp-exit-rule{margin-top:8px;font-size:10px;color:rgba(176,190,197,0.55);line-height:1.5;border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;}
+        .tp-bottom{display:grid;grid-template-columns:160px 1fr;gap:12px;}
+        .tp-rr-box{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;}
+        .tp-rr-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.35);letter-spacing:2px;}
+        .tp-rr-val{font-family:'Oxanium',sans-serif;font-size:28px;font-weight:900;}
+        .tp-rr-verdict{font-size:10px;font-weight:700;letter-spacing:1px;}
+        .tp-rules{background:rgba(0,0,0,0.15);border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:16px 20px;}
+        .tp-rules-title{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.5);letter-spacing:2px;margin-bottom:10px;}
+        .tp-rule-item{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:rgba(176,190,197,0.65);padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.03);line-height:1.4;}
+        .tp-rule-item:last-child{border-bottom:none;}
+        .tp-rule-chk{font-size:14px;color:rgba(128,222,234,0.4);flex-shrink:0;margin-top:1px;}
+        .tp-mindset{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(79,195,247,0.06),rgba(124,77,255,0.06));border:1px solid rgba(79,195,247,0.15);border-radius:14px;padding:16px 20px;}
+        .tp-mindset-icon{font-size:24px;flex-shrink:0;}
+        .tp-mindset-text{font-size:12px;color:rgba(176,190,197,0.7);line-height:1.7;}
+        @media(max-width:768px){
+            .tp-exits{grid-template-columns:1fr;}
+            .tp-bottom{grid-template-columns:1fr;}
+            .tp-banner{flex-direction:column;}
+            .tp-banner-right{text-align:left;}
+        }
         .filter-btn{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid rgba(79,195,247,0.2);background:transparent;color:rgba(176,190,197,0.5);transition:all 0.2s ease;font-family:'Oxanium',sans-serif;}
         .filter-btn.active,.filter-btn:hover{background:rgba(79,195,247,0.1);border-color:rgba(79,195,247,0.4);color:#4fc3f7;}
 
@@ -478,7 +522,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">01-Mar-2026 04:00 IST</span>
+                <span class="sb-value gen-val">01-Mar-2026 04:12 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -1000,7 +1044,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-            As of: 01-Mar-2026 04:00 IST
+            As of: 01-Mar-2026 04:12 IST
           </span>
         </div>
 
@@ -1502,6 +1546,87 @@
             <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> BUY 25200PE  +  SELL 25150PE  +  SELL 25050PE  (step-down strikes)</div>
         </div></div>
         </div>
+        <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
+        <div class="section">
+            <div class="section-title"><span>&#128203;</span> TRADE PLAN — AUTO FILLED
+                <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;margin-left:auto;">
+                    Define exits BEFORE you enter — not after
+                </span>
+            </div>
+            <div class="tp-wrap">
+
+                <!-- Row 1: Primary strategy banner -->
+                <div class="tp-banner">
+                    <div class="tp-banner-left">
+                        <div class="tp-banner-label">PRIMARY STRATEGY</div>
+                        <div class="tp-banner-strat">Long Put</div>
+                        <div class="tp-banner-strike">&#127919; BUY 25200PE (ATM) or 25150PE (slight OTM)</div>
+                    </div>
+                    <div class="tp-banner-right">
+                        <div class="tp-banner-label">EXPIRY</div>
+                        <div class="tp-banner-exp">02-Mar-2026</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: The 3 exit conditions -->
+                <div class="tp-exits">
+                    <div class="tp-exit tp-exit-profit">
+                        <div class="tp-exit-icon">&#9989;</div>
+                        <div class="tp-exit-title">PROFIT EXIT</div>
+                        <div class="tp-exit-val">&#8377;25,167</div>
+                        <div class="tp-exit-sub">Target 1 · 11 pts from spot</div>
+                        <div class="tp-exit-val2">&#8377;25,000</div>
+                        <div class="tp-exit-sub">Target 2 (CE/PE wall)</div>
+                        <div class="tp-exit-rule">&#128161; Take 50–60% profits at Target 1. Let the rest run to Target 2.</div>
+                    </div>
+                    <div class="tp-exit tp-exit-loss">
+                        <div class="tp-exit-icon">&#10060;</div>
+                        <div class="tp-exit-title">STOP LOSS EXIT</div>
+                        <div class="tp-exit-val">&#8377;25,329</div>
+                        <div class="tp-exit-sub">Hard stop · 150 pts from spot</div>
+                        <div class="tp-exit-rule">&#128161; Exit immediately when hit — no averaging down. Max 2% of capital at risk per trade.</div>
+                    </div>
+                    <div class="tp-exit tp-exit-time">
+                        <div class="tp-exit-icon">&#9200;</div>
+                        <div class="tp-exit-title">TIME EXIT</div>
+                        <div class="tp-exit-val">40% DTE Rule</div>
+                        <div class="tp-exit-sub">Exit if target not reached by 40% of expiry elapsed</div>
+                        <div class="tp-exit-rule">&#128161; Theta decay accelerates after 40% DTE. A stalled trade is a losing trade — exit and preserve capital.</div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Risk/Reward + Rules summary -->
+                <div class="tp-bottom">
+                    <div class="tp-rr-box">
+                        <div class="tp-rr-label">RISK : REWARD</div>
+                        <div class="tp-rr-val" style="color:#ff5252;">1 : 0.07</div>
+                        <div class="tp-rr-verdict" style="color:#ff5252;">&#10005; Poor — consider skipping</div>
+                    </div>
+                    <div class="tp-rules">
+                        <div class="tp-rules-title">&#128736; PRE-TRADE CHECKLIST</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is R:R ratio &ge; 1.5? If not, skip this trade.</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is current price too close to resistance (bearish) or support (bullish)? If yes, wait.</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Have I written down all 3 exit conditions above?</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Am I risking &le; 2% of total capital on this trade?</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> Is there a major event (RBI, earnings, expiry) before my time exit?</div>
+                        <div class="tp-rule-item"><span class="tp-rule-chk">&#9744;</span> If halfway to target and stalled — take 50% profits and reassess.</div>
+                    </div>
+                </div>
+
+                <!-- Row 4: Mindset reminder -->
+                <div class="tp-mindset">
+                    <span class="tp-mindset-icon">&#129504;</span>
+                    <span class="tp-mindset-text">
+                        A loss that follows your rules is <strong>not a failure</strong>.
+                        A loss without rules <strong>is</strong>. &nbsp;·&nbsp;
+                        Your job is not to be right — it is to <strong>manage risk</strong>.
+                    </span>
+                </div>
+
+            </div>
+        </div>
+        <!-- ══════════════ END TRADE PLAN ══════════════ -->
+
         <div class="section">
             <div class="section-title"><span>&#128218;</span> SCORING LEGEND</div>
             <div class="logic-box" style="margin-top:0;">
