@@ -1217,44 +1217,84 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
     # Base R:R from market analysis — needed before card loop
     rr_ratio = d.get('risk_reward_ratio', 0) or 0
 
-    # Per-strategy R:R multipliers relative to base market R:R
-    # Spreads cap both profit AND loss → better RR than naked. Ratio backspread = high reward/unlimited.
-    STRAT_RR_MULT = {
-        "Long Call":                           1.0,
-        "Long Put":                            1.0,
-        "Bull Call Spread":                    1.4,
-        "Bull Put Spread":                     1.3,
-        "Bear Put Spread":                     1.4,
-        "Bear Call Spread":                    1.3,
-        "Bull Call Ladder":                    1.2,
-        "Bull Put Ladder":                     1.1,
-        "Bear Put Ladder":                     1.2,
-        "Bear Call Ladder":                    1.1,
-        "Synthetic Long":                      1.0,
-        "Synthetic Short":                     1.0,
-        "Call Ratio Backspread":               1.8,
-        "Put Ratio Backspread":                1.8,
-        "Strap (Bullish Bias)":                1.3,
-        "Strip (Bearish Bias)":                1.3,
-        "Jade Lizard":                         1.5,
-        "Reverse Jade Lizard":                 1.5,
-        "The Wheel Strategy (CSP + Covered Call)": 1.6,
-        "Short Straddle":                      0.6,
-        "Short Strangle":                      0.7,
-        "Iron Condor":                         0.9,
-        "Iron Butterfly":                      0.8,
-        "Condor Spread (Short)":               0.9,
-        "Calendar Spread":                     1.1,
-        "Diagonal Spread":                     1.2,
-        "Butterfly Spread (Short)":            0.8,
-        "Long Straddle":                       1.2,
-        "Long Strangle":                       1.1,
-        "Long Guts":                           1.0,
-        "Butterfly Spread (Long)":             1.5,
-        "Call Ratio Spread":                   1.3,
-        "Put Ratio Spread":                    1.3,
-        "Christmas Tree Spread":               1.4,
-    }
+    # Per-strategy INDEPENDENT R:R — based on each strategy's structural profit/loss profile
+    # Uses: atm_strike, ce_wall (resistance), pe_wall (support), current_price
+    # These are real structural R:Rs, NOT derived from market direction R:R
+    def calc_strat_rr(strat_name, spot, atm, ce, pe, sl_pts, reward_pts_base):
+        """
+        Returns (rr_ratio, rr_note) for each strategy independently.
+        sl_pts      = hard stop loss distance in points (from market analysis)
+        reward_pts  = distance to target 1 (support/resistance)
+        For spreads: max_profit = spread_width - net_debit (approx)
+                     max_loss   = net_debit (approx half spread for even split)
+        """
+        spread = 200   # standard Nifty spread width (4 strikes × 50)
+        half   = spread / 2   # approx net debit for ATM spread
+        sl     = max(sl_pts, 50)        # never divide by zero
+        rw     = max(reward_pts_base, 50)
+
+        rr_map = {
+            # Naked directional — full premium at risk, uncapped reward
+            "Long Call":            round(rw / sl, 2),
+            "Long Put":             round(rw / sl, 2),
+            "Synthetic Long":       round(rw / sl, 2),
+            "Synthetic Short":      round(rw / sl, 2),
+            # Debit spreads — max loss = net debit (~half spread), max profit = spread - debit
+            "Bull Call Spread":     round((spread - half) / half, 2),   # ~1.0 for equal width
+            "Bear Put Spread":      round((spread - half) / half, 2),
+            "Bull Put Spread":      round((spread - half) / half, 2),
+            "Bear Call Spread":     round((spread - half) / half, 2),
+            # Ladders — extra short strike adds premium but adds tail risk
+            "Bull Call Ladder":     round((spread * 0.6) / (spread * 0.4), 2),
+            "Bear Put Ladder":      round((spread * 0.6) / (spread * 0.4), 2),
+            "Bull Put Ladder":      round((spread * 0.5) / (spread * 0.5), 2),
+            "Bear Call Ladder":     round((spread * 0.5) / (spread * 0.5), 2),
+            # Ratio backspreads — small loss in middle, big win at extremes
+            "Call Ratio Backspread":  round((spread * 1.5) / (spread * 0.5), 2),
+            "Put Ratio Backspread":   round((spread * 1.5) / (spread * 0.5), 2),
+            # Strap/Strip — 2:1 long positions, pays on big move
+            "Strap (Bullish Bias)": round((rw * 1.5) / (sl * 0.8), 2),
+            "Strip (Bearish Bias)": round((rw * 1.5) / (sl * 0.8), 2),
+            # Income strategies — limited credit, unlimited risk
+            "Jade Lizard":          round((spread * 0.3) / (spread * 0.7), 2),
+            "Reverse Jade Lizard":  round((spread * 0.3) / (spread * 0.7), 2),
+            "The Wheel Strategy (CSP + Covered Call)": round((spread * 0.25) / (spread * 0.75), 2),
+            # Neutral short premium — limited credit, large risk
+            "Short Straddle":       round((half * 0.4) / (spread * 1.0), 2),
+            "Short Strangle":       round((half * 0.35) / (spread * 1.2), 2),
+            # Iron structures — defined on both sides
+            "Iron Condor":          round((half * 0.5) / (half * 0.5), 2),
+            "Iron Butterfly":       round((half * 0.6) / (half * 0.4), 2),
+            "Condor Spread (Short)":round((half * 0.45) / (half * 0.55), 2),
+            # Calendar/Diagonal — time value play
+            "Calendar Spread":      round((half * 0.8) / (half * 0.6), 2),
+            "Diagonal Spread":      round((half * 0.9) / (half * 0.6), 2),
+            "Butterfly Spread (Short)": round((half * 0.4) / (half * 0.6), 2),
+            # Long vol
+            "Long Straddle":        round((rw * 1.2) / (half * 0.8), 2),
+            "Long Strangle":        round((rw * 1.0) / (half * 0.7), 2),
+            "Long Guts":            round((rw * 0.9) / (half * 0.9), 2),
+            "Butterfly Spread (Long)": round((half * 1.2) / (half * 0.5), 2),
+            # Advanced ratio
+            "Call Ratio Spread":    round((spread * 0.8) / (spread * 0.5), 2),
+            "Put Ratio Spread":     round((spread * 0.8) / (spread * 0.5), 2),
+            "Christmas Tree Spread":round((spread * 0.7) / (spread * 0.45), 2),
+        }
+        return rr_map.get(strat_name, round(rw / sl, 2))
+
+    # ── All variables needed by card loop must be defined HERE ───────────────
+    current_price = d.get('current_price', 0)
+    support       = d.get('support', 0)
+    resistance    = d.get('resistance', 0)
+    stop_loss_val = d.get('stop_loss', None)
+    target_1_val  = d.get('target_1', resistance)
+    target_2_val  = d.get('target_2', 0)
+    expiry_date   = d.get('expiry', 'N/A')
+
+    sl_pts_for_rr     = abs(int(current_price - stop_loss_val)) if stop_loss_val and current_price else int(current_price * 0.005) if current_price else 150
+    reward_pts_for_rr = abs(int(target_1_val  - current_price)) if target_1_val  and current_price else 200
+    sl_pts_for_rr     = max(sl_pts_for_rr,     100)
+    reward_pts_for_rr = max(reward_pts_for_rr, 150)
 
     strat_cards_html = ""
     strat_data_js = {}  # for JS lookup
@@ -1264,8 +1304,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         rank = "PRIMARY" if i <= 4 else ("SECONDARY" if i <= 8 else "ADVANCED")
         strike_rec = get_strike_suggestion(s, atm_strike, ce_wall, pe_wall) if has_strikes else "Strike data unavailable"
         safe_name = s.replace('"', '&quot;').replace("'", "\\'")
-        rr_mult   = STRAT_RR_MULT.get(s, 1.0)
-        strat_rr  = round(rr_ratio * rr_mult, 2)
+        strat_rr  = calc_strat_rr(s, current_price, atm_strike, ce_wall, pe_wall, sl_pts_for_rr, reward_pts_for_rr)
         strat_data_js[s] = {"strike": strike_rec, "type": stype, "rank": rank, "rr": strat_rr}
         strat_cards_html += f"""
         <div class="strat-card {card_cls}" data-type="{stype}" data-strat="{safe_name}" onclick="selectStrat(this)">
@@ -1308,14 +1347,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                    "Mixed signals — range-bound or sideways strategies preferred.")
     strat_count = len(strategy_list)
 
-    # ── Trade Plan auto-values ────────────────────────────────────────────────
-    current_price = d.get('current_price', 0)
-    support       = d.get('support', 0)
-    resistance    = d.get('resistance', 0)
-    stop_loss_val = d.get('stop_loss', None)
-    target_1_val  = d.get('target_1', resistance)
-    target_2_val  = d.get('target_2', 0)
-    expiry_date   = d.get('expiry', 'N/A')
+    # ── Trade Plan auto-values (already defined above for card loop) ─────────
 
     if stop_loss_val:
         sl_display = f"&#8377;{int(stop_loss_val):,}"
