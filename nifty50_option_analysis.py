@@ -475,6 +475,20 @@ def get_heatmap_javascript():
         }
     }
 
+    // Full Nifty 50 weight order — descending by approximate index weight
+    var NIFTY_WEIGHT_ORDER = [
+        "HDFCBANK","RELIANCE","ICICIBANK","INFY","TCS",
+        "BHARTIARTL","LT","AXISBANK","SBIN","KOTAKBANK",
+        "BAJFINANCE","HINDUNILVR","MARUTI","SUNPHARMA","HCLTECH",
+        "TITAN","WIPRO","NTPC","M&M","ONGC",
+        "ULTRACEMCO","POWERGRID","TATAMOTORS","COALINDIA","ADANIPORTS",
+        "BAJAJ-AUTO","BAJAJFINSV","ETERNAL","GRASIM","ITC",
+        "JSWSTEEL","TATACONSUM","TATASTEEL","TECHM","DRREDDY",
+        "CIPLA","HINDALCO","EICHERMOT","SBILIFE","HDFCLIFE",
+        "JIOFIN","HEROMOTOCO","TRENT","MAXHEALTH","INDIGO",
+        "NESTLEIND","ASIANPAINT","SHRIRAMFIN","BEL","APOLLOHOSP"
+    ];
+
     function renderHeatmap() {
     var el = document.getElementById('hmDataScript');
     var grid = document.getElementById('hmGrid');
@@ -490,6 +504,15 @@ def get_heatmap_javascript():
     var data;
     try { data = JSON.parse(rawText); }
     catch(e) { console.warn('HM parse error:', e); return; }
+
+        // Sort by Nifty index weight (descending) — unknowns go to end
+        var weightIndex = {};
+        NIFTY_WEIGHT_ORDER.forEach(function(sym, i){ weightIndex[sym] = i; });
+        data = data.slice().sort(function(a, b) {
+            var ai = weightIndex[a.symbol] !== undefined ? weightIndex[a.symbol] : 999;
+            var bi = weightIndex[b.symbol] !== undefined ? weightIndex[b.symbol] : 999;
+            return ai - bi;
+        });
 
         var html = '';
         data.forEach(function(s) {
