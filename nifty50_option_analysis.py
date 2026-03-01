@@ -1298,21 +1298,82 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 
     strat_cards_html = ""
     strat_data_js = {}  # for JS lookup
+
+    _border_grad = {
+        "bullish":    "linear-gradient(180deg,#00e676,#00796b)",
+        "bearish":    "linear-gradient(180deg,#ff5252,#b71c1c)",
+        "neutral":    "linear-gradient(180deg,#ffb74d,#e65100)",
+        "volatility": "linear-gradient(180deg,#b388ff,#6200ea)",
+        "advanced":   "linear-gradient(180deg,#4fc3f7,#0277bd)",
+    }
+    _rb_cls = {"PRIMARY":"sc-rb-primary","SECONDARY":"sc-rb-secondary","ADVANCED":"sc-rb-advanced"}
+    _type_info = {
+        "bullish":    ("Debit / Credit", "Directional"),
+        "bearish":    ("Debit / Credit", "Directional"),
+        "neutral":    ("Premium Sell",   "Range-bound"),
+        "volatility": ("Debit",          "Vol Breakout"),
+        "advanced":   ("Multi-leg",      "Experienced"),
+    }
+
     for i, s in enumerate(strategy_list, 1):
-        stype = STRAT_TYPE_MAP.get(s, "advanced")
-        card_cls, tag_cls, tag_txt = tag_map.get(stype, tag_map["advanced"])
-        rank = "PRIMARY" if i <= 4 else ("SECONDARY" if i <= 8 else "ADVANCED")
+        stype      = STRAT_TYPE_MAP.get(s, "advanced")
+        _, tag_cls, tag_txt = tag_map.get(stype, tag_map["advanced"])
+        rank       = "PRIMARY" if i <= 4 else ("SECONDARY" if i <= 8 else "ADVANCED")
         strike_rec = get_strike_suggestion(s, atm_strike, ce_wall, pe_wall) if has_strikes else "Strike data unavailable"
-        safe_name = s.replace('"', '&quot;').replace("'", "\\'")
-        strat_rr  = calc_strat_rr(s, current_price, atm_strike, ce_wall, pe_wall, sl_pts_for_rr, reward_pts_for_rr)
+        safe_name  = s.replace('"', '&quot;').replace("'", "\\'")
+        strat_rr   = calc_strat_rr(s, current_price, atm_strike, ce_wall, pe_wall, sl_pts_for_rr, reward_pts_for_rr)
         strat_data_js[s] = {"strike": strike_rec, "type": stype, "rank": rank, "rr": strat_rr}
+
+        bar_grad = _border_grad.get(stype, _border_grad["advanced"])
+        if   strat_rr >= 2: rr_col, rr_lbl = "#00e676", "&#10003; Good"
+        elif strat_rr >= 1: rr_col, rr_lbl = "#ffb74d", "&#9888; Acceptable"
+        else:               rr_col, rr_lbl = "#ff5252", "&#10005; Poor"
+        rb_cls   = _rb_cls.get(rank, "sc-rb-advanced")
+        rr_bar_w = min(95, int(strat_rr / 3.0 * 100))
+        tl, ts   = _type_info.get(stype, ("Multi-leg", "Complex"))
+        panel_id = f"sc-dp-{i}"
+
         strat_cards_html += f"""
-        <div class="strat-card {card_cls}" data-type="{stype}" data-strat="{safe_name}" onclick="selectStrat(this)">
-            <div class="strat-num">{i:02d} · {rank}</div>
-            <div class="strat-name">{s}</div>
-            <span class="strat-tag {tag_cls}">{tag_txt}</span>
-            <div class="strat-strike-rec">&#127919; <span class="strat-strike-lbl">Strike Rec:</span> {strike_rec}</div>
-            <div class="strat-select-hint">&#128070; Click to load Trade Plan</div>
+        <div class="sc-row" data-type="{stype}" data-strat="{safe_name}" onclick="scToggle(this,'{panel_id}')">
+            <div class="sc-row-bar" style="background:{bar_grad};"></div>
+            <div class="sc-row-num">{i:02d}</div>
+            <div class="sc-row-body">
+                <div class="sc-row-name">{s}</div>
+                <div class="sc-row-strike">&#127919; <span>{strike_rec}</span></div>
+            </div>
+            <div class="sc-row-meta">
+                <span class="sc-row-tag {tag_cls}">{tag_txt}</span>
+                <span class="sc-rb {rb_cls}">{rank}</span>
+                <span class="sc-row-rr" style="color:{rr_col};">R:R {strat_rr:.2f}</span>
+            </div>
+            <div class="sc-row-chevron" id="chev-{panel_id}">&#8250;</div>
+        </div>
+        <div class="sc-dp" id="{panel_id}">
+            <div class="sc-dp-grid">
+                <div class="sc-dp-box">
+                    <div class="sc-dp-lbl">STRATEGY TYPE</div>
+                    <div class="sc-dp-val" style="color:{rr_col};">{tl}</div>
+                    <div class="sc-dp-sub">{ts}</div>
+                </div>
+                <div class="sc-dp-box">
+                    <div class="sc-dp-lbl">RISK : REWARD</div>
+                    <div class="sc-dp-val" style="color:{rr_col};">1 : {strat_rr:.2f}</div>
+                    <div class="sc-dp-sub">{rr_lbl}</div>
+                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:{rr_bar_w}%;background:{bar_grad};"></div></div>
+                </div>
+                <div class="sc-dp-box">
+                    <div class="sc-dp-lbl">RANK</div>
+                    <div class="sc-dp-val" style="color:#80deea;">{rank}</div>
+                    <div class="sc-dp-sub">#{i:02d} of {len(strategy_list)}</div>
+                </div>
+            </div>
+            <div class="sc-dp-strike-box">
+                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> {strike_rec}
+            </div>
+            <div class="sc-dp-actions">
+                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('{panel_id}',event)">&#10005; Close</button>
+                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('{safe_name}',event)">&#128203; Load Trade Plan &#8599;</button>
+            </div>
         </div>"""
 
     # Build JS strategy data map
@@ -1417,7 +1478,31 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                     <button class="filter-btn" onclick="filterStrats('advanced',this)">&#128309; Advanced</button>
                 </div>
             </div>
-            <div class="strat-grid" id="stratGrid">{strat_cards_html}</div>
+            <!-- compact strategy summary strip -->
+            <div class="sc-summary-strip">
+                <div class="sc-ss-item">
+                    <span class="sc-ss-dot" style="background:#00e5ff;box-shadow:0 0 5px #00e5ff;"></span>
+                    <span class="sc-ss-lbl">PRIMARY</span>
+                    <span class="sc-ss-val" style="color:#00e5ff;">{min(4, strat_count)}</span>
+                </div>
+                <div class="sc-ss-sep"></div>
+                <div class="sc-ss-item">
+                    <span class="sc-ss-dot" style="background:#ffb74d;"></span>
+                    <span class="sc-ss-lbl">SECONDARY</span>
+                    <span class="sc-ss-val" style="color:#ffb74d;">{max(0, min(4, strat_count - 4))}</span>
+                </div>
+                <div class="sc-ss-sep"></div>
+                <div class="sc-ss-item">
+                    <span class="sc-ss-dot" style="background:#b388ff;"></span>
+                    <span class="sc-ss-lbl">ADVANCED</span>
+                    <span class="sc-ss-val" style="color:#b388ff;">{max(0, strat_count - 8)}</span>
+                </div>
+                <div class="sc-ss-sep"></div>
+                <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.3);">
+                    ATM: &#8377;{atm_strike:,} &nbsp;&middot;&nbsp; CE Wall: &#8377;{ce_wall:,} &nbsp;&middot;&nbsp; PE Wall: &#8377;{pe_wall:,}
+                </div>
+            </div>
+            <div class="sc-compact-grid" id="stratGrid">{strat_cards_html}</div>
         </div>
         <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
         <script id="stratDataMap" type="application/json">{strat_js_map}</script>
@@ -2984,74 +3069,104 @@ function switchTab(tab) {
 function filterStrats(type, btn) {
     document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
-    document.querySelectorAll('.strat-card').forEach(function(c){
-        c.style.display=(type==='all'||c.dataset.type===type)?'':'none';
+    // Close all open panels first
+    document.querySelectorAll('.sc-dp').forEach(function(p){ p.classList.remove('sc-dp-open'); });
+    document.querySelectorAll('.sc-row').forEach(function(r){ r.classList.remove('sc-selected'); });
+    // Show/hide rows and their paired panels
+    document.querySelectorAll('.sc-row').forEach(function(r){
+        var show = (type === 'all' || r.dataset.type === type);
+        r.style.display = show ? '' : 'none';
+        var chev = r.querySelector('.sc-row-chevron');
+        if (chev) {
+            var pid = chev.id.replace('chev-', '');
+            var panel = document.getElementById(pid);
+            if (panel) panel.style.display = show ? '' : 'none';
+        }
     });
 }
 
-function selectStrat(card) {
-    // Remove selected state from all cards
-    document.querySelectorAll('.strat-card').forEach(function(c){
-        c.classList.remove('strat-selected');
-    });
-    card.classList.add('strat-selected');
+/* ── Compact row toggle / close / load ─────────────────────── */
+function scToggle(row, panelId) {
+    var panel      = document.getElementById(panelId);
+    var wasOpen    = panel && panel.classList.contains('sc-dp-open');
+    var wasSelected = row.classList.contains('sc-selected');
+    // Close everything
+    document.querySelectorAll('.sc-dp').forEach(function(p){ p.classList.remove('sc-dp-open'); });
+    document.querySelectorAll('.sc-row').forEach(function(r){ r.classList.remove('sc-selected'); });
+    // If it wasn't already open, open it
+    if (!wasSelected || !wasOpen) {
+        row.classList.add('sc-selected');
+        if (panel) {
+            panel.classList.add('sc-dp-open');
+            setTimeout(function(){ panel.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 50);
+        }
+        selectStrat(row);
+    }
+}
 
-    var stratName = card.dataset.strat;
+function scClose(panelId, evt) {
+    if (evt) evt.stopPropagation();
+    var panel = document.getElementById(panelId);
+    if (panel) panel.classList.remove('sc-dp-open');
+    document.querySelectorAll('.sc-row').forEach(function(r){ r.classList.remove('sc-selected'); });
+}
 
-    // Lookup strike rec and RR from embedded data
+function scLoadPlan(safeName, evt) {
+    if (evt) evt.stopPropagation();
+    // Decode HTML entities
+    var tmp = document.createElement('textarea');
+    tmp.innerHTML = safeName;
+    var stratName = tmp.value;
     var mapEl = document.getElementById('stratDataMap');
     var stratMap = {};
     try { stratMap = JSON.parse(mapEl.textContent || mapEl.innerHTML); } catch(e){}
     var info = stratMap[stratName] || {};
-    var strikeRec = info.strike || 'N/A';
-    var rank      = info.rank   || 'SELECTED';
-    var rr        = typeof info.rr === 'number' ? info.rr : 0;
+    _applyTradePlan(stratName, info.strike || 'N/A', info.rank || 'PRIMARY', typeof info.rr === 'number' ? info.rr : 0);
+    // Button flash
+    if (evt && evt.target) {
+        var btn = evt.target, orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; Loaded!';
+        btn.style.background = 'linear-gradient(135deg,#00e676,#00796b)';
+        setTimeout(function(){ btn.innerHTML = orig; btn.style.background = ''; }, 1500);
+    }
+    // Scroll to trade plan
+    var bannerEl = document.getElementById('tp-banner');
+    if (bannerEl) { var s = bannerEl.closest('.section'); if (s) s.scrollIntoView({ behavior:'smooth', block:'start' }); }
+}
 
-    // Update banner
+function _applyTradePlan(stratName, strikeRec, rank, rr) {
     var nameEl   = document.getElementById('tp-strat-name');
     var strikeEl = document.getElementById('tp-strike-rec');
     var rankEl   = document.getElementById('tp-rank-badge');
     var bannerEl = document.getElementById('tp-banner');
-    if (nameEl)   { nameEl.textContent = stratName; }
-    if (strikeEl) { strikeEl.innerHTML = '&#127919; ' + strikeRec; }
-    if (rankEl)   {
-        rankEl.textContent = rank;
-        rankEl.className   = 'tp-rank-badge tp-rank-' + rank.toLowerCase();
-    }
-
-    // Update R:R dynamically with color + label
-    var rrValEl     = document.getElementById('tp-rr-val');
-    var rrVerdictEl = document.getElementById('tp-rr-verdict');
-    if (rrValEl && rrVerdictEl) {
-        var rrColor, rrLabel;
-        if (rr >= 2)      { rrColor = '#00e676'; rrLabel = '✓ Good'; }
-        else if (rr >= 1) { rrColor = '#ffb74d'; rrLabel = '⚠ Acceptable'; }
-        else              { rrColor = '#ff5252'; rrLabel = '✕ Poor — consider skipping'; }
-
-        // Animate: fade out → update → fade in
-        rrValEl.style.transition     = 'opacity 0.15s';
-        rrVerdictEl.style.transition = 'opacity 0.15s';
-        rrValEl.style.opacity        = '0';
-        rrVerdictEl.style.opacity    = '0';
-        setTimeout(function() {
-            rrValEl.textContent     = '1 : ' + rr.toFixed(2);
-            rrValEl.style.color     = rrColor;
-            rrVerdictEl.textContent = rrLabel;
-            rrVerdictEl.style.color = rrColor;
-            rrValEl.style.opacity   = '1';
-            rrVerdictEl.style.opacity = '1';
+    if (nameEl)   nameEl.textContent = stratName;
+    if (strikeEl) strikeEl.innerHTML = '&#127919; ' + strikeRec;
+    if (rankEl)   { rankEl.textContent = rank; rankEl.className = 'tp-rank-badge tp-rank-' + rank.toLowerCase(); }
+    var rrValEl = document.getElementById('tp-rr-val'), rrVEl = document.getElementById('tp-rr-verdict');
+    if (rrValEl && rrVEl) {
+        var c = rr >= 2 ? '#00e676' : rr >= 1 ? '#ffb74d' : '#ff5252';
+        var l = rr >= 2 ? '\u2713 Good' : rr >= 1 ? '\u26a0 Acceptable' : '\u2715 Poor \u2014 consider skipping';
+        rrValEl.style.transition = rrVEl.style.transition = 'opacity 0.15s';
+        rrValEl.style.opacity = rrVEl.style.opacity = '0';
+        setTimeout(function(){
+            rrValEl.textContent = '1 : ' + rr.toFixed(2); rrValEl.style.color = c;
+            rrVEl.textContent = l; rrVEl.style.color = c;
+            rrValEl.style.opacity = rrVEl.style.opacity = '1';
         }, 150);
     }
+    if (bannerEl) { bannerEl.classList.add('tp-banner-flash'); setTimeout(function(){ bannerEl.classList.remove('tp-banner-flash'); }, 600); }
+}
 
-    // Flash the banner to draw attention
-    if (bannerEl) {
-        bannerEl.classList.add('tp-banner-flash');
-        setTimeout(function(){ bannerEl.classList.remove('tp-banner-flash'); }, 600);
-    }
-
-    // Scroll trade plan into view smoothly
-    var tpSection = bannerEl ? bannerEl.closest('.section') : null;
-    if (tpSection) { tpSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function selectStrat(row) {
+    if (!row || !row.dataset) return;
+    var tmp = document.createElement('textarea');
+    tmp.innerHTML = row.dataset.strat || '';
+    var stratName = tmp.value;
+    var mapEl = document.getElementById('stratDataMap');
+    var stratMap = {};
+    try { stratMap = JSON.parse(mapEl.textContent || mapEl.innerHTML); } catch(e){}
+    var info = stratMap[stratName] || {};
+    _applyTradePlan(stratName, info.strike || 'N/A', info.rank || 'PRIMARY', typeof info.rr === 'number' ? info.rr : 0);
 }
 
 var _oiInterval = 3;
@@ -3514,9 +3629,9 @@ function loadOILog() {
 window.addEventListener('load', function(){
     if (window.location.hash === '#oi-trend') { switchTab('oi-trend'); }
     else { loadOILog(); }
-    // Auto-select first strategy card so Trade Plan is pre-filled
-    var firstCard = document.querySelector('.strat-card');
-    if (firstCard) { selectStrat(firstCard); }
+    // Auto-select first strategy row so Trade Plan is pre-filled
+    var firstRow = document.querySelector('.sc-row');
+    if (firstRow) { selectStrat(firstRow); }
 });
 
 setInterval(loadOILog, 30000);
@@ -3766,35 +3881,67 @@ window.addEventListener('resize', function(){
         .sc-pill-bear{{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.3);color:#ff5252;}}
         .sc-pill-neu{{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.3);color:#ffb74d;}}
         .sc-pill-na{{background:rgba(176,190,197,0.06);border:1px solid rgba(176,190,197,0.15);color:rgba(176,190,197,0.4);}}
-        .strat-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}}
-        .strat-card{{background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.12);border-radius:14px;padding:16px;position:relative;overflow:hidden;transition:all 0.25s ease;}}
-        .strat-card::before{{content:'';position:absolute;top:0;left:0;right:0;height:2px;}}
-        .strat-bull::before{{background:linear-gradient(90deg,transparent,#00e676,transparent);}}
-        .strat-bear::before{{background:linear-gradient(90deg,transparent,#ff5252,transparent);}}
-        .strat-neu::before{{background:linear-gradient(90deg,transparent,#ffb74d,transparent);}}
-        .strat-vol::before{{background:linear-gradient(90deg,transparent,#7c4dff,transparent);}}
-        .strat-misc::before{{background:linear-gradient(90deg,transparent,#4fc3f7,transparent);}}
-        .strat-card:hover{{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.3);border-color:rgba(79,195,247,0.3);}}
-        .strat-card{{cursor:pointer;}}
-        .strat-selected{{border-color:#00e5ff !important;box-shadow:0 0 0 2px #00e5ff55, 0 12px 32px rgba(0,229,255,0.2) !important;transform:translateY(-3px);background:rgba(0,229,255,0.07) !important;}}
-        .strat-selected .strat-select-hint{{display:none;}}
-        .strat-select-hint{{font-size:9px;color:rgba(128,222,234,0.35);margin-top:8px;letter-spacing:0.5px;font-family:'JetBrains Mono',monospace;}}
-        .tp-rank-badge{{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}}
-        .tp-rank-primary{{background:rgba(0,230,118,0.15);border:1px solid rgba(0,230,118,0.4);color:#00e676;}}
-        .tp-rank-secondary{{background:rgba(255,183,77,0.15);border:1px solid rgba(255,183,77,0.4);color:#ffb74d;}}
-        .tp-rank-advanced{{background:rgba(179,136,255,0.15);border:1px solid rgba(179,136,255,0.4);color:#b388ff;}}
-        @keyframes tpFlash{{0%{{box-shadow:0 0 0 0 rgba(0,229,255,0.6);}} 50%{{box-shadow:0 0 0 8px rgba(0,229,255,0);}} 100%{{box-shadow:none;}}}}
-        .tp-banner-flash{{animation:tpFlash 0.6s ease-out;}}
-        .strat-num{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.25);margin-bottom:6px;letter-spacing:1px;}}
-        .strat-name{{font-family:'Oxanium',sans-serif;font-size:clamp(12px,1.5vw,15px);font-weight:700;color:#e0f7fa;margin-bottom:8px;line-height:1.3;}}
-        .strat-tag{{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:1px;}}
+        /* ══ COMPACT STRATEGY WIDGET ══════════════════════════════════════ */
+        .sc-summary-strip{{display:flex;align-items:center;gap:12px;background:rgba(6,13,20,0.8);border:1px solid rgba(79,195,247,0.12);border-radius:10px;padding:10px 16px;margin-bottom:10px;flex-wrap:wrap;}}
+        .sc-ss-item{{display:flex;align-items:center;gap:6px;}}
+        .sc-ss-dot{{width:7px;height:7px;border-radius:50%;flex-shrink:0;}}
+        .sc-ss-lbl{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;color:rgba(128,222,234,0.4);}}
+        .sc-ss-val{{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;}}
+        .sc-ss-sep{{width:1px;height:18px;background:rgba(79,195,247,0.12);}}
+        /* 2-column compact grid */
+        .sc-compact-grid{{display:grid;grid-template-columns:1fr 1fr;gap:6px;}}
+        /* row card */
+        .sc-row{{display:grid;grid-template-columns:3px 26px 1fr auto 18px;align-items:center;gap:0;background:rgba(10,18,32,0.9);border:1px solid rgba(79,195,247,0.1);border-radius:10px;cursor:pointer;transition:all 0.18s ease;overflow:hidden;min-height:50px;}}
+        .sc-row:hover{{background:rgba(16,28,48,0.95);border-color:rgba(79,195,247,0.3);box-shadow:0 4px 18px rgba(0,0,0,0.4);}}
+        .sc-row.sc-selected{{border-color:#00e5ff;background:rgba(0,229,255,0.06);box-shadow:0 0 0 1px #00e5ff44,0 6px 20px rgba(0,229,255,0.12);}}
+        .sc-row-bar{{width:3px;height:100%;border-radius:10px 0 0 10px;align-self:stretch;min-height:50px;}}
+        .sc-row-num{{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:rgba(176,190,197,0.2);text-align:center;padding:0 4px;}}
+        .sc-row-body{{padding:8px 8px 8px 4px;min-width:0;}}
+        .sc-row-name{{font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;color:#e0f7fa;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px;}}
+        .sc-row-strike{{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:rgba(128,222,234,0.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}}
+        .sc-row-strike span{{color:#4fc3f7;}}
+        .sc-row-meta{{display:flex;flex-direction:column;align-items:flex-end;gap:3px;padding:8px 6px 8px 4px;flex-shrink:0;}}
+        .sc-row-tag{{font-size:8px;font-weight:700;letter-spacing:0.5px;padding:2px 6px;border-radius:8px;white-space:nowrap;}}
+        .sc-rb{{font-family:'JetBrains Mono',monospace;font-size:7px;font-weight:700;letter-spacing:0.5px;padding:1px 5px;border-radius:4px;white-space:nowrap;}}
+        .sc-rb-primary{{background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);color:#00e5ff;}}
+        .sc-rb-secondary{{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.3);color:#ffb74d;}}
+        .sc-rb-advanced{{background:rgba(124,77,255,0.08);border:1px solid rgba(124,77,255,0.25);color:#9e7bff;}}
+        .sc-row-rr{{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;}}
+        .sc-row-chevron{{font-size:16px;color:rgba(79,195,247,0.3);padding-right:8px;transition:transform 0.2s ease;line-height:1;user-select:none;}}
+        .sc-row.sc-selected .sc-row-chevron{{transform:rotate(90deg);color:#00e5ff;}}
+        /* expand detail panel — spans both columns */
+        .sc-dp{{grid-column:1/-1;display:none;background:rgba(4,10,20,0.97);border:1px solid rgba(79,195,247,0.18);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;animation:scSlide 0.18s ease;}}
+        .sc-dp::before{{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#4fc3f7,transparent);}}
+        .sc-dp.sc-dp-open{{display:block;}}
+        @keyframes scSlide{{from{{opacity:0;transform:translateY(-5px);}}to{{opacity:1;transform:translateY(0);}}}}
+        .sc-dp-grid{{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}}
+        .sc-dp-box{{background:rgba(255,255,255,0.025);border:1px solid rgba(79,195,247,0.1);border-radius:8px;padding:9px 11px;}}
+        .sc-dp-lbl{{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:2px;color:rgba(128,222,234,0.35);text-transform:uppercase;margin-bottom:3px;}}
+        .sc-dp-val{{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;line-height:1.2;}}
+        .sc-dp-sub{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.35);margin-top:2px;}}
+        .sc-dp-rr-track{{height:3px;background:rgba(0,0,0,0.4);border-radius:2px;overflow:hidden;margin-top:5px;}}
+        .sc-dp-rr-fill{{height:100%;border-radius:2px;}}
+        .sc-dp-strike-box{{background:rgba(0,0,0,0.3);border-left:3px solid rgba(79,195,247,0.4);border-radius:0 7px 7px 0;padding:7px 11px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(176,190,197,0.75);line-height:1.65;margin-bottom:10px;word-break:break-word;}}
+        .sc-dp-strike-lbl{{color:#80deea;font-weight:700;}}
+        .sc-dp-actions{{display:flex;gap:8px;justify-content:flex-end;}}
+        .sc-dp-btn{{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;padding:6px 14px;border-radius:6px;cursor:pointer;border:none;transition:all 0.15s ease;}}
+        .sc-dp-btn-load{{background:linear-gradient(135deg,#00bcd4,#006064);color:#fff;}}
+        .sc-dp-btn-load:hover{{filter:brightness(1.2);}}
+        .sc-dp-btn-close{{background:transparent;border:1px solid rgba(79,195,247,0.2);color:rgba(176,190,197,0.5);}}
+        .sc-dp-btn-close:hover{{border-color:rgba(79,195,247,0.4);color:#4fc3f7;}}
+        /* tag colours (reused) */
         .strat-tag-bull{{background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);color:#00e676;}}
         .strat-tag-bear{{background:rgba(255,82,82,0.1);border:1px solid rgba(255,82,82,0.25);color:#ff5252;}}
         .strat-tag-neu{{background:rgba(255,183,77,0.1);border:1px solid rgba(255,183,77,0.25);color:#ffb74d;}}
         .strat-tag-vol{{background:rgba(124,77,255,0.1);border:1px solid rgba(124,77,255,0.25);color:#b388ff;}}
         .strat-tag-misc{{background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.25);color:#4fc3f7;}}
-        .strat-strike-rec{{margin-top:10px;padding:8px 10px;background:rgba(0,0,0,0.25);border-left:3px solid rgba(79,195,247,0.4);border-radius:0 8px 8px 0;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(176,190,197,0.75);line-height:1.6;word-break:break-word;}}
-        .strat-strike-lbl{{color:#80deea;font-weight:700;letter-spacing:0.5px;}}
+        /* trade plan badges */
+        .tp-rank-badge{{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:1.5px;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}}
+        .tp-rank-primary{{background:rgba(0,230,118,0.15);border:1px solid rgba(0,230,118,0.4);color:#00e676;}}
+        .tp-rank-secondary{{background:rgba(255,183,77,0.15);border:1px solid rgba(255,183,77,0.4);color:#ffb74d;}}
+        .tp-rank-advanced{{background:rgba(179,136,255,0.15);border:1px solid rgba(179,136,255,0.4);color:#b388ff;}}
+        @keyframes tpFlash{{0%{{box-shadow:0 0 0 0 rgba(0,229,255,0.6);}}50%{{box-shadow:0 0 0 8px rgba(0,229,255,0);}}100%{{box-shadow:none;}}}}
+        .tp-banner-flash{{animation:tpFlash 0.6s ease-out;}}
 
         /* ── TRADE PLAN ─────────────────────────────────────────────── */
         .tp-wrap{{display:flex;flex-direction:column;gap:16px;}}
@@ -3966,7 +4113,8 @@ window.addEventListener('resize', function(){
         @media(max-width:768px){{
             .snap-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .logic-grid{{grid-template-columns:1fr;}}
-            .strat-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
+            .strat-grid-legacy{{grid-template-columns:repeat(2,minmax(0,1fr));}}
+            .sc-compact-grid{{grid-template-columns:1fr;}}
             .nc-cards-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
             .pf-grid{{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}}
             .o5-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
@@ -3993,7 +4141,8 @@ window.addEventListener('resize', function(){
             .sb-item:nth-child(odd){{border-right:1px solid rgba(79,195,247,0.08);}}
             .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){{border-bottom:none;}}
             .pf-date-range{{display:none;}}
-            .strat-grid{{grid-template-columns:1fr;}}
+            .strat-grid-legacy{{grid-template-columns:1fr;}}
+            .sc-dp-grid{{grid-template-columns:1fr 1fr;}}
             .o5-grid{{grid-template-columns:1fr;}}
             .o5-top-banner{{flex-direction:column;align-items:flex-start;}}
             .oi-summary-strip{{grid-template-columns:1fr 1fr;}}
