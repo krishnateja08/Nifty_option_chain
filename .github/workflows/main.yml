@@ -1,6 +1,11 @@
 name: Nifty 50 Analysis + GitHub Pages
 
 on:
+  push:
+    branches:
+      - main          # ← fires whenever you save & push to main
+    paths:
+      - 'nifty50_option_analysis.py'   # ← only triggers if THIS file changed
   schedule:
     # All times in UTC → IST = UTC + 5:30
     # Runs at 04:08, 04:35 UTC  (IST: 09:38, 10:05)
