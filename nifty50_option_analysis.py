@@ -225,6 +225,10 @@ def fetch_volume_at_levels(technical):
         import yfinance as _yf
         print("  📦 Fetching volume at support/resistance levels...")
 
+        if not technical.get('support') or not technical.get('resistance'):
+            print("  ⚠️  Key levels are N/A — skipping volume at levels")
+            return None, None
+
         df = _yf.Ticker("NIFTYBEES.NS").history(interval="1h", period="60d")
 
         if df is None or df.empty or len(df) < 25:
@@ -2493,33 +2497,87 @@ class NiftyHTMLAnalyzer:
             macd_val   = float(df_clean['MACD'].iloc[-1])   if not df_clean.empty else float('nan')
             signal_val = float(df_clean['Signal'].iloc[-1]) if not df_clean.empty else float('nan')
             current_price = latest['Close']
-            print("  Fetching 1H candles for Key Levels...")
-            df_1h = nifty.history(interval="1h", period="60d")
+            print("  Fetching 1H candles for Key Levels (tiered lookback: 6M → 1Y → wide window)...")
+            from datetime import datetime, timedelta
+
+            end_date  = datetime.today()
+            start_6m  = end_date - timedelta(days=180)
+            start_1yr = end_date - timedelta(days=365)
+
             s1 = s2 = r1 = r2 = None
-            if not df_1h.empty:
-                recent_1h = df_1h.tail(120)
-                highs = sorted(recent_1h['High'].values)
-                lows  = sorted(recent_1h['Low'].values)
-                res_c = [h for h in highs if current_price < h <= current_price + 200]
-                sup_c = [l for l in lows  if current_price - 200 <= l < current_price]
-                if len(res_c) >= 4:
-                    r1 = round(float(np.percentile(res_c, 40)) / 25) * 25
+
+            def _find_levels(highs, lows, price, window):
+                res_c = [h for h in highs if price < h <= price + window]
+                sup_c = [l for l in lows  if price - window <= l < price]
+                return res_c, sup_c
+
+            # Step 1: 6 months of 1H data
+            try:
+                df_6m = nifty.history(interval="1h", start=start_6m, end=end_date)
+                if not df_6m.empty:
+                    highs_6m = sorted(df_6m['High'].values)
+                    lows_6m  = sorted(df_6m['Low'].values)
+                    res_c, sup_c = _find_levels(highs_6m, lows_6m, current_price, 300)
+                    print(f"  6M 1H: {len(df_6m)} candles | res_c={len(res_c)} sup_c={len(sup_c)}")
+                else:
+                    res_c, sup_c = [], []
+            except Exception as e:
+                print(f"  ⚠️  6M 1H fetch failed: {e}")
+                res_c, sup_c = [], []
+
+            # Step 2: expand to 1 year if not enough
+            if len(res_c) < 2 or len(sup_c) < 2:
+                print("  🔄 6M insufficient — expanding to 1 year")
+                try:
+                    df_1yr = nifty.history(interval="1h", start=start_1yr, end=end_date)
+                    if not df_1yr.empty:
+                        highs_1yr = sorted(df_1yr['High'].values)
+                        lows_1yr  = sorted(df_1yr['Low'].values)
+                        res_c, sup_c = _find_levels(highs_1yr, lows_1yr, current_price, 300)
+                        print(f"  1Y 1H: {len(df_1yr)} candles | res_c={len(res_c)} sup_c={len(sup_c)}")
+                    else:
+                        res_c, sup_c = [], []
+                except Exception as e:
+                    print(f"  ⚠️  1Y 1H fetch failed: {e}")
+                    res_c, sup_c = [], []
+
+            # Step 3: widen window to ±500 on same 1Y data
+            if len(res_c) < 2 or len(sup_c) < 2:
+                print("  🔄 Widening window to ±500 on 1Y data")
+                try:
+                    res_c, sup_c = _find_levels(highs_1yr, lows_1yr, current_price, 500)
+                    print(f"  Wide window | res_c={len(res_c)} sup_c={len(sup_c)}")
+                except Exception:
+                    res_c, sup_c = [], []
+
+            # Calculate levels — no hardcoding, N/A if genuinely nothing found
+            if len(res_c) >= 2:
+                r1 = round(float(np.percentile(res_c, 25)) / 25) * 25
+                r2 = round(float(np.percentile(res_c, 65)) / 25) * 25
+                if r1 <= current_price:
+                    r1 = round(float(np.percentile(res_c, 50)) / 25) * 25
+                if r2 and r1 and r2 <= r1:
                     r2 = round(float(np.percentile(res_c, 80)) / 25) * 25
-                if len(sup_c) >= 4:
-                    s1 = round(float(np.percentile(sup_c, 70)) / 25) * 25
-                    s2 = round(float(np.percentile(sup_c, 20)) / 25) * 25
-                if r1 and r1 <= current_price: r1 = round((current_price + 50) / 25) * 25
-                if r2 and r1 and r2 <= r1:     r2 = r1 + 75
-                if s1 and s1 >= current_price: s1 = round((current_price - 50) / 25) * 25
-                if s2 and s1 and s2 >= s1:     s2 = s1 - 75
-                print(f"  ✓ 1H Levels | S2={s2} S1={s1} | Price={current_price:.0f} | R1={r1} R2={r2}")
             else:
-                print("  ⚠️  1H data unavailable — falling back to daily levels")
-            recent_d = df.tail(60)
-            resistance = r1 if r1 else recent_d['High'].quantile(0.90)
-            support    = s1 if s1 else recent_d['Low'].quantile(0.10)
-            strong_resistance = r2 if r2 else resistance + 100
-            strong_support    = s2 if s2 else support - 100
+                print("  ⚠️  No resistance levels found — will show N/A")
+
+            if len(sup_c) >= 2:
+                s1 = round(float(np.percentile(sup_c, 75)) / 25) * 25
+                s2 = round(float(np.percentile(sup_c, 35)) / 25) * 25
+                if s1 >= current_price:
+                    s1 = round(float(np.percentile(sup_c, 50)) / 25) * 25
+                if s2 and s1 and s2 >= s1:
+                    s2 = round(float(np.percentile(sup_c, 20)) / 25) * 25
+            else:
+                print("  ⚠️  No support levels found — will show N/A")
+
+            print(f"  ✓ Final Levels | S2={s2} S1={s1} | Price={current_price:.0f} | R1={r1} R2={r2}")
+
+            # Assign to technical dict — None means N/A, no fallback invented
+            resistance        = r1
+            support           = s1
+            strong_resistance = r2
+            strong_support    = s2
             technical = {
                 'current_price':    current_price,
                 'sma_20':           latest['SMA_20'],
