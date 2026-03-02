@@ -2277,319 +2277,6 @@ def build_pretrade_checklist_tab_html():
 
 
 
-
-
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  PRE-TRADE CHECKLIST — v6 addition
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-def get_pretrade_checklist_css():
-    """CSS for the Pre-Trade Checklist tab — deep ocean theme."""
-    return """
-        /* PRE-TRADE CHECKLIST */
-        .ptc-progress-wrap{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:18px 22px;margin-bottom:22px;}
-        .ptc-progress-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
-        .ptc-progress-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(128,222,234,0.4);font-weight:700;}
-        .ptc-progress-count{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#80deea;}
-        .ptc-reset-btn{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;border:1px solid rgba(79,195,247,0.3);background:rgba(79,195,247,0.06);color:rgba(79,195,247,0.7);cursor:pointer;transition:all 0.2s ease;}
-        .ptc-reset-btn:hover{border-color:rgba(79,195,247,0.6);color:#4fc3f7;background:rgba(79,195,247,0.12);}
-        .ptc-bar-track{height:6px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;margin-bottom:12px;}
-        .ptc-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#00e5ff,#0288d1);transition:width 0.5s cubic-bezier(0.4,0,0.2,1),background 0.4s ease;}
-        .ptc-verdict{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(128,222,234,0.6);font-family:'Rajdhani',sans-serif;font-weight:500;transition:color 0.3s ease;}
-        .ptc-verdict-icon{font-size:16px;flex-shrink:0;}
-        .ptc-list{display:flex;flex-direction:column;gap:0;}
-        .ptc-section-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:700;padding:6px 14px;margin:16px 0 6px 0;display:inline-block;border-radius:4px;}
-        .ptc-item{display:flex;align-items:center;gap:14px;padding:13px 18px;margin-bottom:5px;border-radius:6px;cursor:pointer;background:rgba(19,26,34,0.9);border:1px solid rgba(79,195,247,0.07);border-left-width:3px;user-select:none;transition:opacity 0.25s ease,filter 0.25s ease,background 0.2s ease;position:relative;overflow:hidden;}
-        .ptc-item::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);}
-        .ptc-item:hover{filter:brightness(1.12);background:rgba(26,36,48,0.95);}
-        .ptc-item.ptc-checked{opacity:0.42;}
-        .ptc-item.ptc-checked .ptc-text{text-decoration:line-through;text-decoration-color:rgba(176,190,197,0.4);}
-        .ptc-checkbox{width:20px;height:20px;border:2px solid;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;transition:all 0.2s ease;background:rgba(0,0,0,0.25);}
-        .ptc-text{font-family:'Rajdhani',sans-serif;font-size:clamp(13px,1.6vw,15px);font-weight:500;color:#c9d1d9;line-height:1.45;transition:text-decoration 0.2s ease;}
-        .ptc-text b{font-weight:700;}
-        .ptc-warning{font-size:11px;color:#ff4d4d;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;font-weight:700;margin-left:4px;}
-        .ptc-mindset-box{display:flex;align-items:flex-start;gap:16px;background:linear-gradient(135deg,rgba(79,195,247,0.05),rgba(124,77,255,0.05));border:1px solid rgba(79,195,247,0.14);border-radius:12px;padding:18px 22px;margin-top:22px;}
-        .ptc-mindset-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
-        .ptc-mindset-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2.5px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;margin-bottom:7px;}
-        .ptc-mindset-text{font-size:clamp(12px,1.5vw,13px);color:rgba(176,190,197,0.7);line-height:1.7;font-family:'Rajdhani',sans-serif;font-weight:500;}
-        .ptc-mindset-text strong{color:#80deea;font-weight:700;}
-        @media(max-width:600px){.ptc-item{padding:10px 12px;gap:10px;}.ptc-text{font-size:13px;}.ptc-mindset-box{flex-direction:column;gap:10px;}}
-"""
-
-
-def build_pretrade_checklist_tab_html():
-    """
-    Builds the complete Pre-Trade Checklist tab HTML.
-    23 rules across 7 colour-coded sections.
-    """
-
-    # ── Section + item definitions ────────────────────────────────────────────
-    sections = [
-        {
-            "id": "core", "label": "Core Rules", "icon": "&#9881;",
-            "bg": "rgba(255,77,77,0.08)", "col": "#ff6060",
-            "items": [
-                {"id": "rr",      "c": "#ff4d4d",
-                 "h": 'Is R:R ratio &ge; 1.5? <b style="color:#ff4d4d;">If not, skip this trade.</b>'},
-                {"id": "levels",  "c": "#ffa500",
-                 "h": 'Is current price too close to <b style="color:#ffa500;">resistance (bearish) or support (bullish)</b>? If yes, wait.'},
-                {"id": "exits",   "c": "#e6c619",
-                 "h": 'Have I <b style="color:#e6c619;">written down all 3 exit conditions</b> above?'},
-                {"id": "capital", "c": "#00bcd4",
-                 "h": 'Am I risking <b style="color:#00bcd4;">&le; 2% of total capital</b> on this trade?'},
-                {"id": "event",   "c": "#9b59b6",
-                 "h": 'Is there a <b style="color:#9b59b6;">major event</b> (RBI, earnings, expiry) before my time exit?'},
-                {"id": "halfway", "c": "#2ecc71",
-                 "h": 'If halfway to target and stalled &mdash; <b style="color:#2ecc71;">take 50% profits and reassess.</b>'},
-            ]
-        },
-        {
-            "id": "market", "label": "Market Context", "icon": "&#127760;",
-            "bg": "rgba(0,229,255,0.08)", "col": "#00e5ff",
-            "items": [
-                {"id": "broader",  "c": "#00e5ff",
-                 "h": 'Is the broader market <b style="color:#00e5ff;">(Nifty/Sensex)</b> trending in my trade direction?'},
-                {"id": "trend",    "c": "#00e5ff",
-                 "h": 'Am I trading <b style="color:#00e5ff;">with the primary trend</b> on the higher timeframe?'},
-                {"id": "vol_sess", "c": "#00e5ff",
-                 "h": 'Is this a <b style="color:#00e5ff;">low-volume / holiday session</b>? If yes, avoid or reduce size.'},
-            ]
-        },
-        {
-            "id": "setup", "label": "Setup Quality", "icon": "&#127919;",
-            "bg": "rgba(255,171,64,0.08)", "col": "#ffab40",
-            "items": [
-                {"id": "confluence", "c": "#ffab40",
-                 "h": 'Is there a clear <b style="color:#ffab40;">confluence</b> &mdash; volume, breakout, or pattern confirmation?'},
-                {"id": "candle",     "c": "#ffab40",
-                 "h": 'Have I waited for <b style="color:#ffab40;">candle close confirmation</b> &mdash; not just a wick touch?'},
-                {"id": "agrade",     "c": "#ffab40",
-                 "h": 'Is this an <b style="color:#ffab40;">A-grade setup</b>, or am I forcing a trade out of FOMO?'},
-            ]
-        },
-        {
-            "id": "timing", "label": "Timing", "icon": "&#9201;",
-            "bg": "rgba(181,234,58,0.08)", "col": "#b5ea3a",
-            "items": [
-                {"id": "open15", "c": "#b5ea3a",
-                 "h": 'Am I <b style="color:#b5ea3a;">avoiding the first 15 minutes</b> of market open?'},
-                {"id": "eod1h",  "c": "#b5ea3a",
-                 "h": 'Is there <b style="color:#b5ea3a;">less than 1 hour left</b> in the session? If yes, reduce size or avoid.'},
-            ]
-        },
-        {
-            "id": "psych", "label": "Psychology &amp; Discipline", "icon": "&#129504;",
-            "bg": "rgba(240,98,146,0.08)", "col": "#f06292",
-            "items": [
-                {"id": "losses2", "c": "#f06292",
-                 "h": 'Have I already taken <b style="color:#f06292;">2+ losses today</b>? <span class="ptc-warning">If yes &mdash; STOP trading.</span>'},
-                {"id": "revenge", "c": "#f06292",
-                 "h": 'Am I trading to <b style="color:#f06292;">recover a loss</b>? <span class="ptc-warning">Revenge trading check.</span>'},
-                {"id": "mental",  "c": "#f06292",
-                 "h": 'Am I in the <b style="color:#f06292;">right mental state</b> &mdash; calm, not anxious or overconfident?'},
-            ]
-        },
-        {
-            "id": "position", "label": "Position &amp; Execution", "icon": "&#128208;",
-            "bg": "rgba(77,182,172,0.08)", "col": "#4db6ac",
-            "items": [
-                {"id": "possize", "c": "#4db6ac",
-                 "h": 'Is my <b style="color:#4db6ac;">position size pre-calculated</b> before entry?'},
-                {"id": "slplace", "c": "#4db6ac",
-                 "h": 'Will I place my <b style="color:#4db6ac;">stop-loss order immediately</b> after entry?'},
-                {"id": "target",  "c": "#4db6ac",
-                 "h": 'Is my <b style="color:#4db6ac;">target based on structure</b> &mdash; not wishful thinking?'},
-            ]
-        },
-        {
-            "id": "options", "label": "Options-Specific", "icon": "&#128202;",
-            "bg": "rgba(206,147,216,0.08)", "col": "#ce93d8",
-            "items": [
-                {"id": "iv",          "c": "#ce93d8",
-                 "h": 'Is <b style="color:#ce93d8;">IV (Implied Volatility)</b> too high to buy options profitably?'},
-                {"id": "theta",       "c": "#ce93d8",
-                 "h": 'Is <b style="color:#ce93d8;">theta (time decay)</b> working for or against me?'},
-                {"id": "expiry_time", "c": "#ce93d8",
-                 "h": 'Am I close to <b style="color:#ce93d8;">expiry</b> with insufficient time for the move to play out?'},
-            ]
-        },
-    ]
-
-    all_ids  = [it["id"] for sec in sections for it in sec["items"]]
-    TOTAL    = len(all_ids)
-    ids_json = "[" + ",".join(f'"{i}"' for i in all_ids) + "]"
-
-    # ── Build HTML for all items ──────────────────────────────────────────────
-    body_html = ""
-    for sec in sections:
-        body_html += (
-            f'<div class="ptc-section-label"'
-            f' style="background:{sec["bg"]};color:{sec["col"]};">'
-            f'{sec["icon"]} &nbsp;{sec["label"]}</div>'
-        )
-        for it in sec["items"]:
-            body_html += (
-                f'<div class="ptc-item" id="ptc-{it["id"]}"'
-                f' style="border-left-color:{it["c"]};"'
-                f' onclick="ptcToggle(\'{it["id"]}\')">'
-                f'<div class="ptc-checkbox"'
-                f' style="border-color:{it["c"]};color:{it["c"]};"'
-                f' id="ptc-cb-{it["id"]}"></div>'
-                f'<div class="ptc-text">{it["h"]}</div></div>'
-            )
-
-    return f"""
-    <!-- TAB: PRE-TRADE CHECKLIST -->
-    <div class="tab-panel" id="tab-pretrade">
-      <div class="section">
-        <div class="section-title">
-          <span>&#9989;</span> PRE-TRADE CHECKLIST
-          <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;letter-spacing:1px;margin-left:auto;">
-            {TOTAL} rules &middot; Click to check / uncheck
-          </span>
-        </div>
-
-        <div class="ptc-progress-wrap">
-          <div class="ptc-progress-header">
-            <span class="ptc-progress-label">CHECKLIST PROGRESS</span>
-            <div style="display:flex;align-items:center;gap:12px;">
-              <span class="ptc-progress-count">
-                <span id="ptcChecked">0</span> / {TOTAL} checked
-              </span>
-              <button class="ptc-reset-btn" onclick="ptcReset()">&#8635; Reset</button>
-            </div>
-          </div>
-          <div class="ptc-bar-track">
-            <div class="ptc-bar-fill" id="ptcBarFill" style="width:0%"></div>
-          </div>
-          <div class="ptc-verdict">
-            <span class="ptc-verdict-icon" id="ptcVerdictIcon">□</span>
-            <span id="ptcVerdictText">Complete the checklist before entering any trade.</span>
-          </div>
-        </div>
-
-        <div class="ptc-list">
-          {body_html}
-        </div>
-
-        <div class="ptc-mindset-box">
-          <span class="ptc-mindset-icon">&#129497;</span>
-          <div>
-            <div class="ptc-mindset-title">TRADING MINDSET REMINDER</div>
-            <div class="ptc-mindset-text">
-              A loss that follows your rules is <strong>not a failure</strong>.
-              A loss without rules <strong>is</strong>. &nbsp;&middot;&nbsp;
-              Your job is not to be right &mdash; it is to <strong>manage risk</strong>.
-              &nbsp;&middot;&nbsp; <strong>No setup = No trade.</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="disclaimer" style="margin-top:16px;">
-          <span class="disc-icon">&#9888;&#65039;</span>
-          <span class="disc-label">Disclaimer</span>
-          <span class="disc-sep">|</span>
-          <span class="disc-text">For <strong>EDUCATIONAL purposes only</strong> &mdash; NOT financial advice.</span>
-          <span class="disc-sep">|</span>
-          <span class="disc-text">Always consult a SEBI-registered advisor before trading.</span>
-        </div>
-      </div>
-    </div><!-- /tab-pretrade -->
-
-    <script>
-    (function() {{
-      var IDS   = {ids_json};
-      var TOTAL = {TOTAL};
-      var KEY   = 'ptc_v1';
-
-      function save() {{
-        var s = {{}};
-        IDS.forEach(function(id) {{
-          var r = document.getElementById('ptc-' + id);
-          s[id] = r ? r.classList.contains('ptc-checked') : false;
-        }});
-        try {{ sessionStorage.setItem(KEY, JSON.stringify(s)); }} catch(e) {{}}
-      }}
-
-      function load() {{
-        try {{ var r = sessionStorage.getItem(KEY); return r ? JSON.parse(r) : {{}}; }}
-        catch(e) {{ return {{}}; }}
-      }}
-
-      function apply(s) {{
-        IDS.forEach(function(id) {{
-          var row = document.getElementById('ptc-' + id);
-          var cb  = document.getElementById('ptc-cb-' + id);
-          if (!row || !cb) return;
-          if (s[id]) {{ row.classList.add('ptc-checked');    cb.innerHTML = '&#10003;'; }}
-          else       {{ row.classList.remove('ptc-checked'); cb.innerHTML = ''; }}
-        }});
-        redraw();
-      }}
-
-      function redraw() {{
-        var n   = document.querySelectorAll('.ptc-item.ptc-checked').length;
-        var pct = Math.round(n / TOTAL * 100);
-        var fill = document.getElementById('ptcBarFill');
-        var cnt  = document.getElementById('ptcChecked');
-        var icon = document.getElementById('ptcVerdictIcon');
-        var txt  = document.getElementById('ptcVerdictText');
-        if (fill) fill.style.width = pct + '%';
-        if (cnt)  cnt.textContent  = n;
-        if (pct === 100) {{
-          if (fill) fill.style.background = 'linear-gradient(90deg,#00e676,#00bfa5)';
-          if (icon) icon.textContent = '🚀';
-          if (txt)  {{ txt.textContent = 'All checks passed \u2014 you may proceed!'; txt.style.color = '#00e676'; }}
-        }} else if (pct >= 70) {{
-          if (fill) fill.style.background = 'linear-gradient(90deg,#ffb74d,#ff8f00)';
-          if (icon) icon.textContent = '\u26a0\ufe0f';
-          if (txt)  {{ txt.textContent = 'Almost there \u2014 complete remaining checks.'; txt.style.color = '#ffb74d'; }}
-        }} else {{
-          if (fill) fill.style.background = 'linear-gradient(90deg,#00e5ff,#0288d1)';
-          if (icon) icon.textContent = '\u25a1';
-          if (txt)  {{ txt.textContent = 'Complete the checklist before entering any trade.'; txt.style.color = 'rgba(128,222,234,0.6)'; }}
-        }}
-      }}
-
-      window.ptcToggle = function(id) {{
-        var row = document.getElementById('ptc-' + id);
-        var cb  = document.getElementById('ptc-cb-' + id);
-        if (!row || !cb) return;
-        if (!row.classList.contains('ptc-checked')) {{
-          row.classList.add('ptc-checked');    cb.innerHTML = '&#10003;';
-        }} else {{
-          row.classList.remove('ptc-checked'); cb.innerHTML = '';
-        }}
-        redraw(); save();
-      }};
-
-      window.ptcReset = function() {{
-        IDS.forEach(function(id) {{
-          var row = document.getElementById('ptc-' + id);
-          var cb  = document.getElementById('ptc-cb-' + id);
-          if (row) row.classList.remove('ptc-checked');
-          if (cb)  cb.innerHTML = '';
-        }});
-        redraw();
-        try {{ sessionStorage.removeItem(KEY); }} catch(e) {{}}
-      }};
-
-      window.addEventListener('load', function() {{ apply(load()); }});
-
-      /* Hook into switchTab so state restores on tab activation */
-      var _orig = window.switchTab;
-      if (typeof _orig === 'function') {{
-        window.switchTab = function(tab) {{
-          _orig(tab);
-          if (tab === 'pretrade') {{ setTimeout(function() {{ apply(load()); }}, 60); }}
-        }};
-      }}
-    }})();
-    </script>
-"""
-
-
-
 class NiftyHTMLAnalyzer:
     def __init__(self):
         self.yf_symbol  = "^NSEI"
@@ -3654,7 +3341,6 @@ class NiftyHTMLAnalyzer:
         )
         intraday_oi_tab_html = build_intraday_oi_tab_html()
         pretrade_tab_html = build_pretrade_checklist_tab_html()
-        pretrade_tab_html = build_pretrade_checklist_tab_html()
 
         # ── Heatmap tab HTML ─────────────────────────────────────────
         heatmap_tab_html = build_heatmap_tab_html(
@@ -3667,7 +3353,6 @@ class NiftyHTMLAnalyzer:
 
         # ── Heatmap-specific CSS ─────────────────────────────────────
         heatmap_css = get_heatmap_css()
-        pretrade_css = get_pretrade_checklist_css()
         pretrade_css = get_pretrade_checklist_css()
 
         # ── Heatmap JavaScript ───────────────────────────────────────
@@ -4741,7 +4426,6 @@ window.addEventListener('resize', function(){
 
         {heatmap_css}
         {pretrade_css}
-        {pretrade_css}
 
 
         /* ══ OI CHART ENHANCEMENTS ════════════════════════════ */
@@ -4851,9 +4535,6 @@ window.addEventListener('resize', function(){
             <button class="tab-btn" data-tab="pretrade" onclick="switchTab('pretrade')">
                 <span class="tab-dot"></span> &#9989; Pre-Trade Rules <span class="tab-badge">23</span>
             </button>
-            <button class="tab-btn" data-tab="pretrade" onclick="switchTab('pretrade')">
-                <span class="tab-dot"></span> &#9989; Pre-Trade Rules <span class="tab-badge">23</span>
-            </button>
         </div>
     </div>
 
@@ -4895,7 +4576,6 @@ window.addEventListener('resize', function(){
         html += heatmap_tab_html
         html += intraday_oi_tab_html
         html += checklist_tab_html
-        html += pretrade_tab_html
         html += pretrade_tab_html
         html += """
     <div class="footer">
