@@ -1452,8 +1452,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         reward_pts   = 0
 
     tgt2_display = f"&#8377;{int(target_2_val):,}" if target_2_val else "N/A (CE/PE wall)"
-    rr_color     = "#00e676" if rr_ratio >= 2 else ("#ffb74d" if rr_ratio >= 1 else "#ff5252")
-    rr_label     = "&#10003; Good" if rr_ratio >= 2 else ("&#9888; Acceptable" if rr_ratio >= 1 else "&#10005; Poor — consider skipping")
     primary_strat        = strategy_list[0] if strategy_list else "N/A"
     primary_strike_rec   = get_strike_suggestion(primary_strat, atm_strike, ce_wall, pe_wall) if has_strikes and strategy_list else "N/A"
 
@@ -1579,34 +1577,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
                         <div class="tp-exit-sub">Exit if target not reached by 40% of expiry elapsed</div>
                         <div class="tp-exit-rule">&#128161; Theta decay accelerates after 40% DTE. A stalled trade is a losing trade — exit and preserve capital.</div>
                     </div>
-                </div>
-
-                <!-- Row 3: Risk/Reward + Rules summary -->
-                <div class="tp-bottom">
-                    <div class="tp-rr-box">
-                        <div class="tp-rr-label">RISK : REWARD</div>
-                        <div class="tp-rr-val" id="tp-rr-val" style="color:{rr_color};">1 : {rr_ratio}</div>
-                        <div class="tp-rr-verdict" id="tp-rr-verdict" style="color:{rr_color};">{rr_label}</div>
-                    </div>
-                    <div class="tp-rules">
-                        <div class="tp-rules-title">&#128736; PRE-TRADE CHECKLIST</div>
-                        <div class="tp-rule-item tp-rule-red"><span class="tp-rule-chk tp-chk-red">&#9744;</span><span>Is R:R ratio &ge; 1.5? <strong>If not, skip this trade.</strong></span></div>
-                        <div class="tp-rule-item tp-rule-orange"><span class="tp-rule-chk tp-chk-orange">&#9744;</span><span>Is current price too close to <strong>resistance (bearish)</strong> or <strong>support (bullish)</strong>? If yes, wait.</span></div>
-                        <div class="tp-rule-item tp-rule-yellow"><span class="tp-rule-chk tp-chk-yellow">&#9744;</span><span>Have I <strong>written down all 3 exit conditions</strong> above?</span></div>
-                        <div class="tp-rule-item tp-rule-cyan"><span class="tp-rule-chk tp-chk-cyan">&#9744;</span><span>Am I risking <strong>&le; 2% of total capital</strong> on this trade?</span></div>
-                        <div class="tp-rule-item tp-rule-purple"><span class="tp-rule-chk tp-chk-purple">&#9744;</span><span>Is there a <strong>major event</strong> (RBI, earnings, expiry) before my time exit?</span></div>
-                        <div class="tp-rule-item tp-rule-green"><span class="tp-rule-chk tp-chk-green">&#9744;</span><span>If halfway to target and stalled — <strong>take 50% profits and reassess.</strong></span></div>
-                    </div>
-                </div>
-
-                <!-- Row 4: Mindset reminder -->
-                <div class="tp-mindset">
-                    <span class="tp-mindset-icon">&#129504;</span>
-                    <span class="tp-mindset-text">
-                        A loss that follows your rules is <strong>not a failure</strong>.
-                        A loss without rules <strong>is</strong>. &nbsp;·&nbsp;
-                        Your job is not to be right — it is to <strong>manage risk</strong>.
-                    </span>
                 </div>
 
             </div>
@@ -3538,18 +3508,6 @@ function _applyTradePlan(stratName, strikeRec, rank, rr) {
     if (nameEl)   nameEl.textContent = stratName;
     if (strikeEl) strikeEl.innerHTML = '&#127919; ' + strikeRec;
     if (rankEl)   { rankEl.textContent = rank; rankEl.className = 'tp-rank-badge tp-rank-' + rank.toLowerCase(); }
-    var rrValEl = document.getElementById('tp-rr-val'), rrVEl = document.getElementById('tp-rr-verdict');
-    if (rrValEl && rrVEl) {
-        var c = rr >= 2 ? '#00e676' : rr >= 1 ? '#ffb74d' : '#ff5252';
-        var l = rr >= 2 ? '\u2713 Good' : rr >= 1 ? '\u26a0 Acceptable' : '\u2715 Poor \u2014 consider skipping';
-        rrValEl.style.transition = rrVEl.style.transition = 'opacity 0.15s';
-        rrValEl.style.opacity = rrVEl.style.opacity = '0';
-        setTimeout(function(){
-            rrValEl.textContent = '1 : ' + rr.toFixed(2); rrValEl.style.color = c;
-            rrVEl.textContent = l; rrVEl.style.color = c;
-            rrValEl.style.opacity = rrVEl.style.opacity = '1';
-        }, 150);
-    }
     if (bannerEl) { bannerEl.classList.add('tp-banner-flash'); setTimeout(function(){ bannerEl.classList.remove('tp-banner-flash'); }, 600); }
 }
 
@@ -4363,38 +4321,6 @@ window.addEventListener('resize', function(){
         .tp-exit-val2{{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;color:rgba(224,247,250,0.6);margin-top:4px;}}
         .tp-exit-sub{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.4);}}
         .tp-exit-rule{{margin-top:8px;font-size:10px;color:rgba(176,190,197,0.55);line-height:1.5;border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;}}
-        .tp-bottom{{display:grid;grid-template-columns:160px 1fr;gap:12px;}}
-        .tp-rr-box{{background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;}}
-        .tp-rr-label{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.35);letter-spacing:2px;}}
-        .tp-rr-val{{font-family:'Oxanium',sans-serif;font-size:28px;font-weight:900;}}
-        .tp-rr-verdict{{font-size:10px;font-weight:700;letter-spacing:1px;}}
-        .tp-rules{{background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px 20px;}}
-        .tp-rules-title{{font-family:'JetBrains Mono',monospace;font-size:10px;color:#80deea;letter-spacing:2px;margin-bottom:12px;text-shadow:0 0 10px rgba(128,222,234,0.5);}}
-        .tp-rule-item{{display:flex;align-items:flex-start;gap:10px;font-size:12px;font-weight:500;padding:8px 10px;border-radius:8px;margin-bottom:5px;line-height:1.5;border-left:3px solid;}}
-        .tp-rule-item:last-child{{margin-bottom:0;}}
-        .tp-rule-item strong{{font-weight:800;}}
-        .tp-rule-red{{background:rgba(255,82,82,0.1);border-color:#ff5252;color:#ff8a80;}}
-        .tp-rule-orange{{background:rgba(255,152,0,0.1);border-color:#ff9800;color:#ffcc80;}}
-        .tp-rule-yellow{{background:rgba(255,235,59,0.08);border-color:#ffee58;color:#fff59d;}}
-        .tp-rule-cyan{{background:rgba(0,229,255,0.08);border-color:#00e5ff;color:#80deea;}}
-        .tp-rule-purple{{background:rgba(179,136,255,0.1);border-color:#b388ff;color:#ce93d8;}}
-        .tp-rule-green{{background:rgba(0,230,118,0.08);border-color:#00e676;color:#69f0ae;}}
-        .tp-rule-chk{{font-size:16px;flex-shrink:0;margin-top:1px;}}
-        .tp-chk-red{{color:#ff5252;text-shadow:0 0 8px #ff525299;}}
-        .tp-chk-orange{{color:#ff9800;text-shadow:0 0 8px #ff980099;}}
-        .tp-chk-yellow{{color:#ffee58;text-shadow:0 0 8px #ffee5899;}}
-        .tp-chk-cyan{{color:#00e5ff;text-shadow:0 0 8px #00e5ff99;}}
-        .tp-chk-purple{{color:#b388ff;text-shadow:0 0 8px #b388ff99;}}
-        .tp-chk-green{{color:#00e676;text-shadow:0 0 8px #00e67699;}}
-        .tp-mindset{{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,rgba(79,195,247,0.06),rgba(124,77,255,0.06));border:1px solid rgba(79,195,247,0.15);border-radius:14px;padding:16px 20px;}}
-        .tp-mindset-icon{{font-size:24px;flex-shrink:0;}}
-        .tp-mindset-text{{font-size:12px;color:rgba(176,190,197,0.7);line-height:1.7;}}
-        @media(max-width:768px){{
-            .tp-exits{{grid-template-columns:1fr;}}
-            .tp-bottom{{grid-template-columns:1fr;}}
-            .tp-banner{{flex-direction:column;}}
-            .tp-banner-right{{text-align:left;}}
-        }}
         .filter-btn{{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;border:1px solid rgba(79,195,247,0.2);background:transparent;color:rgba(176,190,197,0.5);transition:all 0.2s ease;font-family:'Oxanium',sans-serif;}}
         .filter-btn.active,.filter-btn:hover{{background:rgba(79,195,247,0.1);border-color:rgba(79,195,247,0.4);color:#4fc3f7;}}
 
