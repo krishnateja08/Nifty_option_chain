@@ -1529,7 +1529,59 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
             </div>
             <div class="sc-compact-grid" id="stratGrid">{strat_cards_html}</div>
         </div>
+        <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
         <script id="stratDataMap" type="application/json">{strat_js_map}</script>
+        <div class="section">
+            <div class="section-title"><span>&#128203;</span> TRADE PLAN — AUTO FILLED
+                <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;margin-left:auto;">
+                    Click any strategy card above to update this plan
+                </span>
+            </div>
+            <div class="tp-wrap">
+
+                <!-- Row 1: Primary strategy banner -->
+                <div class="tp-banner" id="tp-banner">
+                    <div class="tp-banner-left">
+                        <div class="tp-banner-label">SELECTED STRATEGY <span id="tp-rank-badge" class="tp-rank-badge">PRIMARY</span></div>
+                        <div class="tp-banner-strat" id="tp-strat-name">{primary_strat}</div>
+                        <div class="tp-banner-strike" id="tp-strike-rec">&#127919; {primary_strike_rec}</div>
+                    </div>
+                    <div class="tp-banner-right">
+                        <div class="tp-banner-label">EXPIRY</div>
+                        <div class="tp-banner-exp">{expiry_date}</div>
+                    </div>
+                </div>
+
+                <!-- Row 2: The 3 exit conditions -->
+                <div class="tp-exits">
+                    <div class="tp-exit tp-exit-profit">
+                        <div class="tp-exit-icon">&#9989;</div>
+                        <div class="tp-exit-title">PROFIT EXIT</div>
+                        <div class="tp-exit-val">{tgt1_display}</div>
+                        <div class="tp-exit-sub">Target 1 · {reward_pts} pts from spot</div>
+                        <div class="tp-exit-val2">{tgt2_display}</div>
+                        <div class="tp-exit-sub">Target 2 (CE/PE wall)</div>
+                        <div class="tp-exit-rule">&#128161; Take 50–60% profits at Target 1. Let the rest run to Target 2.</div>
+                    </div>
+                    <div class="tp-exit tp-exit-loss">
+                        <div class="tp-exit-icon">&#10060;</div>
+                        <div class="tp-exit-title">STOP LOSS EXIT</div>
+                        <div class="tp-exit-val">{sl_display}</div>
+                        <div class="tp-exit-sub">Hard stop · {sl_pts} pts from spot</div>
+                        <div class="tp-exit-rule">&#128161; Exit immediately when hit — no averaging down. Max 2% of capital at risk per trade.</div>
+                    </div>
+                    <div class="tp-exit tp-exit-time">
+                        <div class="tp-exit-icon">&#9200;</div>
+                        <div class="tp-exit-title">TIME EXIT</div>
+                        <div class="tp-exit-val">40% DTE Rule</div>
+                        <div class="tp-exit-sub">Exit if target not reached by 40% of expiry elapsed</div>
+                        <div class="tp-exit-rule">&#128161; Theta decay accelerates after 40% DTE. A stalled trade is a losing trade — exit and preserve capital.</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- ══════════════ END TRADE PLAN ══════════════ -->
 
         <div class="section">
             <div class="section-title"><span>&#128218;</span> SCORING LEGEND</div>
@@ -3506,14 +3558,28 @@ function vsigHtml(sig) {
 }
 
 function filterByInterval(data, mins) {
-    if (mins === 3) return data;
+    // Step 1: Restrict to today only (use date from most-recent entry's timestamp)
+    var todayData = data;
+    if (data && data.length > 0) {
+        var latestTs  = data[0].timestamp || '';
+        var todayDate = latestTs.split(' ')[0]; // "04-Mar-2026"
+        if (todayDate) {
+            todayData = data.filter(function(row) {
+                return (row.timestamp || '').startsWith(todayDate);
+            });
+        }
+    }
+    if (mins === 3) return todayData;
+    // Step 2: Group by date+hour:slot so same time on different days never merges
     var grouped = {};
-    data.forEach(function(row) {
-        var parts    = (row.time||'00:00').split(':');
-        var h        = parseInt(parts[0]||0);
-        var m        = parseInt(parts[1]||0);
-        var slotMin  = Math.floor(m / mins) * mins;
-        var key      = String(h).padStart(2,'0') + ':' + String(slotMin).padStart(2,'0');
+    todayData.forEach(function(row) {
+        var ts      = row.timestamp || '';
+        var dateKey = ts.split(' ')[0] || 'unknown';
+        var parts   = (row.time||'00:00').split(':');
+        var h       = parseInt(parts[0]||0);
+        var m       = parseInt(parts[1]||0);
+        var slotMin = Math.floor(m / mins) * mins;
+        var key     = dateKey + '|' + String(h).padStart(2,'0') + ':' + String(slotMin).padStart(2,'0');
         if (!grouped[key]) grouped[key] = [];
         grouped[key].push(row);
     });
@@ -3523,8 +3589,9 @@ function filterByInterval(data, mins) {
         var last    = rows[rows.length - 1];
         var totalCE = rows.reduce(function(a,r){ return a+(r.call_oi_chg||0); }, 0);
         var totalPE = rows.reduce(function(a,r){ return a+(r.put_oi_chg||0); }, 0);
+        var displayTime = key.split('|')[1] + ' IST';
         return {
-            time:          key + ' IST',
+            time:          displayTime,
             call_oi_chg:   totalCE,
             put_oi_chg:    totalPE,
             diff:          totalPE - totalCE,
