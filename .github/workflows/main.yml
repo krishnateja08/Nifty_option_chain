@@ -24,6 +24,14 @@ on:
     - cron: '26,30 10 * * 1-5'
   workflow_dispatch:   # Allow manual trigger from GitHub UI
 
+# ── Concurrency control ───────────────────────────────────────────────────────
+# Prevents "deployment already in progress" errors when two scheduled runs
+# overlap. Any queued run is cancelled the moment a newer one starts.
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+# ─────────────────────────────────────────────────────────────────────────────
+
 permissions:
   contents: write
   pages: write
