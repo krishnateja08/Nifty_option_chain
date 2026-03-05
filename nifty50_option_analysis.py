@@ -3634,10 +3634,23 @@ function renderOITable(data) {
     // ── Redraw sparkline (canvas, no flicker) ──
     drawSparkline(filtered);
 
-    // ── Smart table update: add new rows only, no full rebuild ──
+    // ── Table rebuild: full rebuild on interval change, smart append on same interval ──
     var existingRows = tbody.querySelectorAll('tr[data-time]');
     var existingTimes = {};
     existingRows.forEach(function(r){ existingTimes[r.getAttribute('data-time')] = r; });
+
+    // Detect if the current table rows match the filtered set — if not, full rebuild
+    var filteredTimes = filtered.map(function(r){ return r.time || ''; });
+    var existingTimesList = Object.keys(existingTimes);
+    var needsFullRebuild = (existingTimesList.length > 0) && (
+        existingTimesList.length !== filteredTimes.length ||
+        filteredTimes.some(function(t){ return !existingTimes[t]; }) ||
+        existingTimesList.some(function(t){ return filteredTimes.indexOf(t) < 0; })
+    );
+    if (needsFullRebuild) {
+        tbody.innerHTML = '';
+        existingTimes = {};
+    }
 
     // Remove LIVE badge from previous live row
     var prevLive = tbody.querySelector('.oi-live-row');
