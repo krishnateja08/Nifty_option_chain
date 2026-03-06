@@ -2527,6 +2527,12 @@ class NiftyHTMLAnalyzer:
             support           = s1
             strong_resistance = r2
             strong_support    = s2
+            # ── Previous candle OHLC for pivot point calculation ───────────────
+            prev_row   = df.iloc[-2] if len(df) >= 2 else latest
+            prev_high  = float(prev_row['High'])
+            prev_low   = float(prev_row['Low'])
+            prev_close = float(prev_row['Close'])
+
             technical = {
                 'current_price':    current_price,
                 'sma_20':           latest['SMA_20'],
@@ -2539,6 +2545,9 @@ class NiftyHTMLAnalyzer:
                 'support':          support,
                 'strong_resistance':strong_resistance,
                 'strong_support':   strong_support,
+                'prev_high':        prev_high,
+                'prev_low':         prev_low,
+                'prev_close':       prev_close,
             }
             print(f"✓ Technical | Price: {technical['current_price']:.2f} | RSI: {technical['rsi']:.1f}")
             return technical
@@ -2653,6 +2662,9 @@ class NiftyHTMLAnalyzer:
             'risk_reward_ratio': risk_reward_ratio,
             'has_option_data': option_analysis is not None,
             'fii_dii_data': fii_dii_raw, 'fii_dii_summ': fii_dii_summ,
+            'prev_high':  technical.get('prev_high', 0),
+            'prev_low':   technical.get('prev_low', 0),
+            'prev_close': technical.get('prev_close', 0),
         }
 
     def _bar_color_class(self, badge):
@@ -3252,6 +3264,233 @@ class NiftyHTMLAnalyzer:
             '    </div>\n'
             '</div>\n'
         )
+
+    def _option_chain_pivot_section_html(self, d):
+        """
+        Renders TWO sub-panels:
+          1. Option Chain Analysis  — PCR, OI sentiment, Max Pain, Call/Put buildup, OI walls
+          2. Pivot Points (Traditional) — auto-calc from prev H/L/C stored in html_data
+        Placed between KEY LEVELS and FII/DII sections in the main tab.
+        """
+        # ── Option Chain panel values ─────────────────────────────────────────
+        pcr        = d.get('pcr', 0)
+        pcr_str    = f"{pcr:.2f}" if pcr else "N/A"
+        max_pain   = d.get('max_pain', 0)
+        ce_chg     = d.get('total_ce_oi_change', 0)
+        pe_chg     = d.get('total_pe_oi_change', 0)
+        oi_dir     = d.get('oi_direction', 'N/A')
+        oi_class   = d.get('oi_class', 'neutral')
+        max_ce     = d.get('max_ce_oi', 0)
+        max_pe     = d.get('max_pe_oi', 0)
+
+        def _oi_color(cls):
+            return {'bullish':'#26c6da','bearish':'#f44336','neutral':'#ffb74d'}.get(cls,'#ffb74d')
+
+        oi_col = _oi_color(oi_class)
+
+        # OI sentiment label
+        if oi_class == 'bullish':
+            sent_icon = '&#9650;'; sent_lbl = 'BULLISH'; sent_col = '#26c6da'
+        elif oi_class == 'bearish':
+            sent_icon = '&#9660;'; sent_lbl = 'BEARISH'; sent_col = '#f44336'
+        else:
+            sent_icon = '&#8596;'; sent_lbl = 'NEUTRAL'; sent_col = '#ffb74d'
+
+        # CE / PE bar widths (proportional, max bar = 100%)
+        max_abs = max(abs(ce_chg), abs(pe_chg), 1)
+        ce_w    = round(abs(ce_chg) / max_abs * 100)
+        pe_w    = round(abs(pe_chg) / max_abs * 100)
+        ce_k    = f"{ce_chg/1000:+.0f}K" if ce_chg else "0"
+        pe_k    = f"{pe_chg/1000:+.0f}K" if pe_chg else "0"
+        ce_col  = '#f44336' if ce_chg >= 0 else '#26c6da'   # call build = bearish
+        pe_col  = '#26c6da' if pe_chg >= 0 else '#f44336'   # put build  = bullish
+
+        # Max CE / PE OI wall bars (proportional to each other)
+        wall_max = max(max_ce, max_pe, 1)
+        ce_wall_w = round(max_ce / wall_max * 100)
+        pe_wall_w = round(max_pe / wall_max * 100)
+
+        pcr_badge_col = '#26c6da' if pcr > 1.0 else ('#f44336' if pcr < 0.8 else '#ffb74d')
+
+        oc_panel = "" if not d['has_option_data'] else f"""
+        <!-- ── Option Chain Analysis Sub-Panel ── -->
+        <div style="background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:18px 20px;flex:1;min-width:280px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:6px;">
+                <div style="font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#4fc3f7;">
+                    &#128200; OPTION CHAIN ANALYSIS
+                </div>
+                <div style="font-size:10px;color:#546e7a;letter-spacing:0.8px;">NIFTY &middot; WEEKLY EXPIRY &middot; LIVE DATA</div>
+            </div>
+
+            <!-- PCR + Sentiment row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+                <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:10px;padding:10px;text-align:center;">
+                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:4px;">PUT / CALL</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:{pcr_badge_col};">{pcr_str}</div>
+                    <div style="font-size:9px;color:#546e7a;margin-top:2px;">PCR RATIO</div>
+                </div>
+                <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:10px;padding:10px;text-align:center;">
+                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:4px;">OI SENTIMENT</div>
+                    <div style="font-size:15px;font-weight:700;color:{sent_col};">{sent_icon} {sent_lbl}</div>
+                    <div style="font-size:9px;color:#546e7a;margin-top:2px;">{oi_dir}</div>
+                </div>
+                <div style="background:rgba(255,183,77,0.07);border:1px solid rgba(255,183,77,0.2);border-radius:10px;padding:10px;text-align:center;">
+                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:4px;">MAX PAIN</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#ffb74d;">&#8377;{max_pain:,}</div>
+                    <div style="font-size:9px;color:#546e7a;margin-top:2px;">Price magnet at expiry</div>
+                </div>
+            </div>
+
+            <!-- Call / Put Buildups -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+                <div style="background:rgba(244,67,54,0.07);border:1px solid rgba(244,67,54,0.2);border-radius:10px;padding:10px;">
+                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:6px;">&#128200; CALL BUILDUP (OI)</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:{ce_col};">&#9650; {ce_k}</div>
+                    <div style="height:5px;background:rgba(0,0,0,0.35);border-radius:3px;margin-top:8px;overflow:hidden;">
+                        <div style="height:100%;width:{ce_w}%;background:{ce_col};border-radius:3px;transition:width 0.6s;"></div>
+                    </div>
+                </div>
+                <div style="background:rgba(38,198,218,0.07);border:1px solid rgba(38,198,218,0.2);border-radius:10px;padding:10px;">
+                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:6px;">&#128200; PUT BUILDUP (OI)</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:{pe_col};">&#9650; {pe_k}</div>
+                    <div style="height:5px;background:rgba(0,0,0,0.35);border-radius:3px;margin-top:8px;overflow:hidden;">
+                        <div style="height:100%;width:{pe_w}%;background:{pe_col};border-radius:3px;transition:width 0.6s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OI Resistance Walls -->
+            <div style="margin-bottom:10px;">
+                <div style="font-size:10px;color:#f44336;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#9632; OI RESISTANCE WALLS</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                    <span style="font-size:10px;background:rgba(244,67,54,0.2);border:1px solid rgba(244,67,54,0.4);border-radius:4px;padding:2px 7px;color:#f44336;font-weight:700;">R1</span>
+                    <div style="flex:1;height:6px;background:rgba(0,0,0,0.35);border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:{ce_wall_w}%;background:linear-gradient(90deg,#f44336,#ff7043);border-radius:3px;"></div>
+                    </div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#f44336;font-weight:700;">&#8377;{max_ce:,}</span>
+                </div>
+            </div>
+
+            <!-- OI Support Floors -->
+            <div>
+                <div style="font-size:10px;color:#26c6da;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#9632; OI SUPPORT FLOORS</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                    <span style="font-size:10px;background:rgba(38,198,218,0.2);border:1px solid rgba(38,198,218,0.4);border-radius:4px;padding:2px 7px;color:#26c6da;font-weight:700;">S1</span>
+                    <div style="flex:1;height:6px;background:rgba(0,0,0,0.35);border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:{pe_wall_w}%;background:linear-gradient(90deg,#26c6da,#00bcd4);border-radius:3px;"></div>
+                    </div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#26c6da;font-weight:700;">&#8377;{max_pe:,}</span>
+                </div>
+            </div>
+        </div>"""
+
+        # ── Pivot Points (Traditional) calculation ────────────────────────────
+        ph = d.get('prev_high', 0)
+        pl = d.get('prev_low', 0)
+        pc = d.get('prev_close', 0)
+        cp = d.get('current_price', 0)
+
+        if ph and pl and pc:
+            pp = round((ph + pl + pc) / 3, 2)
+            r1p = round(2 * pp - pl, 2)
+            r2p = round(pp + (ph - pl), 2)
+            r3p = round(ph + 2 * (pp - pl), 2)
+            s1p = round(2 * pp - ph, 2)
+            s2p = round(pp - (ph - pl), 2)
+            s3p = round(pl - 2 * (ph - pp), 2)
+        else:
+            pp = r1p = r2p = r3p = s1p = s2p = s3p = 0
+
+        # Position of LTP on the S1→R1 bar
+        if r1p and s1p and r1p != s1p:
+            ltp_pct = round(max(3, min(97, (cp - s1p) / (r1p - s1p) * 100)), 1)
+        else:
+            ltp_pct = 50
+
+        # Nearest R / S
+        nr_col = '#f44336'; ns_col = '#26c6da'
+        pp_dist = round(cp - pp, 2) if pp else 0
+        pp_dist_lbl = f"{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} from LTP"
+
+        def _pvt_row(label, val, col, badge="", nearest_col=None):
+            badge_html = ""
+            if badge:
+                badge_html = f'<span style="font-size:9px;background:{nearest_col or col}33;border:1px solid {nearest_col or col}88;border-radius:4px;padding:2px 7px;color:{nearest_col or col};font-weight:700;margin-left:8px;">{badge}</span>'
+            return f"""
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(79,195,247,0.06);">
+                    <span style="font-size:12px;color:{col};font-weight:600;min-width:28px;">{label}</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:{col};font-weight:700;">&#8377;{val:,.2f}{badge_html}</span>
+                </div>"""
+
+        pv_panel = f"""
+        <!-- ── Pivot Points Sub-Panel ── -->
+        <div style="background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:18px 20px;flex:1;min-width:280px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:6px;">
+                <div style="font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#4fc3f7;">
+                    &#128204; PIVOT POINTS <span style="font-size:10px;font-weight:400;color:#546e7a;">(Traditional)</span>
+                </div>
+                <div style="font-size:10px;color:#546e7a;letter-spacing:0.8px;">Daily &middot; Auto-calculated</div>
+            </div>
+
+            <!-- LTP position bar -->
+            <div style="position:relative;height:8px;background:linear-gradient(90deg,#26c6da 0%,#4fc3f7 45%,#f44336 100%);border-radius:4px;margin-bottom:6px;box-shadow:0 2px 10px rgba(0,0,0,0.4);">
+                <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:4px;height:18px;background:#fff;border-radius:2px;box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:5;"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#546e7a;margin-bottom:12px;">
+                <span>S1 &#8377;{s1p:,.2f}</span>
+                <span style="color:#4fc3f7;">&#9650; LTP &#8377;{cp:,.2f}</span>
+                <span>R1 &#8377;{r1p:,.2f}</span>
+            </div>
+
+            <!-- Pivot table: R levels -->
+            {_pvt_row('R3', r3p, '#b71c1c')}
+            {_pvt_row('R2', r2p, '#ef5350')}
+            {_pvt_row('R1', r1p, '#f44336', 'NEAREST R', '#f44336')}
+
+            <!-- Pivot point center -->
+            <div style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);border-radius:8px;padding:8px 12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;">PIVOT POINT</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#4fc3f7;">&#8377;{pp:,.2f}</div>
+                    <div style="font-size:10px;color:#546e7a;">{pp_dist_lbl}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:10px;color:#546e7a;">LTP</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;background:rgba(79,195,247,0.15);border:1px solid rgba(79,195,247,0.4);border-radius:6px;padding:4px 10px;color:#4fc3f7;">&#8377;{cp:,.2f}</div>
+                </div>
+            </div>
+
+            <!-- Pivot table: S levels -->
+            {_pvt_row('S1', s1p, '#26c6da', 'NEAREST S', '#26c6da')}
+            {_pvt_row('S2', s2p, '#00838f')}
+            {_pvt_row('S3', s3p, '#006064')}
+
+            <!-- Prev candle OHLC footer -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px;">
+                <div style="background:rgba(244,67,54,0.07);border:1px solid rgba(244,67,54,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
+                    <div style="font-size:9px;color:#546e7a;margin-bottom:2px;">&#9650; PREV HIGH</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#f44336;">&#8377;{ph:,.1f}</div>
+                </div>
+                <div style="background:rgba(38,198,218,0.07);border:1px solid rgba(38,198,218,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
+                    <div style="font-size:9px;color:#546e7a;margin-bottom:2px;">&#9660; PREV LOW</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#26c6da;">&#8377;{pl:,.1f}</div>
+                </div>
+                <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
+                    <div style="font-size:9px;color:#546e7a;margin-bottom:2px;">&#9679; PREV CLOSE</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#80deea;">&#8377;{pc:,.2f}</div>
+                </div>
+            </div>
+        </div>"""
+
+        return f"""
+    <div class="section">
+        <div class="section-title"><span>&#128204;</span> OPTION CHAIN &amp; PIVOT POINTS</div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+            {oc_panel if d['has_option_data'] else '<div style="color:#546e7a;font-size:13px;padding:16px;">Option data unavailable</div>'}
+            {pv_panel}
+        </div>
+    </div>
+"""
 
     def _key_levels_visual_section(self, d, _pct_cp, _pts_to_res, _pts_to_sup, _mp_node):
         mp_row = f'<tr><td style="color:#ffb74d;">&#127919; Max Pain</td><td style="color:#ffb74d;">&#8377;{d["max_pain"]:,}</td></tr>' if d['has_option_data'] else ''
@@ -4562,6 +4801,7 @@ window.addEventListener('resize', function(){
         if d['has_option_data']:
             html += self._oi_navy_command_section(d)
         html += self._key_levels_visual_section(d,_pct_cp,_pts_to_res,_pts_to_sup,_mp_node)
+        html += self._option_chain_pivot_section_html(d)
         html += self._fiidii_section_html()
         html += self._market_direction_widget_html()
         html += f"""
