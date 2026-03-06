@@ -316,8 +316,9 @@ def build_heatmap_tab_html(heatmap_data, timestamp, advance, decline, neutral):
       <div class="section">
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
-          <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;">
-            As of: {timestamp}
+          <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+            <span>Stock data as of: {timestamp}</span>
+            <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
 
@@ -4012,7 +4013,6 @@ window.addEventListener('load', function(){
     if (firstRow) { selectStrat(firstRow); }
 });
 
-setInterval(loadOILog, 30000);
 window.addEventListener('resize', function(){
     if (_oiData.length > 0) drawSparkline(filterByInterval(_oiData, _oiInterval));
 });
