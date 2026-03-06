@@ -3648,8 +3648,8 @@ function renderOITable(data) {
             var isLive  = (idx === 0);
             var diffCls = (row.diff||0) >= 0 ? 'oi-diff-pos' : 'oi-diff-neg';
             var timeCell = isLive
-                ? '<div class="oi-time-cell">' + t + '&nbsp;<span class="oi-live-ind">LIVE</span></div>'
-                : t;
+                ? '<div class="oi-time-cell"><span style="font-family:\'Oxanium\',sans-serif;font-size:14px;font-weight:700;color:#e2e8f0;">' + t + '</span>&nbsp;<span class="oi-live-ind">LIVE</span></div>'
+                : '<span style="font-family:\'Oxanium\',sans-serif;font-size:14px;font-weight:600;color:#94a3b8;">' + t + '</span>';
             var isBuy = (row.opt_signal||'').toUpperCase().indexOf('BUY') >= 0;
             var isSell = (row.opt_signal||'').toUpperCase().indexOf('SELL') >= 0;
             var nlabel = row.nearest_label || (isBuy ? 'R1' : isSell ? 'S1' : '—');
@@ -3751,7 +3751,7 @@ function renderOITable(data) {
             r.classList.add('oi-live-row');
             var td = r.querySelector('td:first-child');
             if (td && !td.querySelector('.oi-live-ind')) {
-                td.innerHTML = '<div class="oi-time-cell">' + t + '&nbsp;<span class="oi-live-ind">LIVE</span></div>';
+                td.innerHTML = '<div class="oi-time-cell"><span style="font-family:\'Oxanium\',sans-serif;font-size:14px;font-weight:700;color:#e2e8f0;">' + t + '</span>&nbsp;<span class="oi-live-ind">LIVE</span></div>';
             }
         }
     });
@@ -4362,24 +4362,26 @@ window.addEventListener('resize', function(){
         .oi-sum-val{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,2.5vw,22px);font-weight:700;line-height:1;}}
         .oi-chart-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;padding:16px;margin-bottom:20px;}}
         .oi-chart-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;}}
-        .oi-table-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}}
-        .oi-table{{width:100%;min-width:1080px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}}
+        /* ── OI Table · Style 1 · Frosted Glass Rows ── */
+        .oi-table-wrap{{background:rgba(4,10,22,0.6);border:1px solid rgba(79,195,247,0.12);border-radius:14px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:4px 0;}}
+        .oi-table{{width:100%;min-width:1100px;border-collapse:separate;border-spacing:0 5px;font-family:'JetBrains Mono',monospace;padding:0 8px;}}
         .oi-table-scroll-hint{{display:none;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(79,195,247,0.4);padding:6px 14px 0;text-transform:uppercase;}}
-        .oi-table thead th{{padding:11px 14px;font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.45);text-transform:uppercase;font-weight:700;text-align:right;border-bottom:1px solid rgba(79,195,247,0.15);background:rgba(79,195,247,0.05);white-space:nowrap;}}
-        .oi-table thead th:first-child{{text-align:left;}}
-        .oi-table tbody tr{{border-bottom:1px solid rgba(79,195,247,0.06);transition:background 0.15s ease;}}
-        .oi-table tbody tr:hover{{background:rgba(79,195,247,0.05);}}
-        .oi-table tbody tr.oi-live-row{{background:rgba(0,230,118,0.05);border-left:3px solid rgba(0,230,118,0.5);}}
-        .oi-table tbody td{{padding:10px 14px;font-size:clamp(11px,1.4vw,13px);text-align:right;color:#b0bec5;white-space:nowrap;}}
-        .oi-table tbody td:first-child{{text-align:left;color:#e0f7fa;font-weight:700;}}
+        .oi-table thead th{{padding:10px 13px;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:1.5px;color:rgba(0,229,255,0.4);text-transform:uppercase;font-weight:700;text-align:center;border-bottom:1px solid rgba(0,188,212,0.12);white-space:nowrap;background:transparent;}}
+        .oi-table thead th:first-child{{text-align:left;padding-left:20px;}}
+        .oi-table tbody tr{{transition:all 0.2s ease;}}
+        .oi-table tbody tr:hover td{{background:rgba(0,188,212,0.07)!important;}}
+        .oi-table tbody tr.oi-live-row td{{background:rgba(0,230,118,0.05)!important;border-top:1px solid rgba(0,230,118,0.15)!important;border-bottom:1px solid rgba(0,230,118,0.06)!important;}}
+        .oi-table tbody td{{padding:11px 13px;font-size:clamp(11px,1.3vw,12px);text-align:center;color:#b0bec5;white-space:nowrap;background:rgba(6,20,50,0.55);backdrop-filter:blur(4px);border-top:1px solid rgba(79,195,247,0.07);border-bottom:1px solid rgba(79,195,247,0.03);vertical-align:middle;}}
+        .oi-table tbody td:first-child{{text-align:left;padding-left:20px;border-left:1px solid rgba(79,195,247,0.07);border-radius:8px 0 0 8px;}}
+        .oi-table tbody td:last-child{{border-right:1px solid rgba(79,195,247,0.07);border-radius:0 8px 8px 0;}}
         .oi-time-cell{{display:flex;align-items:center;gap:8px;}}
         .oi-live-ind{{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:#00e676;letter-spacing:1px;font-weight:700;}}
-        .oi-live-ind::before{{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;animation:sb-pulse 1.5s ease-in-out infinite;}}
-        .oi-call-val{{color:#fb7185;}}
-        .oi-put-val{{color:#34d399;}}
-        .oi-diff-neg{{color:#fb7185;font-weight:700;}}
-        .oi-diff-pos{{color:#34d399;font-weight:700;}}
-        .oi-pcr-val{{color:#fbbf24;}}
+        .oi-live-ind::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;animation:sb-pulse 1.5s ease-in-out infinite;}}
+        .oi-call-val{{color:#ef9a9a;font-family:'JetBrains Mono',monospace;}}
+        .oi-put-val{{color:#a5d6a7;font-family:'JetBrains Mono',monospace;}}
+        .oi-diff-neg{{color:#ef9a9a;font-weight:700;font-family:'JetBrains Mono',monospace;}}
+        .oi-diff-pos{{color:#80cbc4;font-weight:700;font-family:'JetBrains Mono',monospace;}}
+        .oi-pcr-val{{color:#ce93d8;font-family:'JetBrains Mono',monospace;}}
         .oi-signal-ssell{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(220,38,38,0.2);color:#fca5a5;border:1px solid rgba(220,38,38,0.4);}}
         .oi-signal-sell{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);}}
         .oi-signal-sbuy{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(5,150,105,0.2);color:#a7f3d0;border:1px solid rgba(5,150,105,0.4);}}
@@ -4387,7 +4389,7 @@ window.addEventListener('resize', function(){
         .oi-signal-neutral{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(245,158,11,0.12);color:#fde68a;border:1px solid rgba(245,158,11,0.25);}}
         .oi-vwap-cell{{color:#93c5fd;font-weight:600;}}
         .oi-fut-cell{{color:#c4b5fd;}}
-        .oi-spot-cell{{color:#e0f7fa;font-weight:700;}}
+        .oi-spot-cell{{color:#ffe082;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:13px;}}
         .oi-vsig-sell{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
         .oi-vsig-buy{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}}
         .oi-nlevel-badge{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}}
