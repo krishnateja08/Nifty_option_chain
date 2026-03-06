@@ -1493,56 +1493,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
         </div>
         <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
         <script id="stratDataMap" type="application/json">{strat_js_map}</script>
-        <div class="section">
-            <div class="section-title"><span>&#128203;</span> TRADE PLAN — AUTO FILLED
-                <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;margin-left:auto;">
-                    Click any strategy card above to update this plan
-                </span>
-            </div>
-            <div class="tp-wrap">
-
-                <!-- Row 1: Primary strategy banner -->
-                <div class="tp-banner" id="tp-banner">
-                    <div class="tp-banner-left">
-                        <div class="tp-banner-label">SELECTED STRATEGY <span id="tp-rank-badge" class="tp-rank-badge">PRIMARY</span></div>
-                        <div class="tp-banner-strat" id="tp-strat-name">{primary_strat}</div>
-                        <div class="tp-banner-strike" id="tp-strike-rec">&#127919; {primary_strike_rec}</div>
-                    </div>
-                    <div class="tp-banner-right">
-                        <div class="tp-banner-label">EXPIRY</div>
-                        <div class="tp-banner-exp">{expiry_date}</div>
-                    </div>
-                </div>
-
-                <!-- Row 2: The 3 exit conditions -->
-                <div class="tp-exits">
-                    <div class="tp-exit tp-exit-profit">
-                        <div class="tp-exit-icon">&#9989;</div>
-                        <div class="tp-exit-title">PROFIT EXIT</div>
-                        <div class="tp-exit-val">{tgt1_display}</div>
-                        <div class="tp-exit-sub">Target 1 · {reward_pts} pts from spot</div>
-                        <div class="tp-exit-val2">{tgt2_display}</div>
-                        <div class="tp-exit-sub">Target 2 (CE/PE wall)</div>
-                        <div class="tp-exit-rule">&#128161; Take 50–60% profits at Target 1. Let the rest run to Target 2.</div>
-                    </div>
-                    <div class="tp-exit tp-exit-loss">
-                        <div class="tp-exit-icon">&#10060;</div>
-                        <div class="tp-exit-title">STOP LOSS EXIT</div>
-                        <div class="tp-exit-val">{sl_display}</div>
-                        <div class="tp-exit-sub">Hard stop · {sl_pts} pts from spot</div>
-                        <div class="tp-exit-rule">&#128161; Exit immediately when hit — no averaging down. Max 2% of capital at risk per trade.</div>
-                    </div>
-                    <div class="tp-exit tp-exit-time">
-                        <div class="tp-exit-icon">&#9200;</div>
-                        <div class="tp-exit-title">TIME EXIT</div>
-                        <div class="tp-exit-val">40% DTE Rule</div>
-                        <div class="tp-exit-sub">Exit if target not reached by 40% of expiry elapsed</div>
-                        <div class="tp-exit-rule">&#128161; Theta decay accelerates after 40% DTE. A stalled trade is a losing trade — exit and preserve capital.</div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
         <!-- ══════════════ END TRADE PLAN ══════════════ -->
 
         <div class="section">
