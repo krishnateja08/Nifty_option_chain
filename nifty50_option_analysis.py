@@ -3887,15 +3887,16 @@ function renderOITable(data) {
             var isLive  = (idx === 0);
             var diffCls = (row.diff||0) >= 0 ? 'oi-diff-pos' : 'oi-diff-neg';
             var timeCell = isLive
-                ? '<div class="oi-time-cell">' + t + '&nbsp;<span class="oi-live-ind">LIVE</span></div>'
-                : t;
+                ? '<div class="oi-time-cell"><span class="oi-time-val">' + t + '</span>&nbsp;<span class="oi-live-ind">LIVE</span></div>'
+                : '<div class="oi-time-cell"><span class="oi-time-val">' + t + '</span></div>';
             var isBuy = (row.opt_signal||'').toUpperCase().indexOf('BUY') >= 0;
             var isSell = (row.opt_signal||'').toUpperCase().indexOf('SELL') >= 0;
             var nlabel = row.nearest_label || (isBuy ? 'R1' : isSell ? 'S1' : '—');
             var nval   = row.nearest_level ? '₹' + row.nearest_level.toLocaleString('en-IN') : '—';
             var nlevelHtml = row.nearest_level
                 ? '<span class="oi-nlevel-badge ' + (isBuy ? 'oi-nlevel-res' : 'oi-nlevel-sup') + '">'
-                  + nlabel + ' &nbsp;' + nval + '</span>'
+                  + '<span class="oi-nlevel-label">' + nlabel + '</span>'
+                  + nval + '</span>'
                 : '<span style="color:rgba(176,190,197,0.3);">—</span>';
             var distHtml = row.distance_pts != null
                 ? '<span class="oi-dist-val ' + (isBuy ? 'oi-dist-res' : 'oi-dist-sup') + '">'
@@ -3975,7 +3976,7 @@ function renderOITable(data) {
                 + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
                 + '<td class="oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
                 + '<td class="' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
-                + '<td class="oi-pcr-val">'  + (row.pcr||'—') + '</td>'
+                + '<td class="oi-pcr-val"><span class="oi-pcr-cell">' + (row.pcr||'—') + '<span class="oi-pcr-bar-wrap"><span class="oi-pcr-bar" style="width:' + Math.min(100,Math.round(((row.pcr||0)/2)*100)) + '%"></span></span></span></td>'
                 + '<td>' + signalHtml(row.opt_signal) + '</td>'
                 + '<td class="oi-spot-cell">'+ (row.spot_price ? row.spot_price.toFixed(2) : '—') + '</td>'
                 + '<td>' + spotDeltaHtml + '</td>'
@@ -3990,7 +3991,7 @@ function renderOITable(data) {
             r.classList.add('oi-live-row');
             var td = r.querySelector('td:first-child');
             if (td && !td.querySelector('.oi-live-ind')) {
-                td.innerHTML = '<div class="oi-time-cell">' + t + '&nbsp;<span class="oi-live-ind">LIVE</span></div>';
+                td.innerHTML = '<div class="oi-time-cell"><span class="oi-time-val">' + t + '</span>&nbsp;<span class="oi-live-ind">LIVE</span></div>';
             }
         }
     });
@@ -4601,68 +4602,103 @@ window.addEventListener('resize', function(){
         .oi-sum-val{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,2.5vw,22px);font-weight:700;line-height:1;}}
         .oi-chart-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;padding:16px;margin-bottom:20px;}}
         .oi-chart-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;}}
-        .oi-table-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;}}
-        .oi-table{{width:100%;min-width:1080px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}}
+        /* ══ OPTION FLOW TABLE — POLISHED UI ════════════════════════════════ */
+        .oi-table-wrap{{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:16px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;box-shadow:0 4px 40px rgba(0,0,0,0.5);}}
+        .oi-table{{width:100%;min-width:1160px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}}
         .oi-table-scroll-hint{{display:none;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(79,195,247,0.4);padding:6px 14px 0;text-transform:uppercase;}}
-        .oi-table thead th{{padding:11px 14px;font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.45);text-transform:uppercase;font-weight:700;text-align:right;border-bottom:1px solid rgba(79,195,247,0.15);background:rgba(79,195,247,0.05);white-space:nowrap;}}
+
+        /* ── Header ── */
+        .oi-table thead tr{{background:rgba(18,26,33,0.95);border-bottom:2px solid rgba(36,53,68,0.9);}}
+        .oi-table thead th{{padding:12px 16px;font-size:9.5px;letter-spacing:1.5px;color:rgba(74,100,120,1);text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap;}}
         .oi-table thead th:first-child{{text-align:left;}}
-        .oi-table tbody tr{{border-bottom:1px solid rgba(79,195,247,0.06);transition:background 0.15s ease;}}
-        .oi-table tbody tr:hover{{background:rgba(79,195,247,0.05);}}
-        .oi-table tbody tr.oi-live-row{{background:rgba(0,230,118,0.05);border-left:3px solid rgba(0,230,118,0.5);}}
-        .oi-table tbody td{{padding:10px 14px;font-size:clamp(11px,1.4vw,13px);text-align:right;color:#b0bec5;white-space:nowrap;}}
-        .oi-table tbody td:first-child{{text-align:left;color:#e0f7fa;font-weight:700;}}
-        .oi-time-cell{{display:flex;align-items:center;gap:8px;}}
-        .oi-live-ind{{display:inline-flex;align-items:center;gap:4px;font-size:9px;color:#00e676;letter-spacing:1px;font-weight:700;}}
-        .oi-live-ind::before{{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;animation:sb-pulse 1.5s ease-in-out infinite;}}
-        .oi-call-val{{color:#fb7185;}}
-        .oi-put-val{{color:#34d399;}}
-        .oi-diff-neg{{color:#fb7185;font-weight:700;}}
-        .oi-diff-pos{{color:#34d399;font-weight:700;}}
-        .oi-pcr-val{{color:#fbbf24;}}
-        .oi-signal-ssell{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(220,38,38,0.2);color:#fca5a5;border:1px solid rgba(220,38,38,0.4);}}
-        .oi-signal-sell{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);}}
-        .oi-signal-sbuy{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(5,150,105,0.2);color:#a7f3d0;border:1px solid rgba(5,150,105,0.4);}}
-        .oi-signal-buy{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);}}
-        .oi-signal-neutral{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;background:rgba(245,158,11,0.12);color:#fde68a;border:1px solid rgba(245,158,11,0.25);}}
+        .oi-table thead th.oi-th-divider{{border-left:1px solid rgba(30,45,56,1);}}
+
+        /* ── Body rows ── */
+        .oi-table tbody tr{{border-bottom:1px solid rgba(30,45,56,0.8);transition:background 0.15s ease;}}
+        .oi-table tbody tr:last-child{{border-bottom:none;}}
+        .oi-table tbody tr:hover{{background:rgba(18,26,33,0.9);}}
+        .oi-table tbody tr.oi-live-row{{background:linear-gradient(90deg,rgba(0,212,255,0.04) 0%,transparent 60%);border-bottom:1px solid rgba(0,212,255,0.18);}}
+        .oi-table tbody td{{padding:13px 16px;font-size:12.5px;text-align:right;color:#c8dde8;white-space:nowrap;}}
+        .oi-table tbody td:first-child{{text-align:left;}}
+        .oi-table tbody td.oi-th-divider{{border-left:1px solid rgba(30,45,56,0.8);}}
+
+        /* ── Time cell ── */
+        .oi-time-cell{{display:flex;align-items:center;gap:10px;}}
+        .oi-time-val{{font-size:13px;font-weight:700;color:#fff;letter-spacing:0.5px;}}
+        .oi-live-ind{{display:inline-flex;align-items:center;gap:5px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.5);border-radius:20px;padding:2px 8px;font-size:9px;color:#00e676;letter-spacing:1px;font-weight:700;}}
+        .oi-live-ind::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
+
+        /* ── OI value cells ── */
+        .oi-call-val{{color:#00e676;font-weight:500;}}
+        .oi-put-val{{color:#c8dde8;}}
+        .oi-diff-neg{{color:#ff4757;font-weight:700;}}
+        .oi-diff-pos{{color:#00e676;font-weight:700;}}
+
+        /* ── PCR with mini bar ── */
+        .oi-pcr-val{{color:#ffd32a;font-weight:600;}}
+        .oi-pcr-cell{{display:inline-flex;align-items:center;justify-content:flex-end;gap:6px;}}
+        .oi-pcr-bar-wrap{{width:32px;height:4px;background:rgba(36,53,68,0.9);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;}}
+        .oi-pcr-bar{{height:100%;border-radius:2px;background:rgba(0,153,204,0.8);}}
+
+        /* ── Signal badges — bigger, glowing ── */
+        .oi-signal-ssell{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:#ff3a4a;color:#fff;box-shadow:0 0 14px rgba(255,58,74,0.55);}}
+        .oi-signal-sell{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:#ff3a4a;color:#fff;box-shadow:0 0 10px rgba(255,58,74,0.35);}}
+        .oi-signal-sbuy{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:#00c853;color:#000;box-shadow:0 0 14px rgba(0,200,83,0.55);}}
+        .oi-signal-buy{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:#00c853;color:#000;box-shadow:0 0 10px rgba(0,200,83,0.35);}}
+        .oi-signal-neutral{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:rgba(245,158,11,0.15);color:#fde68a;border:1px solid rgba(245,158,11,0.3);}}
+
+        /* ── Spot price ── */
         .oi-vwap-cell{{color:#93c5fd;font-weight:600;}}
         .oi-fut-cell{{color:#c4b5fd;}}
-        .oi-spot-cell{{color:#e0f7fa;font-weight:700;}}
-        .oi-vsig-sell{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
-        .oi-vsig-buy{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}}
-        .oi-nlevel-badge{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}}
-        .oi-nlevel-res{{background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}}
-        .oi-nlevel-sup{{background:rgba(0,188,212,0.12);color:#67e8f9;border:1px solid rgba(0,188,212,0.3);}}
-        .oi-dist-val{{display:inline-block;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}}
-        .oi-dist-res{{background:rgba(239,68,68,0.08);color:#f87171;}}
-        .oi-dist-sup{{background:rgba(0,188,212,0.08);color:#22d3ee;}}
-        .oi-empty-state{{text-align:center;padding:60px 20px;color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
-        /* ── Spot Δ ── */
-        .oi-sdelta{{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;}}
-        .oi-sdelta-up{{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.25);}}
-        .oi-sdelta-dn{{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);}}
+        .oi-spot-cell{{color:#fff;font-weight:700;font-size:13px;}}
+
+        /* ── Spot Δ — pill style ── */
+        .oi-sdelta{{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:11.5px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;}}
+        .oi-sdelta-up{{background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
+        .oi-sdelta-dn{{background:rgba(255,71,87,0.12);color:#ff4757;border:1px solid rgba(255,71,87,0.3);}}
         .oi-sdelta-fl{{background:rgba(100,116,139,0.1);color:#64748b;border:1px solid rgba(100,116,139,0.2);}}
-        /* ── Nifty Move % ── */
+
+        /* ── Nifty Move % — rounded pill ── */
         .oi-nifty-move{{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;letter-spacing:0.3px;}}
         .oi-nifty-up-strong{{background:rgba(0,230,118,0.18);color:#00e676;border:1px solid rgba(0,230,118,0.35);}}
         .oi-nifty-up-mid{{background:rgba(0,200,83,0.12);color:#69f0ae;border:1px solid rgba(0,200,83,0.25);}}
         .oi-nifty-up-weak{{background:rgba(105,240,174,0.07);color:#a7f3d0;border:1px solid rgba(105,240,174,0.18);}}
-        .oi-nifty-dn-strong{{background:rgba(239,68,68,0.18);color:#ff5252;border:1px solid rgba(239,68,68,0.35);}}
-        .oi-nifty-dn-mid{{background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
-        .oi-nifty-dn-weak{{background:rgba(239,68,68,0.07);color:#fecaca;border:1px solid rgba(239,68,68,0.15);}}
+        .oi-nifty-dn-strong{{background:rgba(255,71,87,0.18);color:#ff4757;border:1px solid rgba(255,71,87,0.35);}}
+        .oi-nifty-dn-mid{{background:rgba(255,71,87,0.12);color:#fca5a5;border:1px solid rgba(255,71,87,0.25);}}
+        .oi-nifty-dn-weak{{background:rgba(255,71,87,0.07);color:#fecaca;border:1px solid rgba(255,71,87,0.15);}}
         .oi-nifty-flat{{background:rgba(120,144,156,0.1);color:#90a4ae;border:1px solid rgba(120,144,156,0.2);}}
+
         /* ── Signal Streak ── */
-        .oi-streak{{display:inline-flex;align-items:center;gap:6px;}}
-        .oi-streak-num{{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:800;line-height:1;}}
-        .oi-streak-sell .oi-streak-num{{color:#f87171;}}
-        .oi-streak-buy  .oi-streak-num{{color:#34d399;}}
-        .oi-streak-neu  .oi-streak-num{{color:#fbbf24;}}
+        .oi-streak{{display:inline-flex;flex-direction:column;align-items:flex-end;gap:4px;}}
+        .oi-streak-num{{font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;line-height:1;letter-spacing:0.5px;}}
+        .oi-streak-sell .oi-streak-num{{color:#ffd32a;}}
+        .oi-streak-buy  .oi-streak-num{{color:#ffd32a;}}
+        .oi-streak-neu  .oi-streak-num{{color:#ffd32a;}}
         .oi-streak-lbl{{font-size:8px;letter-spacing:0.8px;color:rgba(176,190,197,0.35);text-transform:uppercase;line-height:1.4;}}
         .oi-pips{{display:flex;gap:3px;align-items:center;}}
-        .oi-pip{{width:5px;height:5px;border-radius:50%;flex-shrink:0;}}
-        .oi-pip-sell{{background:#f87171;box-shadow:0 0 3px #f87171;}}
-        .oi-pip-buy{{background:#34d399;box-shadow:0 0 3px #34d399;}}
-        .oi-pip-neu{{background:#fbbf24;}}
-        .oi-pip-old{{background:rgba(100,116,139,0.3);}}
+        .oi-pip{{width:7px;height:7px;border-radius:50%;flex-shrink:0;}}
+        .oi-pip-sell{{background:#ff3a4a;opacity:0.85;}}
+        .oi-pip-buy{{background:#00c853;opacity:0.85;}}
+        .oi-pip-neu{{background:#fbbf24;opacity:0.85;}}
+        .oi-pip-old{{background:rgba(74,100,120,0.3);}}
+
+        /* ── Nearest Level badge ── */
+        .oi-nlevel-badge{{display:inline-flex;align-items:center;gap:6px;background:rgba(10,26,37,0.9);border:1px solid rgba(36,53,68,1);border-radius:7px;padding:4px 10px;font-size:11.5px;font-weight:700;letter-spacing:0.3px;white-space:nowrap;}}
+        .oi-nlevel-badge .oi-nlevel-label{{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:0.5px;}}
+        .oi-nlevel-res{{color:#00d4ff;}}
+        .oi-nlevel-res .oi-nlevel-label{{background:rgba(0,153,204,0.9);color:#000;}}
+        .oi-nlevel-sup{{color:#00d4ff;}}
+        .oi-nlevel-sup .oi-nlevel-label{{background:rgba(0,153,204,0.9);color:#000;}}
+
+        /* ── Distance ── */
+        .oi-dist-val{{display:inline-block;font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;}}
+        .oi-dist-res{{color:#ff4757;}}
+        .oi-dist-sup{{color:#ff4757;}}
+
+        /* ── Misc ── */
+        .oi-vsig-sell{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
+        .oi-vsig-buy{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}}
+        .oi-empty-state{{text-align:center;padding:60px 20px;color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
 
         .disclaimer{{background:rgba(255,183,77,0.08);border:1px solid rgba(255,183,77,0.25);border-left:3px solid #ffb74d;border-radius:8px;padding:9px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}}
         .disc-icon{{font-size:13px;flex-shrink:0;line-height:1;}}
