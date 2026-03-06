@@ -1675,6 +1675,19 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
 
     vwap_signal = "BUY" if spot >= vwap else "SELL"
 
+    # ── Nifty 50 % move from previous day close ──
+    nifty_move_pct = None
+    try:
+        import yfinance as _yf
+        df_nsei = _yf.Ticker("^NSEI").history(period="5d", interval="1d")
+        if df_nsei is not None and len(df_nsei) >= 2:
+            prev_close_day = float(df_nsei['Close'].iloc[-2])
+            if prev_close_day > 0:
+                nifty_move_pct = round((spot - prev_close_day) / prev_close_day * 100, 2)
+                print(f"  ✅ Nifty Move %: {nifty_move_pct:+.2f}% (Spot={spot}, Prev Close={prev_close_day})")
+    except Exception as e:
+        print(f"  ⚠️  Nifty move % calc failed: {e}")
+
     # ── Nearest level & distance based on signal direction ──
     # SELL: target is S1 if spot > S1 (not yet reached), else switch to S2 (already broke S1)
     # BUY:  target is R1 if spot < R1 (not yet reached), else switch to R2 (already broke R1)
@@ -1729,12 +1742,12 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
         "diff":          diff,
         "pcr":           pcr,
         "opt_signal":    opt_signal,
-        "vwap":          vwap,
-        "fut_price":     fut_price,
-        "spot_price":    spot,
-        "vwap_signal":   vwap_signal,
-        "vwap_bias":     "ABOVE" if spot >= vwap else "BELOW",
-        "nearest_level": nearest_level,
+        "vwap":            vwap,
+        "fut_price":       fut_price,
+        "spot_price":      spot,
+        "vwap_signal":     vwap_signal,
+        "nifty_move_pct":  nifty_move_pct,
+        "nearest_level":   nearest_level,
         "nearest_label": nearest_label,
         "distance_pts":  distance_pts,
     }
@@ -1786,8 +1799,13 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
 
     print(f"  📊 OI snapshot logged → {ist_now.strftime('%H:%M IST')} | "
           f"CE Δ={ce_chg:+,} | PE Δ={pe_chg:+,} | Diff={diff:+,} | "
-          f"PCR={pcr:.2f} | Signal={opt_signal} | Spot={spot} | VWAP={vwap} | "
-          f"Total entries={len(entries)}")
+          f"PCR={pcr:.2f} | Signal={opt_signal} | Spot={spot} | "
+          f"Move%={nifty_move_pct:+.2f}% | Total entries={len(entries)}"
+          if nifty_move_pct is not None else
+          f"  📊 OI snapshot logged → {ist_now.strftime('%H:%M IST')} | "
+          f"CE Δ={ce_chg:+,} | PE Δ={pe_chg:+,} | Diff={diff:+,} | "
+          f"PCR={pcr:.2f} | Signal={opt_signal} | Spot={spot} | "
+          f"Move%=N/A | Total entries={len(entries)}")
 
 
 def build_intraday_oi_tab_html():
@@ -1909,7 +1927,7 @@ def build_intraday_oi_tab_html():
                 <th>OPTION SIGNAL</th>
                 <th>SPOT PRICE</th>
                 <th>SPOT &#916;</th>
-                <th>VWAP BIAS</th>
+                <th>NIFTY MOVE %</th>
                 <th>STREAK</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
@@ -1928,7 +1946,7 @@ def build_intraday_oi_tab_html():
             <div class="logic-item"><span class="lc-info">DIFF</span> = PE &#916; &#8722; CE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
             <div class="logic-item"><span class="lc-info">3/5/15 Min</span> filters raw rows or aggregates into time slots</div>
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
-            <div class="logic-item"><span class="lc-bull">VWAP BIAS</span> ABOVE = Spot &ge; Session VWAP (bullish anchor) &nbsp;&middot;&nbsp; BELOW = Bearish</div>
+            <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
             <div class="logic-item"><span class="lc-bull">STREAK</span> Consecutive snapshots with same signal &nbsp;&middot;&nbsp; &#215;1 = just flipped &nbsp;&middot;&nbsp; &#215;5+ = strong trend</div>
             <div class="logic-item"><span class="lc-info">Timestamps</span> All times shown in IST (Asia/Kolkata)</div>
           </div>
@@ -3597,13 +3615,13 @@ function filterByInterval(data, mins) {
             diff:          totalPE - totalCE,
             pcr:           last.pcr,
             opt_signal:    last.opt_signal,
-            vwap:          last.vwap,
-            spot_price:    last.spot_price,
-            vwap_bias:     last.vwap_bias,
-            nearest_level: last.nearest_level,
-            nearest_label: last.nearest_label,
-            distance_pts:  last.distance_pts,
-            vwap_signal:   last.vwap_signal,
+            vwap:           last.vwap,
+            spot_price:     last.spot_price,
+            nifty_move_pct: last.nifty_move_pct,
+            nearest_level:  last.nearest_level,
+            nearest_label:  last.nearest_label,
+            distance_pts:   last.distance_pts,
+            vwap_signal:    last.vwap_signal,
             _isLive:       rows[0]._isLive,
         };
     });
@@ -3705,13 +3723,32 @@ function renderOITable(data) {
                 spotDeltaHtml = '<span class="oi-sdelta oi-sdelta-dn">▼ ' + spotDelta.toFixed(1) + '</span>';
             }
 
-            // ── VWAP Bias ──
-            var vsig = (row.vwap_bias || (row.vwap_signal === 'BUY' ? 'ABOVE' : row.vwap_signal === 'SELL' ? 'BELOW' : '')).toUpperCase();
-            var vwapBiasHtml = vsig === 'ABOVE'
-                ? '<span class="oi-vwap-bias oi-vwap-above"><span class="oi-vwap-dot"></span>ABOVE</span>'
-                : vsig === 'BELOW'
-                    ? '<span class="oi-vwap-bias oi-vwap-below"><span class="oi-vwap-dot"></span>BELOW</span>'
-                    : '<span style="color:rgba(176,190,197,0.2);">—</span>';
+            // ── Nifty Move % ──
+            var nmp = row.nifty_move_pct;
+            var niftyMovePctHtml;
+            if (nmp === null || nmp === undefined) {
+                niftyMovePctHtml = '<span style="color:rgba(176,190,197,0.2);">—</span>';
+            } else {
+                var sign  = nmp >= 0 ? '+' : '';
+                var arrow, cls;
+                if (Math.abs(nmp) < 0.1) {
+                    arrow = '→'; cls = 'oi-nifty-flat';
+                } else if (nmp >= 1.0) {
+                    arrow = '▲'; cls = 'oi-nifty-up-strong';
+                } else if (nmp >= 0.5) {
+                    arrow = '▲'; cls = 'oi-nifty-up-mid';
+                } else if (nmp > 0) {
+                    arrow = '▲'; cls = 'oi-nifty-up-weak';
+                } else if (nmp <= -1.0) {
+                    arrow = '▼'; cls = 'oi-nifty-dn-strong';
+                } else if (nmp <= -0.5) {
+                    arrow = '▼'; cls = 'oi-nifty-dn-mid';
+                } else {
+                    arrow = '▼'; cls = 'oi-nifty-dn-weak';
+                }
+                niftyMovePctHtml = '<span class="oi-nifty-move ' + cls + '">'
+                    + arrow + ' ' + sign + nmp.toFixed(2) + '%</span>';
+            }
 
             // ── Signal Streak ──
             var streakCount = 1;
@@ -3743,7 +3780,7 @@ function renderOITable(data) {
                 + '<td>' + signalHtml(row.opt_signal) + '</td>'
                 + '<td class="oi-spot-cell">'+ (row.spot_price ? row.spot_price.toFixed(2) : '—') + '</td>'
                 + '<td>' + spotDeltaHtml + '</td>'
-                + '<td>' + vwapBiasHtml + '</td>'
+                + '<td>' + niftyMovePctHtml + '</td>'
                 + '<td>' + streakHtml + '</td>'
                 + '<td>' + nlevelHtml + '</td>'
                 + '<td>' + distHtml + '</td>'
@@ -4406,13 +4443,15 @@ window.addEventListener('resize', function(){
         .oi-sdelta-up{{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.25);}}
         .oi-sdelta-dn{{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);}}
         .oi-sdelta-fl{{background:rgba(100,116,139,0.1);color:#64748b;border:1px solid rgba(100,116,139,0.2);}}
-        /* ── VWAP Bias ── */
-        .oi-vwap-bias{{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.8px;white-space:nowrap;}}
-        .oi-vwap-above{{background:rgba(16,185,129,0.1);color:#6ee7b7;border:1px solid rgba(16,185,129,0.28);}}
-        .oi-vwap-below{{background:rgba(239,68,68,0.1);color:#fca5a5;border:1px solid rgba(239,68,68,0.28);}}
-        .oi-vwap-dot{{width:6px;height:6px;border-radius:50%;flex-shrink:0;}}
-        .oi-vwap-above .oi-vwap-dot{{background:#10b981;box-shadow:0 0 5px #10b981;}}
-        .oi-vwap-below .oi-vwap-dot{{background:#ef4444;box-shadow:0 0 5px #ef4444;}}
+        /* ── Nifty Move % ── */
+        .oi-nifty-move{{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;letter-spacing:0.3px;}}
+        .oi-nifty-up-strong{{background:rgba(0,230,118,0.18);color:#00e676;border:1px solid rgba(0,230,118,0.35);}}
+        .oi-nifty-up-mid{{background:rgba(0,200,83,0.12);color:#69f0ae;border:1px solid rgba(0,200,83,0.25);}}
+        .oi-nifty-up-weak{{background:rgba(105,240,174,0.07);color:#a7f3d0;border:1px solid rgba(105,240,174,0.18);}}
+        .oi-nifty-dn-strong{{background:rgba(239,68,68,0.18);color:#ff5252;border:1px solid rgba(239,68,68,0.35);}}
+        .oi-nifty-dn-mid{{background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
+        .oi-nifty-dn-weak{{background:rgba(239,68,68,0.07);color:#fecaca;border:1px solid rgba(239,68,68,0.15);}}
+        .oi-nifty-flat{{background:rgba(120,144,156,0.1);color:#90a4ae;border:1px solid rgba(120,144,156,0.2);}}
         /* ── Signal Streak ── */
         .oi-streak{{display:inline-flex;align-items:center;gap:6px;}}
         .oi-streak-num{{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:800;line-height:1;}}
