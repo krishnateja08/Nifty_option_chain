@@ -4644,9 +4644,9 @@ window.addEventListener('resize', function(){
 
         /* ── PCR with mini bar ── */
         .oi-pcr-val{{font-weight:700;font-size:12px;}}
-        .oi-pcr-bull{{color:#00e676;}}
-        .oi-pcr-bear{{color:#ff4757;}}
-        .oi-pcr-neu{{color:#ffd32a;}}
+        .oi-pcr-val.oi-pcr-bull,.oi-pcr-bull{{color:#00e676 !important;}}
+        .oi-pcr-val.oi-pcr-bear,.oi-pcr-bear{{color:#ff4757 !important;}}
+        .oi-pcr-val.oi-pcr-neu,.oi-pcr-neu{{color:#ffd32a !important;}}
         .oi-pcr-cell{{display:inline-flex;align-items:center;justify-content:flex-end;gap:6px;}}
         .oi-pcr-bar-wrap{{width:32px;height:4px;background:rgba(36,53,68,0.9);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle;}}
         .oi-pcr-bar{{height:100%;border-radius:2px;}}
