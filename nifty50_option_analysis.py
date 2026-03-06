@@ -3977,8 +3977,8 @@ function renderOITable(data) {
                 + '<td class="oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
                 + '<td class="' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
                 + (function(){
-                    var pcrV = row.pcr || 0;
-                    var pcrCls = pcrV >= 1.2 ? 'oi-pcr-bull' : pcrV <= 0.8 ? 'oi-pcr-bear' : 'oi-pcr-neu';
+                    var pcrV = parseFloat(row.pcr) || 0;
+                    var pcrCls = pcrV >= 1.1 ? 'oi-pcr-bull' : pcrV <= 0.9 ? 'oi-pcr-bear' : 'oi-pcr-neu';
                     var barW = Math.min(100, Math.round((pcrV / 2) * 100));
                     return '<td class="oi-pcr-val ' + pcrCls + '"><span class="oi-pcr-cell">'
                         + (row.pcr || '—')

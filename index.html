@@ -620,7 +620,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">07-Mar-2026 02:11 IST</span>
+                <span class="sb-value gen-val">07-Mar-2026 02:15 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -1305,7 +1305,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 07-Mar-2026 02:11 IST</span>
+            <span>Stock data as of: 07-Mar-2026 02:15 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -2827,8 +2827,8 @@ function renderOITable(data) {
                 + '<td class="oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
                 + '<td class="' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
                 + (function(){
-                    var pcrV = row.pcr || 0;
-                    var pcrCls = pcrV >= 1.2 ? 'oi-pcr-bull' : pcrV <= 0.8 ? 'oi-pcr-bear' : 'oi-pcr-neu';
+                    var pcrV = parseFloat(row.pcr) || 0;
+                    var pcrCls = pcrV >= 1.1 ? 'oi-pcr-bull' : pcrV <= 0.9 ? 'oi-pcr-bear' : 'oi-pcr-neu';
                     var barW = Math.min(100, Math.round((pcrV / 2) * 100));
                     return '<td class="oi-pcr-val ' + pcrCls + '"><span class="oi-pcr-cell">'
                         + (row.pcr || '—')
