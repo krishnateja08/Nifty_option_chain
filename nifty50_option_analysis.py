@@ -21,7 +21,6 @@ import pandas as pd
 import numpy as np
 import time
 from datetime import datetime, timedelta, date
-import calendar
 import yfinance as yf
 import warnings
 import os
@@ -956,25 +955,6 @@ def score_trend(sma_20_above, sma_50_above, sma_200_above):
     else:
         return -1, "Weak / Mixed", "Price below majority of SMAs — trend weakening"
 
-def score_volume(volume_change_pct, location):
-    if volume_change_pct is None:
-        return 0, "N/A", f"Volume at {location} not provided — skipped"
-    msg_base = f"Volume {'+' if volume_change_pct >= 0 else ''}{volume_change_pct:.0f}% vs average at {location}"
-    if location == "support":
-        if volume_change_pct >= 30:
-            return +1, f"{volume_change_pct:+.0f}%", f"{msg_base} — buyers active, support confirmed (bullish)"
-        elif volume_change_pct <= -20:
-            return -1, f"{volume_change_pct:+.0f}%", f"{msg_base} — weak support, breakdown risk (bearish)"
-        else:
-            return 0, f"{volume_change_pct:+.0f}%", f"{msg_base} — no strong signal"
-    else:
-        if volume_change_pct >= 30:
-            return -1, f"{volume_change_pct:+.0f}%", f"{msg_base} — sellers active, resistance firm (bearish)"
-        elif volume_change_pct <= -20:
-            return +1, f"{volume_change_pct:+.0f}%", f"{msg_base} — weak resistance, breakout possible (bullish)"
-        else:
-            return 0, f"{volume_change_pct:+.0f}%", f"{msg_base} — no strong signal"
-
 def score_global(global_bias):
     if global_bias is None:
         return 0, "N/A", "Global bias not provided"
@@ -1048,7 +1028,6 @@ def get_strike_suggestion(strategy_name, atm, ce_wall, pe_wall):
     atm_p50  = atm + 50    # 1 strike OTM call
     atm_m50  = atm - 50    # 1 strike OTM put
     atm_p100 = atm + 100
-    atm_p150 = atm + 150
     atm_m100 = atm - 100
     atm_m150 = atm - 150
 
@@ -1409,24 +1388,6 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 
     timestamp = d.get('timestamp', 'N/A')
     na_span     = '<span class="na-inline">N/A</span>'
-    val_pcr     = f"{d['pcr']:.3f}" if d.get('has_option_data') and d.get('pcr') else na_span
-    val_rsi     = f"{d['rsi']:.1f}" if d.get('rsi') else na_span
-    if d.get('macd_bullish') is True:
-        val_macd = "Bullish"
-    elif d.get('macd_bullish') is False:
-        val_macd = "Bearish"
-    else:
-        val_macd = na_span
-    if d.get('sma_200_above') is None:
-        val_trend = na_span
-    elif d.get('sma_200_above') and d.get('sma_50_above'):
-        val_trend = "Uptrend"
-    elif not d.get('sma_200_above') and not d.get('sma_50_above'):
-        val_trend = "Downtrend"
-    else:
-        val_trend = "Mixed"
-    val_oi_dir  = d.get('oi_direction', 'N/A') if d.get('has_option_data') else na_span
-    val_global  = global_bias.title() if global_bias else na_span
     na_pill     = f'<span class="sc-pill sc-pill-na">— N/A: {na_count}</span>' if na_count > 0 else ''
     score_note  = ("Strong directional conviction — proceed with caution and stop losses."
                    if abs(total_score) >= 3 else
@@ -1641,7 +1602,6 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
     pcr     = round(option_analysis.get('pcr_oi', 0), 2)
     spot    = round(float(technical.get('current_price', 0)), 2)
 
-    abs_diff = abs(diff)
     if   diff < -5_000_000:  opt_signal = "STRONG SELL"
     elif diff < 0:            opt_signal = "SELL"
     elif diff > 5_000_000:   opt_signal = "STRONG BUY"
@@ -3346,7 +3306,6 @@ class NiftyHTMLAnalyzer:
         sma50_bar ='bar-teal' if d['sma_50_above']  else 'bar-red'
         sma200_bar='bar-teal' if d['sma_200_above'] else 'bar-red'
         macd_bar  ='bar-teal' if d['macd_bullish']  else 'bar-red'
-        pcr_bar=self._bar_color_class(d['pcr_badge'])
         sma20_badge ='bullish' if d['sma_20_above']  else 'bearish'
         sma50_badge ='bullish' if d['sma_50_above']  else 'bearish'
         sma200_badge='bullish' if d['sma_200_above'] else 'bearish'
