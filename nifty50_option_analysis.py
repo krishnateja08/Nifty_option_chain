@@ -2406,6 +2406,11 @@ class NiftyHTMLAnalyzer:
             elif net_oi_change < 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bearish","Net Call Accumulation","🔴","bearish"
             else:                   oi_direction,oi_signal,oi_icon,oi_class="Neutral","Balanced OI Changes","🟡","neutral"
         max_ce_oi_row = df.loc[df['CE_OI'].idxmax()]; max_pe_oi_row = df.loc[df['PE_OI'].idxmax()]
+        # ── 2nd highest CE OI strike (R2 wall) and 2nd highest PE OI strike (S2 wall) ──
+        ce_top2 = df[df['CE_OI'] > 0].nlargest(2, 'CE_OI')
+        pe_top2 = df[df['PE_OI'] > 0].nlargest(2, 'PE_OI')
+        sec_ce_oi_strike = int(ce_top2.iloc[1]['Strike']) if len(ce_top2) >= 2 else int(max_ce_oi_row['Strike'])
+        sec_pe_oi_strike = int(pe_top2.iloc[1]['Strike']) if len(pe_top2) >= 2 else int(max_pe_oi_row['Strike'])
         df['pain']    = abs(df['CE_OI'] - df['PE_OI']); max_pain_row = df.loc[df['pain'].idxmin()]
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
         return {
@@ -2415,6 +2420,8 @@ class NiftyHTMLAnalyzer:
             'total_ce_oi': int(total_ce_oi), 'total_pe_oi': int(total_pe_oi),
             'max_ce_oi_strike': int(max_ce_oi_row['Strike']), 'max_ce_oi_value': int(max_ce_oi_row['CE_OI']),
             'max_pe_oi_strike': int(max_pe_oi_row['Strike']), 'max_pe_oi_value': int(max_pe_oi_row['CE_OI']),
+            'sec_ce_oi_strike': sec_ce_oi_strike,
+            'sec_pe_oi_strike': sec_pe_oi_strike,
             'max_pain': int(max_pain_row['Strike']),
             'total_ce_oi_change': total_ce_oi_change, 'total_pe_oi_change': total_pe_oi_change,
             'net_oi_change': net_oi_change,
@@ -2551,29 +2558,23 @@ class NiftyHTMLAnalyzer:
         return None
 
     # =========================================================================
-    #  PIVOT POINTS — Traditional Method using 30-Min candles (from live NSE)
+    #  PIVOT POINTS — Traditional Method, 30-min candles
     # =========================================================================
     def calculate_pivot_points(self, current_price):
-        """
-        Fetches last 5 days of 30-min Nifty data and computes Traditional
-        pivot points (PP, R1-R3, S1-S3) from the PREVIOUS 30-min candle's H/L/C.
-        Falls back to the prior daily candle if 30-min data is unavailable.
-        """
         try:
-            ticker    = yf.Ticker(self.yf_symbol)
-            df_30m    = ticker.history(period='5d', interval='30m')
+            ticker = yf.Ticker(self.yf_symbol)
+            df_30m = ticker.history(period='5d', interval='30m')
             if len(df_30m) >= 2:
                 prev_high  = float(df_30m['High'].iloc[-2])
                 prev_low   = float(df_30m['Low'].iloc[-2])
                 prev_close = float(df_30m['Close'].iloc[-2])
-                print(f"  📍 Pivot (30m) — H:{prev_high:.2f} L:{prev_low:.2f} C:{prev_close:.2f}")
+                print(f"  📍 Pivot (30m) H:{prev_high:.0f} L:{prev_low:.0f} C:{prev_close:.0f}")
             else:
-                # Fallback: daily
-                df_d       = ticker.history(period='5d', interval='1d')
+                df_d = ticker.history(period='5d', interval='1d')
                 prev_high  = float(df_d['High'].iloc[-2])  if len(df_d) >= 2 else current_price + 100
                 prev_low   = float(df_d['Low'].iloc[-2])   if len(df_d) >= 2 else current_price - 100
                 prev_close = float(df_d['Close'].iloc[-2]) if len(df_d) >= 2 else current_price
-                print(f"  📍 Pivot (daily fallback) — H:{prev_high:.2f} L:{prev_low:.2f} C:{prev_close:.2f}")
+                print(f"  📍 Pivot (daily fallback) H:{prev_high:.0f} L:{prev_low:.0f} C:{prev_close:.0f}")
             pivot = (prev_high + prev_low + prev_close) / 3
             r1 = (2 * pivot) - prev_low
             r2 = pivot + (prev_high - prev_low)
@@ -2581,31 +2582,26 @@ class NiftyHTMLAnalyzer:
             s1 = (2 * pivot) - prev_high
             s2 = pivot - (prev_high - prev_low)
             s3 = prev_low - 2 * (prev_high - pivot)
-            print(f"  ✅ Pivot PP:{pivot:.2f} R1:{r1:.2f} S1:{s1:.2f}")
+            # All values rounded to nearest integer — no decimals displayed
             return {
-                'pivot':      round(pivot,      2),
-                'r1':         round(r1,         2),
-                'r2':         round(r2,         2),
-                'r3':         round(r3,         2),
-                's1':         round(s1,         2),
-                's2':         round(s2,         2),
-                's3':         round(s3,         2),
-                'prev_high':  round(prev_high,  2),
-                'prev_low':   round(prev_low,   2),
-                'prev_close': round(prev_close, 2),
+                'pivot':      round(pivot),
+                'r1':         round(r1),   'r2': round(r2),   'r3': round(r3),
+                's1':         round(s1),   's2': round(s2),   's3': round(s3),
+                'prev_high':  round(prev_high),
+                'prev_low':   round(prev_low),
+                'prev_close': round(prev_close),
             }
         except Exception as e:
-            print(f"  ⚠️  Pivot point calculation failed: {e}")
+            print(f"  ⚠️  Pivot calculation failed: {e}")
+            cp = round(current_price)
             return {
-                'pivot': round(current_price, 2),
-                'r1': round(current_price + 50, 2), 'r2': round(current_price + 100, 2), 'r3': round(current_price + 150, 2),
-                's1': round(current_price - 50, 2), 's2': round(current_price - 100, 2), 's3': round(current_price - 150, 2),
-                'prev_high': round(current_price + 80, 2), 'prev_low': round(current_price - 80, 2), 'prev_close': round(current_price, 2),
+                'pivot': cp,
+                'r1': cp+50,  'r2': cp+100,  'r3': cp+150,
+                's1': cp-50,  's2': cp-100,  's3': cp-150,
+                'prev_high': cp+80, 'prev_low': cp-80, 'prev_close': cp,
             }
 
-    def _nearest_pivot_levels(self, current_price, pivot_points):
-        """Returns the nearest resistance and support from pivot R/S levels."""
-        pp = pivot_points
+    def _nearest_pivot_levels(self, current_price, pp):
         all_res = [pp.get('r1'), pp.get('r2'), pp.get('r3')]
         all_sup = [pp.get('s1'), pp.get('s2'), pp.get('s3')]
         res_above = [r for r in all_res if r and r > current_price]
@@ -2615,15 +2611,423 @@ class NiftyHTMLAnalyzer:
             'nearest_support':    max(sup_below) if sup_below else None,
         }
 
-    def _nearest_level_name(self, pivot_points, value):
+    def _nearest_level_name(self, pp, value):
         mapping = {
-            pivot_points.get('r1'): 'R1', pivot_points.get('r2'): 'R2', pivot_points.get('r3'): 'R3',
-            pivot_points.get('s1'): 'S1', pivot_points.get('s2'): 'S2', pivot_points.get('s3'): 'S3',
-            pivot_points.get('pivot'): 'PP',
+            pp.get('r1'): 'R1', pp.get('r2'): 'R2', pp.get('r3'): 'R3',
+            pp.get('s1'): 'S1', pp.get('s2'): 'S2', pp.get('s3'): 'S3',
+            pp.get('pivot'): 'PP',
         }
         return mapping.get(value, str(value))
 
-    def generate_analysis_data(self, technical, option_analysis):
+    # =========================================================================
+    #  WIDGET — OC PLASMA RADIAL  (R1+R2 OI walls, S1+S2 OI floors)
+    # =========================================================================
+    def _build_oc_plasma_widget(self, d):
+        pcr          = d.get('pcr', 0)
+        max_pain     = d.get('max_pain', 0)
+        oi_class     = d.get('oi_class', 'neutral')
+        call_buildup = d.get('total_ce_oi_change', 0)
+        put_buildup  = d.get('total_pe_oi_change', 0)
+        max_ce       = d.get('max_ce_oi', 0)   # highest CE OI strike  → R1
+        sec_ce       = d.get('sec_ce_oi', 0)   # 2nd highest CE OI strike → R2
+        max_pe       = d.get('max_pe_oi', 0)   # highest PE OI strike  → S1
+        sec_pe       = d.get('sec_pe_oi', 0)   # 2nd highest PE OI strike → S2
+
+        if oi_class == 'bullish':
+            oi_sentiment='Bullish'; sent_col='#26c6da'; sent_bg='rgba(38,198,218,.12)'; sent_brd='#0097a766'; sent_icon='&#8679;'
+        elif oi_class == 'bearish':
+            oi_sentiment='Bearish'; sent_col='#ff5252'; sent_bg='rgba(255,82,82,.12)';  sent_brd='#cc223366'; sent_icon='&#8681;'
+        else:
+            oi_sentiment='Neutral'; sent_col='#ffb74d'; sent_bg='rgba(255,183,77,.10)'; sent_brd='#f57c0066'; sent_icon='&#8596;'
+
+        circ       = 408.4
+        pcr_ratio  = min(pcr / 2.0, 1.0)
+        arc_len    = pcr_ratio * (circ * 0.69)
+        arc_offset = -(circ * 0.155)
+        if   pcr >= 1.2: arc_col1,arc_col2='#00838f','#26c6da'
+        elif pcr >= 1.0: arc_col1,arc_col2='#00695c','#26c6da'
+        elif pcr >= 0.8: arc_col1,arc_col2='#6d4c00','#ffb74d'
+        else:            arc_col1,arc_col2='#b71c1c','#ff5252'
+
+        def fmt_m(val):
+            if abs(val) >= 1_000_000: return f"{val/1_000_000:.1f}M"
+            elif abs(val) >= 1_000:   return f"{val/1_000:.0f}K"
+            return str(int(val))
+
+        # ── R1 and R2 resistance bars ──────────────────────────────────────────
+        r_bars_html = ''
+        if max_ce:
+            r_bars_html += f'''
+            <div class="w2oc-level-row">
+                <span class="w2oc-level-tag w2oc-r-tag">R1</span>
+                <div class="w2oc-level-track"><div class="w2oc-level-fill w2oc-fill-r" style="width:88%;"></div></div>
+                <span class="w2oc-level-price w2oc-r-price">&#8377;{max_ce:,}</span>
+            </div>'''
+        if sec_ce:
+            r_bars_html += f'''
+            <div class="w2oc-level-row">
+                <span class="w2oc-level-tag w2oc-r-tag">R2</span>
+                <div class="w2oc-level-track"><div class="w2oc-level-fill w2oc-fill-r" style="width:62%;"></div></div>
+                <span class="w2oc-level-price w2oc-r-price">&#8377;{sec_ce:,}</span>
+            </div>'''
+        if not r_bars_html:
+            r_bars_html = '<div style="color:#546e7a;font-size:12px;padding:6px 0;">No data</div>'
+
+        # ── S1 and S2 support bars ─────────────────────────────────────────────
+        s_bars_html = ''
+        if max_pe:
+            s_bars_html += f'''
+            <div class="w2oc-level-row">
+                <span class="w2oc-level-tag w2oc-s-tag">S1</span>
+                <div class="w2oc-level-track"><div class="w2oc-level-fill w2oc-fill-s" style="width:88%;"></div></div>
+                <span class="w2oc-level-price w2oc-s-price">&#8377;{max_pe:,}</span>
+            </div>'''
+        if sec_pe:
+            s_bars_html += f'''
+            <div class="w2oc-level-row">
+                <span class="w2oc-level-tag w2oc-s-tag">S2</span>
+                <div class="w2oc-level-track"><div class="w2oc-level-fill w2oc-fill-s" style="width:62%;"></div></div>
+                <span class="w2oc-level-price w2oc-s-price">&#8377;{sec_pe:,}</span>
+            </div>'''
+        if not s_bars_html:
+            s_bars_html = '<div style="color:#546e7a;font-size:12px;padding:6px 0;">No data</div>'
+
+        return f'''
+        <style>
+            .w2oc-wrap{{font-family:'Oxanium','Segoe UI',sans-serif;background:linear-gradient(135deg,#0c1620,#0a1018);border:1px solid rgba(79,195,247,0.2);border-radius:12px;overflow:hidden;box-shadow:0 0 40px rgba(79,195,247,.04),0 20px 60px rgba(0,0,0,.9);}}
+            .w2oc-hdr{{background:linear-gradient(135deg,#0f2027,#141c28);border-bottom:1px solid rgba(79,195,247,0.15);padding:14px 22px;display:flex;align-items:center;gap:12px;position:relative;flex-wrap:wrap;}}
+            .w2oc-hdr::after{{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(79,195,247,0.4),transparent);}}
+            .w2oc-hdr-icon{{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1a2840,#1e3050);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 0 14px rgba(79,195,247,.2);}}
+            .w2oc-hdr-text h3{{font-size:clamp(12px,2.5vw,14px);font-weight:700;color:#b0bec5;letter-spacing:2px;text-transform:uppercase;}}
+            .w2oc-hdr-text p{{font-size:10px;color:#546e7a;margin-top:3px;letter-spacing:1.5px;font-weight:600;}}
+            .w2oc-hdr-badge{{margin-left:auto;background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.3);color:#4fc3f7;padding:5px 16px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:2px;text-shadow:0 0 10px rgba(79,195,247,.5);animation:w2oc-pulse 2s ease-in-out infinite;}}
+            @keyframes w2oc-pulse{{0%,100%{{box-shadow:0 0 0 0 rgba(79,195,247,.2);}}50%{{box-shadow:0 0 0 6px rgba(79,195,247,0);}}}}
+            .w2oc-body{{display:grid;grid-template-columns:220px 1fr;}}
+            .w2oc-gauge-col{{padding:22px 16px;border-right:1px solid rgba(79,195,247,0.12);background:rgba(6,13,20,0.6);display:flex;flex-direction:column;align-items:center;gap:14px;}}
+            .w2oc-gauge-wrap{{position:relative;width:160px;height:160px;}}
+            .w2oc-gauge-wrap svg{{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 8px {arc_col2}44);}}
+            .w2oc-gauge-center{{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}}
+            .w2oc-gauge-lbl{{font-size:9px;color:#546e7a;letter-spacing:3px;text-transform:uppercase;}}
+            .w2oc-gauge-val{{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#b0bec5;text-shadow:0 0 20px {arc_col2};}}
+            .w2oc-gauge-sub{{font-size:9px;color:#546e7a;letter-spacing:2px;}}
+            .w2oc-gauge-title{{font-size:10px;font-weight:700;color:{arc_col2};letter-spacing:2px;text-transform:uppercase;}}
+            .w2oc-sent-pill{{background:{sent_bg};border:1px solid {sent_brd};border-radius:10px;padding:9px 14px;text-align:center;width:100%;}}
+            .w2oc-sent-lbl{{font-size:9px;color:#4fc3f7;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;font-weight:700;}}
+            .w2oc-sent-val{{font-size:18px;font-weight:700;color:{sent_col};text-shadow:0 0 14px {sent_col}88;letter-spacing:1px;}}
+            .w2oc-maxpain{{background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.2);border-radius:10px;padding:9px 14px;text-align:center;width:100%;}}
+            .w2oc-maxpain-lbl{{font-size:9px;color:#ffb74d;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;font-weight:700;}}
+            .w2oc-maxpain-val{{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#ffb74d;text-shadow:0 0 14px rgba(255,183,77,.5);}}
+            .w2oc-maxpain-note{{font-size:9px;color:#546e7a;margin-top:3px;letter-spacing:1px;}}
+            .w2oc-right{{padding:18px 20px;display:flex;flex-direction:column;gap:14px;}}
+            .w2oc-stats-row{{display:grid;grid-template-columns:1fr 1fr;gap:10px;}}
+            .w2oc-stat-card{{background:rgba(79,195,247,.04);border:1px solid rgba(79,195,247,.12);border-radius:10px;padding:12px 14px;position:relative;overflow:hidden;}}
+            .w2oc-stat-card::before{{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--sc-accent);box-shadow:0 0 8px var(--sc-accent);}}
+            .w2oc-stat-card-lbl{{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;color:#78909c;}}
+            .w2oc-stat-card-val{{font-family:'JetBrains Mono',monospace;font-size:clamp(16px,3vw,20px);font-weight:700;color:var(--sc-col);text-shadow:0 0 12px var(--sc-accent);}}
+            .w2oc-div{{height:1px;background:linear-gradient(90deg,transparent,rgba(79,195,247,0.15),transparent);}}
+            .w2oc-levels-section{{display:flex;flex-direction:column;gap:8px;}}
+            .w2oc-levels-title{{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:7px;}}
+            .w2oc-level-row{{display:flex;align-items:center;gap:10px;}}
+            .w2oc-level-tag{{font-size:10px;font-weight:800;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}}
+            .w2oc-r-tag{{background:rgba(244,67,54,.12);border:1px solid rgba(244,67,54,.4);color:#ef5350;}}
+            .w2oc-s-tag{{background:rgba(38,198,218,.12);border:1px solid rgba(38,198,218,.4);color:#26c6da;}}
+            .w2oc-level-track{{flex:1;height:7px;background:rgba(6,13,20,0.7);border-radius:4px;overflow:hidden;}}
+            .w2oc-level-fill{{height:100%;border-radius:4px;}}
+            .w2oc-fill-r{{background:linear-gradient(90deg,rgba(244,67,54,.3),#f44336);box-shadow:0 0 6px #f4433655;}}
+            .w2oc-fill-s{{background:linear-gradient(90deg,rgba(38,198,218,.3),#26c6da);box-shadow:0 0 6px #26c6da55;}}
+            .w2oc-level-price{{font-family:'JetBrains Mono',monospace;font-size:clamp(13px,2vw,15px);font-weight:700;min-width:80px;text-align:right;flex-shrink:0;}}
+            .w2oc-r-price{{color:#ff7043;text-shadow:0 0 8px #f4433655;}}
+            .w2oc-s-price{{color:#26c6da;text-shadow:0 0 8px #26c6da55;}}
+            .w2oc-footer{{background:rgba(6,13,20,0.8);border-top:1px solid rgba(79,195,247,0.1);padding:9px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}}
+            .w2oc-footer-l{{font-size:9px;color:#37474f;letter-spacing:1.5px;font-weight:600;}}
+            .w2oc-footer-r{{display:flex;align-items:center;gap:6px;font-size:9px;color:#4fc3f7;letter-spacing:2px;font-weight:700;}}
+            .w2oc-footer-dot{{width:6px;height:6px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;animation:w2oc-pulse 1.5s ease-in-out infinite;}}
+            @media(max-width:700px){{.w2oc-body{{grid-template-columns:1fr;}}.w2oc-gauge-col{{border-right:none;border-bottom:1px solid rgba(79,195,247,0.12);padding:18px;}}.w2oc-stats-row{{grid-template-columns:1fr;gap:8px;}}}}
+        </style>
+        <div class="w2oc-wrap">
+            <div class="w2oc-hdr">
+                <div class="w2oc-hdr-icon">&#128202;</div>
+                <div class="w2oc-hdr-text"><h3>Option Chain Analysis</h3><p>NIFTY &middot; WEEKLY EXPIRY &middot; LIVE DATA</p></div>
+                <div class="w2oc-hdr-badge">&#9679; LIVE</div>
+            </div>
+            <div class="w2oc-body">
+                <div class="w2oc-gauge-col">
+                    <div class="w2oc-gauge-wrap">
+                        <svg viewBox="0 0 170 170">
+                            <defs>
+                                <linearGradient id="pcr-arc-g2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="{arc_col1}"/><stop offset="100%" stop-color="{arc_col2}"/>
+                                </linearGradient>
+                                <filter id="arc-gl2"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                            </defs>
+                            <circle cx="85" cy="85" r="80" fill="none" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
+                            <circle cx="85" cy="85" r="65" fill="none" stroke="rgba(79,195,247,0.08)" stroke-width="11" stroke-dasharray="{circ*0.69:.1f} {circ:.1f}" stroke-dashoffset="{arc_offset:.1f}" stroke-linecap="round"/>
+                            <circle cx="85" cy="85" r="65" fill="none" stroke="{arc_col2}" stroke-width="18" stroke-dasharray="{arc_len:.1f} {circ:.1f}" stroke-dashoffset="{arc_offset:.1f}" stroke-linecap="round" opacity="0.07"/>
+                            <circle cx="85" cy="85" r="65" fill="none" stroke="url(#pcr-arc-g2)" stroke-width="11" stroke-dasharray="{arc_len:.1f} {circ:.1f}" stroke-dashoffset="{arc_offset:.1f}" stroke-linecap="round" filter="url(#arc-gl2)"/>
+                        </svg>
+                        <div class="w2oc-gauge-center">
+                            <span class="w2oc-gauge-lbl">PUT / CALL</span>
+                            <span class="w2oc-gauge-val">{pcr:.2f}</span>
+                            <span class="w2oc-gauge-sub">PCR RATIO</span>
+                        </div>
+                    </div>
+                    <div class="w2oc-gauge-title">&#9679; PCR GAUGE</div>
+                    <div class="w2oc-sent-pill">
+                        <div class="w2oc-sent-lbl">OI Sentiment</div>
+                        <div class="w2oc-sent-val">{sent_icon} {oi_sentiment.upper()}</div>
+                    </div>
+                    <div class="w2oc-maxpain">
+                        <div class="w2oc-maxpain-lbl">Max Pain Strike</div>
+                        <div class="w2oc-maxpain-val">&#8377;{max_pain:,}</div>
+                        <div class="w2oc-maxpain-note">Price magnet at expiry</div>
+                    </div>
+                </div>
+                <div class="w2oc-right">
+                    <div class="w2oc-stats-row">
+                        <div class="w2oc-stat-card" style="--sc-accent:#f44336;--sc-col:#ff7043;">
+                            <div class="w2oc-stat-card-lbl">Call Buildup (OI)</div>
+                            <div class="w2oc-stat-card-val">&#8679; {fmt_m(call_buildup)}</div>
+                        </div>
+                        <div class="w2oc-stat-card" style="--sc-accent:#26c6da;--sc-col:#4fc3f7;">
+                            <div class="w2oc-stat-card-lbl">Put Buildup (OI)</div>
+                            <div class="w2oc-stat-card-val">&#8679; {fmt_m(put_buildup)}</div>
+                        </div>
+                    </div>
+                    <div class="w2oc-div"></div>
+                    <div class="w2oc-levels-section">
+                        <div class="w2oc-levels-title" style="color:#f44336;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#f44336;display:inline-block;box-shadow:0 0 8px #f44336;flex-shrink:0;"></span>
+                            OI RESISTANCE WALLS
+                        </div>
+                        {r_bars_html}
+                    </div>
+                    <div class="w2oc-div"></div>
+                    <div class="w2oc-levels-section">
+                        <div class="w2oc-levels-title" style="color:#26c6da;">
+                            <span style="width:8px;height:8px;border-radius:50%;background:#26c6da;display:inline-block;box-shadow:0 0 8px #26c6da;flex-shrink:0;"></span>
+                            OI SUPPORT FLOORS
+                        </div>
+                        {s_bars_html}
+                    </div>
+                </div>
+            </div>
+            <div class="w2oc-footer">
+                <span class="w2oc-footer-l">OC PLASMA RADIAL &middot; R1+R2 CALLS &middot; S1+S2 PUTS &middot; MAX PAIN = MIN BUYER PAIN</span>
+                <span class="w2oc-footer-r"><div class="w2oc-footer-dot"></div>NIFTY &middot; WEEKLY EXPIRY</span>
+            </div>
+        </div>'''
+
+    # =========================================================================
+    #  WIDGET — PIVOT NEON RUNWAY  (all values integer, no decimals)
+    # =========================================================================
+    def _build_pivot_widget(self, pivot_points, current_price, nearest_levels):
+        pp  = pivot_points
+        ltp = round(current_price)   # display LTP as integer too
+
+        def dist(val):
+            if val is None: return 'N/A'
+            d = round(val) - ltp
+            return f"{d:+d}"
+
+        def is_nearest_r(val): return val == nearest_levels.get('nearest_resistance')
+        def is_nearest_s(val): return val == nearest_levels.get('nearest_support')
+
+        nr = nearest_levels.get('nearest_resistance')
+        ns = nearest_levels.get('nearest_support')
+        if nr and ns:
+            zone_text   = f"Between {self._nearest_level_name(pp, ns)} and {self._nearest_level_name(pp, nr)}"
+            above_dist  = ltp - round(pp.get('pivot', ltp))
+            zone_detail = f"{above_dist:+d} from PP"
+        elif nr:
+            zone_text   = f"Below {self._nearest_level_name(pp, nr)}"
+            zone_detail = f"Next R: &#8377;{round(nr):,}"
+        elif ns:
+            zone_text   = f"Above {self._nearest_level_name(pp, ns)}"
+            zone_detail = f"Next S: &#8377;{round(ns):,}"
+        else:
+            zone_text   = "At Pivot Zone"
+            zone_detail = f"PP: &#8377;{round(pp.get('pivot', ltp)):,}"
+
+        s1_val      = round(pp.get('s1', ltp - 100))
+        r1_val      = round(pp.get('r1', ltp + 100))
+        total_range = r1_val - s1_val
+        dot_pct     = max(5, min(95, ((ltp - s1_val) / total_range) * 100)) if total_range > 0 else 50
+
+        def res_row(lbl, val, key):
+            val = round(val) if val else val
+            is_near = is_nearest_r(val)
+            if key == 'r1':
+                nc='#ff7043'; pc='#ffccbc'; ps='18px'; rb='background:rgba(244,67,54,0.05);border-left:3px solid rgba(244,67,54,0.4);'
+            elif key == 'r2':
+                nc='rgba(255,112,67,0.75)'; pc='rgba(255,204,188,0.75)'; ps='16px'; rb=''
+            else:
+                nc='rgba(255,112,67,0.45)'; pc='rgba(255,204,188,0.45)'; ps='15px'; rb=''
+            near_html = '<span class="w1-near-tag w1-near-r">NEAREST&nbsp;R</span>' if is_near else ''
+            icon_html = '<span class="w1-icon w1-icon-r">&#9650;</span>' if lbl == 'R1' else ''
+            return f'''
+                <div class="w1-level-row" style="{rb}">
+                    <span class="w1-lv-name" style="color:{nc};">{lbl}</span>
+                    <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span class="w1-lv-price" style="color:{pc};font-size:{ps};">&#8377;{val:,}</span>
+                        {near_html}
+                    </span>
+                    {icon_html}
+                </div>'''
+
+        def sup_row(lbl, val, key):
+            val = round(val) if val else val
+            is_near = is_nearest_s(val)
+            if key == 's1':
+                nc='#26c6da'; pc='#b2ebf2'; ps='18px'; rb='background:rgba(38,198,218,0.04);border-right:3px solid rgba(38,198,218,0.4);'
+            elif key == 's2':
+                nc='rgba(38,198,218,0.75)'; pc='rgba(178,235,242,0.75)'; ps='16px'; rb=''
+            else:
+                nc='rgba(38,198,218,0.45)'; pc='rgba(178,235,242,0.45)'; ps='15px'; rb=''
+            near_html = '<span class="w1-near-tag w1-near-s">NEAREST&nbsp;S</span>' if is_near else ''
+            icon_html = '<span class="w1-icon w1-icon-s">&#9660;</span>' if lbl == 'S1' else ''
+            return f'''
+                <div class="w1-level-row w1-sup-row" style="{rb}">
+                    {icon_html}
+                    <span style="display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
+                        {near_html}
+                        <span class="w1-lv-price" style="color:{pc};font-size:{ps};">&#8377;{val:,}</span>
+                    </span>
+                    <span class="w1-lv-name" style="color:{nc};text-align:right;">{lbl}</span>
+                </div>'''
+
+        res_rows_html = (res_row('R3', pp.get('r3', ltp+150), 'r3') +
+                         res_row('R2', pp.get('r2', ltp+100), 'r2') +
+                         res_row('R1', pp.get('r1', ltp+50),  'r1'))
+        sup_rows_html = (sup_row('S1', pp.get('s1', ltp-50),  's1') +
+                         sup_row('S2', pp.get('s2', ltp-100), 's2') +
+                         sup_row('S3', pp.get('s3', ltp-150), 's3'))
+
+        pv_val   = round(pp.get('pivot', ltp))
+        ph_val   = round(pp.get('prev_high', ltp+80))
+        pl_val   = round(pp.get('prev_low',  ltp-80))
+        pc_val   = round(pp.get('prev_close', ltp))
+
+        return f'''
+        <style>
+            .w1-pv{{background:#0a1018;border:1px solid rgba(79,195,247,0.18);border-radius:12px;overflow:hidden;font-family:'Oxanium','Segoe UI',sans-serif;box-shadow:0 0 0 1px rgba(79,195,247,0.05),0 16px 50px rgba(0,0,0,.9);width:100%;}}
+            .w1-hdr{{background:linear-gradient(135deg,#0f2027,#141c28);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #26c6da;flex-wrap:wrap;gap:10px;}}
+            .w1-hdr-title{{font-size:clamp(13px,3vw,15px);font-weight:700;color:#b0bec5;letter-spacing:2px;}}
+            .w1-hdr-sub{{font-size:11px;color:#546e7a;margin-top:3px;letter-spacing:.5px;}}
+            .w1-hdr-badge{{background:#26c6da;color:#0a1018;font-size:10px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:2px;}}
+            .w1-gauge{{padding:14px 20px 4px;background:rgba(6,13,20,0.5);border-bottom:1px solid rgba(79,195,247,0.1);}}
+            .w1-gauge-track{{height:10px;border-radius:20px;position:relative;overflow:visible;background:linear-gradient(90deg,rgba(38,198,218,.1) 0%,rgba(38,198,218,.3) 30%,rgba(255,255,255,.03) 50%,rgba(244,67,54,.3) 70%,rgba(244,67,54,.1) 100%);border:1px solid rgba(79,195,247,0.12);}}
+            .w1-gdot{{position:absolute;left:{dot_pct:.1f}%;top:50%;transform:translate(-50%,-50%);width:18px;height:18px;background:#26c6da;border-radius:50%;border:3px solid #0a1018;box-shadow:0 0 0 2px #26c6da,0 0 18px rgba(38,198,218,.8);animation:w1-pulse 2s ease-in-out infinite;z-index:2;}}
+            @keyframes w1-pulse{{0%,100%{{box-shadow:0 0 0 2px #26c6da,0 0 18px rgba(38,198,218,.8);}}50%{{box-shadow:0 0 0 3px #26c6da,0 0 28px rgba(38,198,218,1);}}}}
+            .w1-gauge-labels{{display:flex;justify-content:space-between;margin-top:10px;padding-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:clamp(11px,2vw,13px);font-weight:700;flex-wrap:wrap;gap:4px;}}
+            .w1-gl-s{{color:#26c6da;}} .w1-gl-ltp{{color:#b0bec5;font-size:14px;}} .w1-gl-r{{color:#ff7043;}}
+            .w1-zone{{margin:10px 16px;padding:9px 16px;background:rgba(79,195,247,.04);border:1px solid rgba(79,195,247,0.12);border-radius:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}}
+            .w1-zone-dot{{width:9px;height:9px;border-radius:50%;background:#26c6da;flex-shrink:0;box-shadow:0 0 10px #26c6da;animation:w1-pulse 2s ease-in-out infinite;}}
+            .w1-zone-text{{font-size:clamp(12px,2.5vw,14px);font-weight:700;color:#b0bec5;}}
+            .w1-zone-val{{margin-left:auto;font-size:12px;color:#4fc3f7;font-family:'JetBrains Mono';white-space:nowrap;}}
+            .w1-candle{{display:flex;margin:0 16px 14px;border:1px solid rgba(79,195,247,0.12);border-radius:8px;overflow:hidden;}}
+            .w1-ci{{flex:1;padding:10px 14px;border-right:1px solid rgba(79,195,247,0.1);}}
+            .w1-ci:last-child{{border-right:none;}}
+            .w1-ci-lbl{{font-size:10px;color:#546e7a;letter-spacing:1.5px;margin-bottom:5px;text-transform:uppercase;}}
+            .w1-ci-val{{font-size:clamp(13px,2vw,15px);font-weight:700;font-family:'JetBrains Mono';}}
+            .w1-ci-h .w1-ci-val{{color:#ff7043;}} .w1-ci-l .w1-ci-val{{color:#26c6da;}} .w1-ci-c .w1-ci-val{{color:#78909c;}}
+            .w1-grid{{display:grid;grid-template-columns:1fr auto 1fr;border-top:1px solid rgba(79,195,247,0.1);}}
+            .w1-col-res{{border-right:1px solid rgba(79,195,247,0.1);}}
+            .w1-level-row{{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid rgba(79,195,247,0.06);gap:8px;min-height:54px;transition:background .15s;cursor:default;}}
+            .w1-level-row:last-child{{border-bottom:none;}}
+            .w1-level-row:hover{{background:rgba(79,195,247,.025)!important;}}
+            .w1-sup-row{{flex-direction:row-reverse;}}
+            .w1-lv-name{{font-size:clamp(12px,2vw,14px);font-weight:700;letter-spacing:1px;min-width:26px;flex-shrink:0;}}
+            .w1-lv-price{{font-family:'JetBrains Mono',monospace;font-weight:700;}}
+            .w1-icon{{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}}
+            .w1-icon-r{{background:rgba(244,67,54,.12);color:#ff7043;border:1px solid rgba(244,67,54,.4);}}
+            .w1-icon-s{{background:rgba(38,198,218,.12);color:#26c6da;border:1px solid rgba(38,198,218,.4);}}
+            .w1-near-tag{{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:800;letter-spacing:.5px;white-space:nowrap;}}
+            .w1-near-r{{background:rgba(244,67,54,.15);color:#ff7043;border:1px solid rgba(244,67,54,.4);}}
+            .w1-near-s{{background:rgba(38,198,218,.12);color:#26c6da;border:1px solid rgba(38,198,218,.4);}}
+            .w1-pivot-col{{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 14px;gap:6px;background:rgba(79,195,247,.03);border-left:1px solid rgba(79,195,247,0.1);border-right:1px solid rgba(79,195,247,0.1);min-width:130px;}}
+            .w1-pp-tag{{font-size:10px;color:#546e7a;letter-spacing:2px;text-transform:uppercase;}}
+            .w1-pp-val{{font-size:clamp(15px,3vw,19px);font-weight:700;color:#26c6da;font-family:'JetBrains Mono',monospace;text-shadow:0 0 12px rgba(38,198,218,.5);text-align:center;}}
+            .w1-pp-dist{{font-size:12px;color:#546e7a;font-family:'JetBrains Mono';}}
+            .w1-pp-sep{{width:34px;height:1px;background:rgba(79,195,247,0.12);margin:3px 0;}}
+            .w1-ltp-chip{{background:#26c6da;color:#0a1018;border-radius:8px;padding:6px 16px;text-align:center;margin-top:4px;}}
+            .w1-ltp-chip-lbl{{font-size:9px;font-weight:800;letter-spacing:2px;}}
+            .w1-ltp-chip-val{{font-size:clamp(13px,2.5vw,15px);font-weight:800;font-family:'JetBrains Mono';}}
+            .w1-footer{{display:flex;justify-content:space-between;align-items:center;padding:9px 20px;background:rgba(6,13,20,0.8);border-top:1px solid rgba(79,195,247,0.1);font-family:'JetBrains Mono',monospace;font-size:12px;flex-wrap:wrap;gap:8px;}}
+            .w1-footer-l{{color:#37474f;}} .w1-footer-r{{color:#26c6da;font-weight:700;}}
+            @media(max-width:600px){{.w1-grid{{grid-template-columns:1fr;}}.w1-pivot-col{{border:none;border-top:1px solid rgba(79,195,247,0.1);border-bottom:1px solid rgba(79,195,247,0.1);flex-direction:row;justify-content:space-around;padding:12px 16px;}}.w1-col-res{{border-right:none;}}.w1-candle{{flex-direction:column;}}.w1-ci{{border-right:none;border-bottom:1px solid rgba(79,195,247,0.1);}}.w1-ci:last-child{{border-bottom:none;}}}}
+        </style>
+        <div class="w1-pv">
+            <div class="w1-hdr">
+                <div>
+                    <div class="w1-hdr-title">&#128205; PIVOT POINTS</div>
+                    <div class="w1-hdr-sub">Traditional Method &middot; 30 Min &middot; Auto-calculated</div>
+                </div>
+                <div class="w1-hdr-badge">30 MIN</div>
+            </div>
+            <div class="w1-gauge">
+                <div class="w1-gauge-track"><div class="w1-gdot"></div></div>
+                <div class="w1-gauge-labels">
+                    <span class="w1-gl-s">S1 &#8377;{s1_val:,}</span>
+                    <span class="w1-gl-ltp">&#9650; &#8377;{ltp:,} LTP</span>
+                    <span class="w1-gl-r">R1 &#8377;{r1_val:,}</span>
+                </div>
+            </div>
+            <div class="w1-zone">
+                <div class="w1-zone-dot"></div>
+                <span class="w1-zone-text">{zone_text}</span>
+                <span class="w1-zone-val">{zone_detail}</span>
+            </div>
+            <div class="w1-candle">
+                <div class="w1-ci w1-ci-h"><div class="w1-ci-lbl">&#9650; PREV HIGH</div><div class="w1-ci-val">&#8377;{ph_val:,}</div></div>
+                <div class="w1-ci w1-ci-l"><div class="w1-ci-lbl">&#9660; PREV LOW</div><div class="w1-ci-val">&#8377;{pl_val:,}</div></div>
+                <div class="w1-ci w1-ci-c"><div class="w1-ci-lbl">&#9679; PREV CLOSE</div><div class="w1-ci-val">&#8377;{pc_val:,}</div></div>
+            </div>
+            <div class="w1-grid">
+                <div class="w1-col-res">{res_rows_html}</div>
+                <div class="w1-pivot-col">
+                    <div class="w1-pp-tag">PIVOT POINT</div>
+                    <div class="w1-pp-val">&#8377;{pv_val:,}</div>
+                    <div class="w1-pp-dist">{dist(pv_val)} from LTP</div>
+                    <div class="w1-pp-sep"></div>
+                    <div class="w1-ltp-chip">
+                        <div class="w1-ltp-chip-lbl">LTP</div>
+                        <div class="w1-ltp-chip-val">&#8377;{ltp:,}</div>
+                    </div>
+                </div>
+                <div class="w1-col-sup">{sup_rows_html}</div>
+            </div>
+            <div class="w1-footer">
+                <span class="w1-footer-l">Traditional &middot; 30 Min Candle</span>
+                <span class="w1-footer-r">LTP &#8377;{ltp:,}</span>
+            </div>
+        </div>'''
+
+    # =========================================================================
+    #  SECTION — OC PLASMA + PIVOT RUNWAY
+    # =========================================================================
+    def _option_chain_pivot_section_html(self, d):
+        if not d.get('has_option_data'):
+            oc_html = '<div style="padding:20px;color:#546e7a;font-size:13px;text-align:center;background:rgba(6,13,20,0.6);border:1px solid rgba(79,195,247,0.1);border-radius:12px;">Option data unavailable — connect to NSE</div>'
+        else:
+            oc_html = self._build_oc_plasma_widget(d)
+
+        pp      = d.get('pivot_points', {})
+        price   = d.get('current_price', 0)
+        nearest = self._nearest_pivot_levels(price, pp)
+        pv_html = self._build_pivot_widget(pp, price, nearest)
+
+        return f"""
+    <div class="section">
+        <div class="section-title"><span>&#128202;</span> OPTION CHAIN &amp; PIVOT POINTS <span style="font-size:11px;color:#4fc3f7;font-weight:400;letter-spacing:1px;">(30-Min Traditional)</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+            <div>{oc_html}</div>
+            <div>{pv_html}</div>
+        </div>
+        <style>@media(max-width:900px){{.ocp-grid{{grid-template-columns:1fr!important;}}}}</style>
+    </div>
+"""
+
+    def _key_levels_visual_section(self, d, _pct_cp, _pts_to_res, _pts_to_sup, _mp_node):
         if not technical:
             self.log("⚠️  Technical data unavailable"); return
         current    = technical['current_price']
@@ -2663,9 +3067,11 @@ class NiftyHTMLAnalyzer:
             pcr_status,pcr_badge,pcr_icon="N/A","neutral","🟡"
         if option_analysis:
             max_ce_strike=option_analysis['max_ce_oi_strike']; max_pe_strike=option_analysis['max_pe_oi_strike']
+            sec_ce_strike=option_analysis['sec_ce_oi_strike']; sec_pe_strike=option_analysis['sec_pe_oi_strike']
             atm_strike=option_analysis['atm_strike']
         else:
             atm_strike=int(current/50)*50; max_ce_strike=atm_strike+200; max_pe_strike=atm_strike-200
+            sec_ce_strike=atm_strike+300; sec_pe_strike=atm_strike-300
         if bias == "BULLISH":
             mid=((support+resistance)/2); entry_low=current-100 if current>mid else current-50
             entry_high=current-50 if current>mid else current; target_1=resistance; target_2=max_ce_strike
@@ -2696,11 +3102,9 @@ class NiftyHTMLAnalyzer:
             mp_pct=ce_oi_pct=pe_oi_pct=50
         fii_dii_raw  = fetch_fii_dii_data()
         fii_dii_summ = compute_fii_dii_summary(fii_dii_raw)
-
         # ── Pivot Points (30-min Traditional) ─────────────────────────────────
         print("\n📍 Calculating Pivot Points (30-min)...")
         pivot_points = self.calculate_pivot_points(current)
-
         self.html_data = {
             'timestamp': ist_now.strftime('%d-%b-%Y %H:%M IST'),
             'current_price': current, 'expiry': option_analysis['expiry'] if option_analysis else 'N/A',
@@ -2715,6 +3119,7 @@ class NiftyHTMLAnalyzer:
             'pcr_status': pcr_status, 'pcr_badge': pcr_badge, 'pcr_icon': pcr_icon,
             'max_pain': option_analysis['max_pain'] if option_analysis else 0, 'max_pain_pct': mp_pct,
             'max_ce_oi': max_ce_strike, 'max_pe_oi': max_pe_strike,
+            'sec_ce_oi': sec_ce_strike, 'sec_pe_oi': sec_pe_strike,
             'ce_oi_pct': ce_oi_pct, 'pe_oi_pct': pe_oi_pct,
             'total_ce_oi_change': option_analysis['total_ce_oi_change'] if option_analysis else 0,
             'total_pe_oi_change': option_analysis['total_pe_oi_change'] if option_analysis else 0,
@@ -3331,484 +3736,6 @@ class NiftyHTMLAnalyzer:
             '    </div>\n'
             '</div>\n'
         )
-
-    # =========================================================================
-    #  WIDGET — OC PLASMA RADIAL  |  Deep Ocean edition
-    # =========================================================================
-    def _build_oc_plasma_widget(self, d):
-        """Option Chain PCR gauge + OI walls. Data sourced from html_data."""
-        pcr          = d.get('pcr', 0)
-        max_pain     = d.get('max_pain', 0)
-        oi_class     = d.get('oi_class', 'neutral')
-        call_buildup = d.get('total_ce_oi_change', 0)
-        put_buildup  = d.get('total_pe_oi_change', 0)
-        max_ce       = d.get('max_ce_oi', 0)
-        max_pe       = d.get('max_pe_oi', 0)
-
-        if oi_class == 'bullish':
-            oi_sentiment = 'Bullish'
-            sent_col  = '#26c6da'; sent_bg = 'rgba(38,198,218,.12)'; sent_brd = '#0097a766'; sent_icon = '&#8679;'
-        elif oi_class == 'bearish':
-            oi_sentiment = 'Bearish'
-            sent_col  = '#ff5252'; sent_bg = 'rgba(255,82,82,.12)';  sent_brd = '#cc223366'; sent_icon = '&#8681;'
-        else:
-            oi_sentiment = 'Neutral'
-            sent_col  = '#ffb74d'; sent_bg = 'rgba(255,183,77,.10)'; sent_brd = '#f57c0066'; sent_icon = '&#8596;'
-
-        # PCR arc
-        circ      = 408.4
-        pcr_ratio = min(pcr / 2.0, 1.0)
-        arc_len   = pcr_ratio * (circ * 0.69)
-        arc_offset = -(circ * 0.155)
-
-        if pcr >= 1.2:   arc_col1, arc_col2 = '#00838f', '#26c6da'
-        elif pcr >= 1.0: arc_col1, arc_col2 = '#00695c', '#26c6da'
-        elif pcr >= 0.8: arc_col1, arc_col2 = '#6d4c00', '#ffb74d'
-        else:            arc_col1, arc_col2 = '#b71c1c', '#ff5252'
-
-        def fmt_m(val):
-            if abs(val) >= 1_000_000: return f"{val/1_000_000:.1f}M"
-            elif abs(val) >= 1_000:   return f"{val/1_000:.0f}K"
-            return str(int(val))
-
-        call_b_str = fmt_m(call_buildup)
-        put_b_str  = fmt_m(put_buildup)
-        avg_ce_iv  = 0   # not stored separately in this script — kept for layout compat
-
-        # OI resistance/support bars — use max_ce / max_pe strikes as walls
-        r_bars_html = f'''
-            <div class="w2oc-level-row">
-                <span class="w2oc-level-tag w2oc-r-tag">R1</span>
-                <div class="w2oc-level-track"><div class="w2oc-level-fill w2oc-fill-r" style="width:85%;"></div></div>
-                <span class="w2oc-level-price w2oc-r-price">&#8377;{max_ce:,}</span>
-            </div>''' if max_ce else '<div style="color:#546e7a;font-size:12px;padding:6px 0;">No data</div>'
-
-        s_bars_html = f'''
-            <div class="w2oc-level-row">
-                <span class="w2oc-level-tag w2oc-s-tag">S1</span>
-                <div class="w2oc-level-track"><div class="w2oc-level-fill w2oc-fill-s" style="width:85%;"></div></div>
-                <span class="w2oc-level-price w2oc-s-price">&#8377;{max_pe:,}</span>
-            </div>''' if max_pe else '<div style="color:#546e7a;font-size:12px;padding:6px 0;">No data</div>'
-
-        return f'''
-        <style>
-            .w2oc-wrap {{
-                font-family: 'Oxanium','Segoe UI',sans-serif;
-                background: linear-gradient(135deg,#0c1620,#0a1018);
-                border:1px solid rgba(79,195,247,0.2);border-radius:12px;overflow:hidden;
-                box-shadow:0 0 40px rgba(79,195,247,.04),0 20px 60px rgba(0,0,0,.9);
-            }}
-            .w2oc-hdr {{
-                background:linear-gradient(135deg,#0f2027,#141c28);
-                border-bottom:1px solid rgba(79,195,247,0.15);padding:14px 22px;
-                display:flex;align-items:center;gap:12px;position:relative;flex-wrap:wrap;
-            }}
-            .w2oc-hdr::after {{
-                content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-                background:linear-gradient(90deg,transparent,rgba(79,195,247,0.4),transparent);
-            }}
-            .w2oc-hdr-icon {{
-                width:36px;height:36px;border-radius:10px;
-                background:linear-gradient(135deg,#1a2840,#1e3050);
-                display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
-                box-shadow:0 0 14px rgba(79,195,247,.2);
-            }}
-            .w2oc-hdr-text h3 {{font-size:clamp(12px,2.5vw,14px);font-weight:700;color:#b0bec5;letter-spacing:2px;text-transform:uppercase;}}
-            .w2oc-hdr-text p {{font-size:10px;color:#546e7a;margin-top:3px;letter-spacing:1.5px;font-weight:600;}}
-            .w2oc-hdr-badge {{
-                margin-left:auto;background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.3);color:#4fc3f7;
-                padding:5px 16px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:2px;
-                text-shadow:0 0 10px rgba(79,195,247,.5);animation:w2oc-pulse 2s ease-in-out infinite;
-            }}
-            @keyframes w2oc-pulse {{0%,100%{{box-shadow:0 0 0 0 rgba(79,195,247,.2);}}50%{{box-shadow:0 0 0 6px rgba(79,195,247,0);}}}}
-            .w2oc-body {{display:grid;grid-template-columns:220px 1fr;}}
-            .w2oc-gauge-col {{
-                padding:22px 16px;border-right:1px solid rgba(79,195,247,0.12);background:rgba(6,13,20,0.6);
-                display:flex;flex-direction:column;align-items:center;gap:14px;
-            }}
-            .w2oc-gauge-wrap {{position:relative;width:160px;height:160px;}}
-            .w2oc-gauge-wrap svg {{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 8px {arc_col2}44);}}
-            .w2oc-gauge-center {{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}}
-            .w2oc-gauge-lbl {{font-size:9px;color:#546e7a;letter-spacing:3px;text-transform:uppercase;}}
-            .w2oc-gauge-val {{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:#b0bec5;letter-spacing:-1px;text-shadow:0 0 20px {arc_col2};}}
-            .w2oc-gauge-sub {{font-size:9px;color:#546e7a;letter-spacing:2px;}}
-            .w2oc-gauge-title {{font-size:10px;font-weight:700;color:{arc_col2};letter-spacing:2px;text-transform:uppercase;text-shadow:0 0 10px {arc_col2}88;}}
-            .w2oc-sent-pill {{background:{sent_bg};border:1px solid {sent_brd};border-radius:10px;padding:9px 14px;text-align:center;width:100%;}}
-            .w2oc-sent-lbl {{font-size:9px;color:#4fc3f7;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;font-weight:700;}}
-            .w2oc-sent-val {{font-size:18px;font-weight:700;color:{sent_col};text-shadow:0 0 14px {sent_col}88;letter-spacing:1px;}}
-            .w2oc-maxpain {{background:rgba(255,183,77,.06);border:1px solid rgba(255,183,77,.2);border-radius:10px;padding:9px 14px;text-align:center;width:100%;}}
-            .w2oc-maxpain-lbl {{font-size:9px;color:#ffb74d;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;font-weight:700;}}
-            .w2oc-maxpain-val {{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#ffb74d;text-shadow:0 0 14px rgba(255,183,77,.5);}}
-            .w2oc-maxpain-note {{font-size:9px;color:#546e7a;margin-top:3px;letter-spacing:1px;}}
-            .w2oc-right {{padding:18px 20px;display:flex;flex-direction:column;gap:16px;}}
-            .w2oc-stats-row {{display:grid;grid-template-columns:1fr 1fr;gap:10px;}}
-            .w2oc-stat-card {{background:rgba(79,195,247,.04);border:1px solid rgba(79,195,247,.12);border-radius:10px;padding:12px 14px;position:relative;overflow:hidden;}}
-            .w2oc-stat-card::before {{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--sc-accent);box-shadow:0 0 8px var(--sc-accent);}}
-            .w2oc-stat-card-lbl {{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;color:#78909c;}}
-            .w2oc-stat-card-val {{font-family:'JetBrains Mono',monospace;font-size:clamp(16px,3vw,20px);font-weight:700;color:var(--sc-col);text-shadow:0 0 12px var(--sc-accent);}}
-            .w2oc-div {{height:1px;background:linear-gradient(90deg,transparent,rgba(79,195,247,0.15),transparent);}}
-            .w2oc-levels-section {{display:flex;flex-direction:column;gap:9px;}}
-            .w2oc-levels-title {{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px;display:flex;align-items:center;gap:7px;}}
-            .w2oc-level-row {{display:flex;align-items:center;gap:10px;}}
-            .w2oc-level-tag {{font-size:10px;font-weight:800;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}}
-            .w2oc-r-tag {{background:rgba(244,67,54,.12);border:1px solid rgba(244,67,54,.4);color:#ef5350;}}
-            .w2oc-s-tag {{background:rgba(38,198,218,.12);border:1px solid rgba(38,198,218,.4);color:#26c6da;}}
-            .w2oc-level-track {{flex:1;height:7px;background:rgba(6,13,20,0.7);border-radius:4px;overflow:hidden;}}
-            .w2oc-level-fill {{height:100%;border-radius:4px;}}
-            .w2oc-fill-r {{background:linear-gradient(90deg,rgba(244,67,54,.3),#f44336);box-shadow:0 0 6px #f4433655;}}
-            .w2oc-fill-s {{background:linear-gradient(90deg,rgba(38,198,218,.3),#26c6da);box-shadow:0 0 6px #26c6da55;}}
-            .w2oc-level-price {{font-family:'JetBrains Mono',monospace;font-size:clamp(13px,2vw,15px);font-weight:700;min-width:80px;text-align:right;flex-shrink:0;}}
-            .w2oc-r-price {{color:#ff7043;text-shadow:0 0 8px #f4433655;}}
-            .w2oc-s-price {{color:#26c6da;text-shadow:0 0 8px #26c6da55;}}
-            .w2oc-footer {{background:rgba(6,13,20,0.8);border-top:1px solid rgba(79,195,247,0.1);padding:9px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}}
-            .w2oc-footer-l {{font-size:9px;color:#37474f;letter-spacing:1.5px;font-weight:600;}}
-            .w2oc-footer-r {{display:flex;align-items:center;gap:6px;font-size:9px;color:#4fc3f7;letter-spacing:2px;font-weight:700;}}
-            .w2oc-footer-dot {{width:6px;height:6px;border-radius:50%;background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;animation:w2oc-pulse 1.5s ease-in-out infinite;}}
-            @media (max-width:700px) {{
-                .w2oc-body {{grid-template-columns:1fr;}}
-                .w2oc-gauge-col {{border-right:none;border-bottom:1px solid rgba(79,195,247,0.12);padding:18px;}}
-                .w2oc-stats-row {{grid-template-columns:1fr;gap:8px;}}
-            }}
-        </style>
-        <div class="w2oc-wrap">
-            <div class="w2oc-hdr">
-                <div class="w2oc-hdr-icon">&#128202;</div>
-                <div class="w2oc-hdr-text">
-                    <h3>Option Chain Analysis</h3>
-                    <p>NIFTY &middot; WEEKLY EXPIRY &middot; LIVE DATA</p>
-                </div>
-                <div class="w2oc-hdr-badge">&#9679; LIVE</div>
-            </div>
-            <div class="w2oc-body">
-                <div class="w2oc-gauge-col">
-                    <div class="w2oc-gauge-wrap">
-                        <svg viewBox="0 0 170 170">
-                            <defs>
-                                <linearGradient id="pcr-arc-grad2" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" stop-color="{arc_col1}"/>
-                                    <stop offset="100%" stop-color="{arc_col2}"/>
-                                </linearGradient>
-                                <filter id="arc-glow2">
-                                    <feGaussianBlur stdDeviation="3" result="blur"/>
-                                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                                </filter>
-                            </defs>
-                            <circle cx="85" cy="85" r="80" fill="none" stroke="rgba(79,195,247,0.06)" stroke-width="1"/>
-                            <circle cx="85" cy="85" r="65" fill="none" stroke="rgba(79,195,247,0.08)" stroke-width="11"
-                                stroke-dasharray="{circ * 0.69:.1f} {circ:.1f}" stroke-dashoffset="{arc_offset:.1f}" stroke-linecap="round"/>
-                            <circle cx="85" cy="85" r="65" fill="none" stroke="{arc_col2}" stroke-width="18"
-                                stroke-dasharray="{arc_len:.1f} {circ:.1f}" stroke-dashoffset="{arc_offset:.1f}" stroke-linecap="round" opacity="0.07"/>
-                            <circle cx="85" cy="85" r="65" fill="none" stroke="url(#pcr-arc-grad2)" stroke-width="11"
-                                stroke-dasharray="{arc_len:.1f} {circ:.1f}" stroke-dashoffset="{arc_offset:.1f}"
-                                stroke-linecap="round" filter="url(#arc-glow2)"/>
-                        </svg>
-                        <div class="w2oc-gauge-center">
-                            <span class="w2oc-gauge-lbl">PUT / CALL</span>
-                            <span class="w2oc-gauge-val">{pcr:.2f}</span>
-                            <span class="w2oc-gauge-sub">PCR RATIO</span>
-                        </div>
-                    </div>
-                    <div class="w2oc-gauge-title">&#9679; PCR GAUGE</div>
-                    <div class="w2oc-sent-pill">
-                        <div class="w2oc-sent-lbl">OI Sentiment</div>
-                        <div class="w2oc-sent-val">{sent_icon} {oi_sentiment.upper()}</div>
-                    </div>
-                    <div class="w2oc-maxpain">
-                        <div class="w2oc-maxpain-lbl">Max Pain Strike</div>
-                        <div class="w2oc-maxpain-val">&#8377;{max_pain:,}</div>
-                        <div class="w2oc-maxpain-note">Price magnet at expiry</div>
-                    </div>
-                </div>
-                <div class="w2oc-right">
-                    <div class="w2oc-stats-row">
-                        <div class="w2oc-stat-card" style="--sc-accent:#f44336;--sc-col:#ff7043;">
-                            <div class="w2oc-stat-card-lbl">Call Buildup (OI)</div>
-                            <div class="w2oc-stat-card-val">&#8679; {call_b_str}</div>
-                        </div>
-                        <div class="w2oc-stat-card" style="--sc-accent:#26c6da;--sc-col:#4fc3f7;">
-                            <div class="w2oc-stat-card-lbl">Put Buildup (OI)</div>
-                            <div class="w2oc-stat-card-val">&#8679; {put_b_str}</div>
-                        </div>
-                    </div>
-                    <div class="w2oc-div"></div>
-                    <div class="w2oc-levels-section">
-                        <div class="w2oc-levels-title" style="color:#f44336;">
-                            <span style="width:8px;height:8px;border-radius:50%;background:#f44336;display:inline-block;box-shadow:0 0 8px #f44336;flex-shrink:0;"></span>
-                            OI RESISTANCE WALLS
-                        </div>
-                        {r_bars_html}
-                    </div>
-                    <div class="w2oc-div"></div>
-                    <div class="w2oc-levels-section">
-                        <div class="w2oc-levels-title" style="color:#26c6da;">
-                            <span style="width:8px;height:8px;border-radius:50%;background:#26c6da;display:inline-block;box-shadow:0 0 8px #26c6da;flex-shrink:0;"></span>
-                            OI SUPPORT FLOORS
-                        </div>
-                        {s_bars_html}
-                    </div>
-                </div>
-            </div>
-            <div class="w2oc-footer">
-                <span class="w2oc-footer-l">OC PLASMA RADIAL &middot; MAX PAIN = MIN BUYER PAIN</span>
-                <span class="w2oc-footer-r"><div class="w2oc-footer-dot"></div>NIFTY &middot; WEEKLY EXPIRY</span>
-            </div>
-        </div>'''
-
-    # =========================================================================
-    #  WIDGET — PIVOT NEON RUNWAY  |  Deep Ocean edition
-    # =========================================================================
-    def _build_pivot_widget(self, pivot_points, current_price, nearest_levels):
-        pp = pivot_points
-
-        def dist(val):
-            if val is None: return 'N/A'
-            return f"{val - current_price:+.2f}"
-
-        def is_nearest_r(val): return val == nearest_levels.get('nearest_resistance')
-        def is_nearest_s(val): return val == nearest_levels.get('nearest_support')
-
-        nr = nearest_levels.get('nearest_resistance')
-        ns = nearest_levels.get('nearest_support')
-        if nr and ns:
-            zone_text   = f"Between {self._nearest_level_name(pp, ns)} and {self._nearest_level_name(pp, nr)}"
-            above_dist  = current_price - pp.get('pivot', current_price)
-            zone_detail = f"+{above_dist:.2f} above PP" if above_dist >= 0 else f"{above_dist:.2f} below PP"
-        elif nr:
-            zone_text   = f"Below {self._nearest_level_name(pp, nr)}"
-            zone_detail = f"Next R: &#8377;{nr}"
-        elif ns:
-            zone_text   = f"Above {self._nearest_level_name(pp, ns)}"
-            zone_detail = f"Next S: &#8377;{ns}"
-        else:
-            zone_text   = "At Pivot Zone"
-            zone_detail = f"PP: &#8377;{pp.get('pivot','N/A')}"
-
-        s1_val = pp.get('s1', current_price - 100)
-        r1_val = pp.get('r1', current_price + 100)
-        total_range = r1_val - s1_val
-        if total_range > 0:
-            dot_pct = max(5, min(95, ((current_price - s1_val) / total_range) * 100))
-        else:
-            dot_pct = 50
-
-        def res_row(lbl, val, key):
-            is_near = is_nearest_r(val)
-            if key == 'r1':
-                nc='#ff7043'; pc='#ffccbc'; ps='18px'; rb='background:rgba(244,67,54,0.05);border-left:3px solid rgba(244,67,54,0.4);'
-            elif key == 'r2':
-                nc='rgba(255,112,67,0.75)'; pc='rgba(255,204,188,0.75)'; ps='16px'; rb=''
-            else:
-                nc='rgba(255,112,67,0.45)'; pc='rgba(255,204,188,0.45)'; ps='15px'; rb=''
-            near_html = '<span class="w1-near-tag w1-near-r">NEAREST&nbsp;R</span>' if is_near else ''
-            icon_html = '<span class="w1-icon w1-icon-r">&#9650;</span>' if lbl == 'R1' else ''
-            return f'''
-                <div class="w1-level-row" style="{rb}">
-                    <span class="w1-lv-name" style="color:{nc};">{lbl}</span>
-                    <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                        <span class="w1-lv-price" style="color:{pc};font-size:{ps};">&#8377;{val}</span>
-                        {near_html}
-                    </span>
-                    {icon_html}
-                </div>'''
-
-        def sup_row(lbl, val, key):
-            is_near = is_nearest_s(val)
-            if key == 's1':
-                nc='#26c6da'; pc='#b2ebf2'; ps='18px'; rb='background:rgba(38,198,218,0.04);border-right:3px solid rgba(38,198,218,0.4);'
-            elif key == 's2':
-                nc='rgba(38,198,218,0.75)'; pc='rgba(178,235,242,0.75)'; ps='16px'; rb=''
-            else:
-                nc='rgba(38,198,218,0.45)'; pc='rgba(178,235,242,0.45)'; ps='15px'; rb=''
-            near_html = '<span class="w1-near-tag w1-near-s">NEAREST&nbsp;S</span>' if is_near else ''
-            icon_html = '<span class="w1-icon w1-icon-s">&#9660;</span>' if lbl == 'S1' else ''
-            return f'''
-                <div class="w1-level-row w1-sup-row" style="{rb}">
-                    {icon_html}
-                    <span style="display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
-                        {near_html}
-                        <span class="w1-lv-price" style="color:{pc};font-size:{ps};">&#8377;{val}</span>
-                    </span>
-                    <span class="w1-lv-name" style="color:{nc};text-align:right;">{lbl}</span>
-                </div>'''
-
-        res_rows_html = (res_row('R3', pp.get('r3', 'N/A'), 'r3') +
-                         res_row('R2', pp.get('r2', 'N/A'), 'r2') +
-                         res_row('R1', pp.get('r1', 'N/A'), 'r1'))
-        sup_rows_html = (sup_row('S1', pp.get('s1', 'N/A'), 's1') +
-                         sup_row('S2', pp.get('s2', 'N/A'), 's2') +
-                         sup_row('S3', pp.get('s3', 'N/A'), 's3'))
-
-        return f'''
-        <style>
-            .w1-pv {{
-                background:#0a1018;border:1px solid rgba(79,195,247,0.18);border-radius:12px;overflow:hidden;
-                font-family:'Oxanium','Segoe UI',sans-serif;
-                box-shadow:0 0 0 1px rgba(79,195,247,0.05),0 16px 50px rgba(0,0,0,.9);width:100%;
-            }}
-            .w1-hdr {{
-                background:linear-gradient(135deg,#0f2027,#141c28);padding:14px 20px;
-                display:flex;align-items:center;justify-content:space-between;
-                border-bottom:2px solid #26c6da;flex-wrap:wrap;gap:10px;
-            }}
-            .w1-hdr-title {{font-size:clamp(13px,3vw,15px);font-weight:700;color:#b0bec5;letter-spacing:2px;}}
-            .w1-hdr-sub   {{font-size:11px;color:#546e7a;margin-top:3px;letter-spacing:.5px;}}
-            .w1-hdr-badge {{background:#26c6da;color:#0a1018;font-size:10px;font-weight:800;padding:4px 14px;border-radius:20px;letter-spacing:2px;}}
-            .w1-gauge {{padding:14px 20px 4px;background:rgba(6,13,20,0.5);border-bottom:1px solid rgba(79,195,247,0.1);}}
-            .w1-gauge-track {{
-                height:10px;border-radius:20px;position:relative;overflow:visible;
-                background:linear-gradient(90deg,rgba(38,198,218,.1) 0%,rgba(38,198,218,.3) 30%,rgba(255,255,255,.03) 50%,rgba(244,67,54,.3) 70%,rgba(244,67,54,.1) 100%);
-                border:1px solid rgba(79,195,247,0.12);
-            }}
-            .w1-gdot {{
-                position:absolute;left:{dot_pct:.1f}%;top:50%;transform:translate(-50%,-50%);
-                width:18px;height:18px;background:#26c6da;border-radius:50%;
-                border:3px solid #0a1018;box-shadow:0 0 0 2px #26c6da,0 0 18px rgba(38,198,218,.8);
-                animation:w1-pulse 2s ease-in-out infinite;z-index:2;
-            }}
-            @keyframes w1-pulse {{
-                0%,100%{{box-shadow:0 0 0 2px #26c6da,0 0 18px rgba(38,198,218,.8);}}
-                50%     {{box-shadow:0 0 0 3px #26c6da,0 0 28px rgba(38,198,218,1);}}
-            }}
-            .w1-gauge-labels {{
-                display:flex;justify-content:space-between;margin-top:10px;padding-bottom:10px;
-                font-family:'JetBrains Mono',monospace;font-size:clamp(11px,2vw,13px);font-weight:700;flex-wrap:wrap;gap:4px;
-            }}
-            .w1-gl-s {{color:#26c6da;}} .w1-gl-ltp {{color:#b0bec5;font-size:14px;}} .w1-gl-r {{color:#ff7043;}}
-            .w1-zone {{
-                margin:10px 16px;padding:9px 16px;background:rgba(79,195,247,.04);
-                border:1px solid rgba(79,195,247,0.12);border-radius:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-            }}
-            .w1-zone-dot {{width:9px;height:9px;border-radius:50%;background:#26c6da;flex-shrink:0;box-shadow:0 0 10px #26c6da;animation:w1-pulse 2s ease-in-out infinite;}}
-            .w1-zone-text {{font-size:clamp(12px,2.5vw,14px);font-weight:700;color:#b0bec5;letter-spacing:.5px;}}
-            .w1-zone-val  {{margin-left:auto;font-size:12px;color:#4fc3f7;font-family:'JetBrains Mono';white-space:nowrap;}}
-            .w1-candle {{display:flex;margin:0 16px 14px;border:1px solid rgba(79,195,247,0.12);border-radius:8px;overflow:hidden;}}
-            .w1-ci {{flex:1;padding:10px 14px;border-right:1px solid rgba(79,195,247,0.1);}}
-            .w1-ci:last-child {{border-right:none;}}
-            .w1-ci-lbl {{font-size:10px;color:#546e7a;letter-spacing:1.5px;margin-bottom:5px;text-transform:uppercase;}}
-            .w1-ci-val {{font-size:clamp(13px,2vw,15px);font-weight:700;font-family:'JetBrains Mono';}}
-            .w1-ci-h .w1-ci-val {{color:#ff7043;}} .w1-ci-l .w1-ci-val {{color:#26c6da;}} .w1-ci-c .w1-ci-val {{color:#78909c;}}
-            .w1-grid {{display:grid;grid-template-columns:1fr auto 1fr;border-top:1px solid rgba(79,195,247,0.1);}}
-            .w1-col-res {{border-right:1px solid rgba(79,195,247,0.1);}}
-            .w1-level-row {{
-                display:flex;align-items:center;justify-content:space-between;padding:12px 18px;
-                border-bottom:1px solid rgba(79,195,247,0.06);gap:8px;min-height:54px;transition:background .15s;cursor:default;
-            }}
-            .w1-level-row:last-child {{border-bottom:none;}}
-            .w1-level-row:hover {{background:rgba(79,195,247,.025)!important;}}
-            .w1-sup-row {{flex-direction:row-reverse;}}
-            .w1-lv-name  {{font-size:clamp(12px,2vw,14px);font-weight:700;letter-spacing:1px;min-width:26px;flex-shrink:0;}}
-            .w1-lv-price {{font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.5px;}}
-            .w1-icon {{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}}
-            .w1-icon-r {{background:rgba(244,67,54,.12);color:#ff7043;border:1px solid rgba(244,67,54,.4);}}
-            .w1-icon-s {{background:rgba(38,198,218,.12);color:#26c6da;border:1px solid rgba(38,198,218,.4);}}
-            .w1-near-tag {{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:800;letter-spacing:.5px;white-space:nowrap;}}
-            .w1-near-r {{background:rgba(244,67,54,.15);color:#ff7043;border:1px solid rgba(244,67,54,.4);}}
-            .w1-near-s {{background:rgba(38,198,218,.12);color:#26c6da;border:1px solid rgba(38,198,218,.4);}}
-            .w1-pivot-col {{
-                display:flex;flex-direction:column;align-items:center;justify-content:center;
-                padding:18px 14px;gap:6px;background:rgba(79,195,247,.03);
-                border-left:1px solid rgba(79,195,247,0.1);border-right:1px solid rgba(79,195,247,0.1);min-width:130px;
-            }}
-            .w1-pp-tag  {{font-size:10px;color:#546e7a;letter-spacing:2px;text-transform:uppercase;}}
-            .w1-pp-val  {{font-size:clamp(15px,3vw,19px);font-weight:700;color:#26c6da;font-family:'JetBrains Mono',monospace;text-shadow:0 0 12px rgba(38,198,218,.5);text-align:center;}}
-            .w1-pp-dist {{font-size:12px;color:#546e7a;font-family:'JetBrains Mono';}}
-            .w1-pp-sep  {{width:34px;height:1px;background:rgba(79,195,247,0.12);margin:3px 0;}}
-            .w1-ltp-chip {{background:#26c6da;color:#0a1018;border-radius:8px;padding:6px 16px;text-align:center;margin-top:4px;}}
-            .w1-ltp-chip-lbl {{font-size:9px;font-weight:800;letter-spacing:2px;}}
-            .w1-ltp-chip-val {{font-size:clamp(13px,2.5vw,15px);font-weight:800;font-family:'JetBrains Mono';}}
-            .w1-footer {{display:flex;justify-content:space-between;align-items:center;padding:9px 20px;background:rgba(6,13,20,0.8);border-top:1px solid rgba(79,195,247,0.1);font-family:'JetBrains Mono',monospace;font-size:12px;flex-wrap:wrap;gap:8px;}}
-            .w1-footer-l {{color:#37474f;letter-spacing:1px;}}
-            .w1-footer-r {{color:#26c6da;font-weight:700;text-shadow:0 0 8px rgba(38,198,218,.4);}}
-            @media (max-width:600px) {{
-                .w1-grid {{grid-template-columns:1fr;}}
-                .w1-pivot-col {{border:none;border-top:1px solid rgba(79,195,247,0.1);border-bottom:1px solid rgba(79,195,247,0.1);flex-direction:row;justify-content:space-around;padding:12px 16px;}}
-                .w1-col-res {{border-right:none;}}
-                .w1-candle {{flex-direction:column;}}
-                .w1-ci {{border-right:none;border-bottom:1px solid rgba(79,195,247,0.1);}}
-                .w1-ci:last-child {{border-bottom:none;}}
-            }}
-        </style>
-        <div class="w1-pv">
-            <div class="w1-hdr">
-                <div>
-                    <div class="w1-hdr-title">&#128205; PIVOT POINTS</div>
-                    <div class="w1-hdr-sub">Traditional Method &middot; 30 Min &middot; Auto-calculated</div>
-                </div>
-                <div class="w1-hdr-badge">30 MIN</div>
-            </div>
-            <div class="w1-gauge">
-                <div class="w1-gauge-track"><div class="w1-gdot"></div></div>
-                <div class="w1-gauge-labels">
-                    <span class="w1-gl-s">S1 &#8377;{pp.get('s1','N/A')}</span>
-                    <span class="w1-gl-ltp">&#9650; &#8377;{current_price} LTP</span>
-                    <span class="w1-gl-r">R1 &#8377;{pp.get('r1','N/A')}</span>
-                </div>
-            </div>
-            <div class="w1-zone">
-                <div class="w1-zone-dot"></div>
-                <span class="w1-zone-text">{zone_text}</span>
-                <span class="w1-zone-val">{zone_detail}</span>
-            </div>
-            <div class="w1-candle">
-                <div class="w1-ci w1-ci-h"><div class="w1-ci-lbl">&#9650; PREV HIGH</div><div class="w1-ci-val">&#8377;{pp.get('prev_high','N/A')}</div></div>
-                <div class="w1-ci w1-ci-l"><div class="w1-ci-lbl">&#9660; PREV LOW</div><div class="w1-ci-val">&#8377;{pp.get('prev_low','N/A')}</div></div>
-                <div class="w1-ci w1-ci-c"><div class="w1-ci-lbl">&#9679; PREV CLOSE</div><div class="w1-ci-val">&#8377;{pp.get('prev_close','N/A')}</div></div>
-            </div>
-            <div class="w1-grid">
-                <div class="w1-col-res">{res_rows_html}</div>
-                <div class="w1-pivot-col">
-                    <div class="w1-pp-tag">PIVOT POINT</div>
-                    <div class="w1-pp-val">&#8377;{pp.get('pivot','N/A')}</div>
-                    <div class="w1-pp-dist">{dist(pp.get('pivot'))} from LTP</div>
-                    <div class="w1-pp-sep"></div>
-                    <div class="w1-ltp-chip">
-                        <div class="w1-ltp-chip-lbl">LTP</div>
-                        <div class="w1-ltp-chip-val">&#8377;{current_price}</div>
-                    </div>
-                </div>
-                <div class="w1-col-sup">{sup_rows_html}</div>
-            </div>
-            <div class="w1-footer">
-                <span class="w1-footer-l">Traditional &middot; 30 Min Candle</span>
-                <span class="w1-footer-r">LTP &#8377;{current_price}</span>
-            </div>
-        </div>'''
-
-    # =========================================================================
-    #  SECTION — OC PLASMA + PIVOT RUNWAY  (placed after KEY LEVELS, before FII/DII)
-    # =========================================================================
-    def _option_chain_pivot_section_html(self, d):
-        """
-        Renders two full widgets side-by-side (stacked on mobile):
-          LEFT  — Option Chain Plasma Radial (PCR gauge, OI sentiment, Max Pain, buildup bars, OI walls)
-          RIGHT — Pivot Points Neon Runway (30-min Traditional: PP/R1-R3/S1-S3, PREV H/L/C, LTP runway)
-        Inserted AFTER Key Levels and BEFORE FII/DII on the main tab.
-        Zero changes to any existing logic — all data comes from html_data already populated.
-        """
-        if not d.get('has_option_data'):
-            oc_html = '<div style="padding:20px;color:#546e7a;font-size:13px;text-align:center;">Option data unavailable — run with NSE connection</div>'
-        else:
-            oc_html = self._build_oc_plasma_widget(d)
-
-        pp            = d.get('pivot_points', {})
-        current_price = d.get('current_price', 0)
-        nearest       = self._nearest_pivot_levels(current_price, pp)
-        pv_html       = self._build_pivot_widget(pp, current_price, nearest)
-
-        return f"""
-    <div class="section">
-        <div class="section-title"><span>&#128202;</span> OPTION CHAIN &amp; PIVOT POINTS <span style="font-size:11px;color:#4fc3f7;font-weight:400;letter-spacing:1px;">(30-Min Traditional)</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
-            <div>{oc_html}</div>
-            <div>{pv_html}</div>
-        </div>
-        <style>
-            @media (max-width:900px) {{
-                .ocp-grid {{ grid-template-columns:1fr !important; }}
-            }}
-        </style>
-    </div>
-"""
 
     def _key_levels_visual_section(self, d, _pct_cp, _pts_to_res, _pts_to_sup, _mp_node):
         mp_row = f'<tr><td style="color:#ffb74d;">&#127919; Max Pain</td><td style="color:#ffb74d;">&#8377;{d["max_pain"]:,}</td></tr>' if d['has_option_data'] else ''
