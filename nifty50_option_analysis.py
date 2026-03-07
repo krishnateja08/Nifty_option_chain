@@ -3387,6 +3387,202 @@ class NiftyHTMLAnalyzer:
 </div>
 """
 
+    def _top10_oi_widget_html(self, d):
+        """
+        TOP 10 OPEN INTEREST widget — same format as Neon Ledger image.
+        Shows Top 5 CE (calls) and Top 5 PE (puts) by Open Interest.
+        Reads from d['df'] — zero logic changes anywhere.
+        """
+        _df = d.get('df', None)
+        atm = d.get('atm_strike', 0)
+        spot = d.get('current_price', 0)
+
+        if _df is None or _df.empty:
+            return ''
+
+        # ── Top 5 CE by OI (resistance side — above ATM) ──
+        ce_top5 = _df.nlargest(5, 'CE_OI')[['Strike','CE_OI','CE_OI_Change','CE_LTP','CE_Vol']].reset_index(drop=True)
+        # ── Top 5 PE by OI (support side — below ATM) ──
+        pe_top5 = _df.nlargest(5, 'PE_OI')[['Strike','PE_OI','PE_OI_Change','PE_LTP','PE_Vol']].reset_index(drop=True)
+
+        # Max OI for bar width scaling
+        ce_max_oi = ce_top5['CE_OI'].max() or 1
+        pe_max_oi = pe_top5['PE_OI'].max() or 1
+
+        def strike_type(strike, atm_s):
+            if strike == atm_s:   return 'ATM', '#00d4ff', 'rgba(0,212,255,0.12)', 'rgba(0,212,255,0.4)'
+            elif strike > atm_s:  return 'OTM', '#546e7a', 'rgba(84,110,122,0.1)', 'rgba(84,110,122,0.3)'
+            else:                 return 'ITM', '#ffb74d', 'rgba(255,183,77,0.12)', 'rgba(255,183,77,0.35)'
+
+        def fmt_oi(v):
+            if v >= 1_000_000: return f"{v/1_000_000:.1f}M"
+            if v >= 1_000:     return f"{v/1_000:.1f}K"
+            return str(v)
+
+        def fmt_vol(v):
+            if v >= 1_000_000: return f"{v/1_000_000:.1f}M"
+            if v >= 1_000:     return f"{v/1_000:.1f}K"
+            return str(int(v))
+
+        def chg_color(v):
+            return '#00e676' if v > 0 else ('#ff5252' if v < 0 else '#546e7a')
+
+        def chg_fmt(v):
+            return f"+{int(v):,}" if v > 0 else f"{int(v):,}"
+
+        # ── Build CE rows ──
+        ce_rows = ''
+        for i, row in ce_top5.iterrows():
+            strike   = int(row['Strike'])
+            oi_val   = int(row['CE_OI'])
+            oi_chg   = row['CE_OI_Change']
+            ltp      = row['CE_LTP']
+            vol      = row['CE_Vol']
+            bar_w    = round(oi_val / ce_max_oi * 100)
+            stype, sc, sbg, sbdr = strike_type(strike, atm)
+            rank_bg  = 'rgba(255,51,85,0.2)' if i == 0 else 'rgba(255,255,255,0.05)'
+            ce_rows += f"""
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                  <td style="padding:9px 10px;text-align:center;">
+                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:{rank_bg};font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff3355;">{i+1}</span>
+                  </td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;{strike:,}</td>
+                  <td style="padding:9px 10px;">
+                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
+                                 color:{sc};background:{sbg};border:1px solid {sbdr};">{stype}</span>
+                  </td>
+                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">{fmt_oi(oi_val)}</div>
+                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+                      <div style="height:100%;width:{bar_w}%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
+                    </div>
+                  </td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:{chg_color(oi_chg)};">{chg_fmt(oi_chg)}</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#b0bec5;">&#8377;{ltp:.2f}</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">{fmt_vol(vol)}</td>
+                </tr>"""
+
+        # ── Build PE rows ──
+        pe_rows = ''
+        for i, row in pe_top5.iterrows():
+            strike   = int(row['Strike'])
+            oi_val   = int(row['PE_OI'])
+            oi_chg   = row['PE_OI_Change']
+            ltp      = row['PE_LTP']
+            vol      = row['PE_Vol']
+            bar_w    = round(oi_val / pe_max_oi * 100)
+            stype, sc, sbg, sbdr = strike_type(strike, atm)
+            rank_bg  = 'rgba(0,230,118,0.18)' if i == 0 else 'rgba(255,255,255,0.05)'
+            pe_rows += f"""
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                  <td style="padding:9px 10px;text-align:center;">
+                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:{rank_bg};font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#00e676;">{i+1}</span>
+                  </td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;{strike:,}</td>
+                  <td style="padding:9px 10px;">
+                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
+                                 color:{sc};background:{sbg};border:1px solid {sbdr};">{stype}</span>
+                  </td>
+                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">{fmt_oi(oi_val)}</div>
+                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+                      <div style="height:100%;width:{bar_w}%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
+                    </div>
+                  </td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:{chg_color(oi_chg)};">{chg_fmt(oi_chg)}</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#b0bec5;">&#8377;{ltp:.2f}</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">{fmt_vol(vol)}</td>
+                </tr>"""
+
+        th_style = "padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#546e7a;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);"
+
+        return f"""
+<div style="background:#060d18;border:1px solid rgba(0,200,255,0.1);border-radius:14px;overflow:hidden;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">
+
+  <!-- ── Widget Header ── -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 18px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(0,200,255,0.08);">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:32px;height:32px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;">&#9651;</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:#e2eaf5;letter-spacing:1px;">TOP 10 OPEN INTEREST</div>
+        <div style="font-size:9px;color:#546e7a;letter-spacing:1px;margin-top:1px;">NIFTY &middot; &plusmn;10 STRIKES FROM ATM &middot; HIGHEST OI IN WINDOW</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="font-size:10px;padding:4px 12px;border-radius:6px;background:rgba(255,51,85,0.12);border:1px solid rgba(255,51,85,0.3);color:#ff3355;font-weight:700;">5 CE</div>
+      <div style="font-size:10px;padding:4px 14px;border-radius:6px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;font-weight:700;">ATM &#8377;{atm:,}</div>
+      <div style="font-size:10px;padding:4px 12px;border-radius:6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);color:#00e676;font-weight:700;">5 PE</div>
+      <div style="width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;"></div>
+    </div>
+  </div>
+
+  <!-- ── Two-column table layout ── -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+
+    <!-- LEFT: CE Table -->
+    <div style="border-right:1px solid rgba(255,255,255,0.05);">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,51,85,0.04);border-bottom:1px solid rgba(255,51,85,0.12);">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:7px;height:7px;border-radius:50%;background:#ff3355;box-shadow:0 0 5px #ff3355;"></div>
+          <span style="font-size:11px;font-weight:700;color:#ff3355;letter-spacing:1px;">TOP 5 CALL OPTIONS (CE)</span>
+        </div>
+        <span style="font-size:9px;color:#546e7a;letter-spacing:1px;">10 STRIKES ABOVE ATM</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:rgba(0,0,0,0.2);">
+            <th style="{th_style}text-align:center;">#</th>
+            <th style="{th_style}">Strike</th>
+            <th style="{th_style}">Type</th>
+            <th style="{th_style}">Open Interest</th>
+            <th style="{th_style}">Chg OI</th>
+            <th style="{th_style}">LTP</th>
+            <th style="{th_style}">Volume</th>
+          </tr>
+        </thead>
+        <tbody>{ce_rows}</tbody>
+      </table>
+    </div>
+
+    <!-- RIGHT: PE Table -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(0,230,118,0.04);border-bottom:1px solid rgba(0,230,118,0.12);">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;"></div>
+          <span style="font-size:11px;font-weight:700;color:#00e676;letter-spacing:1px;">TOP 5 PUT OPTIONS (PE)</span>
+        </div>
+        <span style="font-size:9px;color:#546e7a;letter-spacing:1px;">10 STRIKES BELOW ATM</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:rgba(0,0,0,0.2);">
+            <th style="{th_style}text-align:center;">#</th>
+            <th style="{th_style}">Strike</th>
+            <th style="{th_style}">Type</th>
+            <th style="{th_style}">Open Interest</th>
+            <th style="{th_style}">Chg OI</th>
+            <th style="{th_style}">LTP</th>
+            <th style="{th_style}">Volume</th>
+          </tr>
+        </thead>
+        <tbody>{pe_rows}</tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ── Footer ── -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 18px;background:rgba(0,0,0,0.25);border-top:1px solid rgba(0,200,255,0.06);">
+    <span style="font-size:9px;color:#37474f;letter-spacing:1.5px;text-transform:uppercase;">Neon Ledger &middot; Top OI &middot; &plusmn;10 ATM Strikes Window</span>
+    <div style="display:flex;align-items:center;gap:5px;">
+      <div style="width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;"></div>
+      <span style="font-size:9px;color:#00e676;letter-spacing:1px;">LIVE</span>
+    </div>
+  </div>
+
+</div>
+"""
+
     def _option_chain_pivot_section_html(self, d):
         """
         Renders TWO sub-panels:
@@ -5018,6 +5214,7 @@ window.addEventListener('resize', function(){
             html += f"""
         <div class="section">
             <div class="section-title"><span>&#127919;</span> OPTION CHAIN ANALYSIS <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM \u00b110 Strikes Only)</span></div>
+            {self._top10_oi_widget_html(d)}
             <div class="card-grid grid-4">{oc_cards}</div>
         </div>
 """
