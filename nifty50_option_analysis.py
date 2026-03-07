@@ -3265,7 +3265,7 @@ class NiftyHTMLAnalyzer:
   </div>
 
   <!-- ── Single compact row: Direction | Bars | CE | PE | Net ── -->
-  <div style="display:grid;grid-template-columns:260px 1px 150px 1px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);min-height:60px;">
+  <div style="display:grid;grid-template-columns:2fr 1px 1fr 1px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);min-height:60px;">
 
     <!-- Direction cell — wider -->
     <div style="
