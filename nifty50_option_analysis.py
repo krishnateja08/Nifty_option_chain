@@ -3498,38 +3498,59 @@ class NiftyHTMLAnalyzer:
         th_style = "padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#546e7a;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);"
 
         return f"""
-<div style="background:#060d18;border:1px solid rgba(0,200,255,0.1);border-radius:14px;overflow:hidden;margin-bottom:4px;font-family:'JetBrains Mono',monospace;">
+<style>
+.top10-oi-widget {{ background:#060d18;border:1px solid rgba(0,200,255,0.1);border-radius:14px;overflow:hidden;margin-bottom:4px;font-family:'JetBrains Mono',monospace; }}
+.top10-oi-header {{ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:11px 18px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(0,200,255,0.08); }}
+.top10-oi-header-left {{ display:flex;align-items:center;gap:10px; }}
+.top10-oi-header-right {{ display:flex;align-items:center;gap:8px;flex-wrap:wrap; }}
+.top10-oi-grid {{ display:grid;grid-template-columns:1fr 1fr;gap:0; }}
+.top10-oi-table {{ width:100%;border-collapse:collapse;overflow-x:auto;display:block; }}
+.top10-oi-sub-header {{ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px 12px; }}
+@media(max-width:900px) {{
+  .top10-oi-grid {{ grid-template-columns:1fr !important; }}
+  .top10-oi-ce-panel {{ border-right:none !important;border-bottom:1px solid rgba(255,255,255,0.06); }}
+  .top10-oi-header {{ padding:8px 12px; }}
+  .top10-oi-sub-header span:last-child {{ display:none; }}
+}}
+@media(max-width:600px) {{
+  .top10-oi-table th:nth-child(3),
+  .top10-oi-table td:nth-child(3),
+  .top10-oi-table th:nth-child(6),
+  .top10-oi-table td:nth-child(6) {{ display:none; }}
+}}
+</style>
+<div class="top10-oi-widget">
 
   <!-- ── Widget Header ── -->
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 18px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(0,200,255,0.08);">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:32px;height:32px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;">&#9651;</div>
+  <div class="top10-oi-header">
+    <div class="top10-oi-header-left">
+      <div style="width:32px;height:32px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">&#9651;</div>
       <div>
         <div style="font-size:12px;font-weight:700;color:#e2eaf5;letter-spacing:1px;">TOP 10 OPEN INTEREST</div>
         <div style="font-size:9px;color:#546e7a;letter-spacing:1px;margin-top:1px;">NIFTY &middot; &plusmn;10 STRIKES FROM ATM &middot; HIGHEST OI IN WINDOW</div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
+    <div class="top10-oi-header-right">
       <div style="font-size:10px;padding:4px 12px;border-radius:6px;background:rgba(255,51,85,0.12);border:1px solid rgba(255,51,85,0.3);color:#ff3355;font-weight:700;">5 CE</div>
       <div style="font-size:10px;padding:4px 14px;border-radius:6px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;font-weight:700;">ATM &#8377;{atm:,}</div>
       <div style="font-size:10px;padding:4px 12px;border-radius:6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);color:#00e676;font-weight:700;">5 PE</div>
-      <div style="width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;"></div>
+      <div style="width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;flex-shrink:0;"></div>
     </div>
   </div>
 
   <!-- ── Two-column table layout ── -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+  <div class="top10-oi-grid">
 
     <!-- LEFT: CE Table -->
-    <div style="border-right:1px solid rgba(255,255,255,0.05);">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,51,85,0.04);border-bottom:1px solid rgba(255,51,85,0.12);">
+    <div class="top10-oi-ce-panel" style="border-right:1px solid rgba(255,255,255,0.05);">
+      <div class="top10-oi-sub-header" style="background:rgba(255,51,85,0.04);border-bottom:1px solid rgba(255,51,85,0.12);">
         <div style="display:flex;align-items:center;gap:6px;">
-          <div style="width:7px;height:7px;border-radius:50%;background:#ff3355;box-shadow:0 0 5px #ff3355;"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#ff3355;box-shadow:0 0 5px #ff3355;flex-shrink:0;"></div>
           <span style="font-size:11px;font-weight:700;color:#ff3355;letter-spacing:1px;">TOP 5 CALL OPTIONS (CE)</span>
         </div>
         <span style="font-size:9px;color:#546e7a;letter-spacing:1px;">10 STRIKES ABOVE ATM</span>
       </div>
-      <table style="width:100%;border-collapse:collapse;">
+      <table class="top10-oi-table">
         <thead>
           <tr style="background:rgba(0,0,0,0.2);">
             <th style="{th_style}text-align:center;">#</th>
@@ -3547,14 +3568,14 @@ class NiftyHTMLAnalyzer:
 
     <!-- RIGHT: PE Table -->
     <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(0,230,118,0.04);border-bottom:1px solid rgba(0,230,118,0.12);">
+      <div class="top10-oi-sub-header" style="background:rgba(0,230,118,0.04);border-bottom:1px solid rgba(0,230,118,0.12);">
         <div style="display:flex;align-items:center;gap:6px;">
-          <div style="width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;flex-shrink:0;"></div>
           <span style="font-size:11px;font-weight:700;color:#00e676;letter-spacing:1px;">TOP 5 PUT OPTIONS (PE)</span>
         </div>
         <span style="font-size:9px;color:#546e7a;letter-spacing:1px;">10 STRIKES BELOW ATM</span>
       </div>
-      <table style="width:100%;border-collapse:collapse;">
+      <table class="top10-oi-table">
         <thead>
           <tr style="background:rgba(0,0,0,0.2);">
             <th style="{th_style}text-align:center;">#</th>
@@ -3573,7 +3594,7 @@ class NiftyHTMLAnalyzer:
   </div>
 
   <!-- ── Footer ── -->
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 18px;background:rgba(0,0,0,0.25);border-top:1px solid rgba(0,200,255,0.06);">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:7px 18px;background:rgba(0,0,0,0.25);border-top:1px solid rgba(0,200,255,0.06);">
     <span style="font-size:9px;color:#37474f;letter-spacing:1.5px;text-transform:uppercase;">Neon Ledger &middot; Top OI &middot; &plusmn;10 ATM Strikes Window</span>
     <div style="display:flex;align-items:center;gap:5px;">
       <div style="width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;"></div>
