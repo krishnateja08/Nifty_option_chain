@@ -620,7 +620,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">08-Mar-2026 01:00 IST</span>
+                <span class="sb-value gen-val">08-Mar-2026 01:04 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -693,86 +693,91 @@
   </div>
 
   <!-- ── Single compact row: Direction | Bars | CE | PE | Net ── -->
-  <div style="display:grid;grid-template-columns:190px 1px 140px 1px 1fr 1fr 1fr;min-height:78px;">
+  <div style="display:grid;grid-template-columns:155px 1px 110px 1px 1fr 1fr 1fr;min-height:60px;">
 
-    <!-- Direction cell -->
+    <!-- Direction cell — tighter -->
     <div style="
-        padding:10px 14px;
+        padding:8px 10px;
         background:linear-gradient(135deg,rgba(30,10,14,0.92),rgba(30,10,14,0.03));
         border-left:3px solid #fb7185;
-        display:flex;flex-direction:column;justify-content:center;gap:2px;
+        display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:8px;letter-spacing:2px;color:rgba(251,113,133,0.5);text-transform:uppercase;">Market Direction</div>
-      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:#fb7185;
-                  text-shadow:0 0 16px #fb718555;line-height:1.15;">Strong Bearish</div>
-      <div style="font-size:8px;color:rgba(251,113,133,0.5);letter-spacing:.5px;">Call Build-up + Put Unwinding</div>
+      <div style="font-size:7px;letter-spacing:1.5px;color:rgba(251,113,133,0.5);text-transform:uppercase;">Market Direction</div>
+      <div style="font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:#fb7185;
+                  text-shadow:0 0 12px #fb718555;line-height:1.2;">Strong Bearish</div>
+      <div style="font-size:7px;color:rgba(251,113,133,0.5);letter-spacing:.3px;margin-top:1px;">Call Build-up + Put Unwinding</div>
     </div>
 
     <!-- Divider -->
     <div style="background:rgba(0,200,255,0.08);"></div>
 
-    <!-- Strength bars cell -->
-    <div style="padding:10px 14px;display:flex;flex-direction:column;justify-content:center;gap:8px;">
-      <div style="display:flex;align-items:center;gap:6px;">
-        <div style="width:6px;height:6px;border-radius:50%;background:#00ff88;box-shadow:0 0 5px #00ff88;flex-shrink:0;"></div>
-        <div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+    <!-- Strength bars cell — tighter -->
+    <div style="padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:5px;height:5px;border-radius:50%;background:#00ff88;box-shadow:0 0 4px #00ff88;flex-shrink:0;"></div>
+        <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
           <div style="height:100%;width:0%;background:#00ff88;border-radius:99px;"></div>
         </div>
-        <div style="font-size:9px;font-weight:600;color:#00ff88;min-width:28px;text-align:right;">0%</div>
+        <div style="font-size:8px;font-weight:600;color:#00ff88;min-width:24px;text-align:right;">0%</div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <div style="width:6px;height:6px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 5px #ff3b5c;flex-shrink:0;"></div>
-        <div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-          <div style="height:100%;width:100%;background:#ff3b5c;border-radius:99px;box-shadow:0 0 6px rgba(255,59,92,0.4);"></div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:5px;height:5px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 4px #ff3b5c;flex-shrink:0;"></div>
+        <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;width:100%;background:#ff3b5c;border-radius:99px;box-shadow:0 0 5px rgba(255,59,92,0.4);"></div>
         </div>
-        <div style="font-size:9px;font-weight:600;color:#ff3b5c;min-width:28px;text-align:right;">100%</div>
+        <div style="font-size:8px;font-weight:600;color:#ff3b5c;min-width:24px;text-align:right;">100%</div>
       </div>
     </div>
 
     <!-- Divider -->
     <div style="background:rgba(0,200,255,0.08);"></div>
 
-    <!-- Call OI cell -->
+    <!-- Call OI cell — tighter -->
     <div style="
-        padding:10px 14px;
+        padding:8px 10px;
         border-left:1px solid rgba(0,200,255,0.08);
-        border-top:3px solid #fb7185;
-        display:flex;flex-direction:column;justify-content:center;gap:2px;
-        position:relative;overflow:hidden;
+        border-top:2px solid #fb7185;
+        display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#4a6080;margin-bottom:2px;">Call OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#fb7185;line-height:1;">+232,770</div>
-      <div style="font-size:8px;color:#4a6080;margin-bottom:4px;">CE open interest</div>
-      <div style="display:inline-block;font-size:8px;letter-spacing:1px;padding:2px 8px;border-radius:4px;width:fit-content;
-                  background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">Bearish Signal</div>
+      <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#4a6080;">Call OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#fb7185;line-height:1.1;">+232,770</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
+        <div style="font-size:7px;color:#4a6080;">CE open interest</div>
+        <div style="font-size:7px;letter-spacing:1px;padding:1px 6px;border-radius:3px;
+                    background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">Bearish Signal</div>
+      </div>
     </div>
 
-    <!-- Put OI cell -->
+    <!-- Put OI cell — tighter -->
     <div style="
-        padding:10px 14px;
+        padding:8px 10px;
         border-left:1px solid rgba(0,200,255,0.08);
-        border-top:3px solid #fb7185;
-        display:flex;flex-direction:column;justify-content:center;gap:2px;
+        border-top:2px solid #fb7185;
+        display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#4a6080;margin-bottom:2px;">Put OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#fb7185;line-height:1;">-124,533</div>
-      <div style="font-size:8px;color:#4a6080;margin-bottom:4px;">PE open interest</div>
-      <div style="display:inline-block;font-size:8px;letter-spacing:1px;padding:2px 8px;border-radius:4px;width:fit-content;
-                  background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">Bearish Signal</div>
+      <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#4a6080;">Put OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#fb7185;line-height:1.1;">-124,533</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
+        <div style="font-size:7px;color:#4a6080;">PE open interest</div>
+        <div style="font-size:7px;letter-spacing:1px;padding:1px 6px;border-radius:3px;
+                    background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">Bearish Signal</div>
+      </div>
     </div>
 
-    <!-- Net OI cell -->
+    <!-- Net OI cell — tighter -->
     <div style="
-        padding:10px 14px;
+        padding:8px 10px;
         border-left:1px solid rgba(0,200,255,0.08);
-        border-top:3px solid #fb7185;
-        display:flex;flex-direction:column;justify-content:center;gap:2px;
+        border-top:2px solid #fb7185;
+        display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#4a6080;margin-bottom:2px;">Net OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#fb7185;line-height:1;">-357,303</div>
-      <div style="font-size:8px;color:#4a6080;margin-bottom:4px;">PE &#916; &#8722; CE &#916;</div>
-      <div style="display:inline-block;font-size:8px;letter-spacing:1px;padding:2px 8px;border-radius:4px;width:fit-content;
-                  background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">&#9878; Bearish Net</div>
+      <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#4a6080;">Net OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#fb7185;line-height:1.1;">-357,303</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
+        <div style="font-size:7px;color:#4a6080;">PE &#916; &#8722; CE &#916;</div>
+        <div style="font-size:7px;letter-spacing:1px;padding:1px 6px;border-radius:3px;
+                    background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">&#9878; Bearish Net</div>
+      </div>
     </div>
 
   </div>
@@ -1418,7 +1423,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 08-Mar-2026 01:00 IST</span>
+            <span>Stock data as of: 08-Mar-2026 01:04 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
