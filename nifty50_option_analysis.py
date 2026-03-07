@@ -363,7 +363,7 @@ def build_heatmap_tab_html(heatmap_data, timestamp, advance, decline, neutral):
               <span class="hm-br-dot" style="background:#78909c;"></span>
               <span class="hm-br-label">Neutral</span>
               <div class="hm-br-bar-wrap"><div class="hm-br-bar" style="width:2%;background:#546e7a;"></div></div>
-              <span class="hm-br-val" style="color:#78909c;">{neutral}</span>
+              <span class="hm-br-val" style="color:#9ab0bc;">{neutral}</span>
             </div>
           </div>
         </div>
@@ -718,7 +718,7 @@ def get_heatmap_css():
         .hm-bs-num{font-family:'Orbitron',monospace;font-size:clamp(26px,4vw,36px);font-weight:900;line-height:1;}
         .hm-bs-adv .hm-bs-num{color:#00e676;text-shadow:0 0 20px rgba(0,230,118,0.5);}
         .hm-bs-dec .hm-bs-num{color:#ff5252;text-shadow:0 0 20px rgba(255,82,82,0.5);}
-        .hm-bs-neu .hm-bs-num{color:#78909c;}
+        .hm-bs-neu .hm-bs-num{color:#9ab0bc;}
         .hm-bs-lbl{font-size:9px;letter-spacing:2.5px;color:rgba(176,190,197,0.4);text-transform:uppercase;font-weight:700;margin-top:4px;}
         .hm-bs-donut-wrap{position:relative;width:110px;height:110px;flex-shrink:0;}
         .hm-bs-donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
@@ -748,9 +748,9 @@ def get_heatmap_css():
         .hm-mover-table thead th:first-child{text-align:left;}
         .hm-mover-table tbody tr{border-bottom:1px solid rgba(79,195,247,0.06);transition:background 0.15s;}
         .hm-mover-table tbody tr:hover{background:rgba(79,195,247,0.05);}
-        .hm-mover-table tbody td{padding:9px 14px;font-size:12px;text-align:right;color:#b0bec5;}
+        .hm-mover-table tbody td{padding:9px 14px;font-size:12px;text-align:right;color:#c8d8e0;}
         .hm-mover-sym{text-align:left!important;color:#e0f7fa!important;font-weight:700;}
-        .hm-mover-prev{color:#546e7a!important;}
+        .hm-mover-prev{color:#8faabe!important;}
         .hm-mover-price{color:#4fc3f7!important;font-weight:600;}
         .hm-mover-chg{font-weight:700;}
         .hm-oi-chart-wrap{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:12px;padding:14px;overflow:hidden;}
@@ -3256,7 +3256,7 @@ class NiftyHTMLAnalyzer:
     <div style="display:flex;align-items:center;gap:8px;">
       <span style="font-size:13px;">&#128202;</span>
       <span style="font-size:11px;font-weight:600;color:#e2eaf5;letter-spacing:.5px;">Change in Open Interest</span>
-      <span style="font-size:9px;color:#4a6080;letter-spacing:1px;">Today's Direction Analysis</span>
+      <span style="font-size:9px;color:#8faabe;letter-spacing:1px;">Today's Direction Analysis</span>
     </div>
     <div style="
         font-size:9px;letter-spacing:1.5px;
@@ -3312,10 +3312,10 @@ class NiftyHTMLAnalyzer:
         border-top:2px solid {ce_col};
         display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#4a6080;">Call OI &#916;</div>
+      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#8faabe;">Call OI &#916;</div>
       <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{ce_col};line-height:1.1;">{ce_val:+,}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
-        <div style="font-size:7px;color:#4a6080;">CE open interest</div>
+        <div style="font-size:7px;color:#8faabe;">CE open interest</div>
         <div style="font-size:7px;padding:1px 5px;border-radius:3px;
                     background:{ce_btn_bg};border:1px solid {ce_btn_bdr};color:{ce_btn_col};">{ce_lbl}</div>
       </div>
@@ -3328,10 +3328,10 @@ class NiftyHTMLAnalyzer:
         border-top:2px solid {pe_col};
         display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#4a6080;">Put OI &#916;</div>
+      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#8faabe;">Put OI &#916;</div>
       <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{pe_col};line-height:1.1;">{pe_val:+,}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
-        <div style="font-size:7px;color:#4a6080;">PE open interest</div>
+        <div style="font-size:7px;color:#8faabe;">PE open interest</div>
         <div style="font-size:7px;padding:1px 5px;border-radius:3px;
                     background:{pe_btn_bg};border:1px solid {pe_btn_bdr};color:{pe_btn_col};">{pe_lbl}</div>
       </div>
@@ -3344,10 +3344,10 @@ class NiftyHTMLAnalyzer:
         border-top:2px solid {net_col};
         display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#4a6080;">Net OI &#916;</div>
+      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#8faabe;">Net OI &#916;</div>
       <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{net_col};line-height:1.1;">{net_val:+,}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
-        <div style="font-size:7px;color:#4a6080;">PE &#916; &#8722; CE &#916;</div>
+        <div style="font-size:7px;color:#8faabe;">PE &#916; &#8722; CE &#916;</div>
         <div style="font-size:7px;padding:1px 5px;border-radius:3px;
                     background:{net_btn_bg};border:1px solid {net_btn_bdr};color:{net_btn_col};">&#9878; {net_lbl}</div>
       </div>
@@ -3361,26 +3361,26 @@ class NiftyHTMLAnalyzer:
       background:rgba(0,0,0,0.25);
       border-top:1px solid rgba(0,200,255,0.06);
       display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;
-      font-size:8px;color:#4a6080;
+      font-size:8px;color:#8faabe;
   ">
     <span>&#128214;</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Call OI +</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Call OI +</span>
     <span>Writers selling calls</span>
     <span style="background:rgba(255,59,92,0.12);border-radius:3px;padding:1px 6px;color:#ff3b5c;">Bearish</span>
     <span style="color:rgba(255,255,255,0.1);">|</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Call OI &#8722;</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Call OI &#8722;</span>
     <span>Unwinding</span>
     <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">Bullish</span>
     <span style="color:rgba(255,255,255,0.1);">|</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Put OI +</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Put OI +</span>
     <span>Writers selling puts</span>
     <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">Bullish</span>
     <span style="color:rgba(255,255,255,0.1);">|</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Net OI</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Net OI</span>
     <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">+ = Bullish</span>
     <span style="background:rgba(255,59,92,0.12);border-radius:3px;padding:1px 6px;color:#ff3b5c;">&#8722; = Bearish</span>
     <span style="color:rgba(255,255,255,0.1);">|</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Bull % + Bear %</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Bull % + Bear %</span>
     <span>= 100% &middot; relative dominance</span>
   </div>
 
@@ -3459,8 +3459,8 @@ class NiftyHTMLAnalyzer:
                     </div>
                   </td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:{chg_color(oi_chg)};">{chg_fmt(oi_chg)}</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#b0bec5;">&#8377;{ltp:.2f}</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">{fmt_vol(vol)}</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;{ltp:.2f}</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">{fmt_vol(vol)}</td>
                 </tr>"""
 
         # ── Build PE rows ──
@@ -3491,11 +3491,11 @@ class NiftyHTMLAnalyzer:
                     </div>
                   </td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:{chg_color(oi_chg)};">{chg_fmt(oi_chg)}</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#b0bec5;">&#8377;{ltp:.2f}</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">{fmt_vol(vol)}</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;{ltp:.2f}</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">{fmt_vol(vol)}</td>
                 </tr>"""
 
-        th_style = "padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#546e7a;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);"
+        th_style = "padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);"
 
         return f"""
 <style>
@@ -3527,7 +3527,7 @@ class NiftyHTMLAnalyzer:
       <div style="width:32px;height:32px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">&#9651;</div>
       <div>
         <div style="font-size:12px;font-weight:700;color:#e2eaf5;letter-spacing:1px;">TOP 10 OPEN INTEREST</div>
-        <div style="font-size:9px;color:#546e7a;letter-spacing:1px;margin-top:1px;">NIFTY &middot; &plusmn;10 STRIKES FROM ATM &middot; HIGHEST OI IN WINDOW</div>
+        <div style="font-size:9px;color:#8faabe;letter-spacing:1px;margin-top:1px;">NIFTY &middot; &plusmn;10 STRIKES FROM ATM &middot; HIGHEST OI IN WINDOW</div>
       </div>
     </div>
     <div class="top10-oi-header-right">
@@ -3548,7 +3548,7 @@ class NiftyHTMLAnalyzer:
           <div style="width:7px;height:7px;border-radius:50%;background:#ff3355;box-shadow:0 0 5px #ff3355;flex-shrink:0;"></div>
           <span style="font-size:11px;font-weight:700;color:#ff3355;letter-spacing:1px;">TOP 5 CALL OPTIONS (CE)</span>
         </div>
-        <span style="font-size:9px;color:#546e7a;letter-spacing:1px;">10 STRIKES ABOVE ATM</span>
+        <span style="font-size:9px;color:#8faabe;letter-spacing:1px;">10 STRIKES ABOVE ATM</span>
       </div>
       <table class="top10-oi-table">
         <thead>
@@ -3573,7 +3573,7 @@ class NiftyHTMLAnalyzer:
           <div style="width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;flex-shrink:0;"></div>
           <span style="font-size:11px;font-weight:700;color:#00e676;letter-spacing:1px;">TOP 5 PUT OPTIONS (PE)</span>
         </div>
-        <span style="font-size:9px;color:#546e7a;letter-spacing:1px;">10 STRIKES BELOW ATM</span>
+        <span style="font-size:9px;color:#8faabe;letter-spacing:1px;">10 STRIKES BELOW ATM</span>
       </div>
       <table class="top10-oi-table">
         <thead>
@@ -3595,7 +3595,7 @@ class NiftyHTMLAnalyzer:
 
   <!-- ── Footer ── -->
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:7px 18px;background:rgba(0,0,0,0.25);border-top:1px solid rgba(0,200,255,0.06);">
-    <span style="font-size:9px;color:#37474f;letter-spacing:1.5px;text-transform:uppercase;">Neon Ledger &middot; Top OI &middot; &plusmn;10 ATM Strikes Window</span>
+    <span style="font-size:9px;color:#8899aa;letter-spacing:1.5px;text-transform:uppercase;">Neon Ledger &middot; Top OI &middot; &plusmn;10 ATM Strikes Window</span>
     <div style="display:flex;align-items:center;gap:5px;">
       <div style="width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;"></div>
       <span style="font-size:9px;color:#00e676;letter-spacing:1px;">LIVE</span>
@@ -3677,39 +3677,39 @@ class NiftyHTMLAnalyzer:
                 <div style="font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#4fc3f7;">
                     &#128200; OPTION CHAIN ANALYSIS
                 </div>
-                <div style="font-size:10px;color:#546e7a;letter-spacing:0.8px;">NIFTY &middot; WEEKLY EXPIRY &middot; LIVE DATA</div>
+                <div style="font-size:10px;color:#8faabe;letter-spacing:0.8px;">NIFTY &middot; WEEKLY EXPIRY &middot; LIVE DATA</div>
             </div>
 
             <!-- PCR + Sentiment row -->
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
                 <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:10px;padding:10px;text-align:center;">
-                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:4px;">PUT / CALL</div>
+                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:4px;">PUT / CALL</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:{pcr_badge_col};">{pcr_str}</div>
-                    <div style="font-size:9px;color:#546e7a;margin-top:2px;">PCR RATIO</div>
+                    <div style="font-size:9px;color:#8faabe;margin-top:2px;">PCR RATIO</div>
                 </div>
                 <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:10px;padding:10px;text-align:center;">
-                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:4px;">OI SENTIMENT</div>
+                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:4px;">OI SENTIMENT</div>
                     <div style="font-size:15px;font-weight:700;color:{sent_col};">{sent_icon} {sent_lbl}</div>
-                    <div style="font-size:9px;color:#546e7a;margin-top:2px;">{oi_dir}</div>
+                    <div style="font-size:9px;color:#8faabe;margin-top:2px;">{oi_dir}</div>
                 </div>
                 <div style="background:rgba(255,183,77,0.07);border:1px solid rgba(255,183,77,0.2);border-radius:10px;padding:10px;text-align:center;">
-                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:4px;">MAX PAIN</div>
+                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:4px;">MAX PAIN</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#ffb74d;">&#8377;{max_pain:,}</div>
-                    <div style="font-size:9px;color:#546e7a;margin-top:2px;">Price magnet at expiry</div>
+                    <div style="font-size:9px;color:#8faabe;margin-top:2px;">Price magnet at expiry</div>
                 </div>
             </div>
 
             <!-- Call / Put Buildups -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
                 <div style="background:rgba(244,67,54,0.07);border:1px solid rgba(244,67,54,0.2);border-radius:10px;padding:10px;">
-                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:6px;">&#128200; CALL BUILDUP (OI)</div>
+                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:6px;">&#128200; CALL BUILDUP (OI)</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:{ce_col};">&#9650; {ce_k}</div>
                     <div style="height:5px;background:rgba(0,0,0,0.35);border-radius:3px;margin-top:8px;overflow:hidden;">
                         <div style="height:100%;width:{ce_w}%;background:{ce_col};border-radius:3px;transition:width 0.6s;"></div>
                     </div>
                 </div>
                 <div style="background:rgba(38,198,218,0.07);border:1px solid rgba(38,198,218,0.2);border-radius:10px;padding:10px;">
-                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;margin-bottom:6px;">&#128200; PUT BUILDUP (OI)</div>
+                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:6px;">&#128200; PUT BUILDUP (OI)</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:{pe_col};">&#9650; {pe_k}</div>
                     <div style="height:5px;background:rgba(0,0,0,0.35);border-radius:3px;margin-top:8px;overflow:hidden;">
                         <div style="height:100%;width:{pe_w}%;background:{pe_col};border-radius:3px;transition:width 0.6s;"></div>
@@ -3799,16 +3799,16 @@ class NiftyHTMLAnalyzer:
         <div style="background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:18px 20px;flex:1;min-width:280px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:6px;">
                 <div style="font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#4fc3f7;">
-                    &#128204; PIVOT POINTS <span style="font-size:10px;font-weight:400;color:#546e7a;">(Traditional)</span>
+                    &#128204; PIVOT POINTS <span style="font-size:10px;font-weight:400;color:#8faabe;">(Traditional)</span>
                 </div>
-                <div style="font-size:10px;color:#546e7a;letter-spacing:0.8px;">Daily &middot; Auto-calculated</div>
+                <div style="font-size:10px;color:#8faabe;letter-spacing:0.8px;">Daily &middot; Auto-calculated</div>
             </div>
 
             <!-- LTP position bar -->
             <div style="position:relative;height:8px;background:linear-gradient(90deg,#26c6da 0%,#4fc3f7 45%,#f44336 100%);border-radius:4px;margin-bottom:6px;box-shadow:0 2px 10px rgba(0,0,0,0.4);">
                 <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:4px;height:18px;background:#fff;border-radius:2px;box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:5;"></div>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#546e7a;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#8faabe;margin-bottom:12px;">
                 <span>S1 &#8377;{s1p:,.2f}</span>
                 <span style="color:#4fc3f7;">&#9650; LTP &#8377;{cp:,.2f}</span>
                 <span>R1 &#8377;{r1p:,.2f}</span>
@@ -3822,12 +3822,12 @@ class NiftyHTMLAnalyzer:
             <!-- Pivot point center -->
             <div style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);border-radius:8px;padding:8px 12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;">
                 <div>
-                    <div style="font-size:10px;color:#546e7a;letter-spacing:1px;">PIVOT POINT</div>
+                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;">PIVOT POINT</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#4fc3f7;">&#8377;{pp:,.2f}</div>
-                    <div style="font-size:10px;color:#546e7a;">{pp_dist_lbl}</div>
+                    <div style="font-size:10px;color:#8faabe;">{pp_dist_lbl}</div>
                 </div>
                 <div style="text-align:right;">
-                    <div style="font-size:10px;color:#546e7a;">LTP</div>
+                    <div style="font-size:10px;color:#8faabe;">LTP</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;background:rgba(79,195,247,0.15);border:1px solid rgba(79,195,247,0.4);border-radius:6px;padding:4px 10px;color:#4fc3f7;">&#8377;{cp:,.2f}</div>
                 </div>
             </div>
@@ -3840,15 +3840,15 @@ class NiftyHTMLAnalyzer:
             <!-- Prev candle OHLC footer -->
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px;">
                 <div style="background:rgba(244,67,54,0.07);border:1px solid rgba(244,67,54,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
-                    <div style="font-size:9px;color:#546e7a;margin-bottom:2px;">&#9650; PREV HIGH</div>
+                    <div style="font-size:9px;color:#8faabe;margin-bottom:2px;">&#9650; PREV HIGH</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#f44336;">&#8377;{ph:,.1f}</div>
                 </div>
                 <div style="background:rgba(38,198,218,0.07);border:1px solid rgba(38,198,218,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
-                    <div style="font-size:9px;color:#546e7a;margin-bottom:2px;">&#9660; PREV LOW</div>
+                    <div style="font-size:9px;color:#8faabe;margin-bottom:2px;">&#9660; PREV LOW</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#26c6da;">&#8377;{pl:,.1f}</div>
                 </div>
                 <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
-                    <div style="font-size:9px;color:#546e7a;margin-bottom:2px;">&#9679; PREV CLOSE</div>
+                    <div style="font-size:9px;color:#8faabe;margin-bottom:2px;">&#9679; PREV CLOSE</div>
                     <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#80deea;">&#8377;{pc:,.2f}</div>
                 </div>
             </div>
@@ -3858,7 +3858,7 @@ class NiftyHTMLAnalyzer:
     <div class="section">
         <div class="section-title"><span>&#128204;</span> OPTION CHAIN &amp; PIVOT POINTS</div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;">
-            {oc_panel if d['has_option_data'] else '<div style="color:#546e7a;font-size:13px;padding:16px;">Option data unavailable</div>'}
+            {oc_panel if d['has_option_data'] else '<div style="color:#8faabe;font-size:13px;padding:16px;">Option data unavailable</div>'}
             {pv_panel}
         </div>
     </div>
@@ -3901,11 +3901,11 @@ class NiftyHTMLAnalyzer:
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
             <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
-                <span style="font-size:12px;color:#b0bec5;">&#128205; To Resistance</span>
+                <span style="font-size:12px;color:#c8d8e0;">&#128205; To Resistance</span>
                 <span style="font-size:15px;font-weight:700;color:#f44336;">+{_pts_to_res:,} pts</span>
             </div>
             <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
-                <span style="font-size:12px;color:#b0bec5;">&#128205; To Support</span>
+                <span style="font-size:12px;color:#c8d8e0;">&#128205; To Support</span>
                 <span style="font-size:15px;font-weight:700;color:#00bcd4;">\u2212{_pts_to_sup:,} pts</span>
             </div>
         </div>
@@ -4649,7 +4649,7 @@ window.addEventListener('resize', function(){
     <style>
         *{{margin:0;padding:0;box-sizing:border-box;}}
         html{{scroll-behavior:smooth;}}
-        body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:clamp(8px,2vw,24px);color:#b0bec5;overflow-x:hidden;-webkit-text-size-adjust:100%;}}
+        body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:clamp(8px,2vw,24px);color:#c8d8e0;overflow-x:hidden;-webkit-text-size-adjust:100%;}}
 
         .tab-nav{{display:flex;gap:0;border-bottom:2px solid rgba(79,195,247,0.2);overflow-x:auto;scrollbar-width:none;background:linear-gradient(135deg,#0f2027,#203a43);}}
         .tab-nav::-webkit-scrollbar{{display:none;}}
@@ -4724,7 +4724,7 @@ window.addEventListener('resize', function(){
         .bar-red{{background:linear-gradient(90deg,#f44336,#ff5722);box-shadow:0 0 8px rgba(244,67,54,0.5);}}
         .bar-gold{{background:linear-gradient(90deg,#ffb74d,#ffd54f);box-shadow:0 0 8px rgba(255,183,77,0.5);}}
         .card-foot{{display:flex;justify-content:space-between;align-items:center;padding:0 16px 14px;position:relative;z-index:2;flex-wrap:wrap;gap:4px;}}
-        .sub{{font-size:10px;color:#455a64;font-family:'JetBrains Mono',monospace;}}
+        .sub{{font-size:10px;color:#8fa8b8;font-family:'JetBrains Mono',monospace;}}
         .tag{{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:clamp(9px,1.2vw,11px);font-weight:700;letter-spacing:0.5px;font-family:'Rajdhani',sans-serif;white-space:nowrap;}}
         .tag-neu{{background:rgba(255,183,77,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
         .tag-bull{{background:rgba(0,229,255,0.12);color:#00e5ff;border:1px solid rgba(0,229,255,0.35);}}
@@ -4765,7 +4765,7 @@ window.addEventListener('resize', function(){
         .rl-node-a{{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;}}
         .rl-node-b{{position:absolute;top:0;transform:translateX(-50%);text-align:center;}}
         .rl-dot{{width:12px;height:12px;border-radius:50%;border:2px solid rgba(10,20,35,0.9);}}
-        .rl-lbl{{font-size:clamp(7px,1vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;line-height:1.3;white-space:nowrap;color:#b0bec5;}}
+        .rl-lbl{{font-size:clamp(7px,1vw,10px);font-weight:700;text-transform:uppercase;letter-spacing:0.4px;line-height:1.3;white-space:nowrap;color:#c8d8e0;}}
         .rl-val{{font-size:clamp(9px,1.3vw,13px);font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;}}
         /* Mobile key levels: hide absolute labels, show compact table instead */
         .kl-mobile-table{{display:none;width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px;margin-top:10px;}}
@@ -4803,7 +4803,7 @@ window.addEventListener('resize', function(){
         .pf-avg-cell{{text-align:center;min-width:0;}}
         .pf-avg-eyebrow{{font-size:8px;letter-spacing:2.5px;color:rgba(0,229,255,0.4);text-transform:uppercase;margin-bottom:6px;font-weight:700;}}
         .pf-avg-val{{font-family:'Oxanium',sans-serif;font-size:clamp(18px,3vw,26px);font-weight:800;line-height:1;letter-spacing:-0.5px;word-break:break-word;}}
-        .pf-avg-unit{{font-size:9px;color:#37474f;margin-top:3px;letter-spacing:1px;}}
+        .pf-avg-unit{{font-size:9px;color:#8899aa;margin-top:3px;letter-spacing:1px;}}
         .pf-avg-sep{{width:1px;height:48px;background:linear-gradient(180deg,transparent,rgba(79,195,247,0.2),transparent);margin:0 16px;flex-shrink:0;}}
         .pf-insight-box{{border-radius:12px;padding:16px 18px;}}
         .pf-insight-header{{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}}
@@ -5052,7 +5052,7 @@ window.addEventListener('resize', function(){
         .oi-nifty-dn-strong{{background:rgba(255,71,87,0.18);color:#ff4757;border:1px solid rgba(255,71,87,0.35);}}
         .oi-nifty-dn-mid{{background:rgba(255,71,87,0.12);color:#fca5a5;border:1px solid rgba(255,71,87,0.25);}}
         .oi-nifty-dn-weak{{background:rgba(255,71,87,0.07);color:#fecaca;border:1px solid rgba(255,71,87,0.15);}}
-        .oi-nifty-flat{{background:rgba(120,144,156,0.1);color:#90a4ae;border:1px solid rgba(120,144,156,0.2);}}
+        .oi-nifty-flat{{background:rgba(120,144,156,0.1);color:#a8c0cc;border:1px solid rgba(120,144,156,0.2);}}
 
         /* ── Signal Streak ── */
         .oi-streak{{display:inline-flex;flex-direction:column;align-items:flex-end;gap:4px;}}
@@ -5093,7 +5093,7 @@ window.addEventListener('resize', function(){
         .disc-text{{font-size:12px;color:rgba(255,183,77,0.75);font-family:'Rajdhani',sans-serif;font-weight:500;white-space:nowrap;}}
         .disc-text strong{{color:#ffb74d;font-weight:700;}}
         @media(max-width:700px){{.disc-text{{white-space:normal;}}}}
-        .footer{{text-align:center;padding:24px;color:#546e7a;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}}
+        .footer{{text-align:center;padding:24px;color:#8faabe;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}}
 
         {heatmap_css}
         {pretrade_css}
