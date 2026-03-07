@@ -2661,6 +2661,7 @@ class NiftyHTMLAnalyzer:
             'risk_points': int(risk_points), 'reward_points': int(reward_points),
             'risk_reward_ratio': risk_reward_ratio,
             'has_option_data': option_analysis is not None,
+            'df': option_analysis['df'] if option_analysis else None,
             'fii_dii_data': fii_dii_raw, 'fii_dii_summ': fii_dii_summ,
             'prev_high':  technical.get('prev_high', 0),
             'prev_low':   technical.get('prev_low', 0),
