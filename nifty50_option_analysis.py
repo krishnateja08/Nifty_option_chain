@@ -3265,26 +3265,26 @@ class NiftyHTMLAnalyzer:
   </div>
 
   <!-- ── Single compact row: Direction | Bars | CE | PE | Net ── -->
-  <div style="display:grid;grid-template-columns:155px 1px 110px 1px 1fr 1fr 1fr;min-height:60px;">
+  <div style="display:grid;grid-template-columns:260px 1px 150px 1px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);min-height:60px;">
 
-    <!-- Direction cell — tighter -->
+    <!-- Direction cell — wider -->
     <div style="
-        padding:8px 10px;
+        padding:8px 14px;
         background:linear-gradient(135deg,{dir_bg},{dir_bg.replace('0.92','0.03')});
         border-left:3px solid {dir_name_col};
         display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
       <div style="font-size:7px;letter-spacing:1.5px;color:{dir_desc_col};text-transform:uppercase;">Market Direction</div>
-      <div style="font-family:'Orbitron',monospace;font-size:12px;font-weight:900;color:{dir_name_col};
-                  text-shadow:0 0 12px {dir_name_col}55;line-height:1.2;">{direction}</div>
+      <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:{dir_name_col};
+                  text-shadow:0 0 14px {dir_name_col}55;line-height:1.2;">{direction}</div>
       <div style="font-size:7px;color:{dir_desc_col};letter-spacing:.3px;margin-top:1px;">{signal}</div>
     </div>
 
     <!-- Divider -->
     <div style="background:rgba(0,200,255,0.08);"></div>
 
-    <!-- Strength bars cell — tighter -->
-    <div style="padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+    <!-- Strength bars cell -->
+    <div style="padding:8px 12px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
       <div style="display:flex;align-items:center;gap:5px;">
         <div style="width:5px;height:5px;border-radius:50%;background:#00ff88;box-shadow:0 0 4px #00ff88;flex-shrink:0;"></div>
         <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
@@ -3304,50 +3304,50 @@ class NiftyHTMLAnalyzer:
     <!-- Divider -->
     <div style="background:rgba(0,200,255,0.08);"></div>
 
-    <!-- Call OI cell — tighter -->
+    <!-- Call OI cell — compact -->
     <div style="
         padding:8px 10px;
         border-left:1px solid rgba(0,200,255,0.08);
         border-top:2px solid {ce_col};
         display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#4a6080;">Call OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:{ce_col};line-height:1.1;">{ce_val:+,}</div>
+      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#4a6080;">Call OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{ce_col};line-height:1.1;">{ce_val:+,}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
         <div style="font-size:7px;color:#4a6080;">CE open interest</div>
-        <div style="font-size:7px;letter-spacing:1px;padding:1px 6px;border-radius:3px;
+        <div style="font-size:7px;padding:1px 5px;border-radius:3px;
                     background:{ce_btn_bg};border:1px solid {ce_btn_bdr};color:{ce_btn_col};">{ce_lbl}</div>
       </div>
     </div>
 
-    <!-- Put OI cell — tighter -->
+    <!-- Put OI cell — compact -->
     <div style="
         padding:8px 10px;
         border-left:1px solid rgba(0,200,255,0.08);
         border-top:2px solid {pe_col};
         display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#4a6080;">Put OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:{pe_col};line-height:1.1;">{pe_val:+,}</div>
+      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#4a6080;">Put OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{pe_col};line-height:1.1;">{pe_val:+,}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
         <div style="font-size:7px;color:#4a6080;">PE open interest</div>
-        <div style="font-size:7px;letter-spacing:1px;padding:1px 6px;border-radius:3px;
+        <div style="font-size:7px;padding:1px 5px;border-radius:3px;
                     background:{pe_btn_bg};border:1px solid {pe_btn_bdr};color:{pe_btn_col};">{pe_lbl}</div>
       </div>
     </div>
 
-    <!-- Net OI cell — tighter -->
+    <!-- Net OI cell — compact -->
     <div style="
         padding:8px 10px;
         border-left:1px solid rgba(0,200,255,0.08);
         border-top:2px solid {net_col};
         display:flex;flex-direction:column;justify-content:center;gap:1px;
     ">
-      <div style="font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#4a6080;">Net OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:{net_col};line-height:1.1;">{net_val:+,}</div>
+      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#4a6080;">Net OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{net_col};line-height:1.1;">{net_val:+,}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
         <div style="font-size:7px;color:#4a6080;">PE &#916; &#8722; CE &#916;</div>
-        <div style="font-size:7px;letter-spacing:1px;padding:1px 6px;border-radius:3px;
+        <div style="font-size:7px;padding:1px 5px;border-radius:3px;
                     background:{net_btn_bg};border:1px solid {net_btn_bdr};color:{net_btn_col};">&#9878; {net_lbl}</div>
       </div>
     </div>
