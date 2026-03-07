@@ -3432,6 +3432,24 @@ class NiftyHTMLAnalyzer:
         ce_wall_w = round(max_ce / wall_max * 100)
         pe_wall_w = round(max_pe / wall_max * 100)
 
+        # ── R2 / S2: 2nd highest CE OI strike (resistance) and PE OI strike (support) ──
+        # Derived purely from the existing df — zero logic changes elsewhere
+        _df = d.get('df', None)
+        if _df is not None and not _df.empty and len(_df) >= 2:
+            _ce_sorted = _df.nlargest(2, 'CE_OI')
+            _pe_sorted = _df.nlargest(2, 'PE_OI')
+            max_ce_r2  = int(_ce_sorted.iloc[1]['Strike']) if len(_ce_sorted) > 1 else max_ce
+            max_pe_s2  = int(_pe_sorted.iloc[1]['Strike']) if len(_pe_sorted) > 1 else max_pe
+            max_ce_r2_val = int(_ce_sorted.iloc[1]['CE_OI']) if len(_ce_sorted) > 1 else 0
+            max_pe_s2_val = int(_pe_sorted.iloc[1]['PE_OI']) if len(_pe_sorted) > 1 else 0
+        else:
+            max_ce_r2 = max_ce; max_pe_s2 = max_pe
+            max_ce_r2_val = 0;  max_pe_s2_val = 0
+
+        # Bar widths for R2/S2 (relative to R1/S1 = 100%)
+        ce_wall_r2_w = round(max_ce_r2_val / max(_df['CE_OI'].max(), 1) * 100) if _df is not None and not _df.empty else 60
+        pe_wall_s2_w = round(max_pe_s2_val / max(_df['PE_OI'].max(), 1) * 100) if _df is not None and not _df.empty else 60
+
         pcr_badge_col = '#26c6da' if pcr > 1.0 else ('#f44336' if pcr < 0.8 else '#ffb74d')
 
         oc_panel = "" if not d['has_option_data'] else f"""
@@ -3481,7 +3499,7 @@ class NiftyHTMLAnalyzer:
                 </div>
             </div>
 
-            <!-- OI Resistance Walls -->
+            <!-- OI Resistance Walls — R1 + R2 -->
             <div style="margin-bottom:10px;">
                 <div style="font-size:10px;color:#f44336;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#9632; OI RESISTANCE WALLS</div>
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
@@ -3491,9 +3509,16 @@ class NiftyHTMLAnalyzer:
                     </div>
                     <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#f44336;font-weight:700;">&#8377;{max_ce:,}</span>
                 </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                    <span style="font-size:10px;background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.25);border-radius:4px;padding:2px 7px;color:#ff7043;font-weight:700;">R2</span>
+                    <div style="flex:1;height:6px;background:rgba(0,0,0,0.35);border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:{ce_wall_r2_w}%;background:linear-gradient(90deg,#ff7043,#ffa726);border-radius:3px;"></div>
+                    </div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff7043;font-weight:700;">&#8377;{max_ce_r2:,}</span>
+                </div>
             </div>
 
-            <!-- OI Support Floors -->
+            <!-- OI Support Floors — S1 + S2 -->
             <div>
                 <div style="font-size:10px;color:#26c6da;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#9632; OI SUPPORT FLOORS</div>
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
@@ -3502,6 +3527,13 @@ class NiftyHTMLAnalyzer:
                         <div style="height:100%;width:{pe_wall_w}%;background:linear-gradient(90deg,#26c6da,#00bcd4);border-radius:3px;"></div>
                     </div>
                     <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#26c6da;font-weight:700;">&#8377;{max_pe:,}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                    <span style="font-size:10px;background:rgba(38,198,218,0.1);border:1px solid rgba(38,198,218,0.25);border-radius:4px;padding:2px 7px;color:#4dd0e1;font-weight:700;">S2</span>
+                    <div style="flex:1;height:6px;background:rgba(0,0,0,0.35);border-radius:3px;overflow:hidden;">
+                        <div style="height:100%;width:{pe_wall_s2_w}%;background:linear-gradient(90deg,#4dd0e1,#80deea);border-radius:3px;"></div>
+                    </div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#4dd0e1;font-weight:700;">&#8377;{max_pe_s2:,}</span>
                 </div>
             </div>
         </div>"""
