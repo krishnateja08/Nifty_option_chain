@@ -3231,39 +3231,156 @@ class NiftyHTMLAnalyzer:
             f'<div class="nc-meter-track"><div class="nc-meter-fill" style="width:{bear_pct}%;background:linear-gradient(90deg,#ef4444,#f97316);"></div>'
             f'<div class="nc-meter-head" style="left:{bear_pct}%;background:#fb7185;box-shadow:0 0 8px #fb7185;"></div></div></div></div>'
         )
-        return (
-            '\n<div class="section">\n'
-            '    <div class="nc-section-header">\n'
-            '        <div class="nc-header-left"><div class="nc-header-icon">\U0001f4ca</div>\n'
-            '        <div><div class="nc-header-title">Change in Open Interest</div>\n'
-            '        <div class="nc-header-sub">Today\'s Direction Analysis</div></div></div>\n'
-            '        <div class="nc-atm-badge">ATM \u00b110</div>\n'
-            '    </div>\n'
-            f'    <div class="nc-dir-box" style="background:{dir_bg};border:1px solid {dir_border};">\n'
-            '        <div style="display:flex;align-items:stretch;gap:18px;">\n'
-            f'            <div class="nc-dir-bar" style="background:{dir_left_bar};"></div>\n'
-            '            <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">\n'
-            '                <div>\n'
-            '                    <div class="nc-dir-tag">MARKET DIRECTION</div>\n'
-            f'                    <div class="nc-dir-name" style="color:{dir_name_col};">{direction}</div>\n'
-            f'                    <div class="nc-dir-signal" style="color:{dir_desc_col};">{signal}</div>\n'
-            '                </div>\n'
-            f'                {dual_meters}\n'
-            '            </div>\n'
-            '        </div>\n'
-            '    </div>\n'
-            f'    <div class="nc-cards-grid">{cards_html}</div>\n'
-            '    <div class="logic-box" style="margin-top:16px;">\n'
-            '        <div class="logic-box-head">\U0001f4d6 HOW TO READ</div>\n'
-            '        <div class="logic-grid">\n'
-            '            <div class="logic-item"><span class="lc-info">Call OI +</span> Writers selling calls <span class="lc-bear">Bearish</span>&nbsp;&nbsp;<span class="lc-info">Call OI \u2212</span> Unwinding <span class="lc-bull">Bullish</span></div>\n'
-            '            <div class="logic-item"><span class="lc-info">Put OI +</span> Writers selling puts <span class="lc-bull">Bullish</span>&nbsp;&nbsp;<span class="lc-info">Put OI \u2212</span> Unwinding <span class="lc-bear">Bearish</span></div>\n'
-            '            <div class="logic-item"><span class="lc-info">Net OI</span> = PE \u0394 \u2212 CE \u0394 &nbsp;\u00b7&nbsp; <span class="lc-bull">Positive = Bullish</span> &nbsp;<span class="lc-bear">Negative = Bearish</span></div>\n'
-            '            <div class="logic-item"><span class="lc-info">Bull % + Bear %</span> = 100% &nbsp;\u00b7&nbsp; relative dominance</div>\n'
-            '        </div>\n'
-            '    </div>\n'
-            '</div>\n'
-        )
+        # ── Compact single-row OI widget (space-saving redesign) ──
+        # All values (ce_val, pe_val, net_val, direction, signal,
+        # bull_pct, bear_pct, dir_name_col, dir_desc_col) come from
+        # the logic above — nothing changed there.
+        return f"""
+<div class="section">
+<div style="
+    background:#090f1c;
+    border:1px solid rgba(0,200,255,0.1);
+    border-radius:12px;
+    overflow:hidden;
+    font-family:'JetBrains Mono',monospace;
+">
+
+  <!-- ── Header row ── -->
+  <div style="
+      display:flex;align-items:center;justify-content:space-between;
+      padding:8px 14px;
+      background:rgba(0,0,0,0.35);
+      border-bottom:1px solid rgba(0,200,255,0.08);
+  ">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:13px;">&#128202;</span>
+      <span style="font-size:11px;font-weight:600;color:#e2eaf5;letter-spacing:.5px;">Change in Open Interest</span>
+      <span style="font-size:9px;color:#4a6080;letter-spacing:1px;">Today's Direction Analysis</span>
+    </div>
+    <div style="
+        font-size:9px;letter-spacing:1.5px;
+        background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);
+        color:#00d4ff;padding:3px 10px;border-radius:5px;
+    ">ATM &#177;10</div>
+  </div>
+
+  <!-- ── Single compact row: Direction | Bars | CE | PE | Net ── -->
+  <div style="display:grid;grid-template-columns:190px 1px 140px 1px 1fr 1fr 1fr;min-height:78px;">
+
+    <!-- Direction cell -->
+    <div style="
+        padding:10px 14px;
+        background:linear-gradient(135deg,{dir_bg},{dir_bg.replace('0.92','0.03')});
+        border-left:3px solid {dir_name_col};
+        display:flex;flex-direction:column;justify-content:center;gap:2px;
+    ">
+      <div style="font-size:8px;letter-spacing:2px;color:{dir_desc_col};text-transform:uppercase;">Market Direction</div>
+      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{dir_name_col};
+                  text-shadow:0 0 16px {dir_name_col}55;line-height:1.15;">{direction}</div>
+      <div style="font-size:8px;color:{dir_desc_col};letter-spacing:.5px;">{signal}</div>
+    </div>
+
+    <!-- Divider -->
+    <div style="background:rgba(0,200,255,0.08);"></div>
+
+    <!-- Strength bars cell -->
+    <div style="padding:10px 14px;display:flex;flex-direction:column;justify-content:center;gap:8px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:6px;height:6px;border-radius:50%;background:#00ff88;box-shadow:0 0 5px #00ff88;flex-shrink:0;"></div>
+        <div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;width:{bull_pct}%;background:#00ff88;border-radius:99px;"></div>
+        </div>
+        <div style="font-size:9px;font-weight:600;color:#00ff88;min-width:28px;text-align:right;">{bull_pct}%</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:6px;height:6px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 5px #ff3b5c;flex-shrink:0;"></div>
+        <div style="flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
+          <div style="height:100%;width:{bear_pct}%;background:#ff3b5c;border-radius:99px;box-shadow:0 0 6px rgba(255,59,92,0.4);"></div>
+        </div>
+        <div style="font-size:9px;font-weight:600;color:#ff3b5c;min-width:28px;text-align:right;">{bear_pct}%</div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div style="background:rgba(0,200,255,0.08);"></div>
+
+    <!-- Call OI cell -->
+    <div style="
+        padding:10px 14px;
+        border-left:1px solid rgba(0,200,255,0.08);
+        border-top:3px solid {ce_col};
+        display:flex;flex-direction:column;justify-content:center;gap:2px;
+        position:relative;overflow:hidden;
+    ">
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#4a6080;margin-bottom:2px;">Call OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:{ce_col};line-height:1;">{ce_val:+,}</div>
+      <div style="font-size:8px;color:#4a6080;margin-bottom:4px;">CE open interest</div>
+      <div style="display:inline-block;font-size:8px;letter-spacing:1px;padding:2px 8px;border-radius:4px;width:fit-content;
+                  background:{ce_btn_bg};border:1px solid {ce_btn_bdr};color:{ce_btn_col};">{ce_lbl}</div>
+    </div>
+
+    <!-- Put OI cell -->
+    <div style="
+        padding:10px 14px;
+        border-left:1px solid rgba(0,200,255,0.08);
+        border-top:3px solid {pe_col};
+        display:flex;flex-direction:column;justify-content:center;gap:2px;
+    ">
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#4a6080;margin-bottom:2px;">Put OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:{pe_col};line-height:1;">{pe_val:+,}</div>
+      <div style="font-size:8px;color:#4a6080;margin-bottom:4px;">PE open interest</div>
+      <div style="display:inline-block;font-size:8px;letter-spacing:1px;padding:2px 8px;border-radius:4px;width:fit-content;
+                  background:{pe_btn_bg};border:1px solid {pe_btn_bdr};color:{pe_btn_col};">{pe_lbl}</div>
+    </div>
+
+    <!-- Net OI cell -->
+    <div style="
+        padding:10px 14px;
+        border-left:1px solid rgba(0,200,255,0.08);
+        border-top:3px solid {net_col};
+        display:flex;flex-direction:column;justify-content:center;gap:2px;
+    ">
+      <div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#4a6080;margin-bottom:2px;">Net OI &#916;</div>
+      <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:{net_col};line-height:1;">{net_val:+,}</div>
+      <div style="font-size:8px;color:#4a6080;margin-bottom:4px;">PE &#916; &#8722; CE &#916;</div>
+      <div style="display:inline-block;font-size:8px;letter-spacing:1px;padding:2px 8px;border-radius:4px;width:fit-content;
+                  background:{net_btn_bg};border:1px solid {net_btn_bdr};color:{net_btn_col};">&#9878; {net_lbl}</div>
+    </div>
+
+  </div>
+
+  <!-- ── Legend — one tight line ── -->
+  <div style="
+      padding:6px 14px;
+      background:rgba(0,0,0,0.25);
+      border-top:1px solid rgba(0,200,255,0.06);
+      display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;
+      font-size:8px;color:#4a6080;
+  ">
+    <span>&#128214;</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Call OI +</span>
+    <span>Writers selling calls</span>
+    <span style="background:rgba(255,59,92,0.12);border-radius:3px;padding:1px 6px;color:#ff3b5c;">Bearish</span>
+    <span style="color:rgba(255,255,255,0.1);">|</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Call OI &#8722;</span>
+    <span>Unwinding</span>
+    <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">Bullish</span>
+    <span style="color:rgba(255,255,255,0.1);">|</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Put OI +</span>
+    <span>Writers selling puts</span>
+    <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">Bullish</span>
+    <span style="color:rgba(255,255,255,0.1);">|</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Net OI</span>
+    <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">+ = Bullish</span>
+    <span style="background:rgba(255,59,92,0.12);border-radius:3px;padding:1px 6px;color:#ff3b5c;">&#8722; = Bearish</span>
+    <span style="color:rgba(255,255,255,0.1);">|</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#4a6080;">Bull % + Bear %</span>
+    <span>= 100% &middot; relative dominance</span>
+  </div>
+
+</div>
+</div>
+"""
 
     def _option_chain_pivot_section_html(self, d):
         """
