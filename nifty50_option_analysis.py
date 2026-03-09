@@ -1825,7 +1825,7 @@ def build_intraday_oi_tab_html():
           </div>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <div class="oi-live-badge"><span class="oi-live-dot"></span> LIVE &middot; IST &middot; Auto-refresh 30s</div>
-            <div id="oiLastFetch" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.3);letter-spacing:1px;">Last fetch: —</div>
+            <div id="oiLastFetch" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.8);letter-spacing:1px;">Last fetch: —</div>
           </div>
         </div>
         <div class="oi-summary-strip">
@@ -1872,14 +1872,14 @@ def build_intraday_oi_tab_html():
 
         <!-- Signal History Bar -->
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span style="font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.3);text-transform:uppercase;white-space:nowrap;font-family:'JetBrains Mono',monospace;">SIGNAL HISTORY</span>
+          <span style="font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.9);text-transform:uppercase;white-space:nowrap;font-family:'JetBrains Mono',monospace;">SIGNAL HISTORY</span>
           <div id="oiSignalBar" style="flex:1;display:flex;gap:3px;height:6px;border-radius:4px;overflow:hidden;"></div>
         </div>
 
         <div class="oi-chart-wrap">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <div class="oi-chart-label">NET OI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
-            <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.3);letter-spacing:1px;"></div>
+            <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.8);letter-spacing:1px;"></div>
           </div>
           <!-- Chart: Y-labels + Canvas + Crosshair + Tooltip -->
           <div style="display:flex;gap:0;position:relative;">
@@ -5108,10 +5108,10 @@ window.addEventListener('resize', function(){
         .oi-live-dot{{width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:sb-pulse 1.5s ease-in-out infinite;}}
         .oi-summary-strip{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px;}}
         .oi-sum-card{{background:rgba(255,255,255,0.03);border:1px solid rgba(79,195,247,0.14);border-radius:12px;padding:14px 16px;text-align:center;}}
-        .oi-sum-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;margin-bottom:6px;}}
+        .oi-sum-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.9);text-transform:uppercase;font-weight:700;margin-bottom:6px;}}
         .oi-sum-val{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,2.5vw,22px);font-weight:700;line-height:1;}}
         .oi-chart-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;padding:16px;margin-bottom:20px;}}
-        .oi-chart-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;}}
+        .oi-chart-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.9);text-transform:uppercase;font-weight:700;}}
         /* ══ OPTION FLOW TABLE — POLISHED UI ════════════════════════════════ */
         .oi-table-wrap{{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:16px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;box-shadow:0 4px 40px rgba(0,0,0,0.5);}}
         .oi-table{{width:100%;min-width:1160px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}}
@@ -5119,7 +5119,7 @@ window.addEventListener('resize', function(){
 
         /* ── Header ── */
         .oi-table thead tr{{background:rgba(18,26,33,0.95);border-bottom:2px solid rgba(36,53,68,0.9);}}
-        .oi-table thead th{{padding:12px 16px;font-size:9.5px;letter-spacing:1.5px;color:rgba(74,100,120,1);text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap;}}
+        .oi-table thead th{{padding:12px 16px;font-size:9.5px;letter-spacing:1.5px;color:rgba(128,222,234,0.9);text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap;}}
         .oi-table thead th:first-child{{text-align:left;}}
         .oi-table thead th.oi-th-divider{{border-left:1px solid rgba(30,45,56,1);}}
 
@@ -5232,7 +5232,7 @@ window.addEventListener('resize', function(){
         /* ══ OI CHART ENHANCEMENTS ════════════════════════════ */
         .oi-stat-strip{{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}}
         .oi-stat-box{{background:rgba(255,255,255,0.025);border:1px solid rgba(79,195,247,0.1);border-radius:10px;padding:10px 14px;text-align:center;}}
-        .oi-stat-label{{font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.35);text-transform:uppercase;font-weight:700;margin-bottom:4px;font-family:'JetBrains Mono',monospace;}}
+        .oi-stat-label{{font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.9);text-transform:uppercase;font-weight:700;margin-bottom:4px;font-family:'JetBrains Mono',monospace;}}
         .oi-stat-val{{font-family:'Oxanium',monospace;font-size:clamp(14px,2vw,18px);font-weight:700;line-height:1.2;color:#e0f7fa;}}
         .oi-stat-pos{{color:#34d399!important;}}
         .oi-stat-neg{{color:#f87171!important;}}
