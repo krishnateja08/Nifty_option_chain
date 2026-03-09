@@ -3273,151 +3273,230 @@ class NiftyHTMLAnalyzer:
         # bull_pct, bear_pct, dir_name_col, dir_desc_col) come from
         # the logic above — nothing changed there.
         return f"""
-<div class="section">
-<div style="
+<style>
+/* ── OI Navy Command — responsive ── */
+.nc-wrap {{
     background:#090f1c;
     border:1px solid rgba(0,200,255,0.1);
     border-radius:12px;
     overflow:hidden;
     font-family:'JetBrains Mono',monospace;
-">
+}}
+.nc-header {{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 14px;
+    background:rgba(0,0,0,0.35);
+    border-bottom:1px solid rgba(0,200,255,0.08);
+    flex-wrap:wrap;gap:6px;
+}}
+.nc-header-left {{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}}
+.nc-header-title {{font-size:11px;font-weight:600;color:#e2eaf5;letter-spacing:.5px;}}
+.nc-header-sub {{font-size:9px;color:#8faabe;letter-spacing:1px;}}
+.nc-atm-badge {{
+    font-size:9px;letter-spacing:1.5px;white-space:nowrap;
+    background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);
+    color:#00d4ff;padding:3px 10px;border-radius:5px;
+}}
+/* Desktop: single row 7-col grid */
+.nc-grid {{
+    display:grid;
+    grid-template-columns:2fr 1px 1fr 1px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+    min-height:60px;
+}}
+.nc-divider {{background:rgba(0,200,255,0.08);}}
+.nc-dir-cell {{
+    padding:8px 14px;
+    border-left:3px solid {dir_name_col};
+    display:flex;flex-direction:column;justify-content:center;gap:1px;
+}}
+.nc-dir-label {{font-size:7px;letter-spacing:1.5px;color:{dir_desc_col};text-transform:uppercase;}}
+.nc-dir-name {{
+    font-family:'Orbitron',monospace;font-size:16px;font-weight:900;
+    color:{dir_name_col};text-shadow:0 0 14px {dir_name_col}55;line-height:1.2;
+}}
+.nc-dir-sig {{font-size:7px;color:{dir_desc_col};letter-spacing:.3px;margin-top:1px;}}
+.nc-bars-cell {{padding:8px 12px;display:flex;flex-direction:column;justify-content:center;gap:6px;}}
+.nc-bar-row {{display:flex;align-items:center;gap:5px;}}
+.nc-bar-track {{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;}}
+.nc-oi-cell {{
+    padding:8px 10px;
+    border-left:1px solid rgba(0,200,255,0.08);
+    display:flex;flex-direction:column;justify-content:center;gap:1px;
+}}
+.nc-oi-label {{font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#8faabe;}}
+.nc-oi-value {{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;line-height:1.1;}}
+.nc-oi-footer {{display:flex;align-items:center;justify-content:space-between;margin-top:2px;flex-wrap:wrap;gap:2px;}}
+.nc-oi-sub {{font-size:7px;color:#8faabe;}}
+.nc-oi-btn {{font-size:7px;padding:1px 5px;border-radius:3px;white-space:nowrap;}}
+.nc-legend {{
+    padding:6px 14px;
+    background:rgba(0,0,0,0.25);
+    border-top:1px solid rgba(0,200,255,0.06);
+    display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;
+    font-size:8px;color:#8faabe;
+}}
 
-  <!-- ── Header row ── -->
-  <div style="
-      display:flex;align-items:center;justify-content:space-between;
-      padding:8px 14px;
-      background:rgba(0,0,0,0.35);
-      border-bottom:1px solid rgba(0,200,255,0.08);
-  ">
-    <div style="display:flex;align-items:center;gap:8px;">
+/* ── MOBILE: stack into 2 rows ── */
+@media (max-width:620px) {{
+    .nc-grid {{
+        /* Row 1: Direction + Bars side-by-side
+           Row 2: CE | PE | Net equal thirds
+           Dividers hidden on mobile */
+        display:grid;
+        grid-template-columns:1fr 1fr 1fr;
+        grid-template-rows:auto auto;
+    }}
+    /* Hide the 1px divider columns on mobile */
+    .nc-divider {{ display:none; }}
+
+    /* Direction cell: spans full width of row 1 cols 1–2 */
+    .nc-dir-cell {{
+        grid-column:1 / 3;
+        grid-row:1;
+        border-left:3px solid {dir_name_col};
+        border-bottom:1px solid rgba(0,200,255,0.08);
+        padding:10px 12px;
+    }}
+    .nc-dir-name {{ font-size:18px; }}
+
+    /* Bars cell: col 3 of row 1 */
+    .nc-bars-cell {{
+        grid-column:3 / 4;
+        grid-row:1;
+        border-left:1px solid rgba(0,200,255,0.08);
+        border-bottom:1px solid rgba(0,200,255,0.08);
+        padding:10px 10px;
+    }}
+
+    /* CE cell: col 1 of row 2 */
+    .nc-ce-cell {{
+        grid-column:1 / 2;
+        grid-row:2;
+        border-top:2px solid {ce_col};
+        border-right:1px solid rgba(0,200,255,0.08);
+        padding:10px 10px;
+    }}
+    /* PE cell: col 2 of row 2 */
+    .nc-pe-cell {{
+        grid-column:2 / 3;
+        grid-row:2;
+        border-top:2px solid {pe_col};
+        border-right:1px solid rgba(0,200,255,0.08);
+        padding:10px 10px;
+    }}
+    /* Net cell: col 3 of row 2 */
+    .nc-net-cell {{
+        grid-column:3 / 4;
+        grid-row:2;
+        border-top:2px solid {net_col};
+        padding:10px 10px;
+    }}
+
+    /* Bigger value font on mobile so it's readable */
+    .nc-oi-value {{ font-size:13px; }}
+    /* Wrap the signal badge below the sub-label */
+    .nc-oi-footer {{ flex-direction:column; align-items:flex-start; gap:3px; }}
+    /* Legend: hide verbose parts, keep badges */
+    .nc-legend-verbose {{ display:none; }}
+}}
+</style>
+
+<div class="section">
+<div class="nc-wrap">
+
+  <!-- ── Header ── -->
+  <div class="nc-header">
+    <div class="nc-header-left">
       <span style="font-size:13px;">&#128202;</span>
-      <span style="font-size:11px;font-weight:600;color:#e2eaf5;letter-spacing:.5px;">Change in Open Interest</span>
-      <span style="font-size:9px;color:#8faabe;letter-spacing:1px;">Today's Direction Analysis</span>
+      <span class="nc-header-title">Change in Open Interest</span>
+      <span class="nc-header-sub">Today's Direction Analysis</span>
     </div>
-    <div style="
-        font-size:9px;letter-spacing:1.5px;
-        background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);
-        color:#00d4ff;padding:3px 10px;border-radius:5px;
-    ">ATM &#177;10</div>
+    <div class="nc-atm-badge">ATM &#177;10</div>
   </div>
 
-  <!-- ── Single compact row: Direction | Bars | CE | PE | Net ── -->
-  <div style="display:grid;grid-template-columns:2fr 1px 1fr 1px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);min-height:60px;">
+  <!-- ── Grid: Direction | divider | Bars | divider | CE | PE | Net ── -->
+  <div class="nc-grid">
 
-    <!-- Direction cell — wider -->
-    <div style="
-        padding:8px 14px;
-        background:linear-gradient(135deg,{dir_bg},{dir_bg.replace('0.92','0.03')});
-        border-left:3px solid {dir_name_col};
-        display:flex;flex-direction:column;justify-content:center;gap:1px;
-    ">
-      <div style="font-size:7px;letter-spacing:1.5px;color:{dir_desc_col};text-transform:uppercase;">Market Direction</div>
-      <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:900;color:{dir_name_col};
-                  text-shadow:0 0 14px {dir_name_col}55;line-height:1.2;">{direction}</div>
-      <div style="font-size:7px;color:{dir_desc_col};letter-spacing:.3px;margin-top:1px;">{signal}</div>
+    <!-- Direction cell -->
+    <div class="nc-dir-cell" style="background:linear-gradient(135deg,{dir_bg},{dir_bg.replace('0.92','0.03')});">
+      <div class="nc-dir-label">Market Direction</div>
+      <div class="nc-dir-name">{direction}</div>
+      <div class="nc-dir-sig">{signal}</div>
     </div>
 
     <!-- Divider -->
-    <div style="background:rgba(0,200,255,0.08);"></div>
+    <div class="nc-divider"></div>
 
-    <!-- Strength bars cell -->
-    <div style="padding:8px 12px;display:flex;flex-direction:column;justify-content:center;gap:6px;">
-      <div style="display:flex;align-items:center;gap:5px;">
+    <!-- Strength bars -->
+    <div class="nc-bars-cell">
+      <div class="nc-bar-row">
         <div style="width:5px;height:5px;border-radius:50%;background:#00ff88;box-shadow:0 0 4px #00ff88;flex-shrink:0;"></div>
-        <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-          <div style="height:100%;width:{bull_pct}%;background:#00ff88;border-radius:99px;"></div>
-        </div>
+        <div class="nc-bar-track"><div style="height:100%;width:{bull_pct}%;background:#00ff88;border-radius:99px;"></div></div>
         <div style="font-size:8px;font-weight:600;color:#00ff88;min-width:24px;text-align:right;">{bull_pct}%</div>
       </div>
-      <div style="display:flex;align-items:center;gap:5px;">
+      <div class="nc-bar-row">
         <div style="width:5px;height:5px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 4px #ff3b5c;flex-shrink:0;"></div>
-        <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-          <div style="height:100%;width:{bear_pct}%;background:#ff3b5c;border-radius:99px;box-shadow:0 0 5px rgba(255,59,92,0.4);"></div>
-        </div>
+        <div class="nc-bar-track"><div style="height:100%;width:{bear_pct}%;background:#ff3b5c;border-radius:99px;box-shadow:0 0 5px rgba(255,59,92,0.4);"></div></div>
         <div style="font-size:8px;font-weight:600;color:#ff3b5c;min-width:24px;text-align:right;">{bear_pct}%</div>
       </div>
     </div>
 
     <!-- Divider -->
-    <div style="background:rgba(0,200,255,0.08);"></div>
+    <div class="nc-divider"></div>
 
-    <!-- Call OI cell — compact -->
-    <div style="
-        padding:8px 10px;
-        border-left:1px solid rgba(0,200,255,0.08);
-        border-top:2px solid {ce_col};
-        display:flex;flex-direction:column;justify-content:center;gap:1px;
-    ">
-      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#8faabe;">Call OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{ce_col};line-height:1.1;">{ce_val:+,}</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
-        <div style="font-size:7px;color:#8faabe;">CE open interest</div>
-        <div style="font-size:7px;padding:1px 5px;border-radius:3px;
-                    background:{ce_btn_bg};border:1px solid {ce_btn_bdr};color:{ce_btn_col};">{ce_lbl}</div>
+    <!-- Call OI -->
+    <div class="nc-oi-cell nc-ce-cell" style="border-top:2px solid {ce_col};">
+      <div class="nc-oi-label">Call OI &#916;</div>
+      <div class="nc-oi-value" style="color:{ce_col};">{ce_val:+,}</div>
+      <div class="nc-oi-footer">
+        <div class="nc-oi-sub">CE open interest</div>
+        <div class="nc-oi-btn" style="background:{ce_btn_bg};border:1px solid {ce_btn_bdr};color:{ce_btn_col};">{ce_lbl}</div>
       </div>
     </div>
 
-    <!-- Put OI cell — compact -->
-    <div style="
-        padding:8px 10px;
-        border-left:1px solid rgba(0,200,255,0.08);
-        border-top:2px solid {pe_col};
-        display:flex;flex-direction:column;justify-content:center;gap:1px;
-    ">
-      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#8faabe;">Put OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{pe_col};line-height:1.1;">{pe_val:+,}</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
-        <div style="font-size:7px;color:#8faabe;">PE open interest</div>
-        <div style="font-size:7px;padding:1px 5px;border-radius:3px;
-                    background:{pe_btn_bg};border:1px solid {pe_btn_bdr};color:{pe_btn_col};">{pe_lbl}</div>
+    <!-- Put OI -->
+    <div class="nc-oi-cell nc-pe-cell" style="border-top:2px solid {pe_col};">
+      <div class="nc-oi-label">Put OI &#916;</div>
+      <div class="nc-oi-value" style="color:{pe_col};">{pe_val:+,}</div>
+      <div class="nc-oi-footer">
+        <div class="nc-oi-sub">PE open interest</div>
+        <div class="nc-oi-btn" style="background:{pe_btn_bg};border:1px solid {pe_btn_bdr};color:{pe_btn_col};">{pe_lbl}</div>
       </div>
     </div>
 
-    <!-- Net OI cell — compact -->
-    <div style="
-        padding:8px 10px;
-        border-left:1px solid rgba(0,200,255,0.08);
-        border-top:2px solid {net_col};
-        display:flex;flex-direction:column;justify-content:center;gap:1px;
-    ">
-      <div style="font-size:7px;letter-spacing:1px;text-transform:uppercase;color:#8faabe;">Net OI &#916;</div>
-      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:{net_col};line-height:1.1;">{net_val:+,}</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px;">
-        <div style="font-size:7px;color:#8faabe;">PE &#916; &#8722; CE &#916;</div>
-        <div style="font-size:7px;padding:1px 5px;border-radius:3px;
-                    background:{net_btn_bg};border:1px solid {net_btn_bdr};color:{net_btn_col};">&#9878; {net_lbl}</div>
+    <!-- Net OI -->
+    <div class="nc-oi-cell nc-net-cell" style="border-top:2px solid {net_col};">
+      <div class="nc-oi-label">Net OI &#916;</div>
+      <div class="nc-oi-value" style="color:{net_col};">{net_val:+,}</div>
+      <div class="nc-oi-footer">
+        <div class="nc-oi-sub">PE &#916; &#8722; CE &#916;</div>
+        <div class="nc-oi-btn" style="background:{net_btn_bg};border:1px solid {net_btn_bdr};color:{net_btn_col};">&#9878; {net_lbl}</div>
       </div>
     </div>
 
   </div>
 
-  <!-- ── Legend — one tight line ── -->
-  <div style="
-      padding:6px 14px;
-      background:rgba(0,0,0,0.25);
-      border-top:1px solid rgba(0,200,255,0.06);
-      display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;
-      font-size:8px;color:#8faabe;
-  ">
+  <!-- ── Legend ── -->
+  <div class="nc-legend">
     <span>&#128214;</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Call OI +</span>
-    <span>Writers selling calls</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;">Call OI +</span>
+    <span class="nc-legend-verbose">Writers selling calls</span>
     <span style="background:rgba(255,59,92,0.12);border-radius:3px;padding:1px 6px;color:#ff3b5c;">Bearish</span>
-    <span style="color:rgba(255,255,255,0.1);">|</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Call OI &#8722;</span>
-    <span>Unwinding</span>
+    <span style="color:rgba(255,255,255,0.1);" class="nc-legend-verbose">|</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;" class="nc-legend-verbose">Call OI &#8722;</span>
+    <span class="nc-legend-verbose">Unwinding</span>
+    <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;" class="nc-legend-verbose">Bullish</span>
+    <span style="color:rgba(255,255,255,0.1);" class="nc-legend-verbose">|</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;">Put OI +</span>
+    <span class="nc-legend-verbose">Writers selling puts</span>
     <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">Bullish</span>
-    <span style="color:rgba(255,255,255,0.1);">|</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Put OI +</span>
-    <span>Writers selling puts</span>
-    <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">Bullish</span>
-    <span style="color:rgba(255,255,255,0.1);">|</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Net OI</span>
+    <span style="color:rgba(255,255,255,0.1);" class="nc-legend-verbose">|</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;">Net OI</span>
     <span style="background:rgba(0,255,136,0.1);border-radius:3px;padding:1px 6px;color:#00ff88;">+ = Bullish</span>
     <span style="background:rgba(255,59,92,0.12);border-radius:3px;padding:1px 6px;color:#ff3b5c;">&#8722; = Bearish</span>
-    <span style="color:rgba(255,255,255,0.1);">|</span>
-    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;color:#8faabe;">Bull % + Bear %</span>
-    <span>= 100% &middot; relative dominance</span>
+    <span style="color:rgba(255,255,255,0.1);" class="nc-legend-verbose">|</span>
+    <span style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.07);border-radius:3px;padding:1px 6px;" class="nc-legend-verbose">Bull % + Bear %</span>
+    <span class="nc-legend-verbose">= 100% &middot; relative dominance</span>
   </div>
 
 </div>
