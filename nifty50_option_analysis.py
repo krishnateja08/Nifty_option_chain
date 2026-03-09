@@ -4192,22 +4192,9 @@ class NiftyHTMLAnalyzer:
     tick();
 
     function silentRefresh() {
-        // Only refresh the OI table if the user is currently on that tab —
-        // avoids DOM mutations (and the scroll restore) when they're elsewhere.
-        var oiPanel = document.getElementById('tab-oi-trend');
-        if (oiPanel && oiPanel.classList.contains('active')) {
-            loadOILog();
-        } else {
-            // Still fetch in background so data is ready when they switch tab,
-            // but don't call renderOITable (which triggers the scroll restore).
-            fetch('oi_log.json?_t=' + Date.now(), {cache:'no-store'})
-                .then(function(r){ return r.ok ? r.json() : null; })
-                .then(function(data){
-                    if (data && Array.isArray(data) && data.length > 0) {
-                        _oiData = data; window._oiData = data;
-                    }
-                }).catch(function(){});
-        }
+        // Silent refresh — runs on ALL tabs, no restrictions.
+        // loadOILog → renderOITable uses double-rAF scroll anchor so no jump.
+        loadOILog();
         if (typeof window.renderHeatmap === 'function') window.renderHeatmap();
         countdown = INTERVAL / 1000;
     }
@@ -4596,26 +4583,30 @@ function renderOITable(data) {
     });
 
     if (newRowsHtml) {
-        // ── Scroll-jump fix ──────────────────────────────────────────────
-        // 1. Capture BOTH window scroll AND any scrollable ancestor positions
-        //    before the DOM mutation causes a reflow.
-        // 2. Temporarily disable CSS scroll-behavior so scrollTo is instant.
-        // 3. Restore after two animation frames (ensures reflow is complete).
+        // ── Bulletproof no-scroll-jump insert ───────────────────────────
+        // overflow-anchor:none on tbody stops Chrome's scroll anchoring from
+        // auto-adjusting when rows are prepended (the main cause of jumps).
+        // We also manually save + restore window.scrollY with double-rAF to
+        // cover Firefox and Safari which don't support overflow-anchor.
         var winSy   = window.scrollY || window.pageYOffset;
         var docEl   = document.documentElement;
         var bodyEl  = document.body;
+        // Disable CSS scroll-behavior so our scrollTo is truly instant
         var prevDocSB  = docEl.style.scrollBehavior;
         var prevBodySB = bodyEl.style.scrollBehavior;
         docEl.style.scrollBehavior  = 'auto';
         bodyEl.style.scrollBehavior = 'auto';
+        // Disable browser scroll anchoring on the table body
+        tbody.style.overflowAnchor = 'none';
 
         tbody.insertAdjacentHTML('afterbegin', newRowsHtml);
 
-        // Use double-rAF: first frame = reflow, second frame = paint
-        // Only then restore scroll — guarantees no visible jump
+        // Double-rAF: frame 1 = layout/reflow, frame 2 = paint → scroll after both
         requestAnimationFrame(function() {
             requestAnimationFrame(function() {
                 window.scrollTo(0, winSy);
+                // Restore everything
+                tbody.style.overflowAnchor = '';
                 docEl.style.scrollBehavior  = prevDocSB;
                 bodyEl.style.scrollBehavior = prevBodySB;
             });
@@ -5220,8 +5211,8 @@ window.addEventListener('resize', function(){
         .oi-chart-wrap{{background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;padding:16px;margin-bottom:20px;}}
         .oi-chart-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.9);text-transform:uppercase;font-weight:700;}}
         /* ══ OPTION FLOW TABLE — POLISHED UI ════════════════════════════════ */
-        .oi-table-wrap{{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:16px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;box-shadow:0 4px 40px rgba(0,0,0,0.5);}}
-        .oi-table{{width:100%;min-width:1160px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;}}
+        .oi-table-wrap{{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:16px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;box-shadow:0 4px 40px rgba(0,0,0,0.5);overflow-anchor:none;}}
+        .oi-table{{width:100%;min-width:1160px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;overflow-anchor:none;}}
         .oi-table-scroll-hint{{display:none;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(79,195,247,0.4);padding:6px 14px 0;text-transform:uppercase;}}
 
         /* ── Header ── */
