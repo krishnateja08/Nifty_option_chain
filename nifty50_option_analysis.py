@@ -4413,12 +4413,12 @@ function renderOITable(data) {
     });
 
     if (newRowsHtml) {
-        // Save scroll position, insert rows at top, restore scroll
-        var scrollEl = tbody.closest('.oi-table-wrap') || window;
-        var sy = scrollEl === window ? window.scrollY : scrollEl.scrollTop;
+        // Always save window.scrollY — .oi-table-wrap has overflow-y:hidden
+        // so its scrollTop is always 0 and useless as a save target.
+        // Saving window scroll prevents the page jumping to top on every refresh.
+        var winSy = window.scrollY;
         tbody.insertAdjacentHTML('afterbegin', newRowsHtml);
-        if (scrollEl === window) window.scrollTo({top: sy, behavior: 'instant'});
-        else scrollEl.scrollTop = sy;
+        window.scrollTo({top: winSy, behavior: 'instant'});
     }
 
     // Remove empty state row if present
