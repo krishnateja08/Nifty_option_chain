@@ -3814,87 +3814,87 @@ class NiftyHTMLAnalyzer:
 
                 <!-- PCR / Sentiment / MaxPain stats row -->
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.06);border-radius:4px;overflow:hidden;margin-bottom:14px;">
-                    <div style="background:rgba(0,8,16,0.9);padding:12px 14px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.4);text-transform:uppercase;margin-bottom:6px;">Put / Call</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:700;line-height:1;color:{pcr_badge_col};text-shadow:0 0 12px {pcr_badge_col}66;">{pcr_str}</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(176,190,197,0.4);margin-top:4px;">PCR RATIO</div>
+                    <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">Put / Call</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:700;line-height:1;color:{pcr_badge_col};text-shadow:0 0 16px {pcr_badge_col}99;">{pcr_str}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">PCR RATIO</div>
                     </div>
-                    <div style="background:rgba(0,8,16,0.9);padding:12px 14px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.4);text-transform:uppercase;margin-bottom:6px;">OI Sentiment</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:700;line-height:1;color:{sent_col};text-shadow:0 0 12px {sent_col}66;">{sent_icon} {sent_lbl}</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(176,190,197,0.4);margin-top:4px;">{oi_dir}</div>
+                    <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">OI Sentiment</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:700;line-height:1;color:{sent_col};text-shadow:0 0 16px {sent_col}99;">{sent_icon} {sent_lbl}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">{oi_dir}</div>
                     </div>
-                    <div style="background:rgba(0,8,16,0.9);padding:12px 14px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.4);text-transform:uppercase;margin-bottom:6px;">Max Pain</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:700;line-height:1;color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,0.3);">&#8377;{max_pain:,}</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(176,190,197,0.4);margin-top:4px;">Expiry magnet</div>
+                    <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">Max Pain</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:700;line-height:1;color:#ffd700;text-shadow:0 0 16px rgba(255,215,0,0.5);">&#8377;{max_pain:,}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">Expiry magnet</div>
                     </div>
                 </div>
 
                 <!-- OI Direction bars -->
                 <div style="margin-bottom:14px;">
-                    <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
-                        OI DIRECTION <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
+                    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                        OI DIRECTION <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:#ff4d6d;width:22px;flex-shrink:0;">CE</div>
-                        <div style="flex:1;height:5px;background:rgba(255,255,255,0.04);position:relative;overflow:hidden;">
-                            <div style="height:100%;width:{ce_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.3),#ff4d6d);position:relative;">
-                                <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#ff4d6d;filter:brightness(2);box-shadow:0 0 6px #ff4d6d;"></span>
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#ff4d6d;width:26px;flex-shrink:0;">CE</div>
+                        <div style="flex:1;height:7px;background:rgba(255,255,255,0.06);position:relative;overflow:hidden;">
+                            <div style="height:100%;width:{ce_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.4),#ff4d6d);position:relative;">
+                                <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#ff4d6d;filter:brightness(2);box-shadow:0 0 8px #ff4d6d;"></span>
                             </div>
                         </div>
-                        <div style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#ff8fa3;width:52px;text-align:right;flex-shrink:0;">{ce_k}</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;width:64px;text-align:right;flex-shrink:0;">{ce_k}</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:#00e676;width:22px;flex-shrink:0;">PE</div>
-                        <div style="flex:1;height:5px;background:rgba(255,255,255,0.04);position:relative;overflow:hidden;">
-                            <div style="height:100%;width:{pe_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.3),#00e676);position:relative;">
-                                <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#00e676;filter:brightness(2);box-shadow:0 0 6px #00e676;"></span>
+                        <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#00e676;width:26px;flex-shrink:0;">PE</div>
+                        <div style="flex:1;height:7px;background:rgba(255,255,255,0.06);position:relative;overflow:hidden;">
+                            <div style="height:100%;width:{pe_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.4),#00e676);position:relative;">
+                                <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#00e676;filter:brightness(2);box-shadow:0 0 8px #00e676;"></span>
                             </div>
                         </div>
-                        <div style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#69f0ae;width:52px;text-align:right;flex-shrink:0;">{pe_k}</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;width:64px;text-align:right;flex-shrink:0;">{pe_k}</div>
                     </div>
                 </div>
 
                 <!-- OI Resistance Walls -->
-                <div style="margin-bottom:10px;">
-                    <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
-                        OI RESISTANCE WALLS <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
+                <div style="margin-bottom:12px;">
+                    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                        OI RESISTANCE WALLS <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,200,255,0.04);">
-                        <span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(255,77,109,0.12);color:#ff4d6d;border:1px solid rgba(255,77,109,0.25);width:26px;text-align:center;flex-shrink:0;">R1</span>
-                        <div style="flex:1;height:4px;background:rgba(255,255,255,0.03);">
-                            <div style="height:100%;width:{ce_wall_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.2),#ff4d6d);"></div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,200,255,0.06);">
+                        <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(255,77,109,0.15);color:#ff4d6d;border:1px solid rgba(255,77,109,0.35);width:32px;text-align:center;flex-shrink:0;">R1</span>
+                        <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
+                            <div style="height:100%;width:{ce_wall_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.3),#ff4d6d);box-shadow:0 0 6px rgba(255,77,109,0.3);"></div>
                         </div>
-                        <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#ff8fa3;flex-shrink:0;width:72px;text-align:right;">&#8377;{max_ce:,}</span>
+                        <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;flex-shrink:0;min-width:80px;text-align:right;">&#8377;{max_ce:,}</span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;">
-                        <span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(255,77,109,0.07);color:rgba(255,77,109,0.7);border:1px solid rgba(255,77,109,0.15);width:26px;text-align:center;flex-shrink:0;">R2</span>
-                        <div style="flex:1;height:4px;background:rgba(255,255,255,0.03);">
-                            <div style="height:100%;width:{ce_wall_r2_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.1),rgba(255,77,109,0.6));"></div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
+                        <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(255,77,109,0.08);color:rgba(255,100,130,0.85);border:1px solid rgba(255,77,109,0.2);width:32px;text-align:center;flex-shrink:0;">R2</span>
+                        <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
+                            <div style="height:100%;width:{ce_wall_r2_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.15),rgba(255,77,109,0.7));"></div>
                         </div>
-                        <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:rgba(255,143,163,0.6);flex-shrink:0;width:72px;text-align:right;">&#8377;{max_ce_r2:,}</span>
+                        <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:rgba(255,143,163,0.85);flex-shrink:0;min-width:80px;text-align:right;">&#8377;{max_ce_r2:,}</span>
                     </div>
                 </div>
 
                 <!-- OI Support Floors -->
                 <div>
-                    <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
-                        OI SUPPORT FLOORS <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
+                    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                        OI SUPPORT FLOORS <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,200,255,0.04);">
-                        <span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.25);width:26px;text-align:center;flex-shrink:0;">S1</span>
-                        <div style="flex:1;height:4px;background:rgba(255,255,255,0.03);">
-                            <div style="height:100%;width:{pe_wall_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.2),#00e676);"></div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,200,255,0.06);">
+                        <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(0,230,118,0.15);color:#00e676;border:1px solid rgba(0,230,118,0.35);width:32px;text-align:center;flex-shrink:0;">S1</span>
+                        <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
+                            <div style="height:100%;width:{pe_wall_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.3),#00e676);box-shadow:0 0 6px rgba(0,230,118,0.3);"></div>
                         </div>
-                        <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#69f0ae;flex-shrink:0;width:72px;text-align:right;">&#8377;{max_pe:,}</span>
+                        <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;flex-shrink:0;min-width:80px;text-align:right;">&#8377;{max_pe:,}</span>
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;">
-                        <span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(0,230,118,0.07);color:rgba(0,230,118,0.7);border:1px solid rgba(0,230,118,0.15);width:26px;text-align:center;flex-shrink:0;">S2</span>
-                        <div style="flex:1;height:4px;background:rgba(255,255,255,0.03);">
-                            <div style="height:100%;width:{pe_wall_s2_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.1),rgba(0,230,118,0.5));"></div>
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
+                        <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(0,230,118,0.08);color:rgba(0,200,100,0.85);border:1px solid rgba(0,230,118,0.2);width:32px;text-align:center;flex-shrink:0;">S2</span>
+                        <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
+                            <div style="height:100%;width:{pe_wall_s2_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.15),rgba(0,230,118,0.7));"></div>
                         </div>
-                        <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:rgba(105,240,174,0.6);flex-shrink:0;width:72px;text-align:right;">&#8377;{max_pe_s2:,}</span>
+                        <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:rgba(105,240,174,0.85);flex-shrink:0;min-width:80px;text-align:right;">&#8377;{max_pe_s2:,}</span>
                     </div>
                 </div>
 
@@ -3932,27 +3932,29 @@ class NiftyHTMLAnalyzer:
         def _pvt_row(label, val, col, badge="", nearest_col=None):
             badge_html = ""
             if badge:
-                badge_html = f'<span style="font-family:\'Space Mono\',monospace;font-size:7px;background:{nearest_col or col}22;border:1px solid {nearest_col or col}55;border-radius:2px;padding:1px 6px;color:{nearest_col or col};font-weight:700;margin-left:8px;letter-spacing:1px;">{badge}</span>'
+                badge_html = f'<span style="font-family:\'Space Mono\',monospace;font-size:8px;background:{nearest_col or col}33;border:1px solid {nearest_col or col}88;border-radius:2px;padding:2px 7px;color:{nearest_col or col};font-weight:700;margin-left:10px;letter-spacing:1px;">{badge}</span>'
             # label tag style
             if label.startswith('R'):
-                tag_style = f"background:rgba(255,77,109,0.12);color:#ff4d6d;border:1px solid rgba(255,77,109,0.25);" if label == 'R1' else ("background:rgba(255,77,109,0.07);color:rgba(255,77,109,0.7);border:1px solid rgba(255,77,109,0.15);" if label == 'R2' else "background:rgba(255,77,109,0.03);color:rgba(255,77,109,0.35);border:1px solid rgba(255,77,109,0.08);")
-                price_col = "#ff8fa3" if label == 'R1' else ("rgba(255,143,163,0.6)" if label == 'R2' else "rgba(255,143,163,0.25)")
-                bar_bg = f"rgba(255,77,109,{'0.6' if label=='R1' else ('0.35' if label=='R2' else '0.12')})"
+                tag_style = f"background:rgba(255,77,109,0.15);color:#ff4d6d;border:1px solid rgba(255,77,109,0.35);" if label == 'R1' else ("background:rgba(255,77,109,0.08);color:rgba(255,100,130,0.9);border:1px solid rgba(255,77,109,0.2);" if label == 'R2' else "background:rgba(255,77,109,0.04);color:rgba(255,77,109,0.55);border:1px solid rgba(255,77,109,0.12);")
+                price_col = "#ff6b85" if label == 'R1' else ("rgba(255,143,163,0.85)" if label == 'R2' else "rgba(255,143,163,0.45)")
+                bar_bg = f"rgba(255,77,109,{'0.65' if label=='R1' else ('0.4' if label=='R2' else '0.15')})"
                 bar_w = "65" if label == 'R1' else ("85" if label == 'R2' else "100")
+                price_size = "15px" if label == 'R1' else ("14px" if label == 'R2' else "13px")
             elif label.startswith('S'):
-                tag_style = f"background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.25);" if label == 'S1' else ("background:rgba(0,230,118,0.07);color:rgba(0,230,118,0.7);border:1px solid rgba(0,230,118,0.15);" if label == 'S2' else "background:rgba(0,230,118,0.03);color:rgba(0,230,118,0.35);border:1px solid rgba(0,230,118,0.08);")
-                price_col = "#69f0ae" if label == 'S1' else ("rgba(105,240,174,0.6)" if label == 'S2' else "rgba(105,240,174,0.25)")
-                bar_bg = f"rgba(0,230,118,{'0.6' if label=='S1' else ('0.35' if label=='S2' else '0.12')})"
+                tag_style = f"background:rgba(0,230,118,0.15);color:#00e676;border:1px solid rgba(0,230,118,0.35);" if label == 'S1' else ("background:rgba(0,230,118,0.08);color:rgba(0,200,100,0.9);border:1px solid rgba(0,230,118,0.2);" if label == 'S2' else "background:rgba(0,230,118,0.04);color:rgba(0,230,118,0.55);border:1px solid rgba(0,230,118,0.12);")
+                price_col = "#00e676" if label == 'S1' else ("rgba(105,240,174,0.85)" if label == 'S2' else "rgba(105,240,174,0.45)")
+                bar_bg = f"rgba(0,230,118,{'0.65' if label=='S1' else ('0.4' if label=='S2' else '0.15')})"
                 bar_w = "60" if label == 'S1' else ("40" if label == 'S2' else "20")
+                price_size = "15px" if label == 'S1' else ("14px" if label == 'S2' else "13px")
             else:
-                tag_style = "color:#4fc3f7;"; price_col = "#4fc3f7"; bar_bg = "rgba(79,195,247,0.4)"; bar_w = "50"
+                tag_style = "color:#4fc3f7;"; price_col = "#4fc3f7"; bar_bg = "rgba(79,195,247,0.4)"; bar_w = "50"; price_size = "14px"
             return f"""
-                <div style="display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid rgba(0,200,255,0.04);">
-                    <span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;text-align:center;padding:3px 4px;border-radius:3px;{tag_style}">{label}</span>
-                    <div style="height:3px;background:rgba(255,255,255,0.03);border-radius:0;">
+                <div style="display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(0,200,255,0.05);">
+                    <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-align:center;padding:4px 4px;border-radius:3px;{tag_style}">{label}</span>
+                    <div style="height:4px;background:rgba(255,255,255,0.04);border-radius:0;">
                         <div style="height:100%;width:{bar_w}%;background:{bar_bg};border-radius:0;"></div>
                     </div>
-                    <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-align:right;white-space:nowrap;color:{price_col};">&#8377;{val:,.2f}{badge_html}</span>
+                    <span style="font-family:'Orbitron',monospace;font-size:{price_size};font-weight:700;text-align:right;white-space:nowrap;color:{price_col};">&#8377;{val:,.2f}{badge_html}</span>
                 </div>"""
 
         pv_panel = f"""
@@ -3968,59 +3970,59 @@ class NiftyHTMLAnalyzer:
             <div style="padding:16px;">
 
                 <!-- Pivot Point hero block -->
-                <div style="background:rgba(79,195,247,0.05);border:1px solid rgba(79,195,247,0.12);border-radius:4px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.18);border-radius:4px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
                     <div>
-                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(79,195,247,0.5);text-transform:uppercase;margin-bottom:4px;">Pivot Point</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:#4fc3f7;text-shadow:0 0 20px rgba(79,195,247,0.4);">&#8377;{pp:,.2f}</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(176,190,197,0.4);margin-top:4px;">{pp_dist_lbl}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(79,195,247,0.65);text-transform:uppercase;margin-bottom:6px;">Pivot Point</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:#4fc3f7;text-shadow:0 0 24px rgba(79,195,247,0.55);">&#8377;{pp:,.2f}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(200,216,224,0.55);margin-top:5px;">{pp_dist_lbl}</div>
                     </div>
-                    <div style="text-align:right;background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:4px;padding:8px 12px;flex-shrink:0;">
-                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(79,195,247,0.4);text-transform:uppercase;margin-bottom:3px;">LTP</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
+                    <div style="text-align:right;background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.2);border-radius:4px;padding:10px 14px;flex-shrink:0;">
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(79,195,247,0.55);text-transform:uppercase;margin-bottom:5px;">LTP</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
                     </div>
                 </div>
 
                 <!-- LTP position bar S1→R1 -->
-                <div style="position:relative;height:6px;background:linear-gradient(90deg,#26c6da 0%,#4fc3f7 45%,#f44336 100%);border-radius:0;margin-bottom:5px;">
+                <div style="position:relative;height:6px;background:linear-gradient(90deg,#26c6da 0%,#4fc3f7 45%,#f44336 100%);border-radius:0;margin-bottom:6px;">
                     <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:3px;height:16px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:5;"></div>
                 </div>
-                <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:9px;color:rgba(176,190,197,0.4);margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:10px;color:rgba(200,216,224,0.6);margin-bottom:14px;">
                     <span>S1 &#8377;{s1p:,.2f}</span>
-                    <span style="color:#4fc3f7;">&#9650; LTP &#8377;{cp:,.2f}</span>
+                    <span style="color:#4fc3f7;font-weight:700;">&#9650; LTP &#8377;{cp:,.2f}</span>
                     <span>R1 &#8377;{r1p:,.2f}</span>
                 </div>
 
                 <!-- R levels -->
-                <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                    RESISTANCE <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
+                <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+                    RESISTANCE <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
                 </div>
                 {_pvt_row('R3', r3p, '#b71c1c')}
                 {_pvt_row('R2', r2p, '#ef5350')}
                 {_pvt_row('R1', r1p, '#f44336', 'NEAREST R', '#f44336')}
 
-                <div style="border-top:1px dashed rgba(79,195,247,0.1);margin:8px 0;"></div>
+                <div style="border-top:1px dashed rgba(79,195,247,0.12);margin:10px 0;"></div>
 
                 <!-- S levels -->
-                <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-                    SUPPORT <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
+                <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+                    SUPPORT <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
                 </div>
                 {_pvt_row('S1', s1p, '#26c6da', 'NEAREST S', '#26c6da')}
                 {_pvt_row('S2', s2p, '#00838f')}
                 {_pvt_row('S3', s3p, '#006064')}
 
                 <!-- Prev candle footer -->
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.06);border-radius:4px;overflow:hidden;margin-top:14px;">
-                    <div style="background:rgba(0,0,0,0.6);padding:10px 12px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(176,190,197,0.35);text-transform:uppercase;margin-bottom:3px;">Prev High</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#fca5a5;">&#8377;{ph:,.1f}</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.08);border-radius:4px;overflow:hidden;margin-top:16px;">
+                    <div style="background:rgba(0,0,0,0.6);padding:12px 14px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;color:rgba(200,216,224,0.45);text-transform:uppercase;margin-bottom:5px;">Prev High</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#fca5a5;">&#8377;{ph:,.1f}</div>
                     </div>
-                    <div style="background:rgba(0,0,0,0.6);padding:10px 12px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(176,190,197,0.35);text-transform:uppercase;margin-bottom:3px;">Prev Low</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#86efac;">&#8377;{pl:,.1f}</div>
+                    <div style="background:rgba(0,0,0,0.6);padding:12px 14px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;color:rgba(200,216,224,0.45);text-transform:uppercase;margin-bottom:5px;">Prev Low</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#86efac;">&#8377;{pl:,.1f}</div>
                     </div>
-                    <div style="background:rgba(0,0,0,0.6);padding:10px 12px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(176,190,197,0.35);text-transform:uppercase;margin-bottom:3px;">Prev Close</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#c8d8e0;">&#8377;{pc:,.2f}</div>
+                    <div style="background:rgba(0,0,0,0.6);padding:12px 14px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;color:rgba(200,216,224,0.45);text-transform:uppercase;margin-bottom:5px;">Prev Close</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#e2eaf5;">&#8377;{pc:,.2f}</div>
                     </div>
                 </div>
 
