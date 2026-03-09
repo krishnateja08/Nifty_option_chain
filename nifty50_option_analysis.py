@@ -1928,10 +1928,11 @@ def build_intraday_oi_tab_html():
                 <th>STREAK</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
+                <th>VWAP</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
-              <tr><td colspan="12" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
+              <tr><td colspan="13" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
             </tbody>
           </table>
         </div>
@@ -1945,6 +1946,7 @@ def build_intraday_oi_tab_html():
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
             <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
             <div class="logic-item"><span class="lc-bull">STREAK</span> Consecutive snapshots with same signal &nbsp;&middot;&nbsp; &#215;1 = just flipped &nbsp;&middot;&nbsp; &#215;5+ = strong trend</div>
+            <div class="logic-item"><span class="lc-info">VWAP</span> Volume Weighted Avg Price &nbsp;&middot;&nbsp; <span class="lc-bull">▲ Above = Bullish bias</span> &nbsp;<span class="lc-bear">▼ Below = Bearish bias</span></div>
             <div class="logic-item"><span class="lc-info">Timestamps</span> All times shown in IST (Asia/Kolkata)</div>
           </div>
         </div>
@@ -4377,7 +4379,7 @@ function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
     if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" class="oi-empty-state">&#128218; No data yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" class="oi-empty-state">&#128218; No data yet.</td></tr>';
         return;
     }
     var filtered = filterByInterval(data, _oiInterval);
@@ -4539,6 +4541,21 @@ function renderOITable(data) {
                 + '<td>' + streakHtml + '</td>'
                 + '<td>' + nlevelHtml + '</td>'
                 + '<td>' + distHtml + '</td>'
+                + (function(){
+                    var vwapVal = row.vwap;
+                    if (vwapVal == null || vwapVal === 0) {
+                        return '<td><span style="color:rgba(176,190,197,0.3);">—</span></td>';
+                    }
+                    var spot = row.spot_price || 0;
+                    var aboveVwap = spot >= vwapVal;
+                    var vwapCls = aboveVwap ? 'oi-vwap-bull' : 'oi-vwap-bear';
+                    var vwapArrow = aboveVwap ? '▲' : '▼';
+                    var vwapColor = aboveVwap ? '#4ade80' : '#f87171';
+                    return '<td class="oi-vwap-cell"><span style="color:' + vwapColor + ';font-weight:700;">'
+                        + vwapArrow + ' ₹' + vwapVal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})
+                        + '</span><br><span style="font-size:8px;color:rgba(147,197,253,0.5);letter-spacing:0.5px;">'
+                        + (aboveVwap ? 'Above' : 'Below') + '</span></td>';
+                })()
                 + '</tr>';
         } else if (idx === 0) {
             // Mark existing top row as LIVE
@@ -4796,7 +4813,7 @@ function loadOILog() {
         })
         .catch(function(e) {
             var tbody = document.getElementById('oiTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="12" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="13" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
         });
 }
 
