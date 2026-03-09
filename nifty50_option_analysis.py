@@ -1604,18 +1604,31 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
     spot    = round(float(technical.get('current_price', 0)), 2)
 
     # ── VWAP calculation (moved up — needed for signal logic below) ──
+    # ^NSEI is an index with zero volume → VWAP always equals spot (wrong).
+    # NIFTYBEES.NS is the Nifty ETF trading at ~Nifty/100 with real volume.
+    # Multiply its VWAP by 100 to get Nifty-equivalent VWAP.
     vwap = spot
     try:
         import yfinance as _yf
-        df_1m = _yf.Ticker("^NSEI").history(interval="1m", period="1d")
+        df_1m = _yf.Ticker("NIFTYBEES.NS").history(interval="1m", period="1d")
         if not df_1m.empty:
             df_1m = df_1m.dropna(subset=['Close','Volume'])
-            tp  = (df_1m['High'] + df_1m['Low'] + df_1m['Close']) / 3
-            cum_tpv = (tp * df_1m['Volume']).cumsum()
-            cum_vol = df_1m['Volume'].cumsum()
-            vwap_series = cum_tpv / cum_vol.replace(0, float('nan'))
-            if not vwap_series.empty and not pd.isna(vwap_series.iloc[-1]):
-                vwap = round(float(vwap_series.iloc[-1]), 2)
+            df_1m = df_1m[df_1m['Volume'] > 0]
+            if len(df_1m) >= 5:
+                tp  = (df_1m['High'] + df_1m['Low'] + df_1m['Close']) / 3
+                cum_tpv = (tp * df_1m['Volume']).cumsum()
+                cum_vol = df_1m['Volume'].cumsum()
+                vwap_series = cum_tpv / cum_vol
+                last_vwap = vwap_series.iloc[-1]
+                if not pd.isna(last_vwap) and last_vwap > 0:
+                    vwap = round(float(last_vwap) * 100, 2)   # scale ETF → Nifty
+                    print(f"  ✅ VWAP (NIFTYBEES×100): {vwap}")
+                else:
+                    print(f"  ⚠️  VWAP: series NaN — fallback to spot")
+            else:
+                print(f"  ⚠️  VWAP: insufficient 1m bars ({len(df_1m)}) — fallback to spot")
+        else:
+            print(f"  ⚠️  VWAP: empty dataframe — fallback to spot")
     except Exception as e:
         print(f"  ⚠️  VWAP calc failed: {e} — using spot as VWAP")
 
