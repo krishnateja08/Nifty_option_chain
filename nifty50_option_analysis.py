@@ -1603,12 +1603,7 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
     pcr     = round(option_analysis.get('pcr_oi', 0), 2)
     spot    = round(float(technical.get('current_price', 0)), 2)
 
-    if   diff < -5_000_000:  opt_signal = "STRONG SELL"
-    elif diff < 0:            opt_signal = "SELL"
-    elif diff > 5_000_000:   opt_signal = "STRONG BUY"
-    elif diff > 0:            opt_signal = "BUY"
-    else:                     opt_signal = "NEUTRAL"
-
+    # ── VWAP calculation (moved up — needed for signal logic below) ──
     vwap = spot
     try:
         import yfinance as _yf
@@ -1624,6 +1619,47 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
     except Exception as e:
         print(f"  ⚠️  VWAP calc failed: {e} — using spot as VWAP")
 
+    spot_above_vwap = spot >= vwap
+
+    # ── OI Signal Logic: Step 1 — direction, Step 2 — ratio, Step 3 — PCR+VWAP tiebreaker ──
+    # Step 1: CE and PE moving in OPPOSITE directions → clear signal
+    if   ce_chg > 0 and pe_chg < 0:
+        # Calls building + Puts unwinding = true bearish
+        opt_signal = "STRONG SELL"
+    elif ce_chg < 0 and pe_chg > 0:
+        # Calls unwinding + Puts building = true bullish
+        opt_signal = "STRONG BUY"
+
+    # Step 2: Both building → check if one side clearly dominates (1.5× ratio)
+    elif ce_chg > 0 and pe_chg > 0:
+        if   pe_chg > ce_chg * 1.5:
+            opt_signal = "BUY"           # Put build clearly dominant
+        elif ce_chg > pe_chg * 1.5:
+            opt_signal = "SELL"          # Call build clearly dominant
+        else:
+            # Step 3: Neither dominates → use PCR + VWAP as tiebreaker
+            # PCR > 1.8 (panic zone): VWAP decides — if spot below VWAP,
+            #   floor has broken and retail fear is valid → SELL
+            # PCR 1.2–1.8 (normal institutional put writing): bullish only
+            #   if price is respecting that floor (spot above VWAP)
+            # PCR 0.8–1.2: neutral regardless
+            # PCR < 0.8: bearish only if price confirms (spot below VWAP)
+            if pcr > 1.8:
+                opt_signal = "SELL"      if not spot_above_vwap else "BUY"
+            elif pcr > 1.2:
+                opt_signal = "BUY"       if spot_above_vwap     else "NEUTRAL"
+            elif pcr < 0.8:
+                opt_signal = "SELL"      if not spot_above_vwap else "NEUTRAL"
+            else:
+                opt_signal = "NEUTRAL"   # PCR 0.8–1.2: truly ambiguous
+
+    # Step 4: Both unwinding → no conviction either way
+    elif ce_chg < 0 and pe_chg < 0:
+        opt_signal = "NEUTRAL"
+
+    else:
+        opt_signal = "NEUTRAL"
+
     fut_price = round(spot - 25, 2)
     try:
         import yfinance as _yf
@@ -1634,7 +1670,7 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
     except Exception as e:
         print(f"  ⚠️  Futures price fetch failed: {e} — using spot - 25 as proxy")
 
-    vwap_signal = "BUY" if spot >= vwap else "SELL"
+    vwap_signal = "BUY" if spot_above_vwap else "SELL"
 
     # ── Nifty 50 % move from previous day close ──
     nifty_move_pct = None
