@@ -3801,88 +3801,103 @@ class NiftyHTMLAnalyzer:
         pcr_badge_col = '#26c6da' if pcr > 1.0 else ('#f44336' if pcr < 0.8 else '#ffb74d')
 
         oc_panel = "" if not d['has_option_data'] else f"""
-        <!-- ── Option Chain Analysis Sub-Panel ── -->
-        <div style="background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:18px 20px;flex:1;min-width:280px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:6px;">
-                <div style="font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#4fc3f7;">
-                    &#128200; OPTION CHAIN ANALYSIS
-                </div>
-                <div style="font-size:10px;color:#8faabe;letter-spacing:0.8px;">NIFTY &middot; WEEKLY EXPIRY &middot; LIVE DATA</div>
+        <!-- ── Option Chain Analysis Sub-Panel · Sample 1 Command Terminal ── -->
+        <div style="background:#080f18;border:1px solid rgba(0,200,255,0.15);border-radius:6px;flex:1;min-width:280px;overflow:hidden;">
+
+            <!-- header bar -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.5);border-bottom:1px solid rgba(0,200,255,0.1);">
+                <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:#00c8ff;text-transform:uppercase;">&#11043; Option Chain Analysis</span>
+                <span style="font-family:'Space Mono',monospace;font-size:8px;padding:2px 8px;border-radius:2px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.2);color:rgba(0,200,255,0.7);letter-spacing:1px;">NIFTY &middot; LIVE</span>
             </div>
 
-            <!-- PCR + Sentiment row -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
-                <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:10px;padding:10px;text-align:center;">
-                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:4px;">PUT / CALL</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:{pcr_badge_col};">{pcr_str}</div>
-                    <div style="font-size:9px;color:#8faabe;margin-top:2px;">PCR RATIO</div>
-                </div>
-                <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:10px;padding:10px;text-align:center;">
-                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:4px;">OI SENTIMENT</div>
-                    <div style="font-size:15px;font-weight:700;color:{sent_col};">{sent_icon} {sent_lbl}</div>
-                    <div style="font-size:9px;color:#8faabe;margin-top:2px;">{oi_dir}</div>
-                </div>
-                <div style="background:rgba(255,183,77,0.07);border:1px solid rgba(255,183,77,0.2);border-radius:10px;padding:10px;text-align:center;">
-                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:4px;">MAX PAIN</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#ffb74d;">&#8377;{max_pain:,}</div>
-                    <div style="font-size:9px;color:#8faabe;margin-top:2px;">Price magnet at expiry</div>
-                </div>
-            </div>
+            <div style="padding:16px;">
 
-            <!-- Call / Put Buildups -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-                <div style="background:rgba(244,67,54,0.07);border:1px solid rgba(244,67,54,0.2);border-radius:10px;padding:10px;">
-                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:6px;">&#128200; CALL BUILDUP (OI)</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:{ce_col};">&#9650; {ce_k}</div>
-                    <div style="height:5px;background:rgba(0,0,0,0.35);border-radius:3px;margin-top:8px;overflow:hidden;">
-                        <div style="height:100%;width:{ce_w}%;background:{ce_col};border-radius:3px;transition:width 0.6s;"></div>
+                <!-- PCR / Sentiment / MaxPain stats row -->
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.06);border-radius:4px;overflow:hidden;margin-bottom:14px;">
+                    <div style="background:rgba(0,8,16,0.9);padding:12px 14px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.4);text-transform:uppercase;margin-bottom:6px;">Put / Call</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:700;line-height:1;color:{pcr_badge_col};text-shadow:0 0 12px {pcr_badge_col}66;">{pcr_str}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(176,190,197,0.4);margin-top:4px;">PCR RATIO</div>
+                    </div>
+                    <div style="background:rgba(0,8,16,0.9);padding:12px 14px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.4);text-transform:uppercase;margin-bottom:6px;">OI Sentiment</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:700;line-height:1;color:{sent_col};text-shadow:0 0 12px {sent_col}66;">{sent_icon} {sent_lbl}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(176,190,197,0.4);margin-top:4px;">{oi_dir}</div>
+                    </div>
+                    <div style="background:rgba(0,8,16,0.9);padding:12px 14px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.4);text-transform:uppercase;margin-bottom:6px;">Max Pain</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:700;line-height:1;color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,0.3);">&#8377;{max_pain:,}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:rgba(176,190,197,0.4);margin-top:4px;">Expiry magnet</div>
                     </div>
                 </div>
-                <div style="background:rgba(38,198,218,0.07);border:1px solid rgba(38,198,218,0.2);border-radius:10px;padding:10px;">
-                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;margin-bottom:6px;">&#128200; PUT BUILDUP (OI)</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:{pe_col};">&#9650; {pe_k}</div>
-                    <div style="height:5px;background:rgba(0,0,0,0.35);border-radius:3px;margin-top:8px;overflow:hidden;">
-                        <div style="height:100%;width:{pe_w}%;background:{pe_col};border-radius:3px;transition:width 0.6s;"></div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- OI Resistance Walls — R1 + R2 -->
-            <div style="margin-bottom:10px;">
-                <div style="font-size:10px;color:#f44336;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#9632; OI RESISTANCE WALLS</div>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-                    <span style="font-size:10px;background:rgba(244,67,54,0.2);border:1px solid rgba(244,67,54,0.4);border-radius:4px;padding:2px 7px;color:#f44336;font-weight:700;">R1</span>
-                    <div style="flex:1;height:6px;background:rgba(0,0,0,0.35);border-radius:3px;overflow:hidden;">
-                        <div style="height:100%;width:{ce_wall_w}%;background:linear-gradient(90deg,#f44336,#ff7043);border-radius:3px;"></div>
+                <!-- OI Direction bars -->
+                <div style="margin-bottom:14px;">
+                    <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+                        OI DIRECTION <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
                     </div>
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#f44336;font-weight:700;">&#8377;{max_ce:,}</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-                    <span style="font-size:10px;background:rgba(244,67,54,0.1);border:1px solid rgba(244,67,54,0.25);border-radius:4px;padding:2px 7px;color:#ff7043;font-weight:700;">R2</span>
-                    <div style="flex:1;height:6px;background:rgba(0,0,0,0.35);border-radius:3px;overflow:hidden;">
-                        <div style="height:100%;width:{ce_wall_r2_w}%;background:linear-gradient(90deg,#ff7043,#ffa726);border-radius:3px;"></div>
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:#ff4d6d;width:22px;flex-shrink:0;">CE</div>
+                        <div style="flex:1;height:5px;background:rgba(255,255,255,0.04);position:relative;overflow:hidden;">
+                            <div style="height:100%;width:{ce_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.3),#ff4d6d);position:relative;">
+                                <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#ff4d6d;filter:brightness(2);box-shadow:0 0 6px #ff4d6d;"></span>
+                            </div>
+                        </div>
+                        <div style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#ff8fa3;width:52px;text-align:right;flex-shrink:0;">{ce_k}</div>
                     </div>
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#ff7043;font-weight:700;">&#8377;{max_ce_r2:,}</span>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:8px;color:#00e676;width:22px;flex-shrink:0;">PE</div>
+                        <div style="flex:1;height:5px;background:rgba(255,255,255,0.04);position:relative;overflow:hidden;">
+                            <div style="height:100%;width:{pe_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.3),#00e676);position:relative;">
+                                <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#00e676;filter:brightness(2);box-shadow:0 0 6px #00e676;"></span>
+                            </div>
+                        </div>
+                        <div style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#69f0ae;width:52px;text-align:right;flex-shrink:0;">{pe_k}</div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- OI Support Floors — S1 + S2 -->
-            <div>
-                <div style="font-size:10px;color:#26c6da;letter-spacing:1px;margin-bottom:6px;font-weight:700;">&#9632; OI SUPPORT FLOORS</div>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-                    <span style="font-size:10px;background:rgba(38,198,218,0.2);border:1px solid rgba(38,198,218,0.4);border-radius:4px;padding:2px 7px;color:#26c6da;font-weight:700;">S1</span>
-                    <div style="flex:1;height:6px;background:rgba(0,0,0,0.35);border-radius:3px;overflow:hidden;">
-                        <div style="height:100%;width:{pe_wall_w}%;background:linear-gradient(90deg,#26c6da,#00bcd4);border-radius:3px;"></div>
+                <!-- OI Resistance Walls -->
+                <div style="margin-bottom:10px;">
+                    <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+                        OI RESISTANCE WALLS <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
                     </div>
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#26c6da;font-weight:700;">&#8377;{max_pe:,}</span>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-                    <span style="font-size:10px;background:rgba(38,198,218,0.1);border:1px solid rgba(38,198,218,0.25);border-radius:4px;padding:2px 7px;color:#4dd0e1;font-weight:700;">S2</span>
-                    <div style="flex:1;height:6px;background:rgba(0,0,0,0.35);border-radius:3px;overflow:hidden;">
-                        <div style="height:100%;width:{pe_wall_s2_w}%;background:linear-gradient(90deg,#4dd0e1,#80deea);border-radius:3px;"></div>
+                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,200,255,0.04);">
+                        <span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(255,77,109,0.12);color:#ff4d6d;border:1px solid rgba(255,77,109,0.25);width:26px;text-align:center;flex-shrink:0;">R1</span>
+                        <div style="flex:1;height:4px;background:rgba(255,255,255,0.03);">
+                            <div style="height:100%;width:{ce_wall_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.2),#ff4d6d);"></div>
+                        </div>
+                        <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#ff8fa3;flex-shrink:0;width:72px;text-align:right;">&#8377;{max_ce:,}</span>
                     </div>
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#4dd0e1;font-weight:700;">&#8377;{max_pe_s2:,}</span>
+                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;">
+                        <span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(255,77,109,0.07);color:rgba(255,77,109,0.7);border:1px solid rgba(255,77,109,0.15);width:26px;text-align:center;flex-shrink:0;">R2</span>
+                        <div style="flex:1;height:4px;background:rgba(255,255,255,0.03);">
+                            <div style="height:100%;width:{ce_wall_r2_w}%;background:linear-gradient(90deg,rgba(255,77,109,0.1),rgba(255,77,109,0.6));"></div>
+                        </div>
+                        <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:rgba(255,143,163,0.6);flex-shrink:0;width:72px;text-align:right;">&#8377;{max_ce_r2:,}</span>
+                    </div>
                 </div>
+
+                <!-- OI Support Floors -->
+                <div>
+                    <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+                        OI SUPPORT FLOORS <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,200,255,0.04);">
+                        <span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.25);width:26px;text-align:center;flex-shrink:0;">S1</span>
+                        <div style="flex:1;height:4px;background:rgba(255,255,255,0.03);">
+                            <div style="height:100%;width:{pe_wall_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.2),#00e676);"></div>
+                        </div>
+                        <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#69f0ae;flex-shrink:0;width:72px;text-align:right;">&#8377;{max_pe:,}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;">
+                        <span style="font-family:'Space Mono',monospace;font-size:7px;padding:2px 6px;border-radius:2px;background:rgba(0,230,118,0.07);color:rgba(0,230,118,0.7);border:1px solid rgba(0,230,118,0.15);width:26px;text-align:center;flex-shrink:0;">S2</span>
+                        <div style="flex:1;height:4px;background:rgba(255,255,255,0.03);">
+                            <div style="height:100%;width:{pe_wall_s2_w}%;background:linear-gradient(90deg,rgba(0,230,118,0.1),rgba(0,230,118,0.5));"></div>
+                        </div>
+                        <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:rgba(105,240,174,0.6);flex-shrink:0;width:72px;text-align:right;">&#8377;{max_pe_s2:,}</span>
+                    </div>
+                </div>
+
             </div>
         </div>"""
 
@@ -3917,77 +3932,105 @@ class NiftyHTMLAnalyzer:
         def _pvt_row(label, val, col, badge="", nearest_col=None):
             badge_html = ""
             if badge:
-                badge_html = f'<span style="font-size:9px;background:{nearest_col or col}33;border:1px solid {nearest_col or col}88;border-radius:4px;padding:2px 7px;color:{nearest_col or col};font-weight:700;margin-left:8px;">{badge}</span>'
+                badge_html = f'<span style="font-family:\'Space Mono\',monospace;font-size:7px;background:{nearest_col or col}22;border:1px solid {nearest_col or col}55;border-radius:2px;padding:1px 6px;color:{nearest_col or col};font-weight:700;margin-left:8px;letter-spacing:1px;">{badge}</span>'
+            # label tag style
+            if label.startswith('R'):
+                tag_style = f"background:rgba(255,77,109,0.12);color:#ff4d6d;border:1px solid rgba(255,77,109,0.25);" if label == 'R1' else ("background:rgba(255,77,109,0.07);color:rgba(255,77,109,0.7);border:1px solid rgba(255,77,109,0.15);" if label == 'R2' else "background:rgba(255,77,109,0.03);color:rgba(255,77,109,0.35);border:1px solid rgba(255,77,109,0.08);")
+                price_col = "#ff8fa3" if label == 'R1' else ("rgba(255,143,163,0.6)" if label == 'R2' else "rgba(255,143,163,0.25)")
+                bar_bg = f"rgba(255,77,109,{'0.6' if label=='R1' else ('0.35' if label=='R2' else '0.12')})"
+                bar_w = "65" if label == 'R1' else ("85" if label == 'R2' else "100")
+            elif label.startswith('S'):
+                tag_style = f"background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.25);" if label == 'S1' else ("background:rgba(0,230,118,0.07);color:rgba(0,230,118,0.7);border:1px solid rgba(0,230,118,0.15);" if label == 'S2' else "background:rgba(0,230,118,0.03);color:rgba(0,230,118,0.35);border:1px solid rgba(0,230,118,0.08);")
+                price_col = "#69f0ae" if label == 'S1' else ("rgba(105,240,174,0.6)" if label == 'S2' else "rgba(105,240,174,0.25)")
+                bar_bg = f"rgba(0,230,118,{'0.6' if label=='S1' else ('0.35' if label=='S2' else '0.12')})"
+                bar_w = "60" if label == 'S1' else ("40" if label == 'S2' else "20")
+            else:
+                tag_style = "color:#4fc3f7;"; price_col = "#4fc3f7"; bar_bg = "rgba(79,195,247,0.4)"; bar_w = "50"
             return f"""
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(79,195,247,0.06);">
-                    <span style="font-size:12px;color:{col};font-weight:600;min-width:28px;">{label}</span>
-                    <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:{col};font-weight:700;">&#8377;{val:,.2f}{badge_html}</span>
+                <div style="display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid rgba(0,200,255,0.04);">
+                    <span style="font-family:'Space Mono',monospace;font-size:9px;font-weight:700;text-align:center;padding:3px 4px;border-radius:3px;{tag_style}">{label}</span>
+                    <div style="height:3px;background:rgba(255,255,255,0.03);border-radius:0;">
+                        <div style="height:100%;width:{bar_w}%;background:{bar_bg};border-radius:0;"></div>
+                    </div>
+                    <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-align:right;white-space:nowrap;color:{price_col};">&#8377;{val:,.2f}{badge_html}</span>
                 </div>"""
 
         pv_panel = f"""
-        <!-- ── Pivot Points Sub-Panel ── -->
-        <div style="background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:18px 20px;flex:1;min-width:280px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:6px;">
-                <div style="font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:#4fc3f7;">
-                    &#128204; PIVOT POINTS <span style="font-size:10px;font-weight:400;color:#8faabe;">(Traditional)</span>
-                </div>
-                <div style="font-size:10px;color:#8faabe;letter-spacing:0.8px;">Daily &middot; Auto-calculated</div>
+        <!-- ── Pivot Points Sub-Panel · Sample 1 Command Terminal ── -->
+        <div style="background:#080f18;border:1px solid rgba(0,200,255,0.15);border-radius:6px;flex:1;min-width:280px;overflow:hidden;">
+
+            <!-- header bar -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.5);border-bottom:1px solid rgba(0,200,255,0.1);">
+                <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:#00c8ff;text-transform:uppercase;">&#9670; Pivot Points</span>
+                <span style="font-family:'Space Mono',monospace;font-size:8px;padding:2px 8px;border-radius:2px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.2);color:rgba(0,200,255,0.7);letter-spacing:1px;">DAILY &middot; AUTO</span>
             </div>
 
-            <!-- LTP position bar -->
-            <div style="position:relative;height:8px;background:linear-gradient(90deg,#26c6da 0%,#4fc3f7 45%,#f44336 100%);border-radius:4px;margin-bottom:6px;box-shadow:0 2px 10px rgba(0,0,0,0.4);">
-                <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:4px;height:18px;background:#fff;border-radius:2px;box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:5;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:#8faabe;margin-bottom:12px;">
-                <span>S1 &#8377;{s1p:,.2f}</span>
-                <span style="color:#4fc3f7;">&#9650; LTP &#8377;{cp:,.2f}</span>
-                <span>R1 &#8377;{r1p:,.2f}</span>
-            </div>
+            <div style="padding:16px;">
 
-            <!-- Pivot table: R levels -->
-            {_pvt_row('R3', r3p, '#b71c1c')}
-            {_pvt_row('R2', r2p, '#ef5350')}
-            {_pvt_row('R1', r1p, '#f44336', 'NEAREST R', '#f44336')}
+                <!-- Pivot Point hero block -->
+                <div style="background:rgba(79,195,247,0.05);border:1px solid rgba(79,195,247,0.12);border-radius:4px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                    <div>
+                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(79,195,247,0.5);text-transform:uppercase;margin-bottom:4px;">Pivot Point</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:#4fc3f7;text-shadow:0 0 20px rgba(79,195,247,0.4);">&#8377;{pp:,.2f}</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(176,190,197,0.4);margin-top:4px;">{pp_dist_lbl}</div>
+                    </div>
+                    <div style="text-align:right;background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:4px;padding:8px 12px;flex-shrink:0;">
+                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(79,195,247,0.4);text-transform:uppercase;margin-bottom:3px;">LTP</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
+                    </div>
+                </div>
 
-            <!-- Pivot point center -->
-            <div style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.3);border-radius:8px;padding:8px 12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;">
-                <div>
-                    <div style="font-size:10px;color:#8faabe;letter-spacing:1px;">PIVOT POINT</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#4fc3f7;">&#8377;{pp:,.2f}</div>
-                    <div style="font-size:10px;color:#8faabe;">{pp_dist_lbl}</div>
+                <!-- LTP position bar S1→R1 -->
+                <div style="position:relative;height:6px;background:linear-gradient(90deg,#26c6da 0%,#4fc3f7 45%,#f44336 100%);border-radius:0;margin-bottom:5px;">
+                    <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:3px;height:16px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:5;"></div>
                 </div>
-                <div style="text-align:right;">
-                    <div style="font-size:10px;color:#8faabe;">LTP</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;background:rgba(79,195,247,0.15);border:1px solid rgba(79,195,247,0.4);border-radius:6px;padding:4px 10px;color:#4fc3f7;">&#8377;{cp:,.2f}</div>
+                <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:9px;color:rgba(176,190,197,0.4);margin-bottom:12px;">
+                    <span>S1 &#8377;{s1p:,.2f}</span>
+                    <span style="color:#4fc3f7;">&#9650; LTP &#8377;{cp:,.2f}</span>
+                    <span>R1 &#8377;{r1p:,.2f}</span>
                 </div>
-            </div>
 
-            <!-- Pivot table: S levels -->
-            {_pvt_row('S1', s1p, '#26c6da', 'NEAREST S', '#26c6da')}
-            {_pvt_row('S2', s2p, '#00838f')}
-            {_pvt_row('S3', s3p, '#006064')}
+                <!-- R levels -->
+                <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                    RESISTANCE <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
+                </div>
+                {_pvt_row('R3', r3p, '#b71c1c')}
+                {_pvt_row('R2', r2p, '#ef5350')}
+                {_pvt_row('R1', r1p, '#f44336', 'NEAREST R', '#f44336')}
 
-            <!-- Prev candle OHLC footer -->
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px;">
-                <div style="background:rgba(244,67,54,0.07);border:1px solid rgba(244,67,54,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
-                    <div style="font-size:9px;color:#8faabe;margin-bottom:2px;">&#9650; PREV HIGH</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#f44336;">&#8377;{ph:,.1f}</div>
+                <div style="border-top:1px dashed rgba(79,195,247,0.1);margin:8px 0;"></div>
+
+                <!-- S levels -->
+                <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(0,200,255,0.35);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                    SUPPORT <span style="flex:1;height:1px;background:rgba(0,200,255,0.08);display:inline-block;"></span>
                 </div>
-                <div style="background:rgba(38,198,218,0.07);border:1px solid rgba(38,198,218,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
-                    <div style="font-size:9px;color:#8faabe;margin-bottom:2px;">&#9660; PREV LOW</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#26c6da;">&#8377;{pl:,.1f}</div>
+                {_pvt_row('S1', s1p, '#26c6da', 'NEAREST S', '#26c6da')}
+                {_pvt_row('S2', s2p, '#00838f')}
+                {_pvt_row('S3', s3p, '#006064')}
+
+                <!-- Prev candle footer -->
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.06);border-radius:4px;overflow:hidden;margin-top:14px;">
+                    <div style="background:rgba(0,0,0,0.6);padding:10px 12px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(176,190,197,0.35);text-transform:uppercase;margin-bottom:3px;">Prev High</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#fca5a5;">&#8377;{ph:,.1f}</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.6);padding:10px 12px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(176,190,197,0.35);text-transform:uppercase;margin-bottom:3px;">Prev Low</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#86efac;">&#8377;{pl:,.1f}</div>
+                    </div>
+                    <div style="background:rgba(0,0,0,0.6);padding:10px 12px;">
+                        <div style="font-family:'Space Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(176,190,197,0.35);text-transform:uppercase;margin-bottom:3px;">Prev Close</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:#c8d8e0;">&#8377;{pc:,.2f}</div>
+                    </div>
                 </div>
-                <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.15);border-radius:7px;padding:6px 8px;text-align:center;">
-                    <div style="font-size:9px;color:#8faabe;margin-bottom:2px;">&#9679; PREV CLOSE</div>
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#80deea;">&#8377;{pc:,.2f}</div>
-                </div>
+
             </div>
         </div>"""
 
         return f"""
     <div class="section">
         <div class="section-title"><span>&#128204;</span> OPTION CHAIN &amp; PIVOT POINTS</div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;gap:2px;flex-wrap:wrap;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.15);border-radius:6px;overflow:hidden;">
             {oc_panel if d['has_option_data'] else '<div style="color:#8faabe;font-size:13px;padding:16px;">Option data unavailable</div>'}
             {pv_panel}
         </div>
