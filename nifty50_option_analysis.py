@@ -4779,7 +4779,7 @@ window.addEventListener('resize', function(){
     <style>
         *{{margin:0;padding:0;box-sizing:border-box;}}
         html{{scroll-behavior:smooth;}}
-        body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:clamp(8px,2vw,24px);color:#c8d8e0;overflow-x:hidden;-webkit-text-size-adjust:100%;}}
+        body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:0;color:#c8d8e0;overflow-x:hidden;-webkit-text-size-adjust:100%;}}
 
         .tab-nav{{display:flex;gap:0;border-bottom:2px solid rgba(79,195,247,0.2);overflow-x:auto;scrollbar-width:none;background:linear-gradient(135deg,#0f2027,#203a43);}}
         .tab-nav::-webkit-scrollbar{{display:none;}}
@@ -4793,7 +4793,7 @@ window.addEventListener('resize', function(){
         .tab-panel{{display:none;}}
         .tab-panel.active{{display:block;}}
 
-        .container{{max-width:1600px;margin:0 auto;background:rgba(15,32,39,0.85);backdrop-filter:blur(20px);border-radius:clamp(12px,2vw,20px);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(79,195,247,0.18);min-width:0;}}
+        .container{{max-width:100%;width:100%;margin:0;background:rgba(15,32,39,0.85);backdrop-filter:blur(20px);border-radius:0;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:none;min-width:0;}}
         .header{{background:linear-gradient(135deg,#0f2027,#203a43);padding:clamp(16px,3vw,32px) clamp(14px,3vw,30px) 0;text-align:center;position:relative;overflow:hidden;}}
         .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}}
         .header h1{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,3.5vw,30px);font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:clamp(0.5px,0.3vw,2px);position:relative;z-index:1;word-break:break-word;margin-bottom:clamp(10px,2vw,18px);}}
