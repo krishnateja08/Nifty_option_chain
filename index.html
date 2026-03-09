@@ -620,7 +620,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">09-Mar-2026 23:15 IST</span>
+                <span class="sb-value gen-val">09-Mar-2026 23:22 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -688,17 +688,23 @@
     background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);
     color:#00d4ff;padding:3px 10px;border-radius:5px;
 }
-/* Desktop: single row 7-col grid */
+/* Desktop: single row — direction+bars merged | divider | CE | PE | Net */
 .nc-grid {
     display:grid;
-    grid-template-columns:2fr 1px 1fr 1px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
+    grid-template-columns:2.2fr 1px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
     min-height:90px;
 }
 .nc-divider {background:rgba(0,200,255,0.08);}
+
+/* Direction+bars unified cell — left:text  right:bars */
 .nc-dir-cell {
     padding:14px 18px;
     border-left:3px solid #fb7185;
+    display:flex;flex-direction:row;align-items:center;gap:0;
+}
+.nc-dir-text {
     display:flex;flex-direction:column;justify-content:center;gap:3px;
+    flex:0 0 auto; min-width:140px;
 }
 .nc-dir-label {font-size:8px;letter-spacing:1.5px;color:rgba(251,113,133,0.5);text-transform:uppercase;}
 .nc-dir-name {
@@ -706,9 +712,25 @@
     color:#fb7185;text-shadow:0 0 18px #fb718577;line-height:1.2;
 }
 .nc-dir-sig {font-size:9px;color:rgba(251,113,133,0.5);letter-spacing:.3px;margin-top:2px;}
-.nc-bars-cell {padding:14px 14px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
-.nc-bar-row {display:flex;align-items:center;gap:6px;}
-.nc-bar-track {flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;}
+
+/* Bars block — fills remaining space of direction cell */
+.nc-bars-block {
+    flex:1;
+    display:flex;flex-direction:column;justify-content:center;gap:10px;
+    padding:0 18px 0 24px;
+    border-left:1px solid rgba(0,200,255,0.08);
+    margin-left:16px;
+}
+.nc-bar-row {display:flex;align-items:center;gap:10px;}
+.nc-bar-lbl {
+    font-size:9px;font-weight:700;letter-spacing:1px;
+    width:32px;flex-shrink:0;
+}
+.nc-bar-track {flex:1;height:6px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;}
+.nc-bar-pct {
+    font-family:'Orbitron',monospace;font-size:15px;font-weight:900;
+    min-width:42px;text-align:right;flex-shrink:0;
+}
 .nc-oi-cell {
     padding:14px 14px;
     border-left:1px solid rgba(0,200,255,0.08);
@@ -730,64 +752,51 @@
 /* ── MOBILE: stack into 2 rows ── */
 @media (max-width:620px) {
     .nc-grid {
-        /* Row 1: Direction + Bars side-by-side
-           Row 2: CE | PE | Net equal thirds
-           Dividers hidden on mobile */
         display:grid;
         grid-template-columns:1fr 1fr 1fr;
         grid-template-rows:auto auto;
     }
-    /* Hide the 1px divider columns on mobile */
     .nc-divider { display:none; }
 
-    /* Direction cell: spans full width of row 1 cols 1–2 */
+    /* Direction+bars cell: spans full row 1 */
     .nc-dir-cell {
-        grid-column:1 / 3;
+        grid-column:1 / 4;
         grid-row:1;
         border-left:3px solid #fb7185;
         border-bottom:1px solid rgba(0,200,255,0.08);
-        padding:10px 12px;
+        padding:12px 14px;
+        flex-direction:row;
+        align-items:center;
     }
+    .nc-dir-text { min-width:110px; }
     .nc-dir-name { font-size:18px; }
-
-    /* Bars cell: col 3 of row 1 */
-    .nc-bars-cell {
-        grid-column:3 / 4;
-        grid-row:1;
-        border-left:1px solid rgba(0,200,255,0.08);
-        border-bottom:1px solid rgba(0,200,255,0.08);
-        padding:10px 10px;
+    .nc-bars-block {
+        padding:0 10px 0 16px;
+        margin-left:12px;
     }
+    .nc-bar-pct { font-size:13px; min-width:36px; }
 
-    /* CE cell: col 1 of row 2 */
+    /* CE / PE / Net — equal thirds in row 2 */
     .nc-ce-cell {
-        grid-column:1 / 2;
-        grid-row:2;
+        grid-column:1 / 2; grid-row:2;
         border-top:2px solid #fb7185;
         border-right:1px solid rgba(0,200,255,0.08);
         padding:10px 10px;
     }
-    /* PE cell: col 2 of row 2 */
     .nc-pe-cell {
-        grid-column:2 / 3;
-        grid-row:2;
+        grid-column:2 / 3; grid-row:2;
         border-top:2px solid #34d399;
         border-right:1px solid rgba(0,200,255,0.08);
         padding:10px 10px;
     }
-    /* Net cell: col 3 of row 2 */
     .nc-net-cell {
-        grid-column:3 / 4;
-        grid-row:2;
+        grid-column:3 / 4; grid-row:2;
         border-top:2px solid #fb7185;
         padding:10px 10px;
     }
 
-    /* Bigger value font on mobile so it's readable */
     .nc-oi-value { font-size:13px; }
-    /* Wrap the signal badge below the sub-label */
     .nc-oi-footer { flex-direction:column; align-items:flex-start; gap:3px; }
-    /* Legend: hide verbose parts, keep badges */
     .nc-legend-verbose { display:none; }
 }
 </style>
@@ -808,28 +817,34 @@
   <!-- ── Grid: Direction | divider | Bars | divider | CE | PE | Net ── -->
   <div class="nc-grid">
 
-    <!-- Direction cell -->
+    <!-- Direction + Bars — unified cell -->
     <div class="nc-dir-cell" style="background:linear-gradient(135deg,rgba(30,10,14,0.92),rgba(30,10,14,0.03));">
-      <div class="nc-dir-label">Market Direction</div>
-      <div class="nc-dir-name">Bearish</div>
-      <div class="nc-dir-sig">Call Build-up Dominant</div>
-    </div>
 
-    <!-- Divider -->
-    <div class="nc-divider"></div>
+      <!-- Left: text -->
+      <div class="nc-dir-text">
+        <div class="nc-dir-label">Market Direction</div>
+        <div class="nc-dir-name">Bearish</div>
+        <div class="nc-dir-sig">Call Build-up Dominant</div>
+      </div>
 
-    <!-- Strength bars -->
-    <div class="nc-bars-cell">
-      <div class="nc-bar-row">
-        <div style="width:5px;height:5px;border-radius:50%;background:#00ff88;box-shadow:0 0 4px #00ff88;flex-shrink:0;"></div>
-        <div class="nc-bar-track"><div style="height:100%;width:7%;background:#00ff88;border-radius:99px;"></div></div>
-        <div style="font-size:8px;font-weight:600;color:#00ff88;min-width:24px;text-align:right;">7%</div>
+      <!-- Right: bars -->
+      <div class="nc-bars-block">
+        <div class="nc-bar-row">
+          <div class="nc-bar-lbl" style="color:#00ff88;">&#9679; Bull</div>
+          <div class="nc-bar-track">
+            <div style="height:100%;width:7%;background:linear-gradient(90deg,#00c96b,#00ff88);border-radius:99px;box-shadow:0 0 6px rgba(0,255,136,0.5);"></div>
+          </div>
+          <div class="nc-bar-pct" style="color:#00ff88;">7%</div>
+        </div>
+        <div class="nc-bar-row">
+          <div class="nc-bar-lbl" style="color:#ff3b5c;">&#9679; Bear</div>
+          <div class="nc-bar-track">
+            <div style="height:100%;width:93%;background:linear-gradient(90deg,#c9003a,#ff3b5c);border-radius:99px;box-shadow:0 0 6px rgba(255,59,92,0.5);"></div>
+          </div>
+          <div class="nc-bar-pct" style="color:#ff3b5c;">93%</div>
+        </div>
       </div>
-      <div class="nc-bar-row">
-        <div style="width:5px;height:5px;border-radius:50%;background:#ff3b5c;box-shadow:0 0 4px #ff3b5c;flex-shrink:0;"></div>
-        <div class="nc-bar-track"><div style="height:100%;width:93%;background:#ff3b5c;border-radius:99px;box-shadow:0 0 5px rgba(255,59,92,0.4);"></div></div>
-        <div style="font-size:8px;font-weight:600;color:#ff3b5c;min-width:24px;text-align:right;">93%</div>
-      </div>
+
     </div>
 
     <!-- Divider -->
@@ -1813,7 +1828,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 09-Mar-2026 23:15 IST</span>
+            <span>Stock data as of: 09-Mar-2026 23:22 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
