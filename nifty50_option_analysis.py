@@ -4192,8 +4192,22 @@ class NiftyHTMLAnalyzer:
     tick();
 
     function silentRefresh() {
-        // Only refresh live data feeds — NO DOM rebuild, NO flicker
-        loadOILog();
+        // Only refresh the OI table if the user is currently on that tab —
+        // avoids DOM mutations (and the scroll restore) when they're elsewhere.
+        var oiPanel = document.getElementById('tab-oi-trend');
+        if (oiPanel && oiPanel.classList.contains('active')) {
+            loadOILog();
+        } else {
+            // Still fetch in background so data is ready when they switch tab,
+            // but don't call renderOITable (which triggers the scroll restore).
+            fetch('oi_log.json?_t=' + Date.now(), {cache:'no-store'})
+                .then(function(r){ return r.ok ? r.json() : null; })
+                .then(function(data){
+                    if (data && Array.isArray(data) && data.length > 0) {
+                        _oiData = data; window._oiData = data;
+                    }
+                }).catch(function(){});
+        }
         if (typeof window.renderHeatmap === 'function') window.renderHeatmap();
         countdown = INTERVAL / 1000;
     }
@@ -4582,12 +4596,30 @@ function renderOITable(data) {
     });
 
     if (newRowsHtml) {
-        // Always save window.scrollY — .oi-table-wrap has overflow-y:hidden
-        // so its scrollTop is always 0 and useless as a save target.
-        // Saving window scroll prevents the page jumping to top on every refresh.
-        var winSy = window.scrollY;
+        // ── Scroll-jump fix ──────────────────────────────────────────────
+        // 1. Capture BOTH window scroll AND any scrollable ancestor positions
+        //    before the DOM mutation causes a reflow.
+        // 2. Temporarily disable CSS scroll-behavior so scrollTo is instant.
+        // 3. Restore after two animation frames (ensures reflow is complete).
+        var winSy   = window.scrollY || window.pageYOffset;
+        var docEl   = document.documentElement;
+        var bodyEl  = document.body;
+        var prevDocSB  = docEl.style.scrollBehavior;
+        var prevBodySB = bodyEl.style.scrollBehavior;
+        docEl.style.scrollBehavior  = 'auto';
+        bodyEl.style.scrollBehavior = 'auto';
+
         tbody.insertAdjacentHTML('afterbegin', newRowsHtml);
-        window.scrollTo({top: winSy, behavior: 'instant'});
+
+        // Use double-rAF: first frame = reflow, second frame = paint
+        // Only then restore scroll — guarantees no visible jump
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                window.scrollTo(0, winSy);
+                docEl.style.scrollBehavior  = prevDocSB;
+                bodyEl.style.scrollBehavior = prevBodySB;
+            });
+        });
     }
 
     // Remove empty state row if present
