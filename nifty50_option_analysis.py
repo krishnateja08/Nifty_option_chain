@@ -1928,11 +1928,10 @@ def build_intraday_oi_tab_html():
                 <th>STREAK</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
-                <th>VWAP</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
-              <tr><td colspan="13" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
+              <tr><td colspan="12" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
             </tbody>
           </table>
         </div>
@@ -4333,7 +4332,7 @@ function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
     if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" class="oi-empty-state">&#128218; No data yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" class="oi-empty-state">&#128218; No data yet.</td></tr>';
         return;
     }
     var filtered = filterByInterval(data, _oiInterval);
@@ -4474,25 +4473,6 @@ function renderOITable(data) {
                 + '<div class="oi-pips">' + pips + '</div>'
                 + '</div>';
 
-            // ── VWAP Cell ──
-            var vwapHtml;
-            if (row.vwap && row.spot_price) {
-                var aboveVwap  = row.spot_price >= row.vwap;
-                var vwapDiff   = Math.round((row.spot_price - row.vwap) * 10) / 10;
-                var vwapSign   = vwapDiff >= 0 ? '+' : '';
-                var vwapBadge  = aboveVwap
-                    ? '<span style="font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#00ff88;white-space:nowrap;">&#9650; ABOVE</span>'
-                    : '<span style="font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,59,92,0.1);border:1px solid rgba(255,59,92,0.3);color:#ff3b5c;white-space:nowrap;">&#9660; BELOW</span>';
-                var vwapDiffCol = aboveVwap ? '#00ff88' : '#ff3b5c';
-                vwapHtml = '<div style="display:flex;flex-direction:column;gap:2px;align-items:flex-end;">'
-                    + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:600;color:#93c5fd;">&#8377;' + row.vwap.toLocaleString('en-IN') + '</span>'
-                    + '<span style="font-size:9px;color:' + vwapDiffCol + ';">' + vwapSign + vwapDiff + ' pts</span>'
-                    + vwapBadge
-                    + '</div>';
-            } else {
-                vwapHtml = '<span style="color:rgba(176,190,197,0.3);">—</span>';
-            }
-
             newRowsHtml += '<tr class="' + (isLive ? 'oi-live-row' : '') + '" data-time="' + t + '">'
                 + '<td>' + timeCell + '</td>'
                 + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
@@ -4514,7 +4494,6 @@ function renderOITable(data) {
                 + '<td>' + streakHtml + '</td>'
                 + '<td>' + nlevelHtml + '</td>'
                 + '<td>' + distHtml + '</td>'
-                + '<td class="oi-vwap-cell">' + vwapHtml + '</td>'
                 + '</tr>';
         } else if (idx === 0) {
             // Mark existing top row as LIVE
@@ -4772,7 +4751,7 @@ function loadOILog() {
         })
         .catch(function(e) {
             var tbody = document.getElementById('oiTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="13" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="12" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
         });
 }
 
