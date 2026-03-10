@@ -3933,14 +3933,23 @@ class NiftyHTMLAnalyzer:
         else:
             pp = r1p = r2p = r3p = s1p = s2p = s3p = 0
 
-        # Position of LTP on the S1→R1 bar
-        if r1p and s1p and r1p != s1p:
-            ltp_pct = round(max(3, min(97, (cp - s1p) / (r1p - s1p) * 100)), 1)
+        # ── Dynamic NEAREST R: lowest R level strictly ABOVE LTP ─────────────
+        r_levels = [('R1', r1p), ('R2', r2p), ('R3', r3p)]
+        above_r  = [(lbl, val) for lbl, val in r_levels if val > cp]
+        nearest_r_lbl = above_r[0][0] if above_r else 'R3'
+        nearest_r_val = dict(r_levels)[nearest_r_lbl]
+
+        # ── Dynamic NEAREST S: highest level strictly BELOW LTP ──────────────
+        s_candidates = [('R1', r1p), ('PP', pp), ('S1', s1p), ('S2', s2p), ('S3', s3p)]
+        below_s  = [(lbl, val) for lbl, val in s_candidates if val < cp]
+        nearest_s_lbl = below_s[0][0] if below_s else 'S1'
+        nearest_s_val = dict(s_candidates)[nearest_s_lbl]
+
+        # Position of LTP on the bar — uses NEAREST S and NEAREST R (not hardcoded S1/R1)
+        if nearest_r_val and nearest_s_val and nearest_r_val != nearest_s_val:
+            ltp_pct = round(max(3, min(97, (cp - nearest_s_val) / (nearest_r_val - nearest_s_val) * 100)), 1)
         else:
             ltp_pct = 50
-
-        # Nearest R / S
-        nr_col = '#f44336'; ns_col = '#26c6da'
         pp_dist = round(cp - pp, 2) if pp else 0
         # pp_dist = LTP minus PP  →  positive means LTP is ABOVE PP
         pp_dist_sign = '+' if pp_dist >= 0 else ''
@@ -3959,16 +3968,6 @@ class NiftyHTMLAnalyzer:
             zone_lbl = "N/A"; zone_col = "#8faabe"; zone_dot = "#8faabe"
 
         pp_above_below = "above PP" if pp_dist >= 0 else "below PP"
-
-        # ── Dynamic NEAREST R: lowest R level strictly ABOVE LTP ─────────────
-        r_levels = [('R1', r1p), ('R2', r2p), ('R3', r3p)]
-        above_r  = [(lbl, val) for lbl, val in r_levels if val > cp]
-        nearest_r_lbl = above_r[0][0] if above_r else 'R3'
-
-        # ── Dynamic NEAREST S: highest level strictly BELOW LTP ──────────────
-        s_candidates = [('R1', r1p), ('PP', pp), ('S1', s1p), ('S2', s2p), ('S3', s3p)]
-        below_s  = [(lbl, val) for lbl, val in s_candidates if val < cp]
-        nearest_s_lbl = below_s[0][0] if below_s else 'S1'
 
         pv_panel = f"""
         <!-- ── Pivot Points Widget · Neon Runway · Phantom Slate Edition ── -->
@@ -3998,9 +3997,21 @@ class NiftyHTMLAnalyzer:
                     <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#0a1929;border:2.5px solid #00c8ff;box-shadow:0 0 12px rgba(0,200,255,0.9);z-index:5;"></div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <span style="font-size:10px;font-weight:700;color:#26c6da;">{nearest_s_lbl} &#8377;{dict(s_candidates).get(nearest_s_lbl, s1p):,.2f}</span>
-                    <span style="font-size:11px;font-weight:700;color:#e2eaf5;">&#9650; &#8377;{cp:,.2f} <span style="background:rgba(0,200,255,0.15);border:1px solid rgba(0,200,255,0.4);border-radius:2px;padding:1px 6px;color:#00c8ff;font-size:9px;font-weight:700;letter-spacing:1px;">LTP</span></span>
-                    <span style="font-size:10px;font-weight:700;color:#f44336;">{nearest_r_lbl} &#8377;{dict(r_levels).get(nearest_r_lbl, r1p):,.2f}</span>
+                    <!-- NEAREST SUPPORT (left) -->
+                    <div style="text-align:left;">
+                        <div style="font-size:8px;font-weight:700;color:#26c6da;letter-spacing:1px;margin-bottom:2px;">&#9660; NEAREST SUPPORT</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:#00e676;">&#8377;{nearest_s_val:,.2f} <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:2px;background:rgba(0,230,118,0.15);border:1px solid rgba(0,230,118,0.4);color:#00e676;">{nearest_s_lbl}</span></div>
+                    </div>
+                    <!-- LTP centre -->
+                    <div style="text-align:center;">
+                        <div style="font-size:8px;font-weight:700;color:rgba(200,216,224,0.6);letter-spacing:1px;margin-bottom:2px;">CURRENT</div>
+                        <div style="font-size:14px;font-weight:800;color:#e2eaf5;">&#9650; &#8377;{cp:,.2f} <span style="background:rgba(0,200,255,0.18);border:1px solid rgba(0,200,255,0.45);border-radius:2px;padding:2px 7px;color:#00c8ff;font-size:10px;font-weight:700;letter-spacing:1px;">LTP</span></div>
+                    </div>
+                    <!-- NEAREST RESISTANCE (right) -->
+                    <div style="text-align:right;">
+                        <div style="font-size:8px;font-weight:700;color:#f44336;letter-spacing:1px;margin-bottom:2px;">NEAREST RESISTANCE &#9650;</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:#ff6b85;"><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:2px;background:rgba(255,77,109,0.15);border:1px solid rgba(255,77,109,0.4);color:#ff4d6d;">{nearest_r_lbl}</span> &#8377;{nearest_r_val:,.2f}</div>
+                    </div>
                 </div>
 
                 <!-- ── ZONE LABEL + PP DISTANCE ───────────────────────────── -->
