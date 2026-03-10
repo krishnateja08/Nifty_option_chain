@@ -2578,11 +2578,24 @@ class NiftyHTMLAnalyzer:
             support           = s1
             strong_resistance = r2
             strong_support    = s2
-            # ── Previous candle OHLC for pivot point calculation ───────────────
-            prev_row   = df.iloc[-2] if len(df) >= 2 else latest
-            prev_high  = float(prev_row['High'])
-            prev_low   = float(prev_row['Low'])
-            prev_close = float(prev_row['Close'])
+            # ── Previous 30-min candle OHLC for pivot point calculation ──────────
+            # Uses 30-min bars (same as reference analyzer) so pivot levels are
+            # tight and intraday-relevant instead of using the wide daily H/L range.
+            try:
+                df_30m    = nifty.history(period='5d', interval='30m')
+                if len(df_30m) >= 2:
+                    prev_high  = float(df_30m['High'].iloc[-2])
+                    prev_low   = float(df_30m['Low'].iloc[-2])
+                    prev_close = float(df_30m['Close'].iloc[-2])
+                    print(f"  ✓ Pivot OHLC (30m prev bar) | H={prev_high} L={prev_low} C={prev_close}")
+                else:
+                    raise ValueError("Not enough 30m bars")
+            except Exception as _pe:
+                print(f"  ⚠️  30m pivot fallback to daily prev bar: {_pe}")
+                prev_row   = df.iloc[-2] if len(df) >= 2 else latest
+                prev_high  = float(prev_row['High'])
+                prev_low   = float(prev_row['Low'])
+                prev_close = float(prev_row['Close'])
 
             technical = {
                 'current_price':    current_price,
