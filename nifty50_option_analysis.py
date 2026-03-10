@@ -3942,7 +3942,9 @@ class NiftyHTMLAnalyzer:
         # Nearest R / S
         nr_col = '#f44336'; ns_col = '#26c6da'
         pp_dist = round(cp - pp, 2) if pp else 0
-        pp_dist_lbl = f"{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} from LTP"
+        # pp_dist = LTP minus PP  →  positive means LTP is ABOVE PP
+        pp_dist_sign = '+' if pp_dist >= 0 else ''
+        pp_dist_lbl  = f"{pp_dist_sign}{pp_dist:.2f} from PP"
 
         # ── Zone detection (which pivot band does LTP sit in) ─────────────────
         if pp and r3p and r2p and r1p and s1p and s2p and s3p:
@@ -4072,15 +4074,29 @@ class NiftyHTMLAnalyzer:
                         </div>
                     </div>
 
-                    <!-- CENTRE: Pivot Point value + LTP chip -->
-                    <div style="background:#040c14;padding:12px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px solid rgba(79,195,247,0.14);border-right:1px solid rgba(79,195,247,0.14);">
-                        <div style="font-size:8px;letter-spacing:2px;font-weight:700;color:#4fc3f7;text-transform:uppercase;margin-bottom:6px;text-align:center;">PIVOT POINT</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#4fc3f7;text-shadow:0 0 16px rgba(79,195,247,0.55);text-align:center;line-height:1;">&#8377;{pp:,.2f}</div>
-                        <div style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.78);margin:6px 0 10px;text-align:center;">{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} from LTP</div>
-                        <div style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.28);border-radius:3px;padding:6px 10px;text-align:center;">
-                            <div style="font-size:8px;letter-spacing:2px;font-weight:700;color:#00c8ff;margin-bottom:3px;">LTP</div>
-                            <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
+                    <!-- CENTRE: Pivot Point + NEAREST R + LTP -->
+                    <div style="background:#040c14;padding:10px 8px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px;border-left:1px solid rgba(79,195,247,0.14);border-right:1px solid rgba(79,195,247,0.14);">
+
+                        <!-- Pivot Point block -->
+                        <div style="text-align:center;width:100%;">
+                            <div style="font-size:7px;letter-spacing:2px;font-weight:700;color:#4fc3f7;text-transform:uppercase;margin-bottom:4px;">PIVOT POINT</div>
+                            <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#4fc3f7;text-shadow:0 0 12px rgba(79,195,247,0.5);line-height:1;">&#8377;{pp:,.2f}</div>
+                            <div style="font-size:8px;font-weight:600;color:rgba(200,216,224,0.7);margin-top:3px;">{pp_dist_sign}{pp_dist:.2f} from PP</div>
                         </div>
+
+                        <!-- NEAREST R block — highlighted in red -->
+                        <div style="width:100%;background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.3);border-radius:3px;padding:6px 8px;text-align:center;">
+                            <div style="font-size:7px;letter-spacing:1.5px;font-weight:700;color:#ff6b85;margin-bottom:3px;">&#9650; NEXT RES ({nearest_r_lbl})</div>
+                            <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:#ff4d6d;text-shadow:0 0 10px rgba(255,77,109,0.5);line-height:1;">&#8377;{dict(r_levels)[nearest_r_lbl]:,.2f}</div>
+                            <div style="font-size:8px;font-weight:600;color:rgba(255,143,163,0.75);margin-top:3px;">+{round(dict(r_levels)[nearest_r_lbl]-cp,2):,.2f} pts away</div>
+                        </div>
+
+                        <!-- LTP chip -->
+                        <div style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.28);border-radius:3px;padding:5px 8px;text-align:center;width:100%;">
+                            <div style="font-size:7px;letter-spacing:2px;font-weight:700;color:#00c8ff;margin-bottom:2px;">LTP</div>
+                            <div style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
+                        </div>
+
                     </div>
 
                     <!-- RIGHT: Support S1 / S2 / S3 — NEAREST S is dynamic -->
