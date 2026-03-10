@@ -4079,22 +4079,22 @@ class NiftyHTMLAnalyzer:
 
                         <!-- Pivot Point block -->
                         <div style="text-align:center;width:100%;">
-                            <div style="font-size:7px;letter-spacing:2px;font-weight:700;color:#4fc3f7;text-transform:uppercase;margin-bottom:4px;">PIVOT POINT</div>
-                            <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#4fc3f7;text-shadow:0 0 12px rgba(79,195,247,0.5);line-height:1;">&#8377;{pp:,.2f}</div>
-                            <div style="font-size:8px;font-weight:600;color:rgba(200,216,224,0.7);margin-top:3px;">{pp_dist_sign}{pp_dist:.2f} from PP</div>
+                            <div style="font-size:8px;letter-spacing:2px;font-weight:700;color:#4fc3f7;text-transform:uppercase;margin-bottom:4px;">PIVOT POINT</div>
+                            <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#4fc3f7;text-shadow:0 0 12px rgba(79,195,247,0.6);line-height:1;">&#8377;{pp:,.2f}</div>
+                            <div style="font-size:9px;font-weight:700;color:{'#00e676' if pp_dist >= 0 else '#f44336'};margin-top:4px;">LTP {pp_dist_sign}{pp_dist:.2f} pts {'above' if pp_dist >= 0 else 'below'} PP</div>
                         </div>
 
                         <!-- NEAREST R block — highlighted in red -->
-                        <div style="width:100%;background:rgba(255,77,109,0.08);border:1px solid rgba(255,77,109,0.3);border-radius:3px;padding:6px 8px;text-align:center;">
-                            <div style="font-size:7px;letter-spacing:1.5px;font-weight:700;color:#ff6b85;margin-bottom:3px;">&#9650; NEXT RES ({nearest_r_lbl})</div>
+                        <div style="width:100%;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.38);border-radius:3px;padding:7px 8px;text-align:center;">
+                            <div style="font-size:8px;letter-spacing:1.5px;font-weight:700;color:#ff6b85;margin-bottom:4px;">&#9650; NEXT RES ({nearest_r_lbl})</div>
                             <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:#ff4d6d;text-shadow:0 0 10px rgba(255,77,109,0.5);line-height:1;">&#8377;{dict(r_levels)[nearest_r_lbl]:,.2f}</div>
-                            <div style="font-size:8px;font-weight:600;color:rgba(255,143,163,0.75);margin-top:3px;">+{round(dict(r_levels)[nearest_r_lbl]-cp,2):,.2f} pts away</div>
+                            <div style="font-size:9px;font-weight:700;color:#fca5a5;margin-top:4px;">+{round(dict(r_levels)[nearest_r_lbl]-cp,2):,.2f} pts away</div>
                         </div>
 
                         <!-- LTP chip -->
-                        <div style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.28);border-radius:3px;padding:5px 8px;text-align:center;width:100%;">
-                            <div style="font-size:7px;letter-spacing:2px;font-weight:700;color:#00c8ff;margin-bottom:2px;">LTP</div>
-                            <div style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
+                        <div style="background:rgba(79,195,247,0.12);border:1px solid rgba(79,195,247,0.35);border-radius:3px;padding:6px 8px;text-align:center;width:100%;">
+                            <div style="font-size:8px;letter-spacing:2px;font-weight:700;color:#00c8ff;margin-bottom:3px;">LTP</div>
+                            <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
                         </div>
 
                     </div>
