@@ -620,7 +620,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">10-Mar-2026 21:49 IST</span>
+                <span class="sb-value gen-val">10-Mar-2026 21:57 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -1083,9 +1083,9 @@
                     <div style="position:absolute;left:97%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#0a1929;border:2.5px solid #00c8ff;box-shadow:0 0 12px rgba(0,200,255,0.9);z-index:5;"></div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <span style="font-size:10px;font-weight:700;color:#26c6da;">S1 &#8377;23,791.19</span>
+                    <span style="font-size:10px;font-weight:700;color:#26c6da;">R1 &#8377;24,171.54</span>
                     <span style="font-size:11px;font-weight:700;color:#e2eaf5;">&#9650; &#8377;24,261.60 <span style="background:rgba(0,200,255,0.15);border:1px solid rgba(0,200,255,0.4);border-radius:2px;padding:1px 6px;color:#00c8ff;font-size:9px;font-weight:700;letter-spacing:1px;">LTP</span></span>
-                    <span style="font-size:10px;font-weight:700;color:#f44336;">R1 &#8377;24,171.54</span>
+                    <span style="font-size:10px;font-weight:700;color:#f44336;">R2 &#8377;24,315.02</span>
                 </div>
 
                 <!-- ── ZONE LABEL + PP DISTANCE ───────────────────────────── -->
@@ -1122,27 +1122,39 @@
                 <!-- ── MAIN 3-COLUMN GRID: R Levels | Pivot Centre | S Levels ── -->
                 <div style="display:grid;grid-template-columns:1fr 130px 1fr;gap:1px;background:rgba(0,200,255,0.08);border-radius:4px;overflow:hidden;">
 
-                    <!-- LEFT: Resistance R3 / R2 / R1 -->
+                    <!-- LEFT: Resistance R3 / R2 / R1 — NEAREST R is dynamic -->
                     <div style="background:#07111c;padding:12px 14px;">
                         <!-- R3 -->
                         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.07);">
-                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.05);color:rgba(255,100,130,0.5);border:1px solid rgba(255,77,109,0.12);">R3</span>
-                            <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(255,143,163,0.5);">&#8377;24,551.89</span>
+                            <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.05);color:rgba(255,100,130,0.5);border:1px solid rgba(255,77,109,0.12);">R3</span>
+                                
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(255,143,163,0.5);">&#8377;24,551.89</span>
+                                
+                            </div>
                         </div>
                         <!-- R2 -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.1);">
-                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.08);color:rgba(255,100,130,0.8);border:1px solid rgba(255,77,109,0.18);">R2</span>
-                            <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:rgba(255,143,163,0.85);">&#8377;24,315.02</span>
-                        </div>
-                        <!-- R1 + NEAREST R badge -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;background:rgba(255,77,109,0.04);border-radius:2px;margin-top:1px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.1);background:rgba(255,77,109,0.06);border-radius:2px;">
                             <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.18);color:#ff4d6d;border:1px solid rgba(255,77,109,0.4);">R1</span>
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.18);color:#ff4d6d;border:1px solid rgba(255,77,109,0.4);">R2</span>
                                 <span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.28);color:#ff6b85;letter-spacing:0.5px;">NEAREST R</span>
                             </div>
                             <div style="display:flex;align-items:center;gap:4px;">
-                                <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;">&#8377;24,171.54</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;">&#8377;24,315.02</span>
                                 <span style="color:#ff6b85;font-size:11px;">&#9650;</span>
+                            </div>
+                        </div>
+                        <!-- R1 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-top:1px;">
+                            <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.06);color:rgba(255,100,130,0.45);border:1px solid rgba(255,77,109,0.15);">R1</span>
+                                
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(255,143,163,0.38);">&#8377;24,171.54</span>
+                                
                             </div>
                         </div>
                     </div>
@@ -1158,28 +1170,40 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT: Support S1 / S2 / S3 -->
+                    <!-- RIGHT: Support S1 / S2 / S3 — NEAREST S is dynamic -->
                     <div style="background:#07111c;padding:12px 14px;">
-                        <!-- S1 + NEAREST S badge -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;background:rgba(0,230,118,0.04);border-radius:2px;margin-bottom:1px;">
+                        <!-- S1 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:1px;">
                             <div style="display:flex;align-items:center;gap:4px;">
-                                <span style="color:#26c6da;font-size:11px;">&#9660;</span>
-                                <span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.28);color:#00e676;letter-spacing:0.5px;">NEAREST S</span>
+                                
+                                
                             </div>
                             <div style="display:flex;align-items:center;gap:4px;">
-                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.18);color:#00e676;border:1px solid rgba(0,230,118,0.4);">S1</span>
-                                <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;">&#8377;23,791.19</span>
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.06);color:rgba(0,200,100,0.5);border:1px solid rgba(0,230,118,0.15);">S1</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(105,240,174,0.45);">&#8377;23,791.19</span>
                             </div>
                         </div>
                         <!-- S2 -->
                         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(0,230,118,0.1);border-top:1px solid rgba(0,230,118,0.07);">
-                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.08);color:rgba(0,200,100,0.8);border:1px solid rgba(0,230,118,0.18);">S2</span>
-                            <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:rgba(105,240,174,0.85);">&#8377;23,554.32</span>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                
+                                
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.08);color:rgba(0,200,100,0.8);border:1px solid rgba(0,230,118,0.18);">S2</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:rgba(105,240,174,0.85);">&#8377;23,554.32</span>
+                            </div>
                         </div>
                         <!-- S3 -->
                         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
-                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.05);color:rgba(0,230,118,0.5);border:1px solid rgba(0,230,118,0.12);">S3</span>
-                            <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(105,240,174,0.45);">&#8377;23,410.84</span>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                
+                                
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.05);color:rgba(0,230,118,0.5);border:1px solid rgba(0,230,118,0.12);">S3</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(105,240,174,0.45);">&#8377;23,410.84</span>
+                            </div>
                         </div>
                     </div>
 
@@ -1898,7 +1922,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 10-Mar-2026 21:49 IST</span>
+            <span>Stock data as of: 10-Mar-2026 21:57 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -2077,7 +2101,7 @@
       </div>
 
       <!-- Heatmap data embedded as JSON for JS rendering -->
-      <script id="hmDataScript" type="application/json">[{"symbol": "ADANIPORTS", "ticker": "ADANIPORTS.NS", "price": 1424.1, "prev_close": 1421.3, "change_pct": 0.2, "change_abs": 2.8, "volume": 2705493, "high_wt": false}, {"symbol": "APOLLOHOSP", "ticker": "APOLLOHOSP.NS", "price": 7803.0, "prev_close": 7779.0, "change_pct": 0.31, "change_abs": 24.0, "volume": 381240, "high_wt": false}, {"symbol": "ASIANPAINT", "ticker": "ASIANPAINT.NS", "price": 2280.4, "prev_close": 2220.8, "change_pct": 2.68, "change_abs": 59.6, "volume": 1191821, "high_wt": false}, {"symbol": "AXISBANK", "ticker": "AXISBANK.NS", "price": 1314.7, "prev_close": 1288.3, "change_pct": 2.05, "change_abs": 26.4, "volume": 6288407, "high_wt": true}, {"symbol": "BAJAJ-AUTO", "ticker": "BAJAJ-AUTO.NS", "price": 9610.0, "prev_close": 9383.0, "change_pct": 2.42, "change_abs": 227.0, "volume": 463446, "high_wt": false}, {"symbol": "BAJAJFINSV", "ticker": "BAJAJFINSV.NS", "price": 1867.8, "prev_close": 1841.5, "change_pct": 1.43, "change_abs": 26.3, "volume": 884672, "high_wt": false}, {"symbol": "BAJFINANCE", "ticker": "BAJFINANCE.NS", "price": 939.8, "prev_close": 938.05, "change_pct": 0.19, "change_abs": 1.75, "volume": 8471518, "high_wt": false}, {"symbol": "BEL", "ticker": "BEL.NS", "price": 463.35, "prev_close": 457.35, "change_pct": 1.31, "change_abs": 6.0, "volume": 19391336, "high_wt": false}, {"symbol": "BHARTIARTL", "ticker": "BHARTIARTL.NS", "price": 1850.4, "prev_close": 1866.7, "change_pct": -0.87, "change_abs": -16.3, "volume": 11738236, "high_wt": true}, {"symbol": "CIPLA", "ticker": "CIPLA.NS", "price": 1333.5, "prev_close": 1325.0, "change_pct": 0.64, "change_abs": 8.5, "volume": 1049578, "high_wt": false}, {"symbol": "COALINDIA", "ticker": "COALINDIA.NS", "price": 443.55, "prev_close": 437.65, "change_pct": 1.35, "change_abs": 5.9, "volume": 10857409, "high_wt": false}, {"symbol": "DRREDDY", "ticker": "DRREDDY.NS", "price": 1314.6, "prev_close": 1287.0, "change_pct": 2.14, "change_abs": 27.6, "volume": 2328593, "high_wt": false}, {"symbol": "EICHERMOT", "ticker": "EICHERMOT.NS", "price": 7536.5, "prev_close": 7266.0, "change_pct": 3.72, "change_abs": 270.5, "volume": 494647, "high_wt": false}, {"symbol": "ETERNAL", "ticker": "ETERNAL.NS", "price": 226.62, "prev_close": 229.56, "change_pct": -1.28, "change_abs": -2.94, "volume": 47182080, "high_wt": false}, {"symbol": "GRASIM", "ticker": "GRASIM.NS", "price": 2743.9, "prev_close": 2681.2, "change_pct": 2.34, "change_abs": 62.7, "volume": 1035221, "high_wt": false}, {"symbol": "HCLTECH", "ticker": "HCLTECH.NS", "price": 1361.5, "prev_close": 1358.6, "change_pct": 0.21, "change_abs": 2.9, "volume": 1671432, "high_wt": false}, {"symbol": "HDFCBANK", "ticker": "HDFCBANK.NS", "price": 849.45, "prev_close": 840.7, "change_pct": 1.04, "change_abs": 8.75, "volume": 52846213, "high_wt": true}, {"symbol": "HDFCLIFE", "ticker": "HDFCLIFE.NS", "price": 656.1, "prev_close": 653.75, "change_pct": 0.36, "change_abs": 2.35, "volume": 3547330, "high_wt": false}, {"symbol": "HEROMOTOCO", "ticker": "HEROMOTOCO.NS", "price": 5711.5, "prev_close": 5480.0, "change_pct": 4.22, "change_abs": 231.5, "volume": 493052, "high_wt": false}, {"symbol": "HINDALCO", "ticker": "HINDALCO.NS", "price": 956.6, "prev_close": 945.35, "change_pct": 1.19, "change_abs": 11.25, "volume": 4837854, "high_wt": false}, {"symbol": "HINDUNILVR", "ticker": "HINDUNILVR.NS", "price": 2190.2, "prev_close": 2194.6, "change_pct": -0.2, "change_abs": -4.4, "volume": 1083715, "high_wt": false}, {"symbol": "ICICIBANK", "ticker": "ICICIBANK.NS", "price": 1311.9, "prev_close": 1278.4, "change_pct": 2.62, "change_abs": 33.5, "volume": 19128413, "high_wt": true}, {"symbol": "INDIGO", "ticker": "INDIGO.NS", "price": 4380.4, "prev_close": 4236.7, "change_pct": 3.39, "change_abs": 143.7, "volume": 2579875, "high_wt": false}, {"symbol": "INFY", "ticker": "INFY.NS", "price": 1295.6, "prev_close": 1315.0, "change_pct": -1.48, "change_abs": -19.4, "volume": 9593406, "high_wt": true}, {"symbol": "ITC", "ticker": "ITC.NS", "price": 309.05, "prev_close": 306.0, "change_pct": 1.0, "change_abs": 3.05, "volume": 18344497, "high_wt": false}, {"symbol": "JIOFIN", "ticker": "JIOFIN.NS", "price": 236.0, "prev_close": 232.25, "change_pct": 1.61, "change_abs": 3.75, "volume": 23111884, "high_wt": false}, {"symbol": "JSWSTEEL", "ticker": "JSWSTEEL.NS", "price": 1214.3, "prev_close": 1192.6, "change_pct": 1.82, "change_abs": 21.7, "volume": 1131206, "high_wt": false}, {"symbol": "KOTAKBANK", "ticker": "KOTAKBANK.NS", "price": 391.85, "prev_close": 386.35, "change_pct": 1.42, "change_abs": 5.5, "volume": 21338296, "high_wt": true}, {"symbol": "LT", "ticker": "LT.NS", "price": 3876.0, "prev_close": 3842.1, "change_pct": 0.88, "change_abs": 33.9, "volume": 3328868, "high_wt": true}, {"symbol": "M&M", "ticker": "M&M.NS", "price": 3293.7, "prev_close": 3187.6, "change_pct": 3.33, "change_abs": 106.1, "volume": 2672001, "high_wt": false}, {"symbol": "MARUTI", "ticker": "MARUTI.NS", "price": 13867.0, "prev_close": 13508.0, "change_pct": 2.66, "change_abs": 359.0, "volume": 353649, "high_wt": false}, {"symbol": "MAXHEALTH", "ticker": "MAXHEALTH.NS", "price": 1043.1, "prev_close": 1041.5, "change_pct": 0.15, "change_abs": 1.6, "volume": 2366853, "high_wt": false}, {"symbol": "NESTLEIND", "ticker": "NESTLEIND.NS", "price": 1241.2, "prev_close": 1235.8, "change_pct": 0.44, "change_abs": 5.4, "volume": 1301134, "high_wt": false}, {"symbol": "NTPC", "ticker": "NTPC.NS", "price": 377.3, "prev_close": 376.25, "change_pct": 0.28, "change_abs": 1.05, "volume": 10875072, "high_wt": false}, {"symbol": "ONGC", "ticker": "ONGC.NS", "price": 269.2, "prev_close": 270.8, "change_pct": -0.59, "change_abs": -1.6, "volume": 18468612, "high_wt": false}, {"symbol": "POWERGRID", "ticker": "POWERGRID.NS", "price": 298.65, "prev_close": 295.2, "change_pct": 1.17, "change_abs": 3.45, "volume": 14625895, "high_wt": false}, {"symbol": "RELIANCE", "ticker": "RELIANCE.NS", "price": 1408.8, "prev_close": 1424.0, "change_pct": -1.07, "change_abs": -15.2, "volume": 18064788, "high_wt": true}, {"symbol": "SBILIFE", "ticker": "SBILIFE.NS", "price": 1963.7, "prev_close": 1912.5, "change_pct": 2.68, "change_abs": 51.2, "volume": 587277, "high_wt": false}, {"symbol": "SBIN", "ticker": "SBIN.NS", "price": 1112.2, "prev_close": 1098.5, "change_pct": 1.25, "change_abs": 13.7, "volume": 17481620, "high_wt": true}, {"symbol": "SHRIRAMFIN", "ticker": "SHRIRAMFIN.NS", "price": 1062.9, "prev_close": 987.2, "change_pct": 7.67, "change_abs": 75.7, "volume": 14295894, "high_wt": false}, {"symbol": "SUNPHARMA", "ticker": "SUNPHARMA.NS", "price": 1812.8, "prev_close": 1807.4, "change_pct": 0.3, "change_abs": 5.4, "volume": 3298187, "high_wt": false}, {"symbol": "TATAMOTORS", "ticker": "TMCV.NS", "price": 459.15, "prev_close": 448.3, "change_pct": 2.42, "change_abs": 10.85, "volume": 11892257, "high_wt": false}, {"symbol": "TATAMOTORS", "ticker": "TMPV.NS", "price": 345.2, "prev_close": 332.0, "change_pct": 3.98, "change_abs": 13.2, "volume": 13766873, "high_wt": false}, {"symbol": "TATACONSUM", "ticker": "TATACONSUM.NS", "price": 1099.5, "prev_close": 1102.5, "change_pct": -0.27, "change_abs": -3.0, "volume": 1165014, "high_wt": false}, {"symbol": "TATASTEEL", "ticker": "TATASTEEL.NS", "price": 195.0, "prev_close": 191.01, "change_pct": 2.09, "change_abs": 3.99, "volume": 25769524, "high_wt": false}, {"symbol": "TCS", "ticker": "TCS.NS", "price": 2513.1, "prev_close": 2527.4, "change_pct": -0.57, "change_abs": -14.3, "volume": 4322243, "high_wt": true}, {"symbol": "TECHM", "ticker": "TECHM.NS", "price": 1336.6, "prev_close": 1336.3, "change_pct": 0.02, "change_abs": 0.3, "volume": 1069047, "high_wt": false}, {"symbol": "TITAN", "ticker": "TITAN.NS", "price": 4220.1, "prev_close": 4159.2, "change_pct": 1.46, "change_abs": 60.9, "volume": 788646, "high_wt": false}, {"symbol": "TRENT", "ticker": "TRENT.NS", "price": 3715.3, "prev_close": 3689.4, "change_pct": 0.7, "change_abs": 25.9, "volume": 725735, "high_wt": false}, {"symbol": "ULTRACEMCO", "ticker": "ULTRACEMCO.NS", "price": 11654.0, "prev_close": 11378.0, "change_pct": 2.43, "change_abs": 276.0, "volume": 460815, "high_wt": false}, {"symbol": "WIPRO", "ticker": "WIPRO.NS", "price": 200.93, "prev_close": 198.75, "change_pct": 1.1, "change_abs": 2.18, "volume": 12976112, "high_wt": false}]</script>
+      <script id="hmDataScript" type="application/json">[{"symbol": "ADANIPORTS", "ticker": "ADANIPORTS.NS", "price": 1424.1, "prev_close": 1421.3, "change_pct": 0.2, "change_abs": 2.8, "volume": 2705493, "high_wt": false}, {"symbol": "APOLLOHOSP", "ticker": "APOLLOHOSP.NS", "price": 7803.0, "prev_close": 7779.0, "change_pct": 0.31, "change_abs": 24.0, "volume": 381240, "high_wt": false}, {"symbol": "ASIANPAINT", "ticker": "ASIANPAINT.NS", "price": 2280.4, "prev_close": 2220.8, "change_pct": 2.68, "change_abs": 59.6, "volume": 1191821, "high_wt": false}, {"symbol": "AXISBANK", "ticker": "AXISBANK.NS", "price": 1314.7, "prev_close": 1288.3, "change_pct": 2.05, "change_abs": 26.4, "volume": 6288407, "high_wt": true}, {"symbol": "BAJAJ-AUTO", "ticker": "BAJAJ-AUTO.NS", "price": 9610.0, "prev_close": 9383.0, "change_pct": 2.42, "change_abs": 227.0, "volume": 463446, "high_wt": false}, {"symbol": "BAJAJFINSV", "ticker": "BAJAJFINSV.NS", "price": 1867.8, "prev_close": 1841.5, "change_pct": 1.43, "change_abs": 26.3, "volume": 884672, "high_wt": false}, {"symbol": "BAJFINANCE", "ticker": "BAJFINANCE.NS", "price": 939.8, "prev_close": 938.05, "change_pct": 0.19, "change_abs": 1.75, "volume": 8471518, "high_wt": false}, {"symbol": "BEL", "ticker": "BEL.NS", "price": 463.35, "prev_close": 457.35, "change_pct": 1.31, "change_abs": 6.0, "volume": 19391336, "high_wt": false}, {"symbol": "BHARTIARTL", "ticker": "BHARTIARTL.NS", "price": 1850.4, "prev_close": 1866.7, "change_pct": -0.87, "change_abs": -16.3, "volume": 11738236, "high_wt": true}, {"symbol": "CIPLA", "ticker": "CIPLA.NS", "price": 1333.5, "prev_close": 1325.0, "change_pct": 0.64, "change_abs": 8.5, "volume": 1049578, "high_wt": false}, {"symbol": "COALINDIA", "ticker": "COALINDIA.NS", "price": 443.55, "prev_close": 437.65, "change_pct": 1.35, "change_abs": 5.9, "volume": 10857409, "high_wt": false}, {"symbol": "DRREDDY", "ticker": "DRREDDY.NS", "price": 1314.6, "prev_close": 1287.0, "change_pct": 2.14, "change_abs": 27.6, "volume": 2328593, "high_wt": false}, {"symbol": "EICHERMOT", "ticker": "EICHERMOT.NS", "price": 7536.5, "prev_close": 7266.0, "change_pct": 3.72, "change_abs": 270.5, "volume": 494647, "high_wt": false}, {"symbol": "ETERNAL", "ticker": "ETERNAL.NS", "price": 226.62, "prev_close": 229.56, "change_pct": -1.28, "change_abs": -2.94, "volume": 47196660, "high_wt": false}, {"symbol": "GRASIM", "ticker": "GRASIM.NS", "price": 2743.9, "prev_close": 2681.2, "change_pct": 2.34, "change_abs": 62.7, "volume": 1035221, "high_wt": false}, {"symbol": "HCLTECH", "ticker": "HCLTECH.NS", "price": 1361.5, "prev_close": 1358.6, "change_pct": 0.21, "change_abs": 2.9, "volume": 1671432, "high_wt": false}, {"symbol": "HDFCBANK", "ticker": "HDFCBANK.NS", "price": 849.45, "prev_close": 840.7, "change_pct": 1.04, "change_abs": 8.75, "volume": 52846213, "high_wt": true}, {"symbol": "HDFCLIFE", "ticker": "HDFCLIFE.NS", "price": 656.1, "prev_close": 653.75, "change_pct": 0.36, "change_abs": 2.35, "volume": 3547330, "high_wt": false}, {"symbol": "HEROMOTOCO", "ticker": "HEROMOTOCO.NS", "price": 5711.5, "prev_close": 5480.0, "change_pct": 4.22, "change_abs": 231.5, "volume": 493052, "high_wt": false}, {"symbol": "HINDALCO", "ticker": "HINDALCO.NS", "price": 956.6, "prev_close": 945.35, "change_pct": 1.19, "change_abs": 11.25, "volume": 4837854, "high_wt": false}, {"symbol": "HINDUNILVR", "ticker": "HINDUNILVR.NS", "price": 2190.2, "prev_close": 2194.6, "change_pct": -0.2, "change_abs": -4.4, "volume": 1083715, "high_wt": false}, {"symbol": "ICICIBANK", "ticker": "ICICIBANK.NS", "price": 1311.9, "prev_close": 1278.4, "change_pct": 2.62, "change_abs": 33.5, "volume": 19128413, "high_wt": true}, {"symbol": "INDIGO", "ticker": "INDIGO.NS", "price": 4380.4, "prev_close": 4236.7, "change_pct": 3.39, "change_abs": 143.7, "volume": 2579875, "high_wt": false}, {"symbol": "INFY", "ticker": "INFY.NS", "price": 1295.6, "prev_close": 1315.0, "change_pct": -1.48, "change_abs": -19.4, "volume": 9593406, "high_wt": true}, {"symbol": "ITC", "ticker": "ITC.NS", "price": 309.05, "prev_close": 306.0, "change_pct": 1.0, "change_abs": 3.05, "volume": 18344497, "high_wt": false}, {"symbol": "JIOFIN", "ticker": "JIOFIN.NS", "price": 236.0, "prev_close": 232.25, "change_pct": 1.61, "change_abs": 3.75, "volume": 23126140, "high_wt": false}, {"symbol": "JSWSTEEL", "ticker": "JSWSTEEL.NS", "price": 1214.3, "prev_close": 1192.6, "change_pct": 1.82, "change_abs": 21.7, "volume": 1131206, "high_wt": false}, {"symbol": "KOTAKBANK", "ticker": "KOTAKBANK.NS", "price": 391.85, "prev_close": 386.35, "change_pct": 1.42, "change_abs": 5.5, "volume": 21338296, "high_wt": true}, {"symbol": "LT", "ticker": "LT.NS", "price": 3876.0, "prev_close": 3842.1, "change_pct": 0.88, "change_abs": 33.9, "volume": 3328868, "high_wt": true}, {"symbol": "M&M", "ticker": "M&M.NS", "price": 3293.7, "prev_close": 3187.6, "change_pct": 3.33, "change_abs": 106.1, "volume": 2672001, "high_wt": false}, {"symbol": "MARUTI", "ticker": "MARUTI.NS", "price": 13867.0, "prev_close": 13508.0, "change_pct": 2.66, "change_abs": 359.0, "volume": 353649, "high_wt": false}, {"symbol": "MAXHEALTH", "ticker": "MAXHEALTH.NS", "price": 1043.1, "prev_close": 1041.5, "change_pct": 0.15, "change_abs": 1.6, "volume": 2366853, "high_wt": false}, {"symbol": "NESTLEIND", "ticker": "NESTLEIND.NS", "price": 1241.2, "prev_close": 1235.8, "change_pct": 0.44, "change_abs": 5.4, "volume": 1301134, "high_wt": false}, {"symbol": "NTPC", "ticker": "NTPC.NS", "price": 377.3, "prev_close": 376.25, "change_pct": 0.28, "change_abs": 1.05, "volume": 10875072, "high_wt": false}, {"symbol": "ONGC", "ticker": "ONGC.NS", "price": 269.2, "prev_close": 270.8, "change_pct": -0.59, "change_abs": -1.6, "volume": 18468612, "high_wt": false}, {"symbol": "POWERGRID", "ticker": "POWERGRID.NS", "price": 298.65, "prev_close": 295.2, "change_pct": 1.17, "change_abs": 3.45, "volume": 14625895, "high_wt": false}, {"symbol": "RELIANCE", "ticker": "RELIANCE.NS", "price": 1408.8, "prev_close": 1424.0, "change_pct": -1.07, "change_abs": -15.2, "volume": 18064788, "high_wt": true}, {"symbol": "SBILIFE", "ticker": "SBILIFE.NS", "price": 1963.7, "prev_close": 1912.5, "change_pct": 2.68, "change_abs": 51.2, "volume": 587277, "high_wt": false}, {"symbol": "SBIN", "ticker": "SBIN.NS", "price": 1112.2, "prev_close": 1098.5, "change_pct": 1.25, "change_abs": 13.7, "volume": 17481620, "high_wt": true}, {"symbol": "SHRIRAMFIN", "ticker": "SHRIRAMFIN.NS", "price": 1062.9, "prev_close": 987.2, "change_pct": 7.67, "change_abs": 75.7, "volume": 14295894, "high_wt": false}, {"symbol": "SUNPHARMA", "ticker": "SUNPHARMA.NS", "price": 1812.8, "prev_close": 1807.4, "change_pct": 0.3, "change_abs": 5.4, "volume": 3298187, "high_wt": false}, {"symbol": "TATAMOTORS", "ticker": "TMCV.NS", "price": 459.15, "prev_close": 448.3, "change_pct": 2.42, "change_abs": 10.85, "volume": 11892257, "high_wt": false}, {"symbol": "TATAMOTORS", "ticker": "TMPV.NS", "price": 345.2, "prev_close": 332.0, "change_pct": 3.98, "change_abs": 13.2, "volume": 13770080, "high_wt": false}, {"symbol": "TATACONSUM", "ticker": "TATACONSUM.NS", "price": 1099.5, "prev_close": 1102.5, "change_pct": -0.27, "change_abs": -3.0, "volume": 1165014, "high_wt": false}, {"symbol": "TATASTEEL", "ticker": "TATASTEEL.NS", "price": 195.0, "prev_close": 191.01, "change_pct": 2.09, "change_abs": 3.99, "volume": 25769524, "high_wt": false}, {"symbol": "TCS", "ticker": "TCS.NS", "price": 2513.1, "prev_close": 2527.4, "change_pct": -0.57, "change_abs": -14.3, "volume": 4322243, "high_wt": true}, {"symbol": "TECHM", "ticker": "TECHM.NS", "price": 1336.6, "prev_close": 1336.3, "change_pct": 0.02, "change_abs": 0.3, "volume": 1069047, "high_wt": false}, {"symbol": "TITAN", "ticker": "TITAN.NS", "price": 4220.1, "prev_close": 4159.2, "change_pct": 1.46, "change_abs": 60.9, "volume": 788646, "high_wt": false}, {"symbol": "TRENT", "ticker": "TRENT.NS", "price": 3715.3, "prev_close": 3689.4, "change_pct": 0.7, "change_abs": 25.9, "volume": 725735, "high_wt": false}, {"symbol": "ULTRACEMCO", "ticker": "ULTRACEMCO.NS", "price": 11654.0, "prev_close": 11378.0, "change_pct": 2.43, "change_abs": 276.0, "volume": 460815, "high_wt": false}, {"symbol": "WIPRO", "ticker": "WIPRO.NS", "price": 200.93, "prev_close": 198.75, "change_pct": 1.1, "change_abs": 2.18, "volume": 12976112, "high_wt": false}]</script>
     </div><!-- /tab-heatmap -->
 
     <!-- TAB: INTRADAY OI TREND -->
@@ -2232,18 +2256,18 @@
                 <div class="o5-top-banner">
                     <div class="o5-banner-left">
                         <div class="o5-score-circle" style="border-color:#ff8a65;box-shadow:0 0 20px #ff8a6544,inset 0 0 16px #ff8a6511;">
-                            <div class="o5-score-num" style="color:#ff8a65;">-2</div>
+                            <div class="o5-score-num" style="color:#ff8a65;">-1</div>
                             <div class="o5-score-lbl">SCORE</div>
                         </div>
                         <div>
                             <div class="o5-verdict" style="color:#ff8a65;text-shadow:0 0 20px #ff8a6566;">MILDLY BEARISH</div>
-                            <div class="o5-sub">Score -2 from 7 signals (0 skipped as N/A). Moderate signal — size positions conservatively.</div>
+                            <div class="o5-sub">Score -1 from 7 signals (0 skipped as N/A). Moderate signal — size positions conservatively.</div>
                         </div>
                     </div>
                     <div class="o5-pills">
-                        <span class="sc-pill sc-pill-bull">&#10003; BULL: 1</span>
+                        <span class="sc-pill sc-pill-bull">&#10003; BULL: 2</span>
                         <span class="sc-pill sc-pill-bear">&#10007; BEAR: 3</span>
-                        <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: 3</span>
+                        <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: 2</span>
                         
                     </div>
                 </div>
@@ -2293,14 +2317,14 @@
             <div class="o5-msg">Net OI change is bullish — put build-up / call unwinding dominant</div>
             <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#10b981,transparent);"></div>
         </div>
-        <div class="o5-tile o5-neu">
+        <div class="o5-tile o5-bull">
             <div class="o5-tile-top">
                 <span class="o5-tile-label">Global Market Bias <span class="auto-badge">AUTO</span></span>
-                <div class="o5-chip o5-chip-neu">0</div>
+                <div class="o5-chip o5-chip-bull">+1</div>
             </div>
-            <div class="o5-val" style="color:#fbbf24;">Neutral</div>
-            <div class="o5-msg">Global indices mixed — no directional edge</div>
-            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#f59e0b,transparent);"></div>
+            <div class="o5-val" style="color:#34d399;">Bullish</div>
+            <div class="o5-msg">Global indices (Dow/S&P/SGX Gift Nifty) showing bullish bias</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#10b981,transparent);"></div>
         </div>
         <div class="o5-tile o5-neu">
             <div class="o5-tile-top">

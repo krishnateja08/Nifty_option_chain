@@ -3958,6 +3958,16 @@ class NiftyHTMLAnalyzer:
 
         pp_above_below = "above PP" if pp_dist >= 0 else "below PP"
 
+        # ── Dynamic NEAREST R: lowest R level strictly ABOVE LTP ─────────────
+        r_levels = [('R1', r1p), ('R2', r2p), ('R3', r3p)]
+        above_r  = [(lbl, val) for lbl, val in r_levels if val > cp]
+        nearest_r_lbl = above_r[0][0] if above_r else 'R3'
+
+        # ── Dynamic NEAREST S: highest level strictly BELOW LTP ──────────────
+        s_candidates = [('R1', r1p), ('PP', pp), ('S1', s1p), ('S2', s2p), ('S3', s3p)]
+        below_s  = [(lbl, val) for lbl, val in s_candidates if val < cp]
+        nearest_s_lbl = below_s[0][0] if below_s else 'S1'
+
         pv_panel = f"""
         <!-- ── Pivot Points Widget · Neon Runway · Phantom Slate Edition ── -->
         <div style="background:#060d15;border:1px solid rgba(0,200,255,0.18);border-radius:6px;flex:1;min-width:320px;overflow:hidden;font-family:'Space Mono',monospace;">
@@ -3986,9 +3996,9 @@ class NiftyHTMLAnalyzer:
                     <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#0a1929;border:2.5px solid #00c8ff;box-shadow:0 0 12px rgba(0,200,255,0.9);z-index:5;"></div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <span style="font-size:10px;font-weight:700;color:#26c6da;">S1 &#8377;{s1p:,.2f}</span>
+                    <span style="font-size:10px;font-weight:700;color:#26c6da;">{nearest_s_lbl} &#8377;{dict(s_candidates).get(nearest_s_lbl, s1p):,.2f}</span>
                     <span style="font-size:11px;font-weight:700;color:#e2eaf5;">&#9650; &#8377;{cp:,.2f} <span style="background:rgba(0,200,255,0.15);border:1px solid rgba(0,200,255,0.4);border-radius:2px;padding:1px 6px;color:#00c8ff;font-size:9px;font-weight:700;letter-spacing:1px;">LTP</span></span>
-                    <span style="font-size:10px;font-weight:700;color:#f44336;">R1 &#8377;{r1p:,.2f}</span>
+                    <span style="font-size:10px;font-weight:700;color:#f44336;">{nearest_r_lbl} &#8377;{dict(r_levels).get(nearest_r_lbl, r1p):,.2f}</span>
                 </div>
 
                 <!-- ── ZONE LABEL + PP DISTANCE ───────────────────────────── -->
@@ -4025,27 +4035,39 @@ class NiftyHTMLAnalyzer:
                 <!-- ── MAIN 3-COLUMN GRID: R Levels | Pivot Centre | S Levels ── -->
                 <div style="display:grid;grid-template-columns:1fr 130px 1fr;gap:1px;background:rgba(0,200,255,0.08);border-radius:4px;overflow:hidden;">
 
-                    <!-- LEFT: Resistance R3 / R2 / R1 -->
+                    <!-- LEFT: Resistance R3 / R2 / R1 — NEAREST R is dynamic -->
                     <div style="background:#07111c;padding:12px 14px;">
                         <!-- R3 -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.07);">
-                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.05);color:rgba(255,100,130,0.5);border:1px solid rgba(255,77,109,0.12);">R3</span>
-                            <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(255,143,163,0.5);">&#8377;{r3p:,.2f}</span>
-                        </div>
-                        <!-- R2 -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.1);">
-                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.08);color:rgba(255,100,130,0.8);border:1px solid rgba(255,77,109,0.18);">R2</span>
-                            <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:rgba(255,143,163,0.85);">&#8377;{r2p:,.2f}</span>
-                        </div>
-                        <!-- R1 + NEAREST R badge -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;background:rgba(255,77,109,0.04);border-radius:2px;margin-top:1px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.07);{'background:rgba(255,77,109,0.06);border-radius:2px;' if nearest_r_lbl=='R3' else ''}">
                             <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.18);color:#ff4d6d;border:1px solid rgba(255,77,109,0.4);">R1</span>
-                                <span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.28);color:#ff6b85;letter-spacing:0.5px;">NEAREST R</span>
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,{'0.18' if nearest_r_lbl=='R3' else '0.05'});color:{'#ff4d6d' if nearest_r_lbl=='R3' else 'rgba(255,100,130,0.5)'};border:1px solid rgba(255,77,109,{'0.4' if nearest_r_lbl=='R3' else '0.12'});">R3</span>
+                                {'<span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.28);color:#ff6b85;letter-spacing:0.5px;">NEAREST R</span>' if nearest_r_lbl=='R3' else ''}
                             </div>
                             <div style="display:flex;align-items:center;gap:4px;">
-                                <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;">&#8377;{r1p:,.2f}</span>
-                                <span style="color:#ff6b85;font-size:11px;">&#9650;</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:{'14' if nearest_r_lbl=='R3' else '12'}px;font-weight:700;color:{'#ff6b85' if nearest_r_lbl=='R3' else 'rgba(255,143,163,0.5)'};">&#8377;{r3p:,.2f}</span>
+                                {'<span style="color:#ff6b85;font-size:11px;">&#9650;</span>' if nearest_r_lbl=='R3' else ''}
+                            </div>
+                        </div>
+                        <!-- R2 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.1);{'background:rgba(255,77,109,0.06);border-radius:2px;' if nearest_r_lbl=='R2' else ''}">
+                            <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,{'0.18' if nearest_r_lbl=='R2' else '0.08'});color:{'#ff4d6d' if nearest_r_lbl=='R2' else 'rgba(255,100,130,0.8)'};border:1px solid rgba(255,77,109,{'0.4' if nearest_r_lbl=='R2' else '0.18'});">R2</span>
+                                {'<span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.28);color:#ff6b85;letter-spacing:0.5px;">NEAREST R</span>' if nearest_r_lbl=='R2' else ''}
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-family:'Orbitron',monospace;font-size:{'14' if nearest_r_lbl=='R2' else '13'}px;font-weight:700;color:{'#ff6b85' if nearest_r_lbl=='R2' else 'rgba(255,143,163,0.85)'};">&#8377;{r2p:,.2f}</span>
+                                {'<span style="color:#ff6b85;font-size:11px;">&#9650;</span>' if nearest_r_lbl=='R2' else ''}
+                            </div>
+                        </div>
+                        <!-- R1 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;{'background:rgba(255,77,109,0.04);border-radius:2px;margin-top:1px;' if nearest_r_lbl=='R1' else 'margin-top:1px;'}">
+                            <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,{'0.18' if nearest_r_lbl=='R1' else '0.06'});color:{'#ff4d6d' if nearest_r_lbl=='R1' else 'rgba(255,100,130,0.45)'};border:1px solid rgba(255,77,109,{'0.4' if nearest_r_lbl=='R1' else '0.15'});">R1</span>
+                                {'<span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.28);color:#ff6b85;letter-spacing:0.5px;">NEAREST R</span>' if nearest_r_lbl=='R1' else ''}
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-family:'Orbitron',monospace;font-size:{'14' if nearest_r_lbl=='R1' else '12'}px;font-weight:700;color:{'#ff6b85' if nearest_r_lbl=='R1' else 'rgba(255,143,163,0.38)'};">&#8377;{r1p:,.2f}</span>
+                                {'<span style="color:#ff6b85;font-size:11px;">&#9650;</span>' if nearest_r_lbl=='R1' else ''}
                             </div>
                         </div>
                     </div>
@@ -4061,28 +4083,40 @@ class NiftyHTMLAnalyzer:
                         </div>
                     </div>
 
-                    <!-- RIGHT: Support S1 / S2 / S3 -->
+                    <!-- RIGHT: Support S1 / S2 / S3 — NEAREST S is dynamic -->
                     <div style="background:#07111c;padding:12px 14px;">
-                        <!-- S1 + NEAREST S badge -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;background:rgba(0,230,118,0.04);border-radius:2px;margin-bottom:1px;">
+                        <!-- S1 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;{'background:rgba(0,230,118,0.04);border-radius:2px;' if nearest_s_lbl=='S1' else ''}margin-bottom:1px;">
                             <div style="display:flex;align-items:center;gap:4px;">
-                                <span style="color:#26c6da;font-size:11px;">&#9660;</span>
-                                <span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.28);color:#00e676;letter-spacing:0.5px;">NEAREST S</span>
+                                {'<span style="color:#26c6da;font-size:11px;">&#9660;</span>' if nearest_s_lbl=='S1' else ''}
+                                {'<span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.28);color:#00e676;letter-spacing:0.5px;">NEAREST S</span>' if nearest_s_lbl=='S1' else ''}
                             </div>
                             <div style="display:flex;align-items:center;gap:4px;">
-                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.18);color:#00e676;border:1px solid rgba(0,230,118,0.4);">S1</span>
-                                <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;">&#8377;{s1p:,.2f}</span>
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,{'0.18' if nearest_s_lbl=='S1' else '0.06'});color:{'#00e676' if nearest_s_lbl=='S1' else 'rgba(0,200,100,0.5)'};border:1px solid rgba(0,230,118,{'0.4' if nearest_s_lbl=='S1' else '0.15'});">S1</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:{'14' if nearest_s_lbl=='S1' else '12'}px;font-weight:700;color:{'#00e676' if nearest_s_lbl=='S1' else 'rgba(105,240,174,0.45)'};">&#8377;{s1p:,.2f}</span>
                             </div>
                         </div>
                         <!-- S2 -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(0,230,118,0.1);border-top:1px solid rgba(0,230,118,0.07);">
-                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.08);color:rgba(0,200,100,0.8);border:1px solid rgba(0,230,118,0.18);">S2</span>
-                            <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:rgba(105,240,174,0.85);">&#8377;{s2p:,.2f}</span>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(0,230,118,0.1);border-top:1px solid rgba(0,230,118,0.07);{'background:rgba(0,230,118,0.04);border-radius:2px;' if nearest_s_lbl=='S2' else ''}">
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                {'<span style="color:#26c6da;font-size:11px;">&#9660;</span>' if nearest_s_lbl=='S2' else ''}
+                                {'<span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.28);color:#00e676;letter-spacing:0.5px;">NEAREST S</span>' if nearest_s_lbl=='S2' else ''}
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,{'0.18' if nearest_s_lbl=='S2' else '0.08'});color:{'#00e676' if nearest_s_lbl=='S2' else 'rgba(0,200,100,0.8)'};border:1px solid rgba(0,230,118,{'0.4' if nearest_s_lbl=='S2' else '0.18'});">S2</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:{'14' if nearest_s_lbl=='S2' else '13'}px;font-weight:700;color:{'#00e676' if nearest_s_lbl=='S2' else 'rgba(105,240,174,0.85)'};">&#8377;{s2p:,.2f}</span>
+                            </div>
                         </div>
                         <!-- S3 -->
-                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
-                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.05);color:rgba(0,230,118,0.5);border:1px solid rgba(0,230,118,0.12);">S3</span>
-                            <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(105,240,174,0.45);">&#8377;{s3p:,.2f}</span>
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;{'background:rgba(0,230,118,0.04);border-radius:2px;' if nearest_s_lbl=='S3' else ''}">
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                {'<span style="color:#26c6da;font-size:11px;">&#9660;</span>' if nearest_s_lbl=='S3' else ''}
+                                {'<span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.28);color:#00e676;letter-spacing:0.5px;">NEAREST S</span>' if nearest_s_lbl=='S3' else ''}
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,{'0.18' if nearest_s_lbl=='S3' else '0.05'});color:{'#00e676' if nearest_s_lbl=='S3' else 'rgba(0,230,118,0.5)'};border:1px solid rgba(0,230,118,{'0.4' if nearest_s_lbl=='S3' else '0.12'});">S3</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:{'14' if nearest_s_lbl=='S3' else '12'}px;font-weight:700;color:{'#00e676' if nearest_s_lbl=='S3' else 'rgba(105,240,174,0.45)'};">&#8377;{s3p:,.2f}</span>
+                            </div>
                         </div>
                     </div>
 
