@@ -3979,7 +3979,7 @@ class NiftyHTMLAnalyzer:
                     </div>
                     <span style="font-size:8px;font-weight:700;padding:3px 10px;border-radius:3px;background:rgba(0,200,255,0.12);border:1px solid rgba(0,200,255,0.35);color:#00c8ff;letter-spacing:2px;">30 MIN</span>
                 </div>
-                <div style="font-size:8px;color:rgba(200,216,224,0.4);letter-spacing:1px;margin-bottom:16px;">Traditional Method &middot; 30 Min &middot; Auto-calculated</div>
+                <div style="font-size:9px;color:rgba(200,216,224,0.75);letter-spacing:1px;margin-bottom:16px;">Traditional Method &middot; 30 Min &middot; Auto-calculated</div>
 
                 <!-- ── PROGRESS BAR (S1 ─── LTP ──→ R1) ──────────────────── -->
                 <div style="position:relative;height:8px;background:linear-gradient(90deg,#00e676 0%,#00c8a0 30%,#4fc3f7 55%,#ff6b85 80%,#f44336 100%);border-radius:4px;margin-bottom:10px;box-shadow:0 0 8px rgba(0,200,255,0.2);">
@@ -3987,7 +3987,7 @@ class NiftyHTMLAnalyzer:
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                     <span style="font-size:10px;font-weight:700;color:#26c6da;">S1 &#8377;{s1p:,.2f}</span>
-                    <span style="font-size:11px;font-weight:700;color:#e2eaf5;">&#9650; &#8377;{cp:,.2f} <span style="color:rgba(200,216,224,0.5);font-size:9px;font-weight:400;">LTP</span></span>
+                    <span style="font-size:11px;font-weight:700;color:#e2eaf5;">&#9650; &#8377;{cp:,.2f} <span style="background:rgba(0,200,255,0.15);border:1px solid rgba(0,200,255,0.4);border-radius:2px;padding:1px 6px;color:#00c8ff;font-size:9px;font-weight:700;letter-spacing:1px;">LTP</span></span>
                     <span style="font-size:10px;font-weight:700;color:#f44336;">R1 &#8377;{r1p:,.2f}</span>
                 </div>
 
@@ -3997,25 +3997,25 @@ class NiftyHTMLAnalyzer:
                         <span style="width:7px;height:7px;border-radius:50%;background:{zone_dot};display:inline-block;flex-shrink:0;box-shadow:0 0 6px {zone_dot};"></span>
                         {zone_lbl}
                     </span>
-                    <span style="font-size:9px;color:rgba(200,216,224,0.5);">{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} {pp_above_below}</span>
+                    <span style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.85);">{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} {pp_above_below}</span>
                 </div>
 
                 <!-- ── PREV HIGH / LOW / CLOSE ─────────────────────────────── -->
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.08);border-radius:4px;overflow:hidden;margin-bottom:14px;">
                     <div style="background:#07111c;padding:10px 12px;">
-                        <div style="font-size:8px;letter-spacing:1px;color:rgba(200,216,224,0.38);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
+                        <div style="font-size:9px;letter-spacing:1.5px;font-weight:600;color:rgba(252,165,165,0.9);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
                             <span style="color:#fca5a5;">&#9650;</span> PREV HIGH
                         </div>
                         <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#fca5a5;">&#8377;{ph:,.2f}</div>
                     </div>
                     <div style="background:#07111c;padding:10px 12px;border-left:1px solid rgba(0,200,255,0.07);border-right:1px solid rgba(0,200,255,0.07);">
-                        <div style="font-size:8px;letter-spacing:1px;color:rgba(200,216,224,0.38);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
+                        <div style="font-size:9px;letter-spacing:1.5px;font-weight:600;color:rgba(134,239,172,0.9);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
                             <span style="color:#86efac;">&#9660;</span> PREV LOW
                         </div>
                         <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#86efac;">&#8377;{pl:,.2f}</div>
                     </div>
                     <div style="background:#07111c;padding:10px 12px;">
-                        <div style="font-size:8px;letter-spacing:1px;color:rgba(200,216,224,0.38);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
+                        <div style="font-size:9px;letter-spacing:1.5px;font-weight:600;color:rgba(200,216,224,0.85);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
                             <span style="color:#94a3b8;">&#9679;</span> PREV CLOSE
                         </div>
                         <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#c9d1d9;">&#8377;{pc:,.2f}</div>
@@ -4052,11 +4052,11 @@ class NiftyHTMLAnalyzer:
 
                     <!-- CENTRE: Pivot Point value + LTP chip -->
                     <div style="background:#040c14;padding:12px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px solid rgba(79,195,247,0.14);border-right:1px solid rgba(79,195,247,0.14);">
-                        <div style="font-size:7px;letter-spacing:2px;color:rgba(79,195,247,0.55);text-transform:uppercase;margin-bottom:6px;text-align:center;">PIVOT POINT</div>
+                        <div style="font-size:8px;letter-spacing:2px;font-weight:700;color:#4fc3f7;text-transform:uppercase;margin-bottom:6px;text-align:center;">PIVOT POINT</div>
                         <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#4fc3f7;text-shadow:0 0 16px rgba(79,195,247,0.55);text-align:center;line-height:1;">&#8377;{pp:,.2f}</div>
-                        <div style="font-size:8px;color:rgba(200,216,224,0.38);margin:6px 0 10px;text-align:center;">{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} from LTP</div>
+                        <div style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.78);margin:6px 0 10px;text-align:center;">{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} from LTP</div>
                         <div style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.28);border-radius:3px;padding:6px 10px;text-align:center;">
-                            <div style="font-size:7px;letter-spacing:1.5px;color:rgba(79,195,247,0.5);margin-bottom:3px;">LTP</div>
+                            <div style="font-size:8px;letter-spacing:2px;font-weight:700;color:#00c8ff;margin-bottom:3px;">LTP</div>
                             <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
                         </div>
                     </div>
@@ -4091,7 +4091,7 @@ class NiftyHTMLAnalyzer:
 
             <!-- ── FOOTER BAR ──────────────────────────────────────────────── -->
             <div style="background:rgba(0,0,0,0.45);border-top:1px solid rgba(0,200,255,0.1);padding:8px 18px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:8px;color:rgba(200,216,224,0.32);letter-spacing:1px;">Traditional &middot; 30 Min Candle</span>
+                <span style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.65);letter-spacing:1px;">Traditional &middot; 30 Min Candle</span>
                 <span style="font-size:9px;color:rgba(79,195,247,0.6);font-weight:700;letter-spacing:1px;">LTP &#8377;{cp:,.2f}</span>
             </div>
 
