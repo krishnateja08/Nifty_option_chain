@@ -2578,24 +2578,11 @@ class NiftyHTMLAnalyzer:
             support           = s1
             strong_resistance = r2
             strong_support    = s2
-            # ── Previous 30-min candle OHLC for pivot point calculation ──────────
-            # Uses 30-min bars (same as reference analyzer) so pivot levels are
-            # tight and intraday-relevant instead of using the wide daily H/L range.
-            try:
-                df_30m    = nifty.history(period='5d', interval='30m')
-                if len(df_30m) >= 2:
-                    prev_high  = float(df_30m['High'].iloc[-2])
-                    prev_low   = float(df_30m['Low'].iloc[-2])
-                    prev_close = float(df_30m['Close'].iloc[-2])
-                    print(f"  ✓ Pivot OHLC (30m prev bar) | H={prev_high} L={prev_low} C={prev_close}")
-                else:
-                    raise ValueError("Not enough 30m bars")
-            except Exception as _pe:
-                print(f"  ⚠️  30m pivot fallback to daily prev bar: {_pe}")
-                prev_row   = df.iloc[-2] if len(df) >= 2 else latest
-                prev_high  = float(prev_row['High'])
-                prev_low   = float(prev_row['Low'])
-                prev_close = float(prev_row['Close'])
+            # ── Previous candle OHLC for pivot point calculation ───────────────
+            prev_row   = df.iloc[-2] if len(df) >= 2 else latest
+            prev_high  = float(prev_row['High'])
+            prev_low   = float(prev_row['Low'])
+            prev_close = float(prev_row['Close'])
 
             technical = {
                 'current_price':    current_price,
@@ -3957,104 +3944,157 @@ class NiftyHTMLAnalyzer:
         pp_dist = round(cp - pp, 2) if pp else 0
         pp_dist_lbl = f"{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} from LTP"
 
-        def _pvt_row(label, val, col, badge="", nearest_col=None):
-            badge_html = ""
-            if badge:
-                badge_html = f'<span style="font-family:\'Space Mono\',monospace;font-size:8px;background:{nearest_col or col}33;border:1px solid {nearest_col or col}88;border-radius:2px;padding:2px 7px;color:{nearest_col or col};font-weight:700;margin-left:10px;letter-spacing:1px;">{badge}</span>'
-            # label tag style
-            if label.startswith('R'):
-                tag_style = f"background:rgba(255,77,109,0.15);color:#ff4d6d;border:1px solid rgba(255,77,109,0.35);" if label == 'R1' else ("background:rgba(255,77,109,0.08);color:rgba(255,100,130,0.9);border:1px solid rgba(255,77,109,0.2);" if label == 'R2' else "background:rgba(255,77,109,0.04);color:rgba(255,77,109,0.55);border:1px solid rgba(255,77,109,0.12);")
-                price_col = "#ff6b85" if label == 'R1' else ("rgba(255,143,163,0.85)" if label == 'R2' else "rgba(255,143,163,0.45)")
-                bar_bg = f"rgba(255,77,109,{'0.65' if label=='R1' else ('0.4' if label=='R2' else '0.15')})"
-                bar_w = "65" if label == 'R1' else ("85" if label == 'R2' else "100")
-                price_size = "15px" if label == 'R1' else ("14px" if label == 'R2' else "13px")
-            elif label.startswith('S'):
-                tag_style = f"background:rgba(0,230,118,0.15);color:#00e676;border:1px solid rgba(0,230,118,0.35);" if label == 'S1' else ("background:rgba(0,230,118,0.08);color:rgba(0,200,100,0.9);border:1px solid rgba(0,230,118,0.2);" if label == 'S2' else "background:rgba(0,230,118,0.04);color:rgba(0,230,118,0.55);border:1px solid rgba(0,230,118,0.12);")
-                price_col = "#00e676" if label == 'S1' else ("rgba(105,240,174,0.85)" if label == 'S2' else "rgba(105,240,174,0.45)")
-                bar_bg = f"rgba(0,230,118,{'0.65' if label=='S1' else ('0.4' if label=='S2' else '0.15')})"
-                bar_w = "60" if label == 'S1' else ("40" if label == 'S2' else "20")
-                price_size = "15px" if label == 'S1' else ("14px" if label == 'S2' else "13px")
-            else:
-                tag_style = "color:#4fc3f7;"; price_col = "#4fc3f7"; bar_bg = "rgba(79,195,247,0.4)"; bar_w = "50"; price_size = "14px"
-            return f"""
-                <div style="display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid rgba(0,200,255,0.05);">
-                    <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;text-align:center;padding:4px 4px;border-radius:3px;{tag_style}">{label}</span>
-                    <div style="height:4px;background:rgba(255,255,255,0.04);border-radius:0;">
-                        <div style="height:100%;width:{bar_w}%;background:{bar_bg};border-radius:0;"></div>
-                    </div>
-                    <span style="font-family:'Orbitron',monospace;font-size:{price_size};font-weight:700;text-align:right;white-space:nowrap;color:{price_col};">&#8377;{val:,.2f}{badge_html}</span>
-                </div>"""
+        # ── Zone detection (which pivot band does LTP sit in) ─────────────────
+        if pp and r3p and r2p and r1p and s1p and s2p and s3p:
+            if   cp >= r3p: zone_lbl = "Above R3";          zone_col = "#ff1744"; zone_dot = "#ff1744"
+            elif cp >= r2p: zone_lbl = "Between R2 and R3"; zone_col = "#ff4d6d"; zone_dot = "#ff4d6d"
+            elif cp >= r1p: zone_lbl = "Between R1 and R2"; zone_col = "#ff6b85"; zone_dot = "#ff6b85"
+            elif cp >= s1p: zone_lbl = "Between S1 and R1"; zone_col = "#4fc3f7"; zone_dot = "#26c6da"
+            elif cp >= s2p: zone_lbl = "Between S2 and S1"; zone_col = "#26c6da"; zone_dot = "#26c6da"
+            elif cp >= s3p: zone_lbl = "Between S3 and S2"; zone_col = "#00bcd4"; zone_dot = "#00bcd4"
+            else:           zone_lbl = "Below S3";          zone_col = "#00e676"; zone_dot = "#00e676"
+        else:
+            zone_lbl = "N/A"; zone_col = "#8faabe"; zone_dot = "#8faabe"
+
+        pp_above_below = "above PP" if pp_dist >= 0 else "below PP"
 
         pv_panel = f"""
-        <!-- ── Pivot Points Sub-Panel · Sample 1 Command Terminal ── -->
-        <div style="background:#080f18;border:1px solid rgba(0,200,255,0.15);border-radius:6px;flex:1;min-width:280px;overflow:hidden;">
+        <!-- ── Pivot Points Widget · Neon Runway · Phantom Slate Edition ── -->
+        <div style="background:#060d15;border:1px solid rgba(0,200,255,0.18);border-radius:6px;flex:1;min-width:320px;overflow:hidden;font-family:'Space Mono',monospace;">
 
-            <!-- header bar -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.5);border-bottom:1px solid rgba(0,200,255,0.1);">
-                <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:#00c8ff;text-transform:uppercase;">&#9670; Pivot Points</span>
-                <span style="font-family:'Space Mono',monospace;font-size:8px;padding:2px 8px;border-radius:2px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.2);color:rgba(0,200,255,0.7);letter-spacing:1px;">DAILY &middot; AUTO</span>
+            <!-- ── TOP BANNER ─────────────────────────────────────────────── -->
+            <div style="background:rgba(0,25,45,0.95);border-bottom:1px solid rgba(0,200,255,0.2);padding:9px 18px;display:flex;align-items:center;justify-content:center;gap:10px;">
+                <span style="color:rgba(0,200,255,0.5);font-size:9px;">&#9658;</span>
+                <span style="font-size:9px;letter-spacing:3px;color:#00c8ff;font-weight:700;text-transform:uppercase;">PIVOT POINTS (TRADITIONAL - 30 MIN)</span>
+                <span style="color:rgba(0,200,255,0.5);font-size:9px;">&#9658;</span>
             </div>
 
-            <div style="padding:16px;">
+            <div style="padding:16px 18px;">
 
-                <!-- Pivot Point hero block -->
-                <div style="background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.18);border-radius:4px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                    <div>
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(79,195,247,0.65);text-transform:uppercase;margin-bottom:6px;">Pivot Point</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:32px;font-weight:900;color:#4fc3f7;text-shadow:0 0 24px rgba(79,195,247,0.55);">&#8377;{pp:,.2f}</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(200,216,224,0.55);margin-top:5px;">{pp_dist_lbl}</div>
+                <!-- ── TITLE ROW ───────────────────────────────────────────── -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-size:14px;">&#128205;</span>
+                        <span style="font-size:12px;font-weight:700;color:#e2eaf5;letter-spacing:1.5px;">PIVOT POINTS</span>
                     </div>
-                    <div style="text-align:right;background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.2);border-radius:4px;padding:10px 14px;flex-shrink:0;">
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(79,195,247,0.55);text-transform:uppercase;margin-bottom:5px;">LTP</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
+                    <span style="font-size:8px;font-weight:700;padding:3px 10px;border-radius:3px;background:rgba(0,200,255,0.12);border:1px solid rgba(0,200,255,0.35);color:#00c8ff;letter-spacing:2px;">30 MIN</span>
+                </div>
+                <div style="font-size:8px;color:rgba(200,216,224,0.4);letter-spacing:1px;margin-bottom:16px;">Traditional Method &middot; 30 Min &middot; Auto-calculated</div>
+
+                <!-- ── PROGRESS BAR (S1 ─── LTP ──→ R1) ──────────────────── -->
+                <div style="position:relative;height:8px;background:linear-gradient(90deg,#00e676 0%,#00c8a0 30%,#4fc3f7 55%,#ff6b85 80%,#f44336 100%);border-radius:4px;margin-bottom:10px;box-shadow:0 0 8px rgba(0,200,255,0.2);">
+                    <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#0a1929;border:2.5px solid #00c8ff;box-shadow:0 0 12px rgba(0,200,255,0.9);z-index:5;"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <span style="font-size:10px;font-weight:700;color:#26c6da;">S1 &#8377;{s1p:,.2f}</span>
+                    <span style="font-size:11px;font-weight:700;color:#e2eaf5;">&#9650; &#8377;{cp:,.2f} <span style="color:rgba(200,216,224,0.5);font-size:9px;font-weight:400;">LTP</span></span>
+                    <span style="font-size:10px;font-weight:700;color:#f44336;">R1 &#8377;{r1p:,.2f}</span>
+                </div>
+
+                <!-- ── ZONE LABEL + PP DISTANCE ───────────────────────────── -->
+                <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(0,200,255,0.04);border:1px solid rgba(0,200,255,0.1);border-radius:3px;padding:7px 12px;margin-bottom:14px;">
+                    <span style="font-size:9px;color:{zone_col};display:flex;align-items:center;gap:6px;font-weight:700;">
+                        <span style="width:7px;height:7px;border-radius:50%;background:{zone_dot};display:inline-block;flex-shrink:0;box-shadow:0 0 6px {zone_dot};"></span>
+                        {zone_lbl}
+                    </span>
+                    <span style="font-size:9px;color:rgba(200,216,224,0.5);">{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} {pp_above_below}</span>
+                </div>
+
+                <!-- ── PREV HIGH / LOW / CLOSE ─────────────────────────────── -->
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.08);border-radius:4px;overflow:hidden;margin-bottom:14px;">
+                    <div style="background:#07111c;padding:10px 12px;">
+                        <div style="font-size:8px;letter-spacing:1px;color:rgba(200,216,224,0.38);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
+                            <span style="color:#fca5a5;">&#9650;</span> PREV HIGH
+                        </div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#fca5a5;">&#8377;{ph:,.2f}</div>
                     </div>
-                </div>
-
-                <!-- LTP position bar S1→R1 -->
-                <div style="position:relative;height:6px;background:linear-gradient(90deg,#26c6da 0%,#4fc3f7 45%,#f44336 100%);border-radius:0;margin-bottom:6px;">
-                    <div style="position:absolute;left:{ltp_pct}%;top:50%;transform:translate(-50%,-50%);width:3px;height:16px;background:#fff;box-shadow:0 0 10px rgba(255,255,255,0.9);z-index:5;"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:10px;color:rgba(200,216,224,0.6);margin-bottom:14px;">
-                    <span>S1 &#8377;{s1p:,.2f}</span>
-                    <span style="color:#4fc3f7;font-weight:700;">&#9650; LTP &#8377;{cp:,.2f}</span>
-                    <span>R1 &#8377;{r1p:,.2f}</span>
-                </div>
-
-                <!-- R levels -->
-                <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
-                    RESISTANCE <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
-                </div>
-                {_pvt_row('R3', r3p, '#b71c1c')}
-                {_pvt_row('R2', r2p, '#ef5350')}
-                {_pvt_row('R1', r1p, '#f44336', 'NEAREST R', '#f44336')}
-
-                <div style="border-top:1px dashed rgba(79,195,247,0.12);margin:10px 0;"></div>
-
-                <!-- S levels -->
-                <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;">
-                    SUPPORT <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
-                </div>
-                {_pvt_row('S1', s1p, '#26c6da', 'NEAREST S', '#26c6da')}
-                {_pvt_row('S2', s2p, '#00838f')}
-                {_pvt_row('S3', s3p, '#006064')}
-
-                <!-- Prev candle footer -->
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.08);border-radius:4px;overflow:hidden;margin-top:16px;">
-                    <div style="background:rgba(0,0,0,0.6);padding:12px 14px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;color:rgba(200,216,224,0.45);text-transform:uppercase;margin-bottom:5px;">Prev High</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#fca5a5;">&#8377;{ph:,.1f}</div>
+                    <div style="background:#07111c;padding:10px 12px;border-left:1px solid rgba(0,200,255,0.07);border-right:1px solid rgba(0,200,255,0.07);">
+                        <div style="font-size:8px;letter-spacing:1px;color:rgba(200,216,224,0.38);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
+                            <span style="color:#86efac;">&#9660;</span> PREV LOW
+                        </div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#86efac;">&#8377;{pl:,.2f}</div>
                     </div>
-                    <div style="background:rgba(0,0,0,0.6);padding:12px 14px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;color:rgba(200,216,224,0.45);text-transform:uppercase;margin-bottom:5px;">Prev Low</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#86efac;">&#8377;{pl:,.1f}</div>
-                    </div>
-                    <div style="background:rgba(0,0,0,0.6);padding:12px 14px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:1.5px;color:rgba(200,216,224,0.45);text-transform:uppercase;margin-bottom:5px;">Prev Close</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#e2eaf5;">&#8377;{pc:,.2f}</div>
+                    <div style="background:#07111c;padding:10px 12px;">
+                        <div style="font-size:8px;letter-spacing:1px;color:rgba(200,216,224,0.38);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
+                            <span style="color:#94a3b8;">&#9679;</span> PREV CLOSE
+                        </div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#c9d1d9;">&#8377;{pc:,.2f}</div>
                     </div>
                 </div>
 
+                <!-- ── MAIN 3-COLUMN GRID: R Levels | Pivot Centre | S Levels ── -->
+                <div style="display:grid;grid-template-columns:1fr 130px 1fr;gap:1px;background:rgba(0,200,255,0.08);border-radius:4px;overflow:hidden;">
+
+                    <!-- LEFT: Resistance R3 / R2 / R1 -->
+                    <div style="background:#07111c;padding:12px 14px;">
+                        <!-- R3 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.07);">
+                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.05);color:rgba(255,100,130,0.5);border:1px solid rgba(255,77,109,0.12);">R3</span>
+                            <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(255,143,163,0.5);">&#8377;{r3p:,.2f}</span>
+                        </div>
+                        <!-- R2 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,77,109,0.1);">
+                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.08);color:rgba(255,100,130,0.8);border:1px solid rgba(255,77,109,0.18);">R2</span>
+                            <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:rgba(255,143,163,0.85);">&#8377;{r2p:,.2f}</span>
+                        </div>
+                        <!-- R1 + NEAREST R badge -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;background:rgba(255,77,109,0.04);border-radius:2px;margin-top:1px;">
+                            <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(255,77,109,0.18);color:#ff4d6d;border:1px solid rgba(255,77,109,0.4);">R1</span>
+                                <span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.28);color:#ff6b85;letter-spacing:0.5px;">NEAREST R</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;">&#8377;{r1p:,.2f}</span>
+                                <span style="color:#ff6b85;font-size:11px;">&#9650;</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CENTRE: Pivot Point value + LTP chip -->
+                    <div style="background:#040c14;padding:12px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px solid rgba(79,195,247,0.14);border-right:1px solid rgba(79,195,247,0.14);">
+                        <div style="font-size:7px;letter-spacing:2px;color:rgba(79,195,247,0.55);text-transform:uppercase;margin-bottom:6px;text-align:center;">PIVOT POINT</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#4fc3f7;text-shadow:0 0 16px rgba(79,195,247,0.55);text-align:center;line-height:1;">&#8377;{pp:,.2f}</div>
+                        <div style="font-size:8px;color:rgba(200,216,224,0.38);margin:6px 0 10px;text-align:center;">{'+' if pp_dist >= 0 else ''}{pp_dist:.2f} from LTP</div>
+                        <div style="background:rgba(79,195,247,0.1);border:1px solid rgba(79,195,247,0.28);border-radius:3px;padding:6px 10px;text-align:center;">
+                            <div style="font-size:7px;letter-spacing:1.5px;color:rgba(79,195,247,0.5);margin-bottom:3px;">LTP</div>
+                            <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#80deea;">&#8377;{cp:,.2f}</div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Support S1 / S2 / S3 -->
+                    <div style="background:#07111c;padding:12px 14px;">
+                        <!-- S1 + NEAREST S badge -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;background:rgba(0,230,118,0.04);border-radius:2px;margin-bottom:1px;">
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="color:#26c6da;font-size:11px;">&#9660;</span>
+                                <span style="font-size:7px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.28);color:#00e676;letter-spacing:0.5px;">NEAREST S</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.18);color:#00e676;border:1px solid rgba(0,230,118,0.4);">S1</span>
+                                <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;">&#8377;{s1p:,.2f}</span>
+                            </div>
+                        </div>
+                        <!-- S2 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(0,230,118,0.1);border-top:1px solid rgba(0,230,118,0.07);">
+                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.08);color:rgba(0,200,100,0.8);border:1px solid rgba(0,230,118,0.18);">S2</span>
+                            <span style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:rgba(105,240,174,0.85);">&#8377;{s2p:,.2f}</span>
+                        </div>
+                        <!-- S3 -->
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+                            <span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:2px;background:rgba(0,230,118,0.05);color:rgba(0,230,118,0.5);border:1px solid rgba(0,230,118,0.12);">S3</span>
+                            <span style="font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:rgba(105,240,174,0.45);">&#8377;{s3p:,.2f}</span>
+                        </div>
+                    </div>
+
+                </div>
             </div>
+
+            <!-- ── FOOTER BAR ──────────────────────────────────────────────── -->
+            <div style="background:rgba(0,0,0,0.45);border-top:1px solid rgba(0,200,255,0.1);padding:8px 18px;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:8px;color:rgba(200,216,224,0.32);letter-spacing:1px;">Traditional &middot; 30 Min Candle</span>
+                <span style="font-size:9px;color:rgba(79,195,247,0.6);font-weight:700;letter-spacing:1px;">LTP &#8377;{cp:,.2f}</span>
+            </div>
+
         </div>"""
 
         return f"""
