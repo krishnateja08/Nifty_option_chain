@@ -3965,7 +3965,7 @@ class NiftyHTMLAnalyzer:
             <!-- ── TOP BANNER ─────────────────────────────────────────────── -->
             <div style="background:rgba(0,25,45,0.95);border-bottom:1px solid rgba(0,200,255,0.2);padding:9px 18px;display:flex;align-items:center;justify-content:center;gap:10px;">
                 <span style="color:rgba(0,200,255,0.5);font-size:9px;">&#9658;</span>
-                <span style="font-size:9px;letter-spacing:3px;color:#00c8ff;font-weight:700;text-transform:uppercase;">PIVOT POINTS (TRADITIONAL - 30 MIN)</span>
+                <span style="font-size:9px;letter-spacing:3px;color:#00c8ff;font-weight:700;text-transform:uppercase;">PIVOT POINTS (TRADITIONAL - DAILY)</span>
                 <span style="color:rgba(0,200,255,0.5);font-size:9px;">&#9658;</span>
             </div>
 
@@ -3977,9 +3977,9 @@ class NiftyHTMLAnalyzer:
                         <span style="font-size:14px;">&#128205;</span>
                         <span style="font-size:12px;font-weight:700;color:#e2eaf5;letter-spacing:1.5px;">PIVOT POINTS</span>
                     </div>
-                    <span style="font-size:8px;font-weight:700;padding:3px 10px;border-radius:3px;background:rgba(0,200,255,0.12);border:1px solid rgba(0,200,255,0.35);color:#00c8ff;letter-spacing:2px;">30 MIN</span>
+                    <span style="font-size:8px;font-weight:700;padding:3px 10px;border-radius:3px;background:rgba(0,200,255,0.12);border:1px solid rgba(0,200,255,0.35);color:#00c8ff;letter-spacing:2px;">DAILY</span>
                 </div>
-                <div style="font-size:9px;color:rgba(200,216,224,0.75);letter-spacing:1px;margin-bottom:16px;">Traditional Method &middot; 30 Min &middot; Auto-calculated</div>
+                <div style="font-size:9px;color:rgba(200,216,224,0.75);letter-spacing:1px;margin-bottom:16px;">Traditional Method &middot; Daily Candle &middot; Auto-calculated</div>
 
                 <!-- ── PROGRESS BAR (S1 ─── LTP ──→ R1) ──────────────────── -->
                 <div style="position:relative;height:8px;background:linear-gradient(90deg,#00e676 0%,#00c8a0 30%,#4fc3f7 55%,#ff6b85 80%,#f44336 100%);border-radius:4px;margin-bottom:10px;box-shadow:0 0 8px rgba(0,200,255,0.2);">
@@ -4091,7 +4091,7 @@ class NiftyHTMLAnalyzer:
 
             <!-- ── FOOTER BAR ──────────────────────────────────────────────── -->
             <div style="background:rgba(0,0,0,0.45);border-top:1px solid rgba(0,200,255,0.1);padding:8px 18px;display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.65);letter-spacing:1px;">Traditional &middot; 30 Min Candle</span>
+                <span style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.65);letter-spacing:1px;">Traditional &middot; Daily Candle</span>
                 <span style="font-size:9px;color:rgba(79,195,247,0.6);font-weight:700;letter-spacing:1px;">LTP &#8377;{cp:,.2f}</span>
             </div>
 
