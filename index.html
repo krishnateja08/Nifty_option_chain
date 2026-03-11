@@ -620,7 +620,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">11-Mar-2026 15:29 IST</span>
+                <span class="sb-value gen-val">11-Mar-2026 16:09 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -658,255 +658,11 @@
         <div class="section">
             <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
             <div class="snap-grid">
-                <div class="g snap-card g-hi"><div class="card-top-row"><span class="card-ico">&#128185;</span><div class="lbl">NIFTY 50 SPOT</div></div><span class="val">&#8377;23,845.55</span></div>
+                <div class="g snap-card g-hi"><div class="card-top-row"><span class="card-ico">&#128185;</span><div class="lbl">NIFTY 50 SPOT</div></div><span class="val">&#8377;23,866.85</span></div>
                 <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#127919;</span><div class="lbl">ATM STRIKE</div></div><span class="val">&#8377;23,850</span></div>
-                <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#128197;</span><div class="lbl">EXPIRY DATE</div></div><span class="val" style="font-size:20px">17-Mar-2026</span></div>
+                <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#128197;</span><div class="lbl">EXPIRY DATE</div></div><span class="val" style="font-size:20px">N/A</span></div>
             </div>
         </div>
-
-<style>
-/* ── OI Navy Command — responsive ── */
-.nc-wrap {
-    background:#090f1c;
-    border:1px solid rgba(0,200,255,0.1);
-    border-radius:12px;
-    overflow:hidden;
-    font-family:'JetBrains Mono',monospace;
-}
-.nc-header {
-    display:flex;align-items:center;justify-content:space-between;
-    padding:8px 14px;
-    background:rgba(0,0,0,0.35);
-    border-bottom:1px solid rgba(0,200,255,0.08);
-    flex-wrap:wrap;gap:6px;
-}
-.nc-header-left {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.nc-header-title {font-size:15px;font-weight:700;color:#e2eaf5;letter-spacing:.5px;}
-.nc-header-sub {font-size:12px;color:#a8c4d8;letter-spacing:1px;}
-.nc-atm-badge {
-    font-size:9px;letter-spacing:1.5px;white-space:nowrap;
-    background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);
-    color:#00d4ff;padding:3px 10px;border-radius:5px;
-}
-/* Desktop: single row — direction+bars merged | divider | CE | PE | Net */
-.nc-grid {
-    display:grid;
-    grid-template-columns:2.2fr 1px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);
-    min-height:90px;
-}
-.nc-divider {background:rgba(0,200,255,0.08);}
-
-/* Direction+bars unified cell — left:text  right:bars */
-.nc-dir-cell {
-    padding:14px 18px;
-    border-left:3px solid #fb7185;
-    display:flex;flex-direction:row;align-items:center;gap:0;
-}
-.nc-dir-text {
-    display:flex;flex-direction:column;justify-content:center;gap:3px;
-    flex:0 0 auto; min-width:140px;
-}
-.nc-dir-label {font-size:10px;letter-spacing:1.5px;color:rgba(251,113,133,0.5);text-transform:uppercase;}
-.nc-dir-name {
-    font-family:'Orbitron',monospace;font-size:22px;font-weight:900;
-    color:#fb7185;text-shadow:0 0 18px #fb718577;line-height:1.2;
-}
-.nc-dir-sig {font-size:11px;color:rgba(251,113,133,0.5);letter-spacing:.3px;margin-top:2px;}
-
-/* Bars block — fills remaining space of direction cell */
-.nc-bars-block {
-    flex:1;
-    display:flex;flex-direction:column;justify-content:center;gap:10px;
-    padding:0 18px 0 24px;
-    border-left:1px solid rgba(0,200,255,0.08);
-    margin-left:16px;
-}
-.nc-bar-row {display:flex;align-items:center;gap:10px;}
-.nc-bar-lbl {
-    font-size:11px;font-weight:700;letter-spacing:1px;
-    width:32px;flex-shrink:0;
-}
-.nc-bar-track {flex:1;height:6px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;}
-.nc-bar-pct {
-    font-family:'Orbitron',monospace;font-size:15px;font-weight:900;
-    min-width:42px;text-align:right;flex-shrink:0;
-}
-.nc-oi-cell {
-    padding:14px 14px;
-    border-left:1px solid rgba(0,200,255,0.08);
-    display:flex;flex-direction:column;justify-content:center;gap:3px;
-}
-.nc-oi-label {font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#a8c4d8;margin-bottom:2px;}
-.nc-oi-value {font-family:'Orbitron',monospace;font-size:20px;font-weight:900;line-height:1.15;}
-.nc-oi-footer {display:flex;align-items:center;justify-content:space-between;margin-top:4px;flex-wrap:wrap;gap:3px;}
-.nc-oi-sub {font-size:10px;color:#a8c4d8;}
-.nc-oi-btn {font-size:10px;padding:2px 7px;border-radius:3px;white-space:nowrap;}
-.nc-legend {
-    padding:8px 14px;
-    background:rgba(0,0,0,0.25);
-    border-top:1px solid rgba(0,200,255,0.06);
-    display:flex;flex-wrap:wrap;align-items:center;gap:5px 10px;
-    font-size:11px;color:#a8c4d8;
-}
-
-/* ── MOBILE: stack into 2 rows ── */
-@media (max-width:620px) {
-    .nc-grid {
-        display:grid;
-        grid-template-columns:1fr 1fr 1fr;
-        grid-template-rows:auto auto;
-    }
-    .nc-divider { display:none; }
-
-    /* Direction+bars cell: spans full row 1 */
-    .nc-dir-cell {
-        grid-column:1 / 4;
-        grid-row:1;
-        border-left:3px solid #fb7185;
-        border-bottom:1px solid rgba(0,200,255,0.08);
-        padding:12px 14px;
-        flex-direction:row;
-        align-items:center;
-    }
-    .nc-dir-text { min-width:110px; }
-    .nc-dir-name { font-size:18px; }
-    .nc-bars-block {
-        padding:0 10px 0 16px;
-        margin-left:12px;
-    }
-    .nc-bar-pct { font-size:13px; min-width:36px; }
-
-    /* CE / PE / Net — equal thirds in row 2 */
-    .nc-ce-cell {
-        grid-column:1 / 2; grid-row:2;
-        border-top:2px solid #fb7185;
-        border-right:1px solid rgba(0,200,255,0.08);
-        padding:10px 10px;
-    }
-    .nc-pe-cell {
-        grid-column:2 / 3; grid-row:2;
-        border-top:2px solid #34d399;
-        border-right:1px solid rgba(0,200,255,0.08);
-        padding:10px 10px;
-    }
-    .nc-net-cell {
-        grid-column:3 / 4; grid-row:2;
-        border-top:2px solid #fb7185;
-        padding:10px 10px;
-    }
-
-    .nc-oi-value { font-size:13px; }
-    .nc-oi-footer { flex-direction:column; align-items:flex-start; gap:3px; }
-    .nc-legend-verbose { display:none; }
-}
-</style>
-
-<div class="section">
-<div class="nc-wrap">
-
-  <!-- ── Header ── -->
-  <div class="nc-header">
-    <div class="nc-header-left">
-      <span style="font-size:13px;">&#128202;</span>
-      <span class="nc-header-title">Change in Open Interest</span>
-      <span class="nc-header-sub">Today's Direction Analysis</span>
-    </div>
-    <div class="nc-atm-badge">ATM &#177;10</div>
-  </div>
-
-  <!-- ── Grid: Direction | divider | Bars | divider | CE | PE | Net ── -->
-  <div class="nc-grid">
-
-    <!-- Direction + Bars — unified cell -->
-    <div class="nc-dir-cell" style="background:linear-gradient(135deg,rgba(30,10,14,0.92),rgba(30,10,14,0.03));">
-
-      <!-- Left: text -->
-      <div class="nc-dir-text">
-        <div class="nc-dir-label">Market Direction</div>
-        <div class="nc-dir-name">Bearish</div>
-        <div class="nc-dir-sig">Call Build-up Dominant</div>
-      </div>
-
-      <!-- Right: bars -->
-      <div class="nc-bars-block">
-        <div class="nc-bar-row">
-          <div class="nc-bar-lbl" style="color:#00ff88;">&#9679; Bull</div>
-          <div class="nc-bar-track">
-            <div style="height:100%;width:30%;background:linear-gradient(90deg,#00c96b,#00ff88);border-radius:99px;box-shadow:0 0 6px rgba(0,255,136,0.5);"></div>
-          </div>
-          <div class="nc-bar-pct" style="color:#00ff88;">30%</div>
-        </div>
-        <div class="nc-bar-row">
-          <div class="nc-bar-lbl" style="color:#ff3b5c;">&#9679; Bear</div>
-          <div class="nc-bar-track">
-            <div style="height:100%;width:70%;background:linear-gradient(90deg,#c9003a,#ff3b5c);border-radius:99px;box-shadow:0 0 6px rgba(255,59,92,0.5);"></div>
-          </div>
-          <div class="nc-bar-pct" style="color:#ff3b5c;">70%</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Divider -->
-    <div class="nc-divider"></div>
-
-    <!-- Call OI -->
-    <div class="nc-oi-cell nc-ce-cell" style="border-top:2px solid #fb7185;">
-      <div class="nc-oi-label">Call OI &#916;</div>
-      <div class="nc-oi-value" style="color:#fb7185;">+342,235</div>
-      <div class="nc-oi-footer">
-        <div class="nc-oi-sub">CE open interest</div>
-        <div class="nc-oi-btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">Bearish Signal</div>
-      </div>
-    </div>
-
-    <!-- Put OI -->
-    <div class="nc-oi-cell nc-pe-cell" style="border-top:2px solid #34d399;">
-      <div class="nc-oi-label">Put OI &#916;</div>
-      <div class="nc-oi-value" style="color:#34d399;">+148,453</div>
-      <div class="nc-oi-footer">
-        <div class="nc-oi-sub">PE open interest</div>
-        <div class="nc-oi-btn" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);color:#10b981;">Bullish Signal</div>
-      </div>
-    </div>
-
-    <!-- Net OI -->
-    <div class="nc-oi-cell nc-net-cell" style="border-top:2px solid #fb7185;">
-      <div class="nc-oi-label">Net OI &#916;</div>
-      <div class="nc-oi-value" style="color:#fb7185;">-193,782</div>
-      <div class="nc-oi-footer">
-        <div class="nc-oi-sub">PE &#916; &#8722; CE &#916;</div>
-        <div class="nc-oi-btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">&#9878; Bearish Net</div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ── Legend ── -->
-  <div class="nc-legend">
-    <span>&#128214;</span>
-    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:2px 8px;color:#dde8f0;">Call OI +</span>
-    <span class="nc-legend-verbose">Writers selling calls</span>
-    <span style="background:rgba(255,59,92,0.18);border:1px solid rgba(255,59,92,0.35);border-radius:4px;padding:2px 8px;color:#ff6b85;">Bearish</span>
-    <span style="color:rgba(255,255,255,0.3);" class="nc-legend-verbose">|</span>
-    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:2px 8px;color:#dde8f0;" class="nc-legend-verbose">Call OI &#8722;</span>
-    <span class="nc-legend-verbose">Unwinding</span>
-    <span style="background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.35);border-radius:4px;padding:2px 8px;color:#00ff88;" class="nc-legend-verbose">Bullish</span>
-    <span style="color:rgba(255,255,255,0.3);" class="nc-legend-verbose">|</span>
-    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:2px 8px;color:#dde8f0;">Put OI +</span>
-    <span class="nc-legend-verbose">Writers selling puts</span>
-    <span style="background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.35);border-radius:4px;padding:2px 8px;color:#00ff88;">Bullish</span>
-    <span style="color:rgba(255,255,255,0.3);" class="nc-legend-verbose">|</span>
-    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:2px 8px;color:#dde8f0;">Net OI</span>
-    <span style="background:rgba(0,255,136,0.15);border:1px solid rgba(0,255,136,0.35);border-radius:4px;padding:2px 8px;color:#00ff88;">+ = Bullish</span>
-    <span style="background:rgba(255,59,92,0.18);border:1px solid rgba(255,59,92,0.35);border-radius:4px;padding:2px 8px;color:#ff6b85;">&#8722; = Bearish</span>
-    <span style="color:rgba(255,255,255,0.3);" class="nc-legend-verbose">|</span>
-    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:2px 8px;color:#dde8f0;" class="nc-legend-verbose">Bull % + Bear %</span>
-    <span class="nc-legend-verbose">= 100% &middot; relative dominance</span>
-  </div>
-
-</div>
-</div>
 
     <div class="section">
         <div class="section-title"><span>&#128202;</span> KEY LEVELS</div>
@@ -918,36 +674,36 @@
                 <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE &#9658;</span>
             </div>
             <div style="position:relative;height:62px;">
-                <div class="rl-node-a" style="left:3%;"><div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div><div class="rl-val" style="color:#26c6da;">&#8377;23,750</div><div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div></div>
-                <div class="rl-node-a" style="left:22%;"><div class="rl-lbl" style="color:#00bcd4;">Support</div><div class="rl-val" style="color:#00bcd4;">&#8377;23,800</div><div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div></div>
-                <div style="position:absolute;left:47.78%;transform:translateX(-50%);bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;box-shadow:0 0 16px rgba(79,195,247,0.7);">&#9660; NOW &nbsp;&#8377;23,846</div>
+                <div class="rl-node-a" style="left:3%;"><div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div><div class="rl-val" style="color:#26c6da;">&#8377;23,775</div><div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div></div>
+                <div class="rl-node-a" style="left:22%;"><div class="rl-lbl" style="color:#00bcd4;">Support</div><div class="rl-val" style="color:#00bcd4;">&#8377;23,850</div><div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div></div>
+                <div style="position:absolute;left:40.82%;transform:translateX(-50%);bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;box-shadow:0 0 16px rgba(79,195,247,0.7);">&#9660; NOW &nbsp;&#8377;23,867</div>
                 <div class="rl-node-a" style="left:75%;"><div class="rl-lbl" style="color:#ff7043;">Resistance</div><div class="rl-val" style="color:#ff7043;">&#8377;23,925</div><div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div></div>
-                <div class="rl-node-a" style="left:95%;"><div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div><div class="rl-val" style="color:#f44336;">&#8377;23,950</div><div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div></div>
+                <div class="rl-node-a" style="left:95%;"><div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div><div class="rl-val" style="color:#f44336;">&#8377;24,000</div><div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div></div>
             </div>
             <div style="position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);box-shadow:0 2px 14px rgba(0,0,0,0.5);">
-                <div style="position:absolute;left:47.78%;top:50%;transform:translate(-50%,-50%);width:4px;height:22px;background:#fff;border-radius:2px;box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
+                <div style="position:absolute;left:40.82%;top:50%;transform:translate(-50%,-50%);width:4px;height:22px;background:#fff;border-radius:2px;box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
             </div>
-            <div style="position:relative;height:58px;"><div class="rl-node-b" style="left:43%;"><div class="rl-dot" style="background:#ffb74d;box-shadow:0 0 8px #ffb74d;margin:0 auto 5px;"></div><div class="rl-lbl" style="color:#ffb74d;">Max Pain</div><div class="rl-val" style="color:#ffb74d;">₹23,950</div></div></div>
+            <div style="position:relative;height:58px;"></div>
         </div>
 
         <!-- Mobile: compact table (shown only on <520px) -->
         <table class="kl-mobile-table">
-            <tr><td style="color:#26c6da;">&#9660; Strong Support</td><td style="color:#26c6da;">&#8377;23,750</td></tr>
-            <tr><td style="color:#00bcd4;">&#9660; Support (S1)</td><td style="color:#00bcd4;">&#8377;23,800</td></tr>
-            <tr><td style="color:#4fc3f7;font-weight:700;">&#9654; NOW</td><td style="color:#4fc3f7;font-weight:700;">&#8377;23,846</td></tr>
-            <tr><td style="color:#ffb74d;">&#127919; Max Pain</td><td style="color:#ffb74d;">&#8377;23,950</td></tr>
+            <tr><td style="color:#26c6da;">&#9660; Strong Support</td><td style="color:#26c6da;">&#8377;23,775</td></tr>
+            <tr><td style="color:#00bcd4;">&#9660; Support (S1)</td><td style="color:#00bcd4;">&#8377;23,850</td></tr>
+            <tr><td style="color:#4fc3f7;font-weight:700;">&#9654; NOW</td><td style="color:#4fc3f7;font-weight:700;">&#8377;23,867</td></tr>
+            
             <tr><td style="color:#ff7043;">&#9650; Resistance (R1)</td><td style="color:#ff7043;">&#8377;23,925</td></tr>
-            <tr><td style="color:#f44336;">&#9650; Strong Resistance</td><td style="color:#f44336;">&#8377;23,950</td></tr>
+            <tr><td style="color:#f44336;">&#9650; Strong Resistance</td><td style="color:#f44336;">&#8377;24,000</td></tr>
         </table>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
             <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
                 <span style="font-size:12px;color:#c8d8e0;">&#128205; To Resistance</span>
-                <span style="font-size:15px;font-weight:700;color:#f44336;">+79 pts</span>
+                <span style="font-size:15px;font-weight:700;color:#f44336;">+58 pts</span>
             </div>
             <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
                 <span style="font-size:12px;color:#c8d8e0;">&#128205; To Support</span>
-                <span style="font-size:15px;font-weight:700;color:#00bcd4;">−45 pts</span>
+                <span style="font-size:15px;font-weight:700;color:#00bcd4;">−16 pts</span>
             </div>
         </div>
     </div>
@@ -955,106 +711,7 @@
     <div class="section">
         <div class="section-title"><span>&#128204;</span> OPTION CHAIN &amp; PIVOT POINTS</div>
         <div style="display:flex;gap:2px;flex-wrap:wrap;background:rgba(0,200,255,0.06);border:1px solid rgba(0,200,255,0.15);border-radius:6px;overflow:hidden;">
-            
-        <!-- ── Option Chain Analysis Sub-Panel · Sample 1 Command Terminal ── -->
-        <div style="background:#080f18;border:1px solid rgba(0,200,255,0.15);border-radius:6px;flex:1;min-width:280px;overflow:hidden;">
-
-            <!-- header bar -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.5);border-bottom:1px solid rgba(0,200,255,0.1);">
-                <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;color:#00c8ff;text-transform:uppercase;">&#11043; Option Chain Analysis</span>
-                <span style="font-family:'Space Mono',monospace;font-size:8px;padding:2px 8px;border-radius:2px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.2);color:rgba(0,200,255,0.7);letter-spacing:1px;">NIFTY &middot; LIVE</span>
-            </div>
-
-            <div style="padding:16px;">
-
-                <!-- PCR / Sentiment / MaxPain stats row -->
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.06);border-radius:4px;overflow:hidden;margin-bottom:14px;">
-                    <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">Put / Call</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:700;line-height:1;color:#ffb74d;text-shadow:0 0 16px #ffb74d99;">0.99</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">PCR RATIO</div>
-                    </div>
-                    <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">OI Sentiment</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:700;line-height:1;color:#f44336;text-shadow:0 0 16px #f4433699;">&#9660; BEARISH</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">Bearish</div>
-                    </div>
-                    <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">Max Pain</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:700;line-height:1;color:#ffd700;text-shadow:0 0 16px rgba(255,215,0,0.5);">&#8377;23,950</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">Expiry magnet</div>
-                    </div>
-                </div>
-
-                <!-- OI Direction bars -->
-                <div style="margin-bottom:14px;">
-                    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
-                        OI DIRECTION <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#ff4d6d;width:26px;flex-shrink:0;">CE</div>
-                        <div style="flex:1;height:7px;background:rgba(255,255,255,0.06);position:relative;overflow:hidden;">
-                            <div style="height:100%;width:100%;background:linear-gradient(90deg,rgba(255,77,109,0.4),#ff4d6d);position:relative;">
-                                <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#ff4d6d;filter:brightness(2);box-shadow:0 0 8px #ff4d6d;"></span>
-                            </div>
-                        </div>
-                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;width:64px;text-align:right;flex-shrink:0;">+342K</div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#00e676;width:26px;flex-shrink:0;">PE</div>
-                        <div style="flex:1;height:7px;background:rgba(255,255,255,0.06);position:relative;overflow:hidden;">
-                            <div style="height:100%;width:43%;background:linear-gradient(90deg,rgba(0,230,118,0.4),#00e676);position:relative;">
-                                <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#00e676;filter:brightness(2);box-shadow:0 0 8px #00e676;"></span>
-                            </div>
-                        </div>
-                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;width:64px;text-align:right;flex-shrink:0;">+148K</div>
-                    </div>
-                </div>
-
-                <!-- OI Resistance Walls -->
-                <div style="margin-bottom:12px;">
-                    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
-                        OI RESISTANCE WALLS <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,200,255,0.06);">
-                        <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(255,77,109,0.15);color:#ff4d6d;border:1px solid rgba(255,77,109,0.35);width:32px;text-align:center;flex-shrink:0;">R1</span>
-                        <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
-                            <div style="height:100%;width:100%;background:linear-gradient(90deg,rgba(255,77,109,0.3),#ff4d6d);box-shadow:0 0 6px rgba(255,77,109,0.3);"></div>
-                        </div>
-                        <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;flex-shrink:0;min-width:80px;text-align:right;">&#8377;24,300</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
-                        <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(255,77,109,0.08);color:rgba(255,100,130,0.85);border:1px solid rgba(255,77,109,0.2);width:32px;text-align:center;flex-shrink:0;">R2</span>
-                        <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
-                            <div style="height:100%;width:87%;background:linear-gradient(90deg,rgba(255,77,109,0.15),rgba(255,77,109,0.7));"></div>
-                        </div>
-                        <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:rgba(255,143,163,0.85);flex-shrink:0;min-width:80px;text-align:right;">&#8377;24,200</span>
-                    </div>
-                </div>
-
-                <!-- OI Support Floors -->
-                <div>
-                    <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
-                        OI SUPPORT FLOORS <span style="flex:1;height:1px;background:rgba(0,200,255,0.12);display:inline-block;"></span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(0,200,255,0.06);">
-                        <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(0,230,118,0.15);color:#00e676;border:1px solid rgba(0,230,118,0.35);width:32px;text-align:center;flex-shrink:0;">S1</span>
-                        <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
-                            <div style="height:100%;width:97%;background:linear-gradient(90deg,rgba(0,230,118,0.3),#00e676);box-shadow:0 0 6px rgba(0,230,118,0.3);"></div>
-                        </div>
-                        <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;flex-shrink:0;min-width:80px;text-align:right;">&#8377;23,500</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
-                        <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(0,230,118,0.08);color:rgba(0,200,100,0.85);border:1px solid rgba(0,230,118,0.2);width:32px;text-align:center;flex-shrink:0;">S2</span>
-                        <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
-                            <div style="height:100%;width:88%;background:linear-gradient(90deg,rgba(0,230,118,0.15),rgba(0,230,118,0.7));"></div>
-                        </div>
-                        <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:rgba(105,240,174,0.85);flex-shrink:0;min-width:80px;text-align:right;">&#8377;24,000</span>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+            <div style="color:#8faabe;font-size:13px;padding:16px;">Option data unavailable</div>
             
         <!-- ── Pivot Points Widget · Neon Runway · Phantom Slate Edition ── -->
         <div style="background:#060d15;border:1px solid rgba(0,200,255,0.18);border-radius:6px;flex:1;min-width:320px;overflow:hidden;font-family:'Space Mono',monospace;">
@@ -1091,7 +748,7 @@
                     <!-- LTP centre -->
                     <div style="text-align:center;">
                         <div style="font-size:8px;font-weight:700;color:rgba(200,216,224,0.6);letter-spacing:1px;margin-bottom:2px;">CURRENT</div>
-                        <div style="font-size:14px;font-weight:800;color:#e2eaf5;">&#9650; &#8377;23,845.55 <span style="background:rgba(0,200,255,0.18);border:1px solid rgba(0,200,255,0.45);border-radius:2px;padding:2px 7px;color:#00c8ff;font-size:10px;font-weight:700;letter-spacing:1px;">LTP</span></div>
+                        <div style="font-size:14px;font-weight:800;color:#e2eaf5;">&#9650; &#8377;23,866.85 <span style="background:rgba(0,200,255,0.18);border:1px solid rgba(0,200,255,0.45);border-radius:2px;padding:2px 7px;color:#00c8ff;font-size:10px;font-weight:700;letter-spacing:1px;">LTP</span></div>
                     </div>
                     <!-- NEAREST RESISTANCE (right) -->
                     <div style="text-align:right;">
@@ -1106,7 +763,7 @@
                         <span style="width:7px;height:7px;border-radius:50%;background:#00e676;display:inline-block;flex-shrink:0;box-shadow:0 0 6px #00e676;"></span>
                         Below S3
                     </span>
-                    <span style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.85);">-369.57 below PP</span>
+                    <span style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.85);">-348.27 below PP</span>
                 </div>
 
                 <!-- ── PREV HIGH / LOW / CLOSE ─────────────────────────────── -->
@@ -1178,20 +835,20 @@
                         <div style="text-align:center;width:100%;">
                             <div style="font-size:8px;letter-spacing:2px;font-weight:700;color:#4fc3f7;text-transform:uppercase;margin-bottom:4px;">PIVOT POINT</div>
                             <div style="font-family:'Orbitron',monospace;font-size:15px;font-weight:900;color:#4fc3f7;text-shadow:0 0 12px rgba(79,195,247,0.6);line-height:1;">&#8377;24,215.12</div>
-                            <div style="font-size:9px;font-weight:700;color:#f44336;margin-top:4px;">LTP -369.57 pts below PP</div>
+                            <div style="font-size:9px;font-weight:700;color:#f44336;margin-top:4px;">LTP -348.27 pts below PP</div>
                         </div>
 
                         <!-- NEAREST R block — highlighted in red -->
                         <div style="width:100%;background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.38);border-radius:3px;padding:7px 8px;text-align:center;">
                             <div style="font-size:8px;letter-spacing:1.5px;font-weight:700;color:#ff6b85;margin-bottom:4px;">&#9650; NEXT RES (R1)</div>
                             <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:800;color:#ff4d6d;text-shadow:0 0 10px rgba(255,77,109,0.5);line-height:1;">&#8377;24,350.29</div>
-                            <div style="font-size:9px;font-weight:700;color:#fca5a5;margin-top:4px;">+504.74 pts away</div>
+                            <div style="font-size:9px;font-weight:700;color:#fca5a5;margin-top:4px;">+483.44 pts away</div>
                         </div>
 
                         <!-- LTP chip -->
                         <div style="background:rgba(79,195,247,0.12);border:1px solid rgba(79,195,247,0.35);border-radius:3px;padding:6px 8px;text-align:center;width:100%;">
                             <div style="font-size:8px;letter-spacing:2px;font-weight:700;color:#00c8ff;margin-bottom:3px;">LTP</div>
-                            <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#80deea;">&#8377;23,845.55</div>
+                            <div style="font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#80deea;">&#8377;23,866.85</div>
                         </div>
 
                     </div>
@@ -1239,7 +896,7 @@
             <!-- ── FOOTER BAR ──────────────────────────────────────────────── -->
             <div style="background:rgba(0,0,0,0.45);border-top:1px solid rgba(0,200,255,0.1);padding:8px 18px;display:flex;justify-content:space-between;align-items:center;">
                 <span style="font-size:9px;font-weight:600;color:rgba(200,216,224,0.65);letter-spacing:1px;">Traditional &middot; Daily Candle</span>
-                <span style="font-size:9px;color:rgba(79,195,247,0.6);font-weight:700;letter-spacing:1px;">LTP &#8377;23,845.55</span>
+                <span style="font-size:9px;color:rgba(79,195,247,0.6);font-weight:700;letter-spacing:1px;">LTP &#8377;23,866.85</span>
             </div>
 
         </div>
@@ -1281,13 +938,13 @@
               color:rgba(120,160,180,0.45);text-transform:uppercase;margin-bottom:4px;">NIFTY 50 · SPOT PRICE</div>
             <div style="display:flex;align-items:baseline;gap:12px;">
               <span style="font-family:'Orbitron',monospace;font-size:clamp(26px,4vw,38px);font-weight:900;
-                color:#ffb74d;line-height:1;">&#8377;23,845.55</span>
+                color:#ffb74d;line-height:1;">&#8377;23,866.85</span>
               <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(180,210,230,0.5);">
-                ATM &#8377;23,850 &nbsp;·&nbsp; 17-Mar-2026</span>
+                ATM &#8377;23,850 &nbsp;·&nbsp; N/A</span>
             </div>
           </div>
           <div style="display:flex;gap:20px;flex-wrap:wrap;">
-            <div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">PCR (OI)</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">0.992</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">Max Pain</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">&#8377;23,950</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">RSI (14)</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">23.1</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">MACD</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ff5252;">Bearish</div></div>
+            <div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">PCR (OI)</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ff5252;">N/A</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">Max Pain</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">N/A</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">RSI (14)</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">23.3</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">MACD</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ff5252;">Bearish</div></div>
           </div>
         </div>
 
@@ -1300,7 +957,7 @@
                   MARKET DIRECTION &nbsp;·&nbsp; ALGORITHMIC
                 </div>
                 <div class="md-pills-top">
-                  <span class="md-pill md-pill-bull">BULL 3</span>
+                  <span class="md-pill md-pill-bull">BULL 2</span>
                   <span class="md-pill md-pill-bear">BEAR 4</span>
                   <span class="md-pill md-pill-conf-med">MEDIUM CONFIDENCE</span>
                 </div>
@@ -1315,8 +972,8 @@
                   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
                   SIDEWAYS</div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(180,210,230,0.4);">
-                  Score: <span style="color:#ffb74d;font-weight:700;">-1</span>
-                  / 7 signals
+                  Score: <span style="color:#ffb74d;font-weight:700;">-2</span>
+                  / 6 signals
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;">
                   <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
@@ -1341,7 +998,7 @@
                     stroke="rgba(255,255,255,0.06)" stroke-width="10" stroke-linecap="round"/>
                   <path d="M 15 82 A 65 65 0 0 1 145 82" fill="none"
                     stroke="url(#gaugeGradMD)" stroke-width="10" stroke-linecap="round" opacity="0.65"/>
-                  <g style="transform:rotate(11deg);transform-origin:80px 82px;">
+                  <g style="transform:rotate(27deg);transform-origin:80px 82px;">
                     <line x1="80" y1="82" x2="80" y2="28" stroke="#ffb74d"
                       stroke-width="2.5" stroke-linecap="round"/>
                     <circle cx="80" cy="82" r="6" fill="#ffb74d"
@@ -1355,7 +1012,7 @@
                 </svg>
                 <div style="text-align:center;margin-top:-4px;">
                   <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:900;
-                    color:#ffb74d;">-1</div>
+                    color:#ffb74d;">-2</div>
                   <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
                     color:rgba(120,160,180,0.35);text-transform:uppercase;">Total Score</div>
                 </div>
@@ -1405,9 +1062,9 @@
             <div style="display:flex;align-items:center;gap:10px;">
               <span style="font-size:9px;letter-spacing:1px;color:rgba(180,210,230,0.5);width:52px;text-align:right;flex-shrink:0;">PCR</span>
               <div style="flex:1;height:6px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                <div style="height:100%;width:45%;border-radius:3px;background:linear-gradient(90deg,#ffb74d,#ffdd66);"></div>
+                <div style="height:100%;width:85%;border-radius:3px;background:linear-gradient(90deg,#ff3355,#ff6680);"></div>
               </div>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#ffb74d;width:24px;flex-shrink:0;">0</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#ff5252;width:24px;flex-shrink:0;">-1</span>
             </div>
               </div>
             </div>
@@ -1438,16 +1095,16 @@
                 <svg viewBox="0 0 56 56" style="width:100%;height:100%;">
                   <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
                   <circle cx="28" cy="28" r="22" fill="none" stroke="#00e676" stroke-width="7"
-                    stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="106.3"
+                    stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="106.0"
                     style="transform:rotate(-90deg);transform-origin:28px 28px;" opacity="0.85"/>
                 </svg>
                 <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
                   font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#00e676;">23</div>
               </div>
             </div>
-                <div class="cc-val">23.1</div>
+                <div class="cc-val">23.3</div>
                 <div class="cc-sub">14-period momentum</div>
-                <div class="cc-bar"><div class="cc-bar-fill bar-gold" style="width:23.1%"></div></div>
+                <div class="cc-bar"><div class="cc-bar-fill bar-gold" style="width:23.3%"></div></div>
             </div>
             <div class="g-compact" style="border-color:rgba(255,82,82,0.35);background:linear-gradient(145deg,rgba(30,10,14,0.9),rgba(12,4,8,0.95));">
                 <div style="position:absolute;top:0;left:0;right:0;height:1px;
@@ -1461,7 +1118,7 @@
                   stroke-linejoin="round" opacity="0.7"/>
               </svg>
             </div>
-                <div class="cc-val">₹25,174</div>
+                <div class="cc-val">₹25,175</div>
                 <div class="cc-sub">20-day average</div>
                 <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:0.0%"></div></div>
             </div>
@@ -1493,7 +1150,7 @@
                   stroke-linejoin="round" opacity="0.7"/>
               </svg>
             </div>
-                <div class="cc-val">₹25,332</div>
+                <div class="cc-val">₹25,333</div>
                 <div class="cc-sub">200-day average</div>
                 <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:0.0%"></div></div>
             </div>
@@ -1506,435 +1163,10 @@
             <div style="display:flex;align-items:flex-end;gap:2px;height:36px;padding:0 2px;margin:6px 0 8px;">
               <div style="flex:1;height:30%;background:#ff5252;opacity:0.40;border-radius:2px 2px 0 0;min-width:3px;"></div><div style="flex:1;height:45%;background:#ff5252;opacity:0.48;border-radius:2px 2px 0 0;min-width:3px;"></div><div style="flex:1;height:55%;background:#ff5252;opacity:0.55;border-radius:2px 2px 0 0;min-width:3px;"></div><div style="flex:1;height:68%;background:#ff5252;opacity:0.62;border-radius:2px 2px 0 0;min-width:3px;"></div><div style="flex:1;height:78%;background:#ff5252;opacity:0.70;border-radius:2px 2px 0 0;min-width:3px;"></div><div style="flex:1;height:88%;background:#ff5252;opacity:0.78;border-radius:2px 2px 0 0;min-width:3px;"></div><div style="flex:1;height:95%;background:#ff5252;opacity:0.85;border-radius:2px 2px 0 0;min-width:3px;"></div><div style="flex:1;height:100%;background:#ff5252;opacity:0.93;border-radius:2px 2px 0 0;min-width:3px;"></div>
             </div>
-                <div class="cc-val">-399.42</div>
-                <div class="cc-sub">Signal: -243.63</div>
+                <div class="cc-val">-397.72</div>
+                <div class="cc-sub">Signal: -243.29</div>
                 <div class="cc-bar"><div class="cc-bar-fill bar-red" style="width:0.0%"></div></div>
             </div></div>
-        </div>
-
-        <div class="section">
-            <div class="section-title"><span>&#127919;</span> OPTION CHAIN ANALYSIS <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM ±10 Strikes Only)</span></div>
-            
-<style>
-.top10-oi-widget { background:#060d18;border:1px solid rgba(0,200,255,0.1);border-radius:14px;overflow:hidden;margin-bottom:4px;font-family:'JetBrains Mono',monospace; }
-.top10-oi-header { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:11px 18px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(0,200,255,0.08); }
-.top10-oi-header-left { display:flex;align-items:center;gap:10px; }
-.top10-oi-header-right { display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
-.top10-oi-grid { display:grid;grid-template-columns:1fr 1fr;gap:0; }
-.top10-oi-table { width:100%;border-collapse:collapse;overflow-x:auto;display:block; }
-.top10-oi-sub-header { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:8px 12px; }
-@media(max-width:900px) {
-  .top10-oi-grid { grid-template-columns:1fr !important; }
-  .top10-oi-ce-panel { border-right:none !important;border-bottom:1px solid rgba(255,255,255,0.06); }
-  .top10-oi-header { padding:8px 12px; }
-  .top10-oi-sub-header span:last-child { display:none; }
-}
-@media(max-width:600px) {
-  .top10-oi-table th:nth-child(3),
-  .top10-oi-table td:nth-child(3),
-  .top10-oi-table th:nth-child(6),
-  .top10-oi-table td:nth-child(6) { display:none; }
-}
-</style>
-<div class="top10-oi-widget">
-
-  <!-- ── Widget Header ── -->
-  <div class="top10-oi-header">
-    <div class="top10-oi-header-left">
-      <div style="width:32px;height:32px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">&#9651;</div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:#e2eaf5;letter-spacing:1px;">TOP 10 OPEN INTEREST</div>
-        <div style="font-size:9px;color:#8faabe;letter-spacing:1px;margin-top:1px;">NIFTY &middot; &plusmn;10 STRIKES FROM ATM &middot; HIGHEST OI IN WINDOW</div>
-      </div>
-    </div>
-    <div class="top10-oi-header-right">
-      <div style="font-size:10px;padding:4px 12px;border-radius:6px;background:rgba(255,51,85,0.12);border:1px solid rgba(255,51,85,0.3);color:#ff3355;font-weight:700;">5 CE</div>
-      <div style="font-size:10px;padding:4px 14px;border-radius:6px;background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00d4ff;font-weight:700;">ATM &#8377;23,850</div>
-      <div style="font-size:10px;padding:4px 12px;border-radius:6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.3);color:#00e676;font-weight:700;">5 PE</div>
-      <div style="width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;flex-shrink:0;"></div>
-    </div>
-  </div>
-
-  <!-- ── Two-column table layout ── -->
-  <div class="top10-oi-grid">
-
-    <!-- LEFT: CE Table -->
-    <div class="top10-oi-ce-panel" style="border-right:1px solid rgba(255,255,255,0.05);">
-      <div class="top10-oi-sub-header" style="background:rgba(255,51,85,0.04);border-bottom:1px solid rgba(255,51,85,0.12);">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <div style="width:7px;height:7px;border-radius:50%;background:#ff3355;box-shadow:0 0 5px #ff3355;flex-shrink:0;"></div>
-          <span style="font-size:11px;font-weight:700;color:#ff3355;letter-spacing:1px;">TOP 5 CALL OPTIONS (CE)</span>
-        </div>
-        <span style="font-size:9px;color:#8faabe;letter-spacing:1px;">10 STRIKES ABOVE ATM</span>
-      </div>
-      <table class="top10-oi-table">
-        <thead>
-          <tr style="background:rgba(0,0,0,0.2);">
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center;">#</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Strike</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Type</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Open Interest</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Chg OI</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">LTP</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Volume</th>
-          </tr>
-        </thead>
-        <tbody>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,51,85,0.2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff3355;">1</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;24,300</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">85.7K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:100%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+58,617</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;110.95</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.3M</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.05);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff3355;">2</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;24,200</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">74.3K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:87%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+56,401</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;142.30</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.4M</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.05);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff3355;">3</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;24,000</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">68.9K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:80%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+50,882</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;224.25</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.3M</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.05);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff3355;">4</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;24,100</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">41.9K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:49%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+36,659</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;180.50</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">976.5K</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.05);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff3355;">5</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;24,250</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">34.9K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:41%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+22,342</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;126.15</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">778.9K</td>
-                </tr></tbody>
-      </table>
-    </div>
-
-    <!-- RIGHT: PE Table -->
-    <div>
-      <div class="top10-oi-sub-header" style="background:rgba(0,230,118,0.04);border-bottom:1px solid rgba(0,230,118,0.12);">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <div style="width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;flex-shrink:0;"></div>
-          <span style="font-size:11px;font-weight:700;color:#00e676;letter-spacing:1px;">TOP 5 PUT OPTIONS (PE)</span>
-        </div>
-        <span style="font-size:9px;color:#8faabe;letter-spacing:1px;">10 STRIKES BELOW ATM</span>
-      </div>
-      <table class="top10-oi-table">
-        <thead>
-          <tr style="background:rgba(0,0,0,0.2);">
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center;">#</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Strike</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Type</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Open Interest</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Chg OI</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">LTP</th>
-            <th style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#8faabe;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);">Volume</th>
-          </tr>
-        </thead>
-        <tbody>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(0,230,118,0.18);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#00e676;">1</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;23,500</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#ffb74d;background:rgba(255,183,77,0.12);border:1px solid rgba(255,183,77,0.35);">ITM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">58.4K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:100%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+15,240</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;162.70</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.1M</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.05);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#00e676;">2</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;24,000</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">51.5K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:88%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+5,700</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;350.60</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">2.3M</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.05);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#00e676;">3</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;23,800</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#ffb74d;background:rgba(255,183,77,0.12);border:1px solid rgba(255,183,77,0.35);">ITM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">36.4K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:62%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+12,011</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;260.35</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.1M</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.05);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#00e676;">4</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;23,900</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">35.8K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:61%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+21,913</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;302.40</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.3M</td>
-                </tr>
-                <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                  <td style="padding:9px 10px;text-align:center;">
-                    <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(255,255,255,0.05);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#00e676;">5</span>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#e2eaf5;">&#8377;23,700</td>
-                  <td style="padding:9px 10px;">
-                    <span style="font-size:9px;padding:2px 7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-weight:700;
-                                 color:#ffb74d;background:rgba(255,183,77,0.12);border:1px solid rgba(255,183,77,0.35);">ITM</span>
-                  </td>
-                  <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">34.4K</div>
-                    <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:59%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
-                    </div>
-                  </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+14,655</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;223.05</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">754.8K</td>
-                </tr></tbody>
-      </table>
-    </div>
-
-  </div>
-
-  <!-- ── Footer ── -->
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;padding:7px 18px;background:rgba(0,0,0,0.25);border-top:1px solid rgba(0,200,255,0.06);">
-    <span style="font-size:9px;color:#8899aa;letter-spacing:1.5px;text-transform:uppercase;">Neon Ledger &middot; Top OI &middot; &plusmn;10 ATM Strikes Window</span>
-    <div style="display:flex;align-items:center;gap:5px;">
-      <div style="width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;"></div>
-      <span style="font-size:9px;color:#00e676;letter-spacing:1px;">LIVE</span>
-    </div>
-  </div>
-
-</div>
-
-            <div class="card-grid grid-4">
-        <!-- ── PCR Card ──────────────────────────────────────────────── -->
-        <div class="g-compact" style="border-color:rgba(255,183,77,0.3);background:linear-gradient(145deg,rgba(12,4,8,0.95),rgba(8,4,6,0.98));position:relative;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;
-            background:linear-gradient(90deg,transparent,#ffb74d,transparent);"></div>
-          <div class="cc-top">
-            <span class="cc-ico">&#128308;</span>
-            <div class="cc-lbl">PCR Ratio (OI)</div>
-            <span class="tag tag-neu">Neutral</span>
-          </div>
-          <div class="cc-val" style="color:#ffb74d;">0.992</div>
-          <div class="cc-sub">Put/Call OI Ratio</div>
-          <div style="position:relative;margin:8px 0 4px;">
-            <div style="height:8px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,0.4);position:relative;">
-              <div style="position:absolute;inset:0;border-radius:4px;
-                background:linear-gradient(90deg,#ff3355 0%,#ff9900 35%,#ffcc00 50%,#88dd00 65%,#00e676 100%);opacity:0.75;"></div>
-              <div style="position:absolute;left:35%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.4);"></div>
-              <div style="position:absolute;left:60%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.4);"></div>
-              <div style="position:absolute;top:-3px;left:49.6%;
-                transform:translateX(-50%);width:3px;height:14px;
-                background:white;border-radius:1.5px;box-shadow:0 0 8px white;"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-top:4px;
-              font-family:'JetBrains Mono',monospace;font-size:8px;">
-              <span style="color:#ff5252;">&#60;0.7 Bear</span>
-              <span style="color:rgba(180,210,230,0.35);">Neutral</span>
-              <span style="color:#00e676;">&#62;1.2 Bull</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── Max Pain Card ─────────────────────────────────────────── -->
-        <div class="g-compact" style="border-color:rgba(255,183,77,0.3);background:linear-gradient(145deg,rgba(28,22,8,0.9),rgba(12,10,4,0.95));position:relative;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;
-            background:linear-gradient(90deg,transparent,#ffb74d,transparent);"></div>
-          <div class="cc-top">
-            <span class="cc-ico">&#127919;</span>
-            <div class="cc-lbl">Max Pain</div>
-            <span class="tag tag-neu">Expiry Magnet</span>
-          </div>
-          <div class="cc-val" style="color:#ffb74d;">&#8377;23,950</div>
-          <div class="cc-sub">Price gravity level</div>
-          <div style="position:relative;height:20px;border-radius:6px;overflow:hidden;
-            background:linear-gradient(90deg,rgba(0,230,118,0.1),rgba(255,183,77,0.2),rgba(255,82,82,0.1));
-            margin:8px 0 4px;">
-            <div style="position:absolute;left:60.4%;top:50%;
-              transform:translate(-50%,-50%);width:3px;height:16px;
-              background:#ffb74d;box-shadow:0 0 8px #ffb74d;border-radius:1.5px;"></div>
-            <div style="position:absolute;left:39.6%;top:50%;
-              transform:translate(-50%,-50%);width:3px;height:16px;
-              background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;border-radius:1.5px;"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:8px;">
-            <span style="color:#4fc3f7;">&#9632; Now &#8377;23,846</span>
-            <span style="color:#00e676;">+104 pts to pain</span>
-            <span style="color:#ffb74d;">&#9632; Pain &#8377;23,950</span>
-          </div>
-        </div>
-
-        <!-- ── Max CE OI (Resistance Wall) ──────────────────────────── -->
-        <div class="g-compact" style="border-color:rgba(255,82,82,0.28);background:linear-gradient(145deg,rgba(30,10,14,0.9),rgba(12,4,8,0.95));position:relative;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;
-            background:linear-gradient(90deg,transparent,#ff5252,transparent);"></div>
-          <div class="cc-top">
-            <span class="cc-ico">&#128308;</span>
-            <div class="cc-lbl">Max Call OI</div>
-            <span class="tag tag-bear">Resistance</span>
-          </div>
-          <div class="cc-val" style="color:#ff8899;">&#8377;24,300</div>
-          <div class="cc-sub">CE wall</div>
-          <div style="margin-top:8px;">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;
-              color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:6px;">OI Change Today</div>
-            <div style="display:flex;flex-direction:column;gap:5px;">
-              <div style="display:flex;align-items:center;gap:7px;">
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:22px;">CE</span>
-                <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:69.7%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
-                </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:30px;text-align:right;">70%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:7px;">
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:22px;">PE</span>
-                <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:30.3%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
-                </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:30px;text-align:right;">30%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── Max PE OI (Support Floor) ────────────────────────────── -->
-        <div class="g-compact" style="border-color:rgba(0,230,118,0.25);background:linear-gradient(145deg,rgba(10,30,20,0.9),rgba(4,14,10,0.95));position:relative;overflow:hidden;">
-          <div style="position:absolute;top:0;left:0;right:0;height:1px;
-            background:linear-gradient(90deg,transparent,#00e676,transparent);"></div>
-          <div class="cc-top">
-            <span class="cc-ico">&#128994;</span>
-            <div class="cc-lbl">Max Put OI</div>
-            <span class="tag tag-bull">Support</span>
-          </div>
-          <div class="cc-val" style="color:#44ffaa;">&#8377;23,500</div>
-          <div class="cc-sub">PE floor</div>
-          <div style="margin-top:8px;">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;
-              color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:6px;">Total OI Ratio</div>
-            <div style="display:flex;flex-direction:column;gap:5px;">
-              <div style="display:flex;align-items:center;gap:7px;">
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff8899;width:22px;">CE</span>
-                <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:50.2%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
-                </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff8899;width:30px;text-align:right;">50%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:7px;">
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#44ffaa;width:22px;">PE</span>
-                <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:49.8%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
-                </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#44ffaa;width:30px;text-align:right;">50%</span>
-              </div>
-            </div>
-          </div>
-        </div></div>
         </div>
 
         <div class="section">
@@ -1948,7 +1180,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 11-Mar-2026 15:29 IST</span>
+            <span>Stock data as of: 11-Mar-2026 16:09 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -2039,62 +1271,62 @@
                 <tr>
                     <td class="hm-mover-sym">RELIANCE</td>
                     <td class="hm-mover-prev">₹1,408.80</td>
-                    <td class="hm-mover-price">₹1,385.70</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-1.64%</td>
+                    <td class="hm-mover-price">₹1,390.20</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-1.32%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">HDFCBANK</td>
                     <td class="hm-mover-prev">₹849.45</td>
-                    <td class="hm-mover-price">₹834.50</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-1.76%</td>
+                    <td class="hm-mover-price">₹833.95</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-1.82%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">ICICIBANK</td>
                     <td class="hm-mover-prev">₹1,311.90</td>
-                    <td class="hm-mover-price">₹1,292.00</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-1.52%</td>
+                    <td class="hm-mover-price">₹1,294.60</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-1.32%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">INFY</td>
                     <td class="hm-mover-prev">₹1,295.60</td>
-                    <td class="hm-mover-price">₹1,275.70</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-1.54%</td>
+                    <td class="hm-mover-price">₹1,276.30</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-1.49%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">TCS</td>
                     <td class="hm-mover-prev">₹2,513.10</td>
-                    <td class="hm-mover-price">₹2,463.00</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-1.99%</td>
+                    <td class="hm-mover-price">₹2,464.90</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-1.92%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">BHARTIARTL</td>
                     <td class="hm-mover-prev">₹1,850.40</td>
-                    <td class="hm-mover-price">₹1,807.40</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-2.32%</td>
+                    <td class="hm-mover-price">₹1,807.00</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-2.35%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">LT</td>
                     <td class="hm-mover-prev">₹3,876.00</td>
-                    <td class="hm-mover-price">₹3,835.00</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-1.06%</td>
+                    <td class="hm-mover-price">₹3,838.80</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-0.96%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">AXISBANK</td>
                     <td class="hm-mover-prev">₹1,314.70</td>
-                    <td class="hm-mover-price">₹1,256.00</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-4.46%</td>
+                    <td class="hm-mover-price">₹1,255.80</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-4.48%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">KOTAKBANK</td>
                     <td class="hm-mover-prev">₹391.85</td>
-                    <td class="hm-mover-price">₹381.40</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-2.67%</td>
+                    <td class="hm-mover-price">₹383.20</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-2.21%</td>
                 </tr>
                 <tr>
                     <td class="hm-mover-sym">SBIN</td>
                     <td class="hm-mover-prev">₹1,112.20</td>
-                    <td class="hm-mover-price">₹1,090.00</td>
-                    <td class="hm-mover-chg" style="color:#ff5252;">-2.00%</td>
+                    <td class="hm-mover-price">₹1,091.10</td>
+                    <td class="hm-mover-chg" style="color:#ff5252;">-1.90%</td>
                 </tr>
                 </tbody>
               </table>
@@ -2127,7 +1359,7 @@
       </div>
 
       <!-- Heatmap data embedded as JSON for JS rendering -->
-      <script id="hmDataScript" type="application/json">[{"symbol": "ADANIPORTS", "ticker": "ADANIPORTS.NS", "price": 1410.6, "prev_close": 1424.1, "change_pct": -0.95, "change_abs": -13.5, "volume": 2208680, "high_wt": false}, {"symbol": "APOLLOHOSP", "ticker": "APOLLOHOSP.NS", "price": 7702.5, "prev_close": 7803.0, "change_pct": -1.29, "change_abs": -100.5, "volume": 331424, "high_wt": false}, {"symbol": "ASIANPAINT", "ticker": "ASIANPAINT.NS", "price": 2231.8, "prev_close": 2280.4, "change_pct": -2.13, "change_abs": -48.6, "volume": 686583, "high_wt": false}, {"symbol": "AXISBANK", "ticker": "AXISBANK.NS", "price": 1256.0, "prev_close": 1314.7, "change_pct": -4.46, "change_abs": -58.7, "volume": 6846988, "high_wt": true}, {"symbol": "BAJAJ-AUTO", "ticker": "BAJAJ-AUTO.NS", "price": 9323.0, "prev_close": 9610.0, "change_pct": -2.99, "change_abs": -287.0, "volume": 489088, "high_wt": false}, {"symbol": "BAJAJFINSV", "ticker": "BAJAJFINSV.NS", "price": 1796.6, "prev_close": 1867.8, "change_pct": -3.81, "change_abs": -71.2, "volume": 1292018, "high_wt": false}, {"symbol": "BAJFINANCE", "ticker": "BAJFINANCE.NS", "price": 892.0, "prev_close": 939.8, "change_pct": -5.09, "change_abs": -47.8, "volume": 11154260, "high_wt": false}, {"symbol": "BEL", "ticker": "BEL.NS", "price": 454.0, "prev_close": 463.35, "change_pct": -2.02, "change_abs": -9.35, "volume": 15951759, "high_wt": false}, {"symbol": "BHARTIARTL", "ticker": "BHARTIARTL.NS", "price": 1807.4, "prev_close": 1850.4, "change_pct": -2.32, "change_abs": -43.0, "volume": 9542110, "high_wt": true}, {"symbol": "CIPLA", "ticker": "CIPLA.NS", "price": 1329.8, "prev_close": 1333.5, "change_pct": -0.28, "change_abs": -3.7, "volume": 1266666, "high_wt": false}, {"symbol": "COALINDIA", "ticker": "COALINDIA.NS", "price": 446.85, "prev_close": 443.55, "change_pct": 0.74, "change_abs": 3.3, "volume": 9939104, "high_wt": false}, {"symbol": "DRREDDY", "ticker": "DRREDDY.NS", "price": 1323.4, "prev_close": 1314.6, "change_pct": 0.67, "change_abs": 8.8, "volume": 2452125, "high_wt": false}, {"symbol": "EICHERMOT", "ticker": "EICHERMOT.NS", "price": 7260.0, "prev_close": 7536.5, "change_pct": -3.67, "change_abs": -276.5, "volume": 620751, "high_wt": false}, {"symbol": "ETERNAL", "ticker": "ETERNAL.NS", "price": 223.24, "prev_close": 226.62, "change_pct": -1.49, "change_abs": -3.38, "volume": 34238628, "high_wt": false}, {"symbol": "GRASIM", "ticker": "GRASIM.NS", "price": 2718.5, "prev_close": 2743.9, "change_pct": -0.93, "change_abs": -25.4, "volume": 1491840, "high_wt": false}, {"symbol": "HCLTECH", "ticker": "HCLTECH.NS", "price": 1349.8, "prev_close": 1361.5, "change_pct": -0.86, "change_abs": -11.7, "volume": 1828835, "high_wt": false}, {"symbol": "HDFCBANK", "ticker": "HDFCBANK.NS", "price": 834.5, "prev_close": 849.45, "change_pct": -1.76, "change_abs": -14.95, "volume": 42194142, "high_wt": true}, {"symbol": "HDFCLIFE", "ticker": "HDFCLIFE.NS", "price": 646.75, "prev_close": 656.1, "change_pct": -1.43, "change_abs": -9.35, "volume": 1334565, "high_wt": false}, {"symbol": "HEROMOTOCO", "ticker": "HEROMOTOCO.NS", "price": 5576.0, "prev_close": 5711.5, "change_pct": -2.37, "change_abs": -135.5, "volume": 511042, "high_wt": false}, {"symbol": "HINDALCO", "ticker": "HINDALCO.NS", "price": 959.0, "prev_close": 956.6, "change_pct": 0.25, "change_abs": 2.4, "volume": 4452676, "high_wt": false}, {"symbol": "HINDUNILVR", "ticker": "HINDUNILVR.NS", "price": 2157.5, "prev_close": 2190.2, "change_pct": -1.49, "change_abs": -32.7, "volume": 1311361, "high_wt": false}, {"symbol": "ICICIBANK", "ticker": "ICICIBANK.NS", "price": 1292.0, "prev_close": 1311.9, "change_pct": -1.52, "change_abs": -19.9, "volume": 13217165, "high_wt": true}, {"symbol": "INDIGO", "ticker": "INDIGO.NS", "price": 4348.9, "prev_close": 4380.4, "change_pct": -0.72, "change_abs": -31.5, "volume": 2644975, "high_wt": false}, {"symbol": "INFY", "ticker": "INFY.NS", "price": 1275.7, "prev_close": 1295.6, "change_pct": -1.54, "change_abs": -19.9, "volume": 7848242, "high_wt": true}, {"symbol": "ITC", "ticker": "ITC.NS", "price": 309.2, "prev_close": 309.05, "change_pct": 0.05, "change_abs": 0.15, "volume": 14825309, "high_wt": false}, {"symbol": "JIOFIN", "ticker": "JIOFIN.NS", "price": 238.3, "prev_close": 236.0, "change_pct": 0.97, "change_abs": 2.3, "volume": 16450776, "high_wt": false}, {"symbol": "JSWSTEEL", "ticker": "JSWSTEEL.NS", "price": 1174.1, "prev_close": 1214.3, "change_pct": -3.31, "change_abs": -40.2, "volume": 1793743, "high_wt": false}, {"symbol": "KOTAKBANK", "ticker": "KOTAKBANK.NS", "price": 381.4, "prev_close": 391.85, "change_pct": -2.67, "change_abs": -10.45, "volume": 29888995, "high_wt": true}, {"symbol": "LT", "ticker": "LT.NS", "price": 3835.0, "prev_close": 3876.0, "change_pct": -1.06, "change_abs": -41.0, "volume": 2063288, "high_wt": true}, {"symbol": "M&M", "ticker": "M&M.NS", "price": 3174.8, "prev_close": 3293.7, "change_pct": -3.61, "change_abs": -118.9, "volume": 4570016, "high_wt": false}, {"symbol": "MARUTI", "ticker": "MARUTI.NS", "price": 13499.0, "prev_close": 13867.0, "change_pct": -2.65, "change_abs": -368.0, "volume": 391723, "high_wt": false}, {"symbol": "MAXHEALTH", "ticker": "MAXHEALTH.NS", "price": 1032.2, "prev_close": 1043.1, "change_pct": -1.04, "change_abs": -10.9, "volume": 1961158, "high_wt": false}, {"symbol": "NESTLEIND", "ticker": "NESTLEIND.NS", "price": 1230.3, "prev_close": 1241.2, "change_pct": -0.88, "change_abs": -10.9, "volume": 1470709, "high_wt": false}, {"symbol": "NTPC", "ticker": "NTPC.NS", "price": 379.55, "prev_close": 377.3, "change_pct": 0.6, "change_abs": 2.25, "volume": 9957476, "high_wt": false}, {"symbol": "ONGC", "ticker": "ONGC.NS", "price": 270.6, "prev_close": 269.2, "change_pct": 0.52, "change_abs": 1.4, "volume": 16072047, "high_wt": false}, {"symbol": "POWERGRID", "ticker": "POWERGRID.NS", "price": 298.5, "prev_close": 298.65, "change_pct": -0.05, "change_abs": -0.15, "volume": 12598945, "high_wt": false}, {"symbol": "RELIANCE", "ticker": "RELIANCE.NS", "price": 1385.7, "prev_close": 1408.8, "change_pct": -1.64, "change_abs": -23.1, "volume": 21824067, "high_wt": true}, {"symbol": "SBILIFE", "ticker": "SBILIFE.NS", "price": 1934.8, "prev_close": 1963.7, "change_pct": -1.47, "change_abs": -28.9, "volume": 828761, "high_wt": false}, {"symbol": "SBIN", "ticker": "SBIN.NS", "price": 1090.0, "prev_close": 1112.2, "change_pct": -2.0, "change_abs": -22.2, "volume": 8352788, "high_wt": true}, {"symbol": "SHRIRAMFIN", "ticker": "SHRIRAMFIN.NS", "price": 1036.3, "prev_close": 1062.9, "change_pct": -2.5, "change_abs": -26.6, "volume": 10721997, "high_wt": false}, {"symbol": "SUNPHARMA", "ticker": "SUNPHARMA.NS", "price": 1823.4, "prev_close": 1812.8, "change_pct": 0.58, "change_abs": 10.6, "volume": 2509450, "high_wt": false}, {"symbol": "TATAMOTORS", "ticker": "TMCV.NS", "price": 443.9, "prev_close": 459.15, "change_pct": -3.32, "change_abs": -15.25, "volume": 8919274, "high_wt": false}, {"symbol": "TATAMOTORS", "ticker": "TMPV.NS", "price": 335.15, "prev_close": 345.2, "change_pct": -2.91, "change_abs": -10.05, "volume": 5919160, "high_wt": false}, {"symbol": "TATACONSUM", "ticker": "TATACONSUM.NS", "price": 1072.3, "prev_close": 1099.5, "change_pct": -2.47, "change_abs": -27.2, "volume": 1065091, "high_wt": false}, {"symbol": "TATASTEEL", "ticker": "TATASTEEL.NS", "price": 194.5, "prev_close": 195.0, "change_pct": -0.26, "change_abs": -0.5, "volume": 34100008, "high_wt": false}, {"symbol": "TCS", "ticker": "TCS.NS", "price": 2463.0, "prev_close": 2513.1, "change_pct": -1.99, "change_abs": -50.1, "volume": 2712050, "high_wt": true}, {"symbol": "TECHM", "ticker": "TECHM.NS", "price": 1333.3, "prev_close": 1336.6, "change_pct": -0.25, "change_abs": -3.3, "volume": 1497793, "high_wt": false}, {"symbol": "TITAN", "ticker": "TITAN.NS", "price": 4139.5, "prev_close": 4220.1, "change_pct": -1.91, "change_abs": -80.6, "volume": 453448, "high_wt": false}, {"symbol": "TRENT", "ticker": "TRENT.NS", "price": 3617.5, "prev_close": 3715.3, "change_pct": -2.63, "change_abs": -97.8, "volume": 683089, "high_wt": false}, {"symbol": "ULTRACEMCO", "ticker": "ULTRACEMCO.NS", "price": 11433.0, "prev_close": 11654.0, "change_pct": -1.9, "change_abs": -221.0, "volume": 230930, "high_wt": false}, {"symbol": "WIPRO", "ticker": "WIPRO.NS", "price": 201.83, "prev_close": 200.93, "change_pct": 0.45, "change_abs": 0.9, "volume": 29168727, "high_wt": false}]</script>
+      <script id="hmDataScript" type="application/json">[{"symbol": "ADANIPORTS", "ticker": "ADANIPORTS.NS", "price": 1410.8, "prev_close": 1424.1, "change_pct": -0.93, "change_abs": -13.3, "volume": 2211949, "high_wt": false}, {"symbol": "APOLLOHOSP", "ticker": "APOLLOHOSP.NS", "price": 7684.0, "prev_close": 7803.0, "change_pct": -1.53, "change_abs": -119.0, "volume": 331690, "high_wt": false}, {"symbol": "ASIANPAINT", "ticker": "ASIANPAINT.NS", "price": 2232.0, "prev_close": 2280.4, "change_pct": -2.12, "change_abs": -48.4, "volume": 687517, "high_wt": false}, {"symbol": "AXISBANK", "ticker": "AXISBANK.NS", "price": 1255.8, "prev_close": 1314.7, "change_pct": -4.48, "change_abs": -58.9, "volume": 6857551, "high_wt": true}, {"symbol": "BAJAJ-AUTO", "ticker": "BAJAJ-AUTO.NS", "price": 9327.5, "prev_close": 9610.0, "change_pct": -2.94, "change_abs": -282.5, "volume": 489329, "high_wt": false}, {"symbol": "BAJAJFINSV", "ticker": "BAJAJFINSV.NS", "price": 1795.3, "prev_close": 1867.8, "change_pct": -3.88, "change_abs": -72.5, "volume": 1298236, "high_wt": false}, {"symbol": "BAJFINANCE", "ticker": "BAJFINANCE.NS", "price": 893.65, "prev_close": 939.8, "change_pct": -4.91, "change_abs": -46.15, "volume": 11170420, "high_wt": false}, {"symbol": "BEL", "ticker": "BEL.NS", "price": 454.1, "prev_close": 463.35, "change_pct": -2.0, "change_abs": -9.25, "volume": 16011405, "high_wt": false}, {"symbol": "BHARTIARTL", "ticker": "BHARTIARTL.NS", "price": 1807.0, "prev_close": 1850.4, "change_pct": -2.35, "change_abs": -43.4, "volume": 9547012, "high_wt": true}, {"symbol": "CIPLA", "ticker": "CIPLA.NS", "price": 1329.5, "prev_close": 1333.5, "change_pct": -0.3, "change_abs": -4.0, "volume": 1267950, "high_wt": false}, {"symbol": "COALINDIA", "ticker": "COALINDIA.NS", "price": 446.75, "prev_close": 443.55, "change_pct": 0.72, "change_abs": 3.2, "volume": 9974632, "high_wt": false}, {"symbol": "DRREDDY", "ticker": "DRREDDY.NS", "price": 1325.5, "prev_close": 1314.6, "change_pct": 0.83, "change_abs": 10.9, "volume": 2453608, "high_wt": false}, {"symbol": "EICHERMOT", "ticker": "EICHERMOT.NS", "price": 7253.5, "prev_close": 7536.5, "change_pct": -3.76, "change_abs": -283.0, "volume": 621535, "high_wt": false}, {"symbol": "ETERNAL", "ticker": "ETERNAL.NS", "price": 223.8, "prev_close": 226.62, "change_pct": -1.24, "change_abs": -2.82, "volume": 34323333, "high_wt": false}, {"symbol": "GRASIM", "ticker": "GRASIM.NS", "price": 2735.6, "prev_close": 2743.9, "change_pct": -0.3, "change_abs": -8.3, "volume": 1492587, "high_wt": false}, {"symbol": "HCLTECH", "ticker": "HCLTECH.NS", "price": 1350.3, "prev_close": 1361.5, "change_pct": -0.82, "change_abs": -11.2, "volume": 1836826, "high_wt": false}, {"symbol": "HDFCBANK", "ticker": "HDFCBANK.NS", "price": 833.95, "prev_close": 849.45, "change_pct": -1.82, "change_abs": -15.5, "volume": 42257499, "high_wt": true}, {"symbol": "HDFCLIFE", "ticker": "HDFCLIFE.NS", "price": 647.9, "prev_close": 656.1, "change_pct": -1.25, "change_abs": -8.2, "volume": 1336765, "high_wt": false}, {"symbol": "HEROMOTOCO", "ticker": "HEROMOTOCO.NS", "price": 5575.0, "prev_close": 5711.5, "change_pct": -2.39, "change_abs": -136.5, "volume": 511865, "high_wt": false}, {"symbol": "HINDALCO", "ticker": "HINDALCO.NS", "price": 959.1, "prev_close": 956.6, "change_pct": 0.26, "change_abs": 2.5, "volume": 4455723, "high_wt": false}, {"symbol": "HINDUNILVR", "ticker": "HINDUNILVR.NS", "price": 2161.4, "prev_close": 2190.2, "change_pct": -1.31, "change_abs": -28.8, "volume": 1312908, "high_wt": false}, {"symbol": "ICICIBANK", "ticker": "ICICIBANK.NS", "price": 1294.6, "prev_close": 1311.9, "change_pct": -1.32, "change_abs": -17.3, "volume": 13224102, "high_wt": true}, {"symbol": "INDIGO", "ticker": "INDIGO.NS", "price": 4350.7, "prev_close": 4380.4, "change_pct": -0.68, "change_abs": -29.7, "volume": 2647306, "high_wt": false}, {"symbol": "INFY", "ticker": "INFY.NS", "price": 1276.3, "prev_close": 1295.6, "change_pct": -1.49, "change_abs": -19.3, "volume": 7867965, "high_wt": true}, {"symbol": "ITC", "ticker": "ITC.NS", "price": 309.0, "prev_close": 309.05, "change_pct": -0.02, "change_abs": -0.05, "volume": 14841510, "high_wt": false}, {"symbol": "JIOFIN", "ticker": "JIOFIN.NS", "price": 238.7, "prev_close": 236.0, "change_pct": 1.14, "change_abs": 2.7, "volume": 16489680, "high_wt": false}, {"symbol": "JSWSTEEL", "ticker": "JSWSTEEL.NS", "price": 1178.8, "prev_close": 1214.3, "change_pct": -2.92, "change_abs": -35.5, "volume": 1802373, "high_wt": false}, {"symbol": "KOTAKBANK", "ticker": "KOTAKBANK.NS", "price": 383.2, "prev_close": 391.85, "change_pct": -2.21, "change_abs": -8.65, "volume": 29991212, "high_wt": true}, {"symbol": "LT", "ticker": "LT.NS", "price": 3838.8, "prev_close": 3876.0, "change_pct": -0.96, "change_abs": -37.2, "volume": 2065715, "high_wt": true}, {"symbol": "M&M", "ticker": "M&M.NS", "price": 3168.2, "prev_close": 3293.7, "change_pct": -3.81, "change_abs": -125.5, "volume": 4574935, "high_wt": false}, {"symbol": "MARUTI", "ticker": "MARUTI.NS", "price": 13497.0, "prev_close": 13867.0, "change_pct": -2.67, "change_abs": -370.0, "volume": 392114, "high_wt": false}, {"symbol": "MAXHEALTH", "ticker": "MAXHEALTH.NS", "price": 1032.2, "prev_close": 1043.1, "change_pct": -1.04, "change_abs": -10.9, "volume": 1963002, "high_wt": false}, {"symbol": "NESTLEIND", "ticker": "NESTLEIND.NS", "price": 1233.7, "prev_close": 1241.2, "change_pct": -0.6, "change_abs": -7.5, "volume": 1471802, "high_wt": false}, {"symbol": "NTPC", "ticker": "NTPC.NS", "price": 379.9, "prev_close": 377.3, "change_pct": 0.69, "change_abs": 2.6, "volume": 9963097, "high_wt": false}, {"symbol": "ONGC", "ticker": "ONGC.NS", "price": 270.75, "prev_close": 269.2, "change_pct": 0.58, "change_abs": 1.55, "volume": 16126219, "high_wt": false}, {"symbol": "POWERGRID", "ticker": "POWERGRID.NS", "price": 298.8, "prev_close": 298.65, "change_pct": 0.05, "change_abs": 0.15, "volume": 12617440, "high_wt": false}, {"symbol": "RELIANCE", "ticker": "RELIANCE.NS", "price": 1390.2, "prev_close": 1408.8, "change_pct": -1.32, "change_abs": -18.6, "volume": 21840320, "high_wt": true}, {"symbol": "SBILIFE", "ticker": "SBILIFE.NS", "price": 1938.6, "prev_close": 1963.7, "change_pct": -1.28, "change_abs": -25.1, "volume": 829631, "high_wt": false}, {"symbol": "SBIN", "ticker": "SBIN.NS", "price": 1091.1, "prev_close": 1112.2, "change_pct": -1.9, "change_abs": -21.1, "volume": 8363152, "high_wt": true}, {"symbol": "SHRIRAMFIN", "ticker": "SHRIRAMFIN.NS", "price": 1031.7, "prev_close": 1062.9, "change_pct": -2.94, "change_abs": -31.2, "volume": 10731002, "high_wt": false}, {"symbol": "SUNPHARMA", "ticker": "SUNPHARMA.NS", "price": 1825.9, "prev_close": 1812.8, "change_pct": 0.72, "change_abs": 13.1, "volume": 2510288, "high_wt": false}, {"symbol": "TATAMOTORS", "ticker": "TMCV.NS", "price": 445.45, "prev_close": 459.15, "change_pct": -2.98, "change_abs": -13.7, "volume": 8944115, "high_wt": false}, {"symbol": "TATAMOTORS", "ticker": "TMPV.NS", "price": 335.35, "prev_close": 345.2, "change_pct": -2.85, "change_abs": -9.85, "volume": 5945416, "high_wt": false}, {"symbol": "TATACONSUM", "ticker": "TATACONSUM.NS", "price": 1073.4, "prev_close": 1099.5, "change_pct": -2.37, "change_abs": -26.1, "volume": 1066849, "high_wt": false}, {"symbol": "TATASTEEL", "ticker": "TATASTEEL.NS", "price": 194.74, "prev_close": 195.0, "change_pct": -0.13, "change_abs": -0.26, "volume": 34204147, "high_wt": false}, {"symbol": "TCS", "ticker": "TCS.NS", "price": 2464.9, "prev_close": 2513.1, "change_pct": -1.92, "change_abs": -48.2, "volume": 2719016, "high_wt": true}, {"symbol": "TECHM", "ticker": "TECHM.NS", "price": 1334.4, "prev_close": 1336.6, "change_pct": -0.16, "change_abs": -2.2, "volume": 1499933, "high_wt": false}, {"symbol": "TITAN", "ticker": "TITAN.NS", "price": 4140.3, "prev_close": 4220.1, "change_pct": -1.89, "change_abs": -79.8, "volume": 454536, "high_wt": false}, {"symbol": "TRENT", "ticker": "TRENT.NS", "price": 3627.4, "prev_close": 3715.3, "change_pct": -2.37, "change_abs": -87.9, "volume": 684424, "high_wt": false}, {"symbol": "ULTRACEMCO", "ticker": "ULTRACEMCO.NS", "price": 11462.0, "prev_close": 11654.0, "change_pct": -1.65, "change_abs": -192.0, "volume": 231134, "high_wt": false}, {"symbol": "WIPRO", "ticker": "WIPRO.NS", "price": 202.23, "prev_close": 200.93, "change_pct": 0.65, "change_abs": 1.3, "volume": 29195615, "high_wt": false}]</script>
     </div><!-- /tab-heatmap -->
 
     <!-- TAB: INTRADAY OI TREND -->
@@ -2282,38 +1514,38 @@
                 <div class="o5-top-banner">
                     <div class="o5-banner-left">
                         <div class="o5-score-circle" style="border-color:#ff5252;box-shadow:0 0 20px #ff525244,inset 0 0 16px #ff525211;">
-                            <div class="o5-score-num" style="color:#ff5252;">-5</div>
+                            <div class="o5-score-num" style="color:#ff5252;">-4</div>
                             <div class="o5-score-lbl">SCORE</div>
                         </div>
                         <div>
                             <div class="o5-verdict" style="color:#ff5252;text-shadow:0 0 20px #ff525266;">STRONGLY BEARISH</div>
-                            <div class="o5-sub">Score -5 from 7 signals (0 skipped as N/A). Strong directional conviction — proceed with caution and stop losses.</div>
+                            <div class="o5-sub">Score -4 from 7 signals (2 skipped as N/A). Strong directional conviction — proceed with caution and stop losses.</div>
                         </div>
                     </div>
                     <div class="o5-pills">
                         <span class="sc-pill sc-pill-bull">&#10003; BULL: 0</span>
-                        <span class="sc-pill sc-pill-bear">&#10007; BEAR: 5</span>
-                        <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: 2</span>
-                        
+                        <span class="sc-pill sc-pill-bear">&#10007; BEAR: 4</span>
+                        <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: 1</span>
+                        <span class="sc-pill sc-pill-na">— N/A: 2</span>
                     </div>
                 </div>
                 <div class="o5-grid">
-        <div class="o5-tile o5-neu">
+        <div class="o5-tile o5-na">
             <div class="o5-tile-top">
                 <span class="o5-tile-label">PCR (OI Ratio) <span class="auto-badge">AUTO</span></span>
-                <div class="o5-chip o5-chip-neu">0</div>
+                <div class="o5-chip o5-chip-na">N/A</div>
             </div>
-            <div class="o5-val" style="color:#fbbf24;">0.992</div>
-            <div class="o5-msg">PCR 0.992 → in 0.8–1.2 range — neutral/mixed sentiment</div>
-            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#f59e0b,transparent);"></div>
+            <div class="o5-val" style="color:rgba(176,190,197,0.3);">N/A</div>
+            <div class="o5-msg">PCR not available</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,rgba(176,190,197,0.15),transparent);"></div>
         </div>
         <div class="o5-tile o5-bear">
             <div class="o5-tile-top">
                 <span class="o5-tile-label">RSI (14-Day) <span class="auto-badge">AUTO</span></span>
                 <div class="o5-chip o5-chip-bear">-1</div>
             </div>
-            <div class="o5-val" style="color:#f87171;">23.1</div>
-            <div class="o5-msg">RSI 23.1 → below 40 — bearish momentum, oversold</div>
+            <div class="o5-val" style="color:#f87171;">23.3</div>
+            <div class="o5-msg">RSI 23.3 → below 40 — bearish momentum, oversold</div>
             <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
         </div>
         <div class="o5-tile o5-bear">
@@ -2334,14 +1566,14 @@
             <div class="o5-msg">Price below all SMAs (20/50/200) — structural downtrend</div>
             <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
         </div>
-        <div class="o5-tile o5-bear">
+        <div class="o5-tile o5-na">
             <div class="o5-tile-top">
                 <span class="o5-tile-label">OI Direction <span class="auto-badge">AUTO</span></span>
-                <div class="o5-chip o5-chip-bear">-1</div>
+                <div class="o5-chip o5-chip-na">N/A</div>
             </div>
-            <div class="o5-val" style="color:#f87171;">Bearish OI</div>
-            <div class="o5-msg">Net OI change is bearish — call build-up / put unwinding dominant</div>
-            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
+            <div class="o5-val" style="color:rgba(176,190,197,0.3);">N/A</div>
+            <div class="o5-msg">OI direction data not available</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,rgba(176,190,197,0.15),transparent);"></div>
         </div>
         <div class="o5-tile o5-neu">
             <div class="o5-tile-top">
@@ -2357,8 +1589,8 @@
                 <span class="o5-tile-label">India VIX <span class="auto-badge">AUTO</span></span>
                 <div class="o5-chip o5-chip-bear">-1</div>
             </div>
-            <div class="o5-val" style="color:#f87171;">21.3 (rising)</div>
-            <div class="o5-msg">VIX 21.3 above 20 — high fear, bearish/volatile market</div>
+            <div class="o5-val" style="color:#f87171;">21.1 (rising)</div>
+            <div class="o5-msg">VIX 21.1 above 20 — high fear, bearish/volatile market</div>
             <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
         </div></div>
             </div>
@@ -2406,7 +1638,7 @@
                 </div>
                 <div class="sc-ss-sep"></div>
                 <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(128,222,234,0.65);">
-                    ATM: &#8377;23,850 &nbsp;&middot;&nbsp; CE Wall: &#8377;24,300 &nbsp;&middot;&nbsp; PE Wall: &#8377;23,500
+                    ATM: &#8377;23,850 &nbsp;&middot;&nbsp; CE Wall: &#8377;24,050 &nbsp;&middot;&nbsp; PE Wall: &#8377;23,650
                 </div>
             </div>
             <div class="sc-compact-grid" id="stratGrid">
@@ -2456,7 +1688,7 @@
             <div class="sc-row-num">02</div>
             <div class="sc-row-body">
                 <div class="sc-row-name">Bear Put Spread</div>
-                <div class="sc-row-strike">&#127919; <span>BUY 23850PE  +  SELL 23500PE (put wall)</span></div>
+                <div class="sc-row-strike">&#127919; <span>BUY 23850PE  +  SELL 23650PE (put wall)</span></div>
             </div>
             <div class="sc-row-meta">
                 <span class="sc-row-tag strat-tag-bear">🔴 Bearish</span>
@@ -2485,7 +1717,7 @@
                 </div>
             </div>
             <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 23850PE  +  SELL 23500PE (put wall)
+                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 23850PE  +  SELL 23650PE (put wall)
             </div>
             <div class="sc-dp-actions">
                 <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-2',event)">&#10005; Close</button>
@@ -2497,7 +1729,7 @@
             <div class="sc-row-num">03</div>
             <div class="sc-row-body">
                 <div class="sc-row-name">Bear Call Spread</div>
-                <div class="sc-row-strike">&#127919; <span>SELL 23900CE  +  BUY 24300CE (call wall hedge)</span></div>
+                <div class="sc-row-strike">&#127919; <span>SELL 23900CE  +  BUY 24050CE (call wall hedge)</span></div>
             </div>
             <div class="sc-row-meta">
                 <span class="sc-row-tag strat-tag-bear">🔴 Bearish</span>
@@ -2526,7 +1758,7 @@
                 </div>
             </div>
             <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> SELL 23900CE  +  BUY 24300CE (call wall hedge)
+                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> SELL 23900CE  +  BUY 24050CE (call wall hedge)
             </div>
             <div class="sc-dp-actions">
                 <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-3',event)">&#10005; Close</button>
@@ -2863,7 +2095,7 @@
         </div></div>
         </div>
         <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
-        <script id="stratDataMap" type="application/json">{"Long Put": {"strike": "BUY 23850PE (ATM) or 23800PE (slight OTM)", "type": "bearish", "rank": "PRIMARY", "rr": 1.26}, "Bear Put Spread": {"strike": "BUY 23850PE  +  SELL 23500PE (put wall)", "type": "bearish", "rank": "PRIMARY", "rr": 1.0}, "Bear Call Spread": {"strike": "SELL 23900CE  +  BUY 24300CE (call wall hedge)", "type": "bearish", "rank": "PRIMARY", "rr": 1.0}, "Bear Put Ladder": {"strike": "BUY 23850PE  +  SELL 23800PE  +  SELL 23750PE", "type": "bearish", "rank": "PRIMARY", "rr": 1.5}, "Bear Call Ladder": {"strike": "SELL 23850CE  +  BUY 23900CE  +  BUY 23950CE", "type": "bearish", "rank": "SECONDARY", "rr": 1.0}, "Synthetic Short": {"strike": "SELL 23850CE  +  BUY 23850PE  (same expiry)", "type": "bearish", "rank": "SECONDARY", "rr": 1.26}, "Put Ratio Backspread": {"strike": "SELL 1× 23850PE  +  BUY 2× 23800PE", "type": "bearish", "rank": "SECONDARY", "rr": 3.0}, "Strip (Bearish Bias)": {"strike": "BUY 1× 23850CE  +  BUY 2× 23850PE  (same strike & expiry)", "type": "volatility", "rank": "SECONDARY", "rr": 2.36}, "Call Ratio Spread": {"strike": "BUY 1× 23850CE  +  SELL 2× 23900CE", "type": "advanced", "rank": "ADVANCED", "rr": 1.6}, "Put Ratio Spread": {"strike": "BUY 1× 23850PE  +  SELL 2× 23800PE", "type": "advanced", "rank": "ADVANCED", "rr": 1.6}, "Christmas Tree Spread": {"strike": "BUY 23850PE  +  SELL 23800PE  +  SELL 23700PE  (step-down strikes)", "type": "advanced", "rank": "ADVANCED", "rr": 1.56}}</script>
+        <script id="stratDataMap" type="application/json">{"Long Put": {"strike": "BUY 23850PE (ATM) or 23800PE (slight OTM)", "type": "bearish", "rank": "PRIMARY", "rr": 1.26}, "Bear Put Spread": {"strike": "BUY 23850PE  +  SELL 23650PE (put wall)", "type": "bearish", "rank": "PRIMARY", "rr": 1.0}, "Bear Call Spread": {"strike": "SELL 23900CE  +  BUY 24050CE (call wall hedge)", "type": "bearish", "rank": "PRIMARY", "rr": 1.0}, "Bear Put Ladder": {"strike": "BUY 23850PE  +  SELL 23800PE  +  SELL 23750PE", "type": "bearish", "rank": "PRIMARY", "rr": 1.5}, "Bear Call Ladder": {"strike": "SELL 23850CE  +  BUY 23900CE  +  BUY 23950CE", "type": "bearish", "rank": "SECONDARY", "rr": 1.0}, "Synthetic Short": {"strike": "SELL 23850CE  +  BUY 23850PE  (same expiry)", "type": "bearish", "rank": "SECONDARY", "rr": 1.26}, "Put Ratio Backspread": {"strike": "SELL 1× 23850PE  +  BUY 2× 23800PE", "type": "bearish", "rank": "SECONDARY", "rr": 3.0}, "Strip (Bearish Bias)": {"strike": "BUY 1× 23850CE  +  BUY 2× 23850PE  (same strike & expiry)", "type": "volatility", "rank": "SECONDARY", "rr": 2.36}, "Call Ratio Spread": {"strike": "BUY 1× 23850CE  +  SELL 2× 23900CE", "type": "advanced", "rank": "ADVANCED", "rr": 1.6}, "Put Ratio Spread": {"strike": "BUY 1× 23850PE  +  SELL 2× 23800PE", "type": "advanced", "rank": "ADVANCED", "rr": 1.6}, "Christmas Tree Spread": {"strike": "BUY 23850PE  +  SELL 23800PE  +  SELL 23700PE  (step-down strikes)", "type": "advanced", "rank": "ADVANCED", "rr": 1.56}}</script>
         <div class="section">
             <div class="section-title"><span>&#128203;</span> TRADE PLAN — AUTO FILLED
                 <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;margin-left:auto;">
@@ -2881,7 +2113,7 @@
                     </div>
                     <div class="tp-banner-right">
                         <div class="tp-banner-label">EXPIRY</div>
-                        <div class="tp-banner-exp">17-Mar-2026</div>
+                        <div class="tp-banner-exp">N/A</div>
                     </div>
                 </div>
 
@@ -2891,15 +2123,15 @@
                         <div class="tp-exit-icon">&#9989;</div>
                         <div class="tp-exit-title">PROFIT EXIT</div>
                         <div class="tp-exit-val">&#8377;23,925</div>
-                        <div class="tp-exit-sub">Target 1 · 79 pts from spot</div>
-                        <div class="tp-exit-val2">&#8377;23,800</div>
+                        <div class="tp-exit-sub">Target 1 · 58 pts from spot</div>
+                        <div class="tp-exit-val2">&#8377;23,850</div>
                         <div class="tp-exit-sub">Target 2 (CE/PE wall)</div>
                         <div class="tp-exit-rule">&#128161; Take 50–60% profits at Target 1. Let the rest run to Target 2.</div>
                     </div>
                     <div class="tp-exit tp-exit-loss">
                         <div class="tp-exit-icon">&#10060;</div>
                         <div class="tp-exit-title">STOP LOSS EXIT</div>
-                        <div class="tp-exit-val">~&#8377;23,726 (0.5% below spot)</div>
+                        <div class="tp-exit-val">~&#8377;23,747 (0.5% below spot)</div>
                         <div class="tp-exit-sub">Hard stop · 119 pts from spot</div>
                         <div class="tp-exit-rule">&#128161; Exit immediately when hit — no averaging down. Max 2% of capital at risk per trade.</div>
                     </div>
