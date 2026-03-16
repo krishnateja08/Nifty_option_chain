@@ -4308,8 +4308,13 @@ class NiftyHTMLAnalyzer:
     // ── Option 2: JSON timestamp polling ──────────────────────────────────
     // Polls latest_report.json every 30s. Only reloads the page when the
     // Python script has actually re-run and the timestamp changed.
-    // No unnecessary reloads — no flicker — scroll position preserved.
+    // Saves active tab before reload → restores it after → no tab jump.
     var _lastKnownTimestamp = null;
+
+    function getActiveTab() {
+        var active = document.querySelector('.tab-btn.active');
+        return active ? active.getAttribute('data-tab') : null;
+    }
 
     function pollForUpdate() {
         fetch('latest_report.json?_=' + Date.now())   // cache-bust
@@ -4320,8 +4325,10 @@ class NiftyHTMLAnalyzer:
                     // First load — just store the current timestamp, don't reload
                     _lastKnownTimestamp = ts;
                 } else if (ts && ts !== _lastKnownTimestamp) {
-                    // Timestamp changed → Python script re-ran → reload page silently
-                    console.log('[AutoRefresh] New data detected (' + ts + ') — reloading…');
+                    // Save active tab before reload so we can restore it after
+                    var activeTab = getActiveTab();
+                    if (activeTab) sessionStorage.setItem('activeTab', activeTab);
+                    console.log('[AutoRefresh] New data detected (' + ts + ') — reloading… (tab: ' + activeTab + ')');
                     location.reload();
                 }
                 // else: same timestamp → do nothing
@@ -4334,6 +4341,17 @@ class NiftyHTMLAnalyzer:
     }
     setInterval(pollForUpdate, INTERVAL);
     pollForUpdate();   // run once immediately on page load to capture baseline timestamp
+
+    // ── Restore tab after reload ───────────────────────────────────────────
+    // Runs once on every page load. If a tab was saved before reload, switch to it.
+    (function restoreTabAfterReload() {
+        var savedTab = sessionStorage.getItem('activeTab');
+        if (savedTab) {
+            sessionStorage.removeItem('activeTab');   // clear so normal nav isn't affected
+            // Wait for DOM to be fully ready before switching
+            setTimeout(function() { switchTab(savedTab); }, 100);
+        }
+    })();
 })();
 
 function switchTab(tab) {
