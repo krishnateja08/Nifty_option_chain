@@ -5,7 +5,7 @@ CHANGE IN OPEN INTEREST: Navy Command Theme (v3)
 FII/DII SECTION: Theme 3 · Pulse Flow
 MARKET DIRECTION: Holographic Glass Widget (Compact)
 KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
-AUTO REFRESH: Silent background fetch every 30s · No flicker · No scroll jump
+AUTO REFRESH: JSON timestamp polling every 30s · Reloads ONLY when script re-runs · No flicker · No scroll jump
 STRATEGY CHECKLIST TAB: Rules-based scoring · Auto-filled from live data · N/A safe
 INTRADAY OI TREND TAB: Every-run snapshot → oi_log.json · 3/5/15 Min filter · IST timestamps
 NIFTY 50 HEATMAP TAB: Live yfinance data · Color-coded by % change · Market Breadth · High Weightage Movers
@@ -4305,14 +4305,35 @@ class NiftyHTMLAnalyzer:
     setInterval(tick, 1000);
     tick();
 
-    function silentRefresh() {
-        // Silent refresh — runs on ALL tabs, no restrictions.
-        // loadOILog → renderOITable uses double-rAF scroll anchor so no jump.
-        loadOILog();
-        if (typeof window.renderHeatmap === 'function') window.renderHeatmap();
+    // ── Option 2: JSON timestamp polling ──────────────────────────────────
+    // Polls latest_report.json every 30s. Only reloads the page when the
+    // Python script has actually re-run and the timestamp changed.
+    // No unnecessary reloads — no flicker — scroll position preserved.
+    var _lastKnownTimestamp = null;
+
+    function pollForUpdate() {
+        fetch('latest_report.json?_=' + Date.now())   // cache-bust
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var ts = data.timestamp || null;
+                if (_lastKnownTimestamp === null) {
+                    // First load — just store the current timestamp, don't reload
+                    _lastKnownTimestamp = ts;
+                } else if (ts && ts !== _lastKnownTimestamp) {
+                    // Timestamp changed → Python script re-ran → reload page silently
+                    console.log('[AutoRefresh] New data detected (' + ts + ') — reloading…');
+                    location.reload();
+                }
+                // else: same timestamp → do nothing
+            })
+            .catch(function(err) {
+                // latest_report.json not found or server not running — silently ignore
+                console.warn('[AutoRefresh] Could not fetch latest_report.json:', err);
+            });
         countdown = INTERVAL / 1000;
     }
-    setInterval(silentRefresh, INTERVAL);
+    setInterval(pollForUpdate, INTERVAL);
+    pollForUpdate();   // run once immediately on page load to capture baseline timestamp
 })();
 
 function switchTab(tab) {
@@ -5714,7 +5735,11 @@ def main():
             analyzer.send_html_email_report(vol_support, vol_resistance, global_bias, vol_view)
         else:
             print("\n⚠️  Skipping email due to save failure")
-        print("\n✅ Done! Open index.html in your browser.\n")
+        print("\n✅ Done! Open index.html in your browser.")
+        print("\n💡 AUTO-REFRESH (Option 2) is active.")
+        print("   ➤ Serve the folder with:  python -m http.server 8000")
+        print("   ➤ Then open:              http://localhost:8000")
+        print("   ➤ Page will auto-reload whenever you re-run this script.\n")
     except Exception as e:
         print(f"\n❌ Critical Error: {e}")
         import traceback; traceback.print_exc()
