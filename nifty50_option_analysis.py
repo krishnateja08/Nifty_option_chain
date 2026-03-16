@@ -3042,6 +3042,75 @@ class NiftyHTMLAnalyzer:
             ''.join(f'<div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);"></div>' for _ in range(5 - filled))
         )
 
+        # ── Neutral S1/R1 panel (only shown when bias is NEUTRAL) ───────────
+        if bias not in ('BULLISH', 'BEARISH'):
+            cp        = float(d.get('current_price', 0))
+            s1        = float(d.get('support', 0))
+            r1        = float(d.get('resistance', 0))
+            pts_to_s1 = round(cp - s1)   if s1 > 0 else None
+            pts_to_r1 = round(r1 - cp)   if r1 > 0 else None
+            # Proximity hint: which level is price closer to?
+            if pts_to_s1 is not None and pts_to_r1 is not None:
+                if pts_to_s1 < pts_to_r1:
+                    proximity_hint = '&#9660; Closer to S1 — watch for bounce or breakdown'
+                    hint_col = '#00e676'
+                elif pts_to_r1 < pts_to_s1:
+                    proximity_hint = '&#9650; Closer to R1 — watch for breakout or rejection'
+                    hint_col = '#ff4d6d'
+                else:
+                    proximity_hint = '&#8596; Midway between S1 and R1'
+                    hint_col = '#ffb74d'
+            else:
+                proximity_hint = ''
+                hint_col = '#ffb74d'
+            dist_s1_html = (f'<span style="font-size:9px;color:rgba(0,230,118,0.55);">{pts_to_s1} pts away</span>'
+                            if pts_to_s1 is not None else '')
+            dist_r1_html = (f'<span style="font-size:9px;color:rgba(255,77,109,0.55);">{pts_to_r1} pts away</span>'
+                            if pts_to_r1 is not None else '')
+            s1_display = f'&#8377;{s1:,.0f}' if s1 > 0 else 'N/A'
+            r1_display = f'&#8377;{r1:,.0f}' if r1 > 0 else 'N/A'
+            neutral_sr_html = f"""
+                <div style="margin-top:10px;width:100%;max-width:260px;">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
+                    color:rgba(120,160,180,0.4);text-transform:uppercase;text-align:center;
+                    margin-bottom:8px;">&#9679; Key Levels (Range-Bound)</div>
+                  <div style="display:flex;gap:8px;justify-content:center;">
+                    <!-- S1 card -->
+                    <div style="flex:1;padding:8px 10px;border-radius:8px;
+                      background:rgba(0,230,118,0.07);border:1px solid rgba(0,230,118,0.25);
+                      text-align:center;min-width:90px;">
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;
+                        letter-spacing:2px;color:rgba(0,230,118,0.6);margin-bottom:4px;">SUPPORT</div>
+                      <div style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;
+                        background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.3);
+                        display:inline-block;margin-bottom:5px;">S1</div>
+                      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;
+                        color:#00e676;">{s1_display}</div>
+                      {dist_s1_html}
+                    </div>
+                    <!-- R1 card -->
+                    <div style="flex:1;padding:8px 10px;border-radius:8px;
+                      background:rgba(255,77,109,0.07);border:1px solid rgba(255,77,109,0.25);
+                      text-align:center;min-width:90px;">
+                      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;
+                        letter-spacing:2px;color:rgba(255,77,109,0.6);margin-bottom:4px;">RESISTANCE</div>
+                      <div style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;
+                        background:rgba(255,77,109,0.12);color:#ff4d6d;border:1px solid rgba(255,77,109,0.3);
+                        display:inline-block;margin-bottom:5px;">R1</div>
+                      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;
+                        color:#ff4d6d;">{r1_display}</div>
+                      {dist_r1_html}
+                    </div>
+                  </div>
+                  <!-- Proximity hint -->
+                  <div style="margin-top:7px;font-family:'JetBrains Mono',monospace;font-size:8px;
+                    letter-spacing:0.5px;color:{hint_col};text-align:center;opacity:0.8;">
+                    {proximity_hint}
+                  </div>
+                </div>"""
+        else:
+            neutral_sr_html = ''  # Not NEUTRAL — show nothing
+
         return f"""
     <div class="section">
         <div class="section-title"><span>&#129517;</span> MARKET DIRECTION (Algorithmic)</div>
@@ -3150,6 +3219,7 @@ class NiftyHTMLAnalyzer:
                   <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
                     color:rgba(120,160,180,0.35);text-transform:uppercase;">Total Score</div>
                 </div>
+                {neutral_sr_html}
               </div>
 
               <!-- Right: Signal breakdown bars -->
