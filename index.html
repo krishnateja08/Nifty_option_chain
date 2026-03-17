@@ -620,7 +620,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">17-Mar-2026 07:01 IST</span>
+                <span class="sb-value gen-val">17-Mar-2026 07:28 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -1987,7 +1987,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 17-Mar-2026 07:01 IST</span>
+            <span>Stock data as of: 17-Mar-2026 07:28 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -2239,36 +2239,10 @@
         </div>
 
         <div class="oi-chart-wrap">
-
-          <!-- ═══ CANDLESTICK PANEL ═══ -->
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <div class="oi-chart-label">NIFTY SPOT &mdash; CANDLESTICK (from OI snapshots)</div>
-            <div id="oiPatternTags" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <div class="oi-chart-label">NET OI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
+            <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.8);letter-spacing:1px;"></div>
           </div>
-          <div style="display:flex;gap:0;position:relative;margin-bottom:0;">
-            <div id="oiCandleYLabels" style="width:58px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.35);text-align:right;padding-right:6px;"></div>
-            <div style="flex:1;position:relative;min-width:0;">
-              <canvas id="oiCandleCanvas" style="width:100%;height:180px;display:block;"></canvas>
-              <div id="oiCandleCrosshair" style="position:absolute;top:0;bottom:0;width:1px;background:rgba(79,195,247,0.25);pointer-events:none;display:none;z-index:10;"></div>
-              <div id="oiCandleTooltip" style="position:absolute;pointer-events:none;background:rgba(6,13,20,0.97);border:1px solid rgba(79,195,247,0.3);border-radius:8px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#e0f7fa;display:none;z-index:20;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.6);min-width:180px;">
-                <div id="oiCTTTime" style="font-size:8px;color:rgba(128,222,234,0.45);letter-spacing:1px;margin-bottom:4px;"></div>
-                <div style="display:flex;justify-content:space-between;gap:14px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">OPEN</span><span id="oiCTTOpen" style="font-weight:700;"></span></div>
-                <div style="display:flex;justify-content:space-between;gap:14px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">HIGH</span><span id="oiCTTHigh" style="font-weight:700;color:#fbbf24;"></span></div>
-                <div style="display:flex;justify-content:space-between;gap:14px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">LOW</span><span id="oiCTTLow" style="font-weight:700;color:#fbbf24;"></span></div>
-                <div style="display:flex;justify-content:space-between;gap:14px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">CLOSE</span><span id="oiCTTClose" style="font-weight:700;"></span></div>
-                <div style="display:flex;justify-content:space-between;gap:14px;"><span style="color:rgba(176,190,197,0.5);">PATTERN</span><span id="oiCTTPattern" style="font-weight:700;"></span></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ═══ DIVIDER ═══ -->
-          <div style="display:flex;align-items:center;gap:10px;margin:4px 0 4px 58px;">
-            <div style="flex:1;height:1px;background:rgba(79,195,247,0.12);"></div>
-            <div style="font-size:8px;color:rgba(128,222,234,0.3);letter-spacing:1.5px;white-space:nowrap;font-family:'JetBrains Mono',monospace;">NET BI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
-            <div style="flex:1;height:1px;background:rgba(79,195,247,0.12);"></div>
-            <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.8);letter-spacing:1px;white-space:nowrap;"></div>
-          </div>
-
           <!-- Chart: Y-labels + Canvas + Crosshair + Tooltip -->
           <div style="display:flex;gap:0;position:relative;">
             <div id="oiYLabels" style="width:58px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;flex-shrink:0;"></div>
@@ -3468,9 +3442,6 @@ function drawSparkline(data) {
     var diffs = reversed.map(function(r){ return r.diff || 0; });
     if (diffs.length < 2) return;
 
-    /* ── Draw candlestick panel first ── */
-    drawCandleChart(reversed);
-
     /* ── Stat boxes ── */
     var latest = diffs[diffs.length - 1];
     var high   = Math.max.apply(null, diffs);
@@ -3664,251 +3635,6 @@ function drawSparkline(data) {
     canvas.onmouseleave = function() {
         if (tooltip)   tooltip.style.display   = 'none';
         if (crosshair) crosshair.style.display = 'none';
-    };
-}
-
-/* ═══════════════════════════════════════════════════════════════════
-   drawCandleChart — builds OHLC candles from spot_price snapshots,
-   detects Doji / Hammer / Shooting Star / Engulfing patterns and
-   annotates them on the chart.  Only this function was added; no
-   other logic was touched.
-═══════════════════════════════════════════════════════════════════ */
-function drawCandleChart(reversed) {
-    var cv = document.getElementById('oiCandleCanvas');
-    if (!cv || !cv.getContext) return;
-    var spots = reversed.map(function(r){ return parseFloat(r.spot_price) || 0; });
-    /* need at least 2 valid spot prices */
-    var validCount = spots.filter(function(v){ return v > 0; }).length;
-    if (validCount < 2) { cv.style.display = 'none'; return; }
-    cv.style.display = 'block';
-
-    var dpr  = window.devicePixelRatio || 1;
-    var wrap = cv.parentElement;
-    var W    = wrap ? wrap.clientWidth : 700;
-    var H    = 180;
-    cv.width        = W * dpr;
-    cv.height       = H * dpr;
-    cv.style.width  = W + 'px';
-    cv.style.height = H + 'px';
-    var ctx = cv.getContext('2d');
-    ctx.scale(dpr, dpr);
-    ctx.clearRect(0, 0, W, H);
-
-    /* ── Build OHLC from consecutive spot prices ── */
-    var candles = [];
-    for (var i = 0; i < reversed.length; i++) {
-        var sp  = parseFloat(reversed[i].spot_price) || 0;
-        if (sp === 0) continue;
-        var prv = 0;
-        for (var j = i + 1; j < reversed.length; j++) {
-            if ((parseFloat(reversed[j].spot_price) || 0) > 0) { prv = parseFloat(reversed[j].spot_price); break; }
-        }
-        var o = prv > 0 ? prv : sp;
-        var c = sp;
-        var bodyHi = Math.max(o, c);
-        var bodyLo = Math.min(o, c);
-        var spread = Math.max(bodyHi * 0.0008, 1.5);  /* realistic wick spread */
-        var h = bodyHi + spread * (0.6 + Math.random() * 0.8);
-        var l = bodyLo - spread * (0.6 + Math.random() * 0.8);
-        candles.push({ o: o, h: h, l: l, c: c, time: reversed[i].time || '', idx: i });
-    }
-    var n = candles.length;
-    if (n < 2) return;
-
-    /* ── Price range ── */
-    var allH = Math.max.apply(null, candles.map(function(c){ return c.h; }));
-    var allL = Math.min.apply(null, candles.map(function(c){ return c.l; }));
-    var rng  = (allH - allL) || 1;
-    var padT = 28, padB = 6, padL2 = 4, padR2 = 8;
-    var cW   = W - padL2 - padR2;
-    var cH   = H - padT - padB;
-    function toY(v){ return padT + (1 - (v - allL) / rng) * cH; }
-    var cw   = Math.max(2, Math.floor(cW / n) - 1);
-    var gap  = Math.max(1, (cW - cw * n) / (n + 1));
-
-    /* ── Grid lines ── */
-    for (var gi = 0; gi <= 3; gi++) {
-        var gv = allL + (rng / 3) * gi;
-        var gy = toY(gv);
-        ctx.beginPath(); ctx.moveTo(padL2, gy); ctx.lineTo(W - padR2, gy);
-        ctx.strokeStyle = 'rgba(79,195,247,0.06)'; ctx.lineWidth = 0.5; ctx.setLineDash([]);
-        ctx.stroke();
-    }
-
-    /* ── Pattern detection ── */
-    var patterns = [];
-    function detectPattern(i) {
-        var c = candles[i];
-        var body    = Math.abs(c.c - c.o);
-        var upWick  = c.h - Math.max(c.o, c.c);
-        var dnWick  = Math.min(c.o, c.c) - c.l;
-        var isBull  = c.c >= c.o;
-        var range2  = c.h - c.l || 0.01;
-        /* Doji */
-        if (body < range2 * 0.08) return { label: 'Doji', col: '#fbbf24' };
-        /* Hammer */
-        if (dnWick > body * 2.0 && upWick < body * 0.5 && body < range2 * 0.35)
-            return { label: 'Hammer', col: '#34d399' };
-        /* Shooting Star */
-        if (upWick > body * 2.0 && dnWick < body * 0.5 && body < range2 * 0.35)
-            return { label: 'Shooting★', col: '#f87171' };
-        /* Engulfing */
-        if (i > 0) {
-            var p = candles[i - 1];
-            var prevBull = p.c >= p.o;
-            if (!prevBull && isBull && c.o <= p.c && c.c >= p.o)
-                return { label: 'Engulfing', col: '#34d399' };
-            if (prevBull && !isBull && c.o >= p.c && c.c <= p.o)
-                return { label: 'Engulfing', col: '#f87171' };
-        }
-        /* Morning Star */
-        if (i > 1) {
-            var p2 = candles[i - 2], p1 = candles[i - 1];
-            var smallBody = Math.abs(p1.c - p1.o) < (p1.h - p1.l) * 0.25;
-            if (!(p2.c >= p2.o) && smallBody && isBull && c.c > (p2.o + p2.c) / 2)
-                return { label: 'Morning★', col: '#34d399' };
-        }
-        /* Evening Star */
-        if (i > 1) {
-            var q2 = candles[i - 2], q1 = candles[i - 1];
-            var smallBody2 = Math.abs(q1.c - q1.o) < (q1.h - q1.l) * 0.25;
-            if ((q2.c >= q2.o) && smallBody2 && !isBull && c.c < (q2.o + q2.c) / 2)
-                return { label: 'Evening★', col: '#f87171' };
-        }
-        return null;
-    }
-
-    /* ── Draw candles ── */
-    candles.forEach(function(c, i) {
-        var x    = padL2 + gap + i * (cw + gap);
-        var bull = c.c >= c.o;
-        var col  = bull ? '#26a69a' : '#ef5350';
-
-        /* Wick */
-        ctx.strokeStyle = bull ? '#4db6ac' : '#ef9a9a';
-        ctx.lineWidth   = 1;
-        ctx.beginPath();
-        ctx.moveTo(x + cw / 2, toY(c.h));
-        ctx.lineTo(x + cw / 2, toY(c.l));
-        ctx.stroke();
-
-        /* Body */
-        var bTop = toY(Math.max(c.o, c.c));
-        var bH   = Math.max(1.5, Math.abs(toY(c.o) - toY(c.c)));
-        ctx.fillStyle = col;
-        ctx.fillRect(x, bTop, cw, bH);
-    });
-
-    /* ── Annotate patterns ── */
-    var seenLabels = {};
-    var tagCounts  = {};
-    candles.forEach(function(c, i) {
-        var pat = detectPattern(i);
-        if (!pat) return;
-        tagCounts[pat.label] = (tagCounts[pat.label] || 0) + 1;
-        /* annotate only first occurrence to avoid clutter */
-        if (seenLabels[pat.label]) return;
-        seenLabels[pat.label] = true;
-        patterns.push({ candle: c, i: i, label: pat.label, col: pat.col });
-    });
-
-    /* draw annotations */
-    patterns.forEach(function(p) {
-        var x  = padL2 + gap + p.i * (cw + gap) + cw / 2;
-        var yT = toY(p.candle.h) - 6;
-
-        /* dashed leader line */
-        ctx.strokeStyle    = p.col;
-        ctx.lineWidth      = 1;
-        ctx.setLineDash([3, 3]);
-        ctx.beginPath(); ctx.moveTo(x, yT - 16); ctx.lineTo(x, yT - 1); ctx.stroke();
-        ctx.setLineDash([]);
-
-        /* label pill */
-        ctx.font = 'bold 9px JetBrains Mono,monospace';
-        var tw   = ctx.measureText(p.label).width;
-        var lx   = Math.min(Math.max(x - tw / 2 - 5, padL2), W - padR2 - tw - 10);
-        ctx.fillStyle = p.col + '22';
-        ctx.beginPath();
-        ctx.roundRect ? ctx.roundRect(lx, yT - 28, tw + 10, 13, 3)
-                      : ctx.rect(lx, yT - 28, tw + 10, 13);
-        ctx.fill();
-        ctx.strokeStyle = p.col + '66'; ctx.lineWidth = 0.8;
-        ctx.beginPath();
-        ctx.roundRect ? ctx.roundRect(lx, yT - 28, tw + 10, 13, 3)
-                      : ctx.rect(lx, yT - 28, tw + 10, 13);
-        ctx.stroke();
-        ctx.fillStyle = p.col; ctx.textAlign = 'left';
-        ctx.fillText(p.label, lx + 5, yT - 18);
-    });
-
-    /* ── Y-axis labels ── */
-    var yEl = document.getElementById('oiCandleYLabels');
-    if (yEl) {
-        yEl.innerHTML = '';
-        for (var gi = 3; gi >= 0; gi--) {
-            var gv2 = allL + (rng / 3) * gi;
-            var d2  = document.createElement('div');
-            d2.style.cssText = 'font-size:9px;color:rgba(128,222,234,0.3);text-align:right;padding-right:6px;white-space:nowrap;';
-            d2.textContent   = '₹' + Math.round(gv2).toLocaleString('en-IN');
-            yEl.appendChild(d2);
-        }
-    }
-
-    /* ── Pattern tag pills (top-right header) ── */
-    var tagEl = document.getElementById('oiPatternTags');
-    if (tagEl) {
-        tagEl.innerHTML = '';
-        Object.keys(tagCounts).forEach(function(lbl) {
-            var col2 = lbl === 'Doji' ? '#fbbf24'
-                     : (lbl === 'Shooting★' || lbl === 'Engulfing' && tagCounts[lbl] && false) ? '#f87171'
-                     : lbl.indexOf('★') >= 0 ? (lbl.indexOf('Morning') >= 0 ? '#34d399' : '#f87171')
-                     : '#34d399';
-            /* pick correct colour from patterns list */
-            patterns.forEach(function(p){ if (p.label === lbl) col2 = p.col; });
-            var sp = document.createElement('span');
-            sp.style.cssText = 'background:' + col2 + '18;border:1px solid ' + col2 + '55;'
-                + 'color:' + col2 + ';font-family:"JetBrains Mono",monospace;font-size:9px;'
-                + 'padding:2px 9px;border-radius:4px;letter-spacing:.06em;white-space:nowrap;';
-            sp.textContent = lbl;
-            tagEl.appendChild(sp);
-        });
-    }
-
-    /* ── Crosshair + Tooltip ── */
-    var cTip  = document.getElementById('oiCandleTooltip');
-    var cHair = document.getElementById('oiCandleCrosshair');
-    cv.onmousemove = function(e) {
-        if (!cTip || !cHair) return;
-        var rect  = cv.getBoundingClientRect();
-        var mx    = e.clientX - rect.left;
-        var idx2  = Math.round((mx - padL2 - gap) / (cw + gap));
-        if (idx2 < 0 || idx2 >= n) { cTip.style.display = 'none'; cHair.style.display = 'none'; return; }
-        var c2   = candles[idx2];
-        var bull2 = c2.c >= c2.o;
-        var dc   = bull2 ? '#34d399' : '#f87171';
-        var cx2  = padL2 + gap + idx2 * (cw + gap) + cw / 2;
-
-        cHair.style.display = 'block'; cHair.style.left = cx2 + 'px';
-
-        var pat2 = detectPattern(idx2);
-        var e1 = document.getElementById('oiCTTTime'),  e2 = document.getElementById('oiCTTOpen'),
-            e3 = document.getElementById('oiCTTHigh'),  e4 = document.getElementById('oiCTTLow'),
-            e5 = document.getElementById('oiCTTClose'), e6 = document.getElementById('oiCTTPattern');
-        if (e1) e1.textContent = (c2.time || '') + ' IST';
-        if (e2) { e2.textContent = '₹' + c2.o.toFixed(2); e2.style.color = dc; }
-        if (e3)   e3.textContent = '₹' + c2.h.toFixed(2);
-        if (e4)   e4.textContent = '₹' + c2.l.toFixed(2);
-        if (e5) { e5.textContent = '₹' + c2.c.toFixed(2); e5.style.color = dc; }
-        if (e6) { e6.textContent = pat2 ? pat2.label : '—'; e6.style.color = pat2 ? pat2.col : 'rgba(176,190,197,0.5)'; }
-
-        var tx2 = cx2 + 14;
-        if (tx2 + 190 > W) tx2 = cx2 - 204;
-        cTip.style.left = tx2 + 'px'; cTip.style.top = '8px'; cTip.style.display = 'block';
-    };
-    cv.onmouseleave = function() {
-        if (cTip)  cTip.style.display  = 'none';
-        if (cHair) cHair.style.display = 'none';
     };
 }
 
