@@ -3044,9 +3044,9 @@ class NiftyHTMLAnalyzer:
 
         # ── Neutral S1/R1 panel (only shown when bias is NEUTRAL) ───────────
         if bias not in ('BULLISH', 'BEARISH'):
-            cp        = float(d.get('current_price', 0))
-            s1        = float(d.get('support', 0))
-            r1        = float(d.get('resistance', 0))
+            cp        = float(d.get('current_price') or 0)
+            s1        = float(d['support'])   if d.get('support')     is not None else 0.0
+            r1        = float(d['resistance']) if d.get('resistance')  is not None else 0.0
             pts_to_s1 = round(cp - s1)   if s1 > 0 else None
             pts_to_r1 = round(r1 - cp)   if r1 > 0 else None
             # Proximity hint: which level is price closer to?
@@ -4312,12 +4312,14 @@ class NiftyHTMLAnalyzer:
             self._stat_card(macd_ico,'MACD',f"{d['macd']:.2f}",macd_lbl,macd_badge,d['macd_pct'],macd_bar,f"Signal: {d['macd_signal']:.2f}")
         )
         oc_cards = self._build_enhanced_oc_cards()
-        _ss=d['strong_support']; _sr=d['strong_resistance']
-        _rng=_sr-_ss if _sr!=_ss else 1
+        _cp  = d['current_price']
+        _ss  = d['strong_support']    if d.get('strong_support')    is not None else (_cp - 300)
+        _sr  = d['strong_resistance'] if d.get('strong_resistance') is not None else (_cp + 300)
+        _rng = (_sr - _ss) if _sr != _ss else 1
         def _pct_real(val): return round(max(3,min(97,(val-_ss)/_rng*100)),2)
-        _pct_cp=_pct_real(d['current_price'])
-        _pts_to_res=int(d['resistance']-d['current_price'])
-        _pts_to_sup=int(d['current_price']-d['support'])
+        _pct_cp     = _pct_real(_cp)
+        _pts_to_res = int(d['resistance'] - _cp) if d.get('resistance') is not None else 0
+        _pts_to_sup = int(_cp - d['support'])     if d.get('support')    is not None else 0
         _mp_node=""
         if d['has_option_data']:
             _mp_node=(f'<div class="rl-node-b" style="left:43%;">'
