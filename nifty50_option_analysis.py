@@ -128,8 +128,27 @@ def fetch_heatmap_data():
                         })
                         continue
    
-                today   = df.iloc[-1]
-                prev    = df.iloc[-2]
+                # dropna: bulk yf.download() fills NaN for dates a ticker had no data.
+                # Without this, df.iloc[-2]['Close'] is often NaN → renders as ₹nan.
+                df_clean = df.dropna(subset=['Close'])
+                if len(df_clean) < 2:
+                    # Per-ticker fallback when bulk data is insufficient
+                    try:
+                        df_fb = yf.download(sym, period="5d", interval="1d",
+                                            auto_adjust=True, progress=False)
+                        df_clean = df_fb.dropna(subset=['Close']) if not df_fb.empty else df_clean
+                    except Exception:
+                        pass
+                if len(df_clean) < 2:
+                    results.append({
+                        'symbol': name, 'ticker': sym,
+                        'price': 0, 'prev_close': 0,
+                        'change_pct': 0, 'change_abs': 0,
+                        'volume': 0, 'high_wt': name in HIGH_WEIGHTAGE
+                    })
+                    continue
+                today   = df_clean.iloc[-1]
+                prev    = df_clean.iloc[-2]
                 price   = float(today['Close'])
                 p_close = float(prev['Close'])
                 chg_abs = price - p_close
@@ -3045,8 +3064,8 @@ class NiftyHTMLAnalyzer:
         # ── Neutral S1/R1 panel (only shown when bias is NEUTRAL) ───────────
         if bias not in ('BULLISH', 'BEARISH'):
             cp        = float(d.get('current_price') or 0)
-            s1        = float(d['support'])   if d.get('support')     is not None else 0.0
-            r1        = float(d['resistance']) if d.get('resistance')  is not None else 0.0
+            s1        = float(d['support'])    if d.get('support')    is not None else 0.0
+            r1        = float(d['resistance']) if d.get('resistance') is not None else 0.0
             pts_to_s1 = round(cp - s1)   if s1 > 0 else None
             pts_to_r1 = round(r1 - cp)   if r1 > 0 else None
             # Proximity hint: which level is price closer to?
