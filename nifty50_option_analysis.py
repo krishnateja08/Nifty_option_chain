@@ -5599,25 +5599,25 @@ function mobNavTo(secId, tabId, label) {
 
         /* Banner row */
         .hb-banner{{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(79,195,247,0.1);flex-wrap:wrap;gap:10px;position:relative;z-index:1;}}
-        .hb-left{{display:flex;align-items:center;gap:10px;}}
-        .hb-nse-badge{{padding:3px 10px;border-radius:5px;font-family:'Oxanium',sans-serif;font-size:10px;font-weight:900;letter-spacing:2px;color:#000;background:linear-gradient(135deg,#4fc3f7,#00e5ff);flex-shrink:0;}}
-        .hb-title-main{{font-family:'Oxanium',sans-serif;font-size:clamp(13px,2vw,18px);font-weight:900;color:#ffffff;letter-spacing:0.5px;}}
-        .hb-title-sub{{font-size:9px;letter-spacing:2px;color:rgba(79,195,247,0.55);text-transform:uppercase;margin-top:2px;}}
+        .hb-left{{display:flex;align-items:center;gap:12px;}}
+        .hb-nse-badge{{padding:4px 13px;border-radius:5px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;color:#000;background:linear-gradient(135deg,#4fc3f7,#00e5ff);flex-shrink:0;}}
+        .hb-title-main{{font-family:'Oxanium',sans-serif;font-size:clamp(15px,2.2vw,21px);font-weight:900;color:#ffffff;letter-spacing:0.5px;}}
+        .hb-title-sub{{font-size:10px;letter-spacing:2px;color:rgba(79,195,247,0.8);text-transform:uppercase;margin-top:3px;font-weight:600;}}
         .hb-chips{{display:flex;gap:6px;flex-wrap:wrap;}}
-        .hb-chip{{text-align:center;padding:5px 12px;border-radius:8px;background:rgba(0,0,0,0.35);border:1px solid rgba(79,195,247,0.14);flex-shrink:0;}}
-        .hb-chip-lbl{{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(128,222,234,0.5);text-transform:uppercase;margin-bottom:2px;}}
-        .hb-chip-val{{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;line-height:1;}}
+        .hb-chip{{text-align:center;padding:6px 14px;border-radius:8px;background:rgba(0,0,0,0.35);border:1px solid rgba(79,195,247,0.18);flex-shrink:0;}}
+        .hb-chip-lbl{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:#80deea;text-transform:uppercase;margin-bottom:3px;font-weight:700;}}
+        .hb-chip-val{{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:800;line-height:1;}}
 
         /* Status row */
-        .hb-status{{display:flex;align-items:center;justify-content:space-between;padding:6px 20px;background:rgba(0,0,0,0.25);flex-wrap:wrap;gap:6px;position:relative;z-index:1;border-bottom:1px solid rgba(79,195,247,0.07);}}
-        .hb-s-item{{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(176,190,197,0.5);white-space:nowrap;}}
-        .hb-s-dot{{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:sb-pulse 2s ease-in-out infinite;}}
-        .hb-s-val{{font-weight:700;color:#80deea;margin-left:2px;}}
+        .hb-status{{display:flex;align-items:center;justify-content:space-between;padding:7px 20px;background:rgba(0,0,0,0.25);flex-wrap:wrap;gap:6px;position:relative;z-index:1;border-bottom:1px solid rgba(79,195,247,0.07);}}
+        .hb-s-item{{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(200,221,232,0.75);white-space:nowrap;font-weight:600;}}
+        .hb-s-dot{{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:sb-pulse 2s ease-in-out infinite;}}
+        .hb-s-val{{font-weight:700;color:#e0f7fa;margin-left:2px;font-size:12px;}}
 
         /* Tabs */
         .tab-nav{{display:flex;gap:0;border-bottom:none;overflow-x:auto;scrollbar-width:none;background:rgba(0,0,0,0.2);position:relative;z-index:1;}}
         .tab-nav::-webkit-scrollbar{{display:none;}}
-        .tab-btn{{display:flex;align-items:center;gap:8px;padding:11px clamp(12px,2vw,22px);font-family:'Oxanium',sans-serif;font-size:clamp(9px,1.2vw,11px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(176,190,197,0.45);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s ease;position:relative;bottom:-1px;}}
+        .tab-btn{{display:flex;align-items:center;gap:8px;padding:11px clamp(12px,2vw,22px);font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.3vw,12px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,221,232,0.6);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s ease;position:relative;bottom:-1px;}}
         .tab-btn:hover{{color:#4fc3f7;background:rgba(79,195,247,0.05);}}
         .tab-btn.active{{color:#4fc3f7;border-bottom-color:#4fc3f7;background:rgba(79,195,247,0.07);}}
         .tab-dot{{width:6px;height:6px;border-radius:50%;background:rgba(79,195,247,0.3);flex-shrink:0;transition:all 0.25s ease;}}
