@@ -4701,6 +4701,17 @@ class NiftyHTMLAnalyzer:
 
     function istNow() { return new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'})); }
     function pad(n){ return String(n).padStart(2,'0'); }
+
+    // ── Sidebar offset: measures sticky header height and sets CSS var ──────
+    function setSidebarOffset() {
+        var hdr = document.querySelector('.header');
+        if (hdr) {
+            var h = hdr.getBoundingClientRect().height;
+            document.documentElement.style.setProperty('--header-h', h + 'px');
+        }
+    }
+    setSidebarOffset();
+    window.addEventListener('resize', setSidebarOffset);
     function fmtTime(d){ return pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds()); }
     function fmtDate(d){
         var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -6203,9 +6214,9 @@ function mobNavTo(secId, tabId, label) {
             width:190px;flex-shrink:0;
             background:#07111a;
             border-right:1px solid rgba(79,195,247,0.12);
-            position:sticky;top:0;
-            height:100vh;
-            max-height:100vh;
+            position:sticky;top:var(--header-h,0px);
+            height:calc(100vh - var(--header-h,0px));
+            max-height:calc(100vh - var(--header-h,0px));
             align-self:flex-start;
             display:flex;flex-direction:column;
             transition:width 0.22s ease;
