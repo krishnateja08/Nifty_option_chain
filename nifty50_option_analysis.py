@@ -5594,7 +5594,7 @@ function mobNavTo(secId, tabId, label) {
         .container{{max-width:100%;width:100%;margin:0;background:rgba(15,32,39,0.85);backdrop-filter:blur(20px);border-radius:0;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:none;min-width:0;}}
 
         /* ══ OPTION B HEADER ══════════════════════════════════════════ */
-        .header{{background:linear-gradient(180deg,#061828 0%,#04111f 100%);border-bottom:2px solid rgba(79,195,247,0.2);padding:0;position:relative;overflow:hidden;}}
+        .header{{background:linear-gradient(180deg,#061828 0%,#04111f 100%);border-bottom:2px solid rgba(79,195,247,0.2);padding:0;position:sticky;top:0;z-index:150;overflow:hidden;}}
         .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(79,195,247,0.05) 0%,transparent 60%);pointer-events:none;}}
 
         /* Banner row */
