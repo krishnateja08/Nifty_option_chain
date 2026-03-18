@@ -7,7 +7,7 @@ MARKET DIRECTION: Holographic Glass Widget (Compact)
 KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
 AUTO REFRESH: JSON timestamp polling every 30s · Reloads ONLY when script re-runs · No flicker · No scroll jump
 STRATEGY CHECKLIST TAB: Rules-based scoring · Auto-filled from live data · N/A safe
-INTRADAY OI TREND TAB: Every-run snapshot → oi_log.json · 3/5/15 Min filter · IST timestamps
+INTRADAY OI TREND TAB: Every-run snapshot → oi_log.json · 3/5/15 Min/1 Hr filter · IST timestamps
 NIFTY 50 HEATMAP TAB: Live yfinance data · Color-coded by % change · Market Breadth · High Weightage Movers
 
 FIX v5: Nifty 50 Heatmap tab added
@@ -1893,6 +1893,7 @@ def build_intraday_oi_tab_html():
             <button class="oi-int-btn active" id="btn3" onclick="setOIInterval(3,this)">3 Min</button>
             <button class="oi-int-btn" id="btn5" onclick="setOIInterval(5,this)">5 Min</button>
             <button class="oi-int-btn" id="btn15" onclick="setOIInterval(15,this)">15 Min</button>
+            <button class="oi-int-btn" id="btn60" onclick="setOIInterval(60,this)">1 Hr</button>
           </div>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <div class="oi-live-badge"><span class="oi-live-dot"></span> LIVE &middot; IST &middot; Auto-refresh 30s</div>
@@ -2021,7 +2022,7 @@ def build_intraday_oi_tab_html():
             <div class="logic-item"><span class="lc-bear">Call OI +</span> Writers adding calls &#8594; Bearish pressure</div>
             <div class="logic-item"><span class="lc-bull">Put OI +</span> Writers adding puts &#8594; Bullish support</div>
             <div class="logic-item"><span class="lc-info">DIFF</span> = PE &#916; &#8722; CE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
-            <div class="logic-item"><span class="lc-info">3/5/15 Min</span> filters raw rows or aggregates into time slots</div>
+            <div class="logic-item"><span class="lc-info">3/5/15 Min · 1 Hr</span> filters raw rows or aggregates into time slots</div>
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
             <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
             <div class="logic-item"><span class="lc-bull">STREAK</span> Consecutive snapshots with same signal &nbsp;&middot;&nbsp; &#215;1 = just flipped &nbsp;&middot;&nbsp; &#215;5+ = strong trend</div>
@@ -4970,6 +4971,12 @@ function filterByInterval(data, mins) {
             nearest_label:  last.nearest_label,
             distance_pts:   last.distance_pts,
             vwap_signal:    last.vwap_signal,
+            rsi_15m:        last.rsi_15m,
+            ema_signal:     last.ema_signal,
+            ema5:           last.ema5,
+            ema13:          last.ema13,
+            bias:           last.bias,
+            timestamp:      last.timestamp,
             _isLive:       rows[0]._isLive,
         };
     });
