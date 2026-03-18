@@ -926,7 +926,7 @@
         <div class="hb-status">
             <div class="hb-s-item">
                 <div class="hb-s-dot" style="background:#00e676;box-shadow:0 0 6px #00e676;"></div>
-                Generated <span class="hb-s-val" id="hb-gen">19-Mar-2026 04:23 IST</span>
+                Generated <span class="hb-s-val" id="hb-gen">19-Mar-2026 04:30 IST</span>
             </div>
             <div class="hb-s-item">
                 <div class="hb-s-dot" style="background:#4fc3f7;box-shadow:0 0 6px #4fc3f7;"></div>
@@ -1055,7 +1055,7 @@
   <div class="ssb-wrap">
     <div class="ssb-header">
       <span class="ssb-title">&#9889; SIGNAL SUMMARY</span>
-      <span class="ssb-ts">19-Mar-2026 04:23 IST</span>
+      <span class="ssb-ts">19-Mar-2026 04:30 IST</span>
     </div>
     <div class="ssb-grid">
       <div class="ssb-cell"><span class="ssb-cell-lbl">OI Signal</span><span class="ssb-badge" style="color:#00e676;background:rgba(0,230,118,0.12);border:1px solid rgba(0,230,118,0.3);">&#9651; Bullish</span><span class="ssb-sub">Put Build-up Dominant</span></div>
@@ -2354,7 +2354,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 19-Mar-2026 04:23 IST</span>
+            <span>Stock data as of: 19-Mar-2026 04:30 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -2551,6 +2551,7 @@
             <button class="oi-int-btn active" id="btn3" onclick="setOIInterval(3,this)">3 Min</button>
             <button class="oi-int-btn" id="btn5" onclick="setOIInterval(5,this)">5 Min</button>
             <button class="oi-int-btn" id="btn15" onclick="setOIInterval(15,this)">15 Min</button>
+            <button class="oi-int-btn" id="btn60" onclick="setOIInterval(60,this)">1 Hr</button>
           </div>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <div class="oi-live-badge"><span class="oi-live-dot"></span> LIVE &middot; IST &middot; Auto-refresh 30s</div>
@@ -2679,7 +2680,7 @@
             <div class="logic-item"><span class="lc-bear">Call OI +</span> Writers adding calls &#8594; Bearish pressure</div>
             <div class="logic-item"><span class="lc-bull">Put OI +</span> Writers adding puts &#8594; Bullish support</div>
             <div class="logic-item"><span class="lc-info">DIFF</span> = PE &#916; &#8722; CE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
-            <div class="logic-item"><span class="lc-info">3/5/15 Min</span> filters raw rows or aggregates into time slots</div>
+            <div class="logic-item"><span class="lc-info">3/5/15 Min · 1 Hr</span> filters raw rows or aggregates into time slots</div>
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
             <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
             <div class="logic-item"><span class="lc-bull">STREAK</span> Consecutive snapshots with same signal &nbsp;&middot;&nbsp; &#215;1 = just flipped &nbsp;&middot;&nbsp; &#215;5+ = strong trend</div>
@@ -3819,6 +3820,12 @@ function filterByInterval(data, mins) {
             nearest_label:  last.nearest_label,
             distance_pts:   last.distance_pts,
             vwap_signal:    last.vwap_signal,
+            rsi_15m:        last.rsi_15m,
+            ema_signal:     last.ema_signal,
+            ema5:           last.ema5,
+            ema13:          last.ema13,
+            bias:           last.bias,
+            timestamp:      last.timestamp,
             _isLive:       rows[0]._isLive,
         };
     });
