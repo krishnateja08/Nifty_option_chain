@@ -574,14 +574,14 @@
         /* PRE-TRADE CHECKLIST */
         .ptc-progress-wrap{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:18px 22px;margin-bottom:22px;}
         .ptc-progress-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
-        .ptc-progress-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(128,222,234,0.4);font-weight:700;}
+        .ptc-progress-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(128,222,234,0.8);font-weight:700;}
         .ptc-progress-count{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#80deea;}
         .ptc-reset-btn{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;border:1px solid rgba(79,195,247,0.3);background:rgba(79,195,247,0.06);color:rgba(79,195,247,0.7);cursor:pointer;transition:all 0.2s ease;}
         .ptc-reset-btn:hover{border-color:rgba(79,195,247,0.6);color:#4fc3f7;background:rgba(79,195,247,0.12);}
         .ptc-bar-track{height:6px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;margin-bottom:12px;}
         .ptc-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#00e5ff,#0288d1);transition:width 0.5s cubic-bezier(0.4,0,0.2,1),background 0.4s ease;}
-        .ptc-verdict{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(128,222,234,0.6);font-family:'Rajdhani',sans-serif;font-weight:500;transition:color 0.3s ease;}
-        .ptc-verdict-icon{font-size:16px;flex-shrink:0;}
+        .ptc-verdict{display:flex;align-items:center;gap:10px;font-size:13px;color:#80deea;font-family:'Rajdhani',sans-serif;font-weight:600;transition:color 0.3s ease;}
+        .ptc-verdict-icon{font-size:18px;flex-shrink:0;}
         .ptc-list{display:flex;flex-direction:column;gap:0;}
         .ptc-section-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;font-weight:700;padding:6px 14px;margin:16px 0 6px 0;display:inline-block;border-radius:4px;}
         .ptc-item{display:flex;align-items:center;gap:14px;padding:13px 18px;margin-bottom:5px;border-radius:6px;cursor:pointer;background:rgba(19,26,34,0.9);border:1px solid rgba(79,195,247,0.07);border-left-width:3px;user-select:none;transition:opacity 0.25s ease,filter 0.25s ease,background 0.2s ease;position:relative;overflow:hidden;}
@@ -595,9 +595,9 @@
         .ptc-warning{font-size:11px;color:#ff4d4d;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;font-weight:700;margin-left:4px;}
         .ptc-mindset-box{display:flex;align-items:flex-start;gap:16px;background:linear-gradient(135deg,rgba(79,195,247,0.05),rgba(124,77,255,0.05));border:1px solid rgba(79,195,247,0.14);border-radius:12px;padding:18px 22px;margin-top:22px;}
         .ptc-mindset-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
-        .ptc-mindset-title{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2.5px;color:rgba(128,222,234,0.4);text-transform:uppercase;font-weight:700;margin-bottom:7px;}
-        .ptc-mindset-text{font-size:clamp(12px,1.5vw,13px);color:rgba(176,190,197,0.7);line-height:1.7;font-family:'Rajdhani',sans-serif;font-weight:500;}
-        .ptc-mindset-text strong{color:#80deea;font-weight:700;}
+        .ptc-mindset-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;color:rgba(128,222,234,0.8);text-transform:uppercase;font-weight:700;margin-bottom:7px;}
+        .ptc-mindset-text{font-size:clamp(13px,1.5vw,14px);color:rgba(200,221,232,0.9);line-height:1.7;font-family:'Rajdhani',sans-serif;font-weight:500;}
+        .ptc-mindset-text strong{color:#4fc3f7;font-weight:700;}
         @media(max-width:600px){.ptc-item{padding:10px 12px;gap:10px;}.ptc-text{font-size:13px;}.ptc-mindset-box{flex-direction:column;gap:10px;}}
 
 
@@ -638,7 +638,7 @@
         }
         .nav-sidebar.collapsed{width:46px;}
         .nsb-header{display:flex;align-items:center;justify-content:space-between;padding:12px 10px;border-bottom:1px solid rgba(79,195,247,0.1);flex-shrink:0;}
-        .nsb-logo{font-family:'Oxanium',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(79,195,247,0.6);font-weight:700;white-space:nowrap;overflow:hidden;transition:opacity 0.2s;}
+        .nsb-logo{font-family:'Oxanium',sans-serif;font-size:11px;letter-spacing:3px;color:#4fc3f7;font-weight:700;white-space:nowrap;overflow:hidden;transition:opacity 0.2s;}
         .nav-sidebar.collapsed .nsb-logo{opacity:0;pointer-events:none;}
         .nsb-toggle{width:26px;height:26px;border-radius:6px;border:1px solid rgba(79,195,247,0.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
         .nsb-toggle:hover{background:rgba(79,195,247,0.1);}
@@ -647,7 +647,7 @@
         .nsb-nav{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0;scrollbar-width:thin;scrollbar-color:rgba(79,195,247,0.15) transparent;}
         .nsb-nav::-webkit-scrollbar{width:3px;}
         .nsb-nav::-webkit-scrollbar-thumb{background:rgba(79,195,247,0.2);border-radius:2px;}
-        .nsb-group{font-size:8px;letter-spacing:2px;color:rgba(79,195,247,0.25);padding:10px 12px 4px;text-transform:uppercase;white-space:nowrap;overflow:hidden;transition:opacity 0.2s;}
+        .nsb-group{font-size:9px;letter-spacing:2px;color:rgba(79,195,247,0.65);padding:10px 12px 4px;text-transform:uppercase;white-space:nowrap;overflow:hidden;transition:opacity 0.2s;font-weight:700;}
         .nav-sidebar.collapsed .nsb-group{opacity:0;}
         .nsb-item{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;border-left:2px solid transparent;transition:all 0.15s ease;position:relative;}
         .nsb-item:hover{background:rgba(79,195,247,0.06);border-left-color:rgba(79,195,247,0.3);}
@@ -845,7 +845,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">18-Mar-2026 07:42 IST</span>
+                <span class="sb-value gen-val">18-Mar-2026 07:45 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -974,7 +974,7 @@
   <div class="ssb-wrap">
     <div class="ssb-header">
       <span class="ssb-title">&#9889; SIGNAL SUMMARY</span>
-      <span class="ssb-ts">18-Mar-2026 07:42 IST</span>
+      <span class="ssb-ts">18-Mar-2026 07:45 IST</span>
     </div>
     <div class="ssb-grid">
       <div class="ssb-cell"><span class="ssb-cell-lbl">OI Signal</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);">&#9711; Neutral</span><span class="ssb-sub">Both Calls & Puts Building</span></div>
@@ -2273,7 +2273,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 18-Mar-2026 07:42 IST</span>
+            <span>Stock data as of: 18-Mar-2026 07:46 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -3081,7 +3081,7 @@
       <div class="section">
         <div class="section-title">
           <span>&#9989;</span> PRE-TRADE CHECKLIST
-          <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;letter-spacing:1px;margin-left:auto;">
+          <span style="font-size:11px;color:rgba(128,222,234,0.75);font-weight:600;letter-spacing:1px;margin-left:auto;">
             23 rules &middot; Click to check / uncheck
           </span>
         </div>
@@ -3100,7 +3100,7 @@
             <div class="ptc-bar-fill" id="ptcBarFill" style="width:0%"></div>
           </div>
           <div class="ptc-verdict">
-            <span class="ptc-verdict-icon" id="ptcVerdictIcon">&#11036;</span>
+            <span class="ptc-verdict-icon" id="ptcVerdictIcon">&#9634;</span>
             <span id="ptcVerdictText">Complete the checklist before entering any trade.</span>
           </div>
         </div>
@@ -3183,7 +3183,7 @@
           if (txt)  { txt.textContent = 'Almost there — complete remaining checks.'; txt.style.color = '#ffb74d'; }
         } else {
           if (fill) fill.style.background = 'linear-gradient(90deg,#00e5ff,#0288d1)';
-          if (icon) icon.innerHTML = '&#11036;';
+          if (icon) icon.innerHTML = '&#9634;';
           if (txt)  { txt.textContent = 'Complete the checklist before entering any trade.'; txt.style.color = 'rgba(128,222,234,0.6)'; }
         }
       }
