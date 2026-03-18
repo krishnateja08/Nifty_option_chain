@@ -5101,20 +5101,17 @@ function renderOITable(data) {
                 } else {
                     // SIDEWAYS bias — derive direction from spot price momentum
                     // Look at up to 3 older snapshots (idx+1 … idx+3) and compare
-                    // their spot_price with the current row's spot_price.
-                    // Net positive drift → WATCH BULL, net negative → WATCH BEAR,
-                    // truly flat (< ±20 pts across all samples) → Flat momentum.
+                    // current spot vs the OLDEST available row — net move over the window.
+                    // Averaging was diluting the signal; net move is more meaningful.
+                    // truly flat (< ±15 pts net move) → Flat momentum.
                     var curSpot  = row.spot_price || 0;
-                    var momSum   = 0;
-                    var momCount = 0;
-                    for (var mi = 1; mi <= 3; mi++) {
-                        var older = filtered[idx + mi];
-                        if (older && older.spot_price) {
-                            momSum += (curSpot - older.spot_price);
-                            momCount++;
+                    var oldestRow = null;
+                    for (var mi = 3; mi >= 1; mi--) {
+                        if (filtered[idx + mi] && filtered[idx + mi].spot_price) {
+                            oldestRow = filtered[idx + mi]; break;
                         }
                     }
-                    var momAvg = momCount > 0 ? momSum / momCount : 0;
+                    var momAvg = oldestRow ? (curSpot - oldestRow.spot_price) : 0;
                     if (momAvg > 15) {
                         // Price drifting upward across recent snapshots
                         wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
@@ -5141,7 +5138,7 @@ function renderOITable(data) {
                             + 'font-size:10px;font-weight:700;background:rgba(176,190,197,0.06);color:#78909c;'
                             + 'border:1px solid rgba(176,190,197,0.15);">→ Flat</span>';
                         wdHtml = '<span style="font-size:9px;color:rgba(176,190,197,0.35);font-family:monospace;">'
-                            + (momCount > 0 ? '±' + Math.abs(momAvg).toFixed(1) + ' pts' : 'no data') + '</span>';
+                            + (oldestRow ? '±' + Math.abs(momAvg).toFixed(1) + ' pts' : 'no data') + '</span>';
                     }
                 }
                 nlevelHtml = wbHtml;
