@@ -4738,11 +4738,16 @@ class NiftyHTMLAnalyzer:
                     // First load — just store the current timestamp, don't reload
                     _lastKnownTimestamp = ts;
                 } else if (ts && ts !== _lastKnownTimestamp) {
-                    // Save active tab before reload so we can restore it after
+                    // Save scroll position + active tab before reload
                     var activeTab = getActiveTab();
                     if (activeTab) sessionStorage.setItem('activeTab', activeTab);
-                    console.log('[AutoRefresh] New data detected (' + ts + ') — reloading… (tab: ' + activeTab + ')');
-                    location.reload();
+                    var scrollY = window.scrollY || window.pageYOffset;
+                    sessionStorage.setItem('scrollY', scrollY);
+                    console.log('[AutoRefresh] New data (' + ts + ') — fading out then reloading…');
+                    // Smooth fade-out before reload — no white flash
+                    document.body.style.transition = 'opacity 0.25s ease';
+                    document.body.style.opacity = '0';
+                    setTimeout(function(){ location.reload(); }, 260);
                 }
                 // else: same timestamp → do nothing
             })
@@ -4755,14 +4760,17 @@ class NiftyHTMLAnalyzer:
     setInterval(pollForUpdate, INTERVAL);
     pollForUpdate();   // run once immediately on page load to capture baseline timestamp
 
-    // ── Restore tab after reload ───────────────────────────────────────────
-    // Runs once on every page load. If a tab was saved before reload, switch to it.
+    // ── Restore tab + scroll position after reload ────────────────────────
     (function restoreTabAfterReload() {
         var savedTab = sessionStorage.getItem('activeTab');
+        var savedScroll = sessionStorage.getItem('scrollY');
         if (savedTab) {
-            sessionStorage.removeItem('activeTab');   // clear so normal nav isn't affected
-            // Wait for DOM to be fully ready before switching
+            sessionStorage.removeItem('activeTab');
             setTimeout(function() { switchTab(savedTab); }, 100);
+        }
+        if (savedScroll) {
+            sessionStorage.removeItem('scrollY');
+            setTimeout(function() { window.scrollTo(0, parseInt(savedScroll, 10)); }, 120);
         }
     })();
 })();
@@ -5576,8 +5584,9 @@ function mobNavTo(secId, tabId, label) {
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <style>
         *{{margin:0;padding:0;box-sizing:border-box;}}
-        html{{scroll-behavior:smooth;}}
-        body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:0;color:#c8d8e0;overflow-x:hidden;-webkit-text-size-adjust:100%;}}
+        html{{scroll-behavior:smooth;background:#04080f;}}
+        body{{font-family:'Rajdhani',sans-serif;background:linear-gradient(135deg,#0f2027 0%,#203a43 50%,#2c5364 100%);min-height:100vh;padding:0;color:#c8d8e0;overflow-x:hidden;-webkit-text-size-adjust:100%;animation:pageIn 0.35s ease forwards;}}
+        @keyframes pageIn{{from{{opacity:0;}}to{{opacity:1;}}}}
 
         .tab-nav{{display:flex;gap:0;border-bottom:2px solid rgba(79,195,247,0.2);overflow-x:auto;scrollbar-width:none;background:linear-gradient(135deg,#0f2027,#203a43);}}
         .tab-nav::-webkit-scrollbar{{display:none;}}
