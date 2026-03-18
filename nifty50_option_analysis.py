@@ -4593,13 +4593,35 @@ class NiftyHTMLAnalyzer:
         sma50_ico ='\u2705' if d['sma_50_above']  else '\u274c'
         sma200_ico='\u2705' if d['sma_200_above'] else '\u274c'
         macd_ico  ='\U0001f7e2' if d['macd_bullish'] else '\U0001f534'
-        tech_cards=(
-            self._stat_card(d['rsi_icon'],'RSI (14)',f"{d['rsi']:.1f}",d['rsi_status'],d['rsi_badge'],d['rsi_pct'],'bar-gold','14-period momentum')+
-            self._stat_card(sma20_ico,'SMA 20',f"\u20b9{d['sma_20']:,.0f}",sma20_lbl,sma20_badge,d['sma_20_pct'],sma20_bar,'20-day average')+
-            self._stat_card(sma50_ico,'SMA 50',f"\u20b9{d['sma_50']:,.0f}",sma50_lbl,sma50_badge,d['sma_50_pct'],sma50_bar,'50-day average')+
-            self._stat_card(sma200_ico,'SMA 200',f"\u20b9{d['sma_200']:,.0f}",sma200_lbl,sma200_badge,d['sma_200_pct'],sma200_bar,'200-day average')+
-            self._stat_card(macd_ico,'MACD',f"{d['macd']:.2f}",macd_lbl,macd_badge,d['macd_pct'],macd_bar,f"Signal: {d['macd_signal']:.2f}")
+        # ── Technical Indicators: Option A pill strip ────────────────────
+        def _pill(lbl, val, badge, badge_cls):
+            if   badge_cls == 'bullish': col='#00e676'; bg='rgba(0,230,118,0.08)';  bdr='rgba(0,230,118,0.25)';  bdg_bg='rgba(0,230,118,0.14)';  bdg_col='#00e676'
+            elif badge_cls == 'bearish': col='#ff4757'; bg='rgba(255,71,87,0.08)';  bdr='rgba(255,71,87,0.25)';  bdg_bg='rgba(255,71,87,0.14)';  bdg_col='#ff4757'
+            else:                        col='#ffb74d'; bg='rgba(255,183,77,0.07)'; bdr='rgba(255,183,77,0.22)'; bdg_bg='rgba(255,183,77,0.14)'; bdg_col='#ffb74d'
+            return (
+                f'<div style="display:flex;align-items:center;gap:7px;padding:6px 13px;border-radius:20px;'
+                f'border:1px solid {bdr};background:{bg};white-space:nowrap;">'
+                f'<span style="font-size:9px;letter-spacing:1.5px;color:rgba(128,222,234,0.6);text-transform:uppercase;">{lbl}</span>'
+                f'<span style="font-family:JetBrains Mono,monospace;font-size:13px;font-weight:700;color:{col};">{val}</span>'
+                f'<span style="font-size:8px;font-weight:700;padding:1px 7px;border-radius:8px;letter-spacing:0.5px;'
+                f'background:{bdg_bg};color:{bdg_col};">{badge}</span>'
+                f'</div>'
+            )
+        rsi_val   = d['rsi'];      rsi_badge_cls = 'bullish' if rsi_val < 30 else ('bearish' if rsi_val > 70 else 'neutral')
+        rsi_badge = d['rsi_status']
+        tech_pills = (
+            _pill('RSI 14',    f"{d['rsi']:.1f}",          rsi_badge,   rsi_badge_cls) +
+            _pill('SMA 20',    f"\u20b9{d['sma_20']:,.0f}", sma20_lbl,   sma20_badge) +
+            _pill('SMA 50',    f"\u20b9{d['sma_50']:,.0f}", sma50_lbl,   sma50_badge) +
+            _pill('SMA 200',   f"\u20b9{d['sma_200']:,.0f}",sma200_lbl,  sma200_badge) +
+            _pill('MACD',      f"{d['macd']:.0f}",          macd_lbl,    macd_badge)
         )
+        if d.get('has_option_data'):
+            pcr_v = d.get('pcr', 1.0)
+            pcr_badge_cls = 'bullish' if pcr_v > 1.2 else ('bearish' if pcr_v < 0.7 else 'neutral')
+            pcr_lbl = 'Bullish' if pcr_v > 1.2 else ('Bearish' if pcr_v < 0.7 else 'Neutral')
+            tech_pills += _pill('PCR', f"{pcr_v:.3f}", pcr_lbl, pcr_badge_cls)
+        tech_cards = tech_pills  # kept same variable name so injection point unchanged
         oc_cards = self._build_enhanced_oc_cards()
         _cp  = d['current_price']
         _ss  = d['strong_support']    if d.get('strong_support')    is not None else (_cp - 300)
@@ -6412,7 +6434,9 @@ function mobNavTo(secId, tabId, label) {
         html += f"""
         <div class="section" id="sec-technical">
             <div class="section-title"><span>&#128269;</span> TECHNICAL INDICATORS</div>
-            <div class="card-grid grid-5">{tech_cards}</div>
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:4px 0;">
+                {tech_cards}
+            </div>
         </div>
 """
         if d['has_option_data']:
