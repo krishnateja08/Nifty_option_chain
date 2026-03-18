@@ -5165,6 +5165,33 @@ window.addEventListener('resize', function(){
 /* ══ SIDEBAR NAV JS ══════════════════════════════════════════════ */
 var _nsbCollapsed = false;
 var _nsbActiveId  = 'snapshot';
+var _currentTab   = 'main';   /* ← tracks active tab so navSidebarTo works correctly */
+
+/* Patch switchTab to keep _currentTab in sync */
+var _origSwitchTab = switchTab;
+switchTab = function(tab) {
+    _origSwitchTab(tab);
+    _currentTab = tab;
+};
+
+function _scrollToSec(secId) {
+    var target = document.getElementById('sec-' + secId);
+    if (!target) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+    }
+    /* Get height of sticky bars so we don't hide section title behind them */
+    var offset = 0;
+    var mobBar = document.getElementById('nsbMobBar');
+    if (mobBar && mobBar.offsetParent !== null) {
+        offset += mobBar.offsetHeight;
+    }
+    var header = document.querySelector('.header');
+    /* Header is NOT sticky, so no need to add it */
+    var rect   = target.getBoundingClientRect();
+    var absTop = rect.top + window.pageYOffset - offset - 8;
+    window.scrollTo({ top: absTop, behavior: 'smooth' });
+}
 
 function toggleNavSidebar() {
     _nsbCollapsed = !_nsbCollapsed;
@@ -5173,51 +5200,41 @@ function toggleNavSidebar() {
 }
 
 function navSidebarTo(secId, tabId) {
-    // 1. Switch tab if needed
+    /* 1. Switch tab if needed */
     if (tabId !== _currentTab) {
         switchTab(tabId);
     }
-    // 2. Set active item
+    /* 2. Set active sidebar item */
     document.querySelectorAll('.nsb-item').forEach(function(el){ el.classList.remove('active'); });
     var activeEl = document.getElementById('nsi-' + secId);
     if (activeEl) activeEl.classList.add('active');
     _nsbActiveId = secId;
-    // 3. Scroll to section (after tab switch paint)
-    setTimeout(function(){
-        var target = document.getElementById('sec-' + secId);
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-            // For tab-only items (heatmap, oi-trend etc), scroll to top of content
-            var pc = document.getElementById('pageContent');
-            if (pc) pc.scrollTop = 0;
-        }
-    }, 80);
+    /* 3. Scroll after tab paint — 150ms is reliable across browsers */
+    setTimeout(function(){ _scrollToSec(secId); }, 150);
 }
 
 function openNsbDrawer()  { document.getElementById('nsbDrawer').classList.add('open'); }
 function closeNsbDrawer() { document.getElementById('nsbDrawer').classList.remove('open'); }
 
 function mobNavTo(secId, tabId, label) {
-    // Update mobile drawer active state
+    /* Update mobile drawer active state */
     document.querySelectorAll('.nsb-mob-item').forEach(function(el){ el.classList.remove('active'); });
     var el = document.getElementById('nsmd-' + secId);
     if (el) el.classList.add('active');
-    // Update mobile title bar
+    /* Update mobile title bar */
     var titleEl = document.getElementById('nsbMobTitle');
     if (titleEl) titleEl.innerHTML = label;
+    /* Close drawer first, then switch + scroll */
     closeNsbDrawer();
-    // Sync desktop sidebar active too
+    /* Sync desktop sidebar active state */
     document.querySelectorAll('.nsb-item').forEach(function(el){ el.classList.remove('active'); });
     var deskEl = document.getElementById('nsi-' + secId);
     if (deskEl) deskEl.classList.add('active');
     _nsbActiveId = secId;
-    // Switch tab then scroll
+    /* Switch tab if needed */
     if (tabId !== _currentTab) { switchTab(tabId); }
-    setTimeout(function(){
-        var target = document.getElementById('sec-' + secId);
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 120);
+    /* Scroll after drawer close animation + tab paint */
+    setTimeout(function(){ _scrollToSec(secId); }, 200);
 }
 </script>
 """
