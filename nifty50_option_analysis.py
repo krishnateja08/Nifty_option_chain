@@ -6156,13 +6156,16 @@ function mobNavTo(secId, tabId, label) {
         }}
 
         /* ══ SIDEBAR NAV ══════════════════════════════════════════════ */
-        .page-body{{display:flex;align-items:flex-start;position:relative;}}
+        .page-body{{display:flex;align-items:flex-start;position:relative;min-height:100vh;}}
         .page-content{{flex:1;min-width:0;width:100%;}}
         .nav-sidebar{{
             width:190px;flex-shrink:0;
             background:#07111a;
             border-right:1px solid rgba(79,195,247,0.12);
-            position:sticky;top:0;height:100vh;
+            position:sticky;top:0;
+            height:100vh;
+            max-height:100vh;
+            align-self:flex-start;
             display:flex;flex-direction:column;
             transition:width 0.22s ease;
             z-index:100;overflow:hidden;
