@@ -3320,43 +3320,22 @@ class NiftyHTMLAnalyzer:
             s1_display = f'&#8377;{s1:,.0f}' if s1 > 0 else 'N/A'
             r1_display = f'&#8377;{r1:,.0f}' if r1 > 0 else 'N/A'
             neutral_sr_html = f"""
-                <div style="margin-top:10px;width:100%;max-width:260px;">
-                  <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
-                    color:rgba(120,160,180,0.4);text-transform:uppercase;text-align:center;
-                    margin-bottom:8px;">&#9679; Key Levels (Range-Bound)</div>
-                  <div style="display:flex;gap:8px;justify-content:center;">
-                    <!-- S1 card -->
-                    <div style="flex:1;padding:8px 10px;border-radius:8px;
-                      background:rgba(0,230,118,0.07);border:1px solid rgba(0,230,118,0.25);
-                      text-align:center;min-width:90px;">
-                      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;
-                        letter-spacing:2px;color:rgba(0,230,118,0.6);margin-bottom:4px;">SUPPORT</div>
-                      <div style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;
-                        background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.3);
-                        display:inline-block;margin-bottom:5px;">S1</div>
-                      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;
-                        color:#00e676;">{s1_display}</div>
-                      {dist_s1_html}
-                    </div>
-                    <!-- R1 card -->
-                    <div style="flex:1;padding:8px 10px;border-radius:8px;
-                      background:rgba(255,77,109,0.07);border:1px solid rgba(255,77,109,0.25);
-                      text-align:center;min-width:90px;">
-                      <div style="font-family:'JetBrains Mono',monospace;font-size:8px;
-                        letter-spacing:2px;color:rgba(255,77,109,0.6);margin-bottom:4px;">RESISTANCE</div>
-                      <div style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;
-                        background:rgba(255,77,109,0.12);color:#ff4d6d;border:1px solid rgba(255,77,109,0.3);
-                        display:inline-block;margin-bottom:5px;">R1</div>
-                      <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;
-                        color:#ff4d6d;">{r1_display}</div>
-                      {dist_r1_html}
-                    </div>
+                <div style="margin-top:6px;width:100%;display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;">
+                  <div style="display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;
+                    background:rgba(0,230,118,0.07);border:1px solid rgba(0,230,118,0.2);">
+                    <span style="font-size:8px;font-weight:700;color:rgba(0,230,118,0.6);letter-spacing:1px;">S1</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#00e676;">{s1_display}</span>
+                    {f'<span style="font-size:8px;color:rgba(0,230,118,0.45);">{pts_to_s1}pt</span>' if pts_to_s1 else ''}
                   </div>
-                  <!-- Proximity hint -->
-                  <div style="margin-top:7px;font-family:'JetBrains Mono',monospace;font-size:8px;
-                    letter-spacing:0.5px;color:{hint_col};text-align:center;opacity:0.8;">
-                    {proximity_hint}
+                  <span style="font-size:9px;color:rgba(120,160,180,0.3);">·</span>
+                  <div style="display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;
+                    background:rgba(255,77,109,0.07);border:1px solid rgba(255,77,109,0.2);">
+                    <span style="font-size:8px;font-weight:700;color:rgba(255,77,109,0.6);letter-spacing:1px;">R1</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff4d6d;">{r1_display}</span>
+                    {f'<span style="font-size:8px;color:rgba(255,77,109,0.45);">{pts_to_r1}pt</span>' if pts_to_r1 else ''}
                   </div>
+                  <div style="width:100%;text-align:center;font-size:8px;font-family:'JetBrains Mono',monospace;
+                    color:{hint_col};opacity:0.75;margin-top:2px;">{proximity_hint}</div>
                 </div>"""
         else:
             neutral_sr_html = ''  # Not NEUTRAL — show nothing
@@ -3417,10 +3396,10 @@ class NiftyHTMLAnalyzer:
             </div>
 
             <!-- Direction + Dial + Signals grid — compact -->
-            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-top:10px;">
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:8px;">
 
               <!-- Left: Direction label + score + confidence dots -->
-              <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="display:flex;flex-direction:column;gap:5px;">
                 <div class="md-direction" style="background:{dir_gradient};
                   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
                   {bias}</div>
@@ -3436,7 +3415,7 @@ class NiftyHTMLAnalyzer:
               </div>
 
               <!-- Centre: SVG Sentiment Dial — smaller -->
-              <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
                 <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1.5px;
                   color:rgba(120,160,180,0.35);text-transform:uppercase;">Sentiment</div>
                 <svg width="110" height="65" viewBox="0 0 160 95" style="overflow:visible;">
@@ -5632,7 +5611,7 @@ function mobNavTo(secId, tabId, label) {
         .snap-card .card-top-row{{margin-bottom:8px;padding:0;}}
         .snap-card .val{{font-size:clamp(18px,3vw,26px);padding:0;margin-bottom:0;}}
 
-        .md-widget{{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:clamp(10px,1.5vw,14px) clamp(12px,1.8vw,18px);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:8px;}}
+        .md-widget{{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 16px;backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:4px;}}
         .md-glow{{position:absolute;top:-80%;left:-80%;width:260%;height:260%;background:conic-gradient(from 180deg,#ff6b35 0deg,#ffcd3c 120deg,#4ecdc4 240deg,#ff6b35 360deg);opacity:0.05;animation:md-rotate 8s linear infinite;border-radius:50%;pointer-events:none;}}
         @keyframes md-rotate{{to{{transform:rotate(360deg);}}}}
         .md-row-top{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}}
@@ -5647,7 +5626,7 @@ function mobNavTo(secId, tabId, label) {
         .md-pill-conf-med{{background:rgba(255,205,60,0.12);border:1px solid rgba(255,205,60,0.35);color:#ffcd3c;}}
         .md-pill-conf-low{{background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.35);color:#ff6b6b;}}
         .md-row-bottom{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}}
-        .md-direction{{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(18px,3.5vw,26px);letter-spacing:clamp(1px,0.3vw,2px);line-height:1;}}
+        .md-direction{{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(16px,2.8vw,22px);letter-spacing:clamp(0.5px,0.2vw,1.5px);line-height:1;}}
 
         .logic-box{{background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.14);border-left:3px solid #4fc3f7;border-radius:10px;padding:10px 16px;margin-top:12px;}}
         .logic-box-head{{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;color:#4fc3f7;letter-spacing:2px;margin-bottom:7px;}}
