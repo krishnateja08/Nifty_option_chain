@@ -1,5 +1,26 @@
 [
   {
+    "time": "14:46",
+    "timestamp": "18-Mar-2026 14:46 IST",
+    "call_oi_chg": 318224,
+    "put_oi_chg": 541023,
+    "diff": 222799,
+    "pcr": 1.12,
+    "opt_signal": "BUY",
+    "vwap": 26902.79,
+    "fut_price": 15973.6,
+    "spot_price": 23783.45,
+    "vwap_signal": "SELL",
+    "nifty_move_pct": 0.86,
+    "nearest_level": 23925,
+    "nearest_label": "R1",
+    "distance_pts": 141.5,
+    "rsi_15m": 47.4,
+    "ema_signal": "BUY",
+    "ema5": 23802.11,
+    "ema13": 23793.23
+  },
+  {
     "time": "14:44",
     "timestamp": "18-Mar-2026 14:44 IST",
     "call_oi_chg": 332623,
@@ -4177,26 +4198,5 @@
     "ema_signal": "BUY",
     "ema5": 23665.18,
     "ema13": 23605.22
-  },
-  {
-    "time": "09:56",
-    "timestamp": "18-Mar-2026 09:56 IST",
-    "call_oi_chg": 316786,
-    "put_oi_chg": 314352,
-    "diff": -2434,
-    "pcr": 0.82,
-    "opt_signal": "NEUTRAL",
-    "vwap": 26848.56,
-    "fut_price": 15835.0,
-    "spot_price": 23693.55,
-    "vwap_signal": "SELL",
-    "nifty_move_pct": 0.48,
-    "nearest_level": null,
-    "nearest_label": null,
-    "distance_pts": null,
-    "rsi_15m": 70.1,
-    "ema_signal": "BUY",
-    "ema5": 23671.05,
-    "ema13": 23607.74
   }
 ]
