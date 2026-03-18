@@ -4968,27 +4968,29 @@ function renderOITable(data) {
                     } else {
                         rsiCol='#ffb74d'; rsiBg='rgba(255,183,77,0.08)'; rsiBdr='rgba(255,183,77,0.2)'; rsiLbl='';
                     }
-                    var badge = rsiLbl ? '<span style="font-size:8px;font-weight:700;letter-spacing:1px;padding:1px 5px;border-radius:3px;background:'+rsiBg+';color:'+rsiCol+';border:1px solid '+rsiBdr+';">'+rsiLbl+'</span>' : '';
+                    var rsiBadge = rsiLbl
+                        ? '<span style="font-size:8px;font-weight:700;letter-spacing:1px;padding:1px 5px;border-radius:3px;background:'+rsiBg+';color:'+rsiCol+';border:1px solid '+rsiBdr+';">'+rsiLbl+'</span>'
+                        : '<span style="font-size:8px;color:rgba(128,222,234,0.3);">neutral</span>';
                     return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
-                        + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:'+rsiCol+';">'+rsi.toFixed(1)+'</span>'
-                        + (badge ? badge : '<span style="font-size:8px;color:rgba(128,222,234,0.3);">neutral</span>')
+                        + '<span style="font-family:monospace;font-size:12px;font-weight:700;color:'+rsiCol+';">'+rsi.toFixed(1)+'</span>'
+                        + rsiBadge
                         + '</div></td>';
                 })()
                 + (function(){
-                    var sig = row.ema_signal;
+                    var emaSig = row.ema_signal;
                     var e5  = row.ema5;
                     var e13 = row.ema13;
-                    if (!sig || e5 == null || e13 == null) return '<td><span style="color:rgba(176,190,197,0.25);">—</span></td>';
-                    var isBuy = sig === 'BUY';
-                    var col   = isBuy ? '#00e676' : '#ff4757';
-                    var bg    = isBuy ? 'rgba(0,230,118,0.12)' : 'rgba(255,71,87,0.12)';
-                    var bdr   = isBuy ? 'rgba(0,230,118,0.3)'  : 'rgba(255,71,87,0.3)';
-                    var arrow = isBuy ? '▲' : '▼';
-                    var diff  = Math.abs(e5 - e13).toFixed(1);
+                    if (!emaSig || e5 == null || e13 == null) return '<td><span style="color:rgba(176,190,197,0.25);">—</span></td>';
+                    var emaIsBuy = emaSig === 'BUY';
+                    var eCol = emaIsBuy ? '#00e676' : '#ff4757';
+                    var eBg  = emaIsBuy ? 'rgba(0,230,118,0.12)' : 'rgba(255,71,87,0.12)';
+                    var eBdr = emaIsBuy ? 'rgba(0,230,118,0.3)'  : 'rgba(255,71,87,0.3)';
+                    var eArr = emaIsBuy ? '▲' : '▼';
+                    var eGap = Math.abs(e5 - e13).toFixed(1);
                     return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
-                        + '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:700;background:'+bg+';color:'+col+';border:1px solid '+bdr+';">'
-                        + arrow + ' ' + sig + '</span>'
-                        + '<span style="font-size:8px;color:rgba(128,222,234,0.3);font-family:\'JetBrains Mono\',monospace;">gap '+diff+'</span>'
+                        + '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:700;background:'+eBg+';color:'+eCol+';border:1px solid '+eBdr+';">'
+                        + eArr + ' ' + emaSig + '</span>'
+                        + '<span style="font-size:8px;color:rgba(128,222,234,0.3);font-family:monospace;">gap '+eGap+'</span>'
                         + '</div></td>';
                 })()
                 + (function(){
