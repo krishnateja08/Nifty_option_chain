@@ -4577,6 +4577,36 @@ class NiftyHTMLAnalyzer:
 
     def generate_html_email(self, vol_support=None, vol_resistance=None, global_bias=None, vol_view="normal"):
         d=self.html_data
+        # ── Header derived values ─────────────────────────────────────────
+        # Expiry countdown
+        try:
+            from datetime import datetime as _dt
+            expiry_dt = _dt.strptime(d.get('expiry',''), '%d-%b-%Y')
+            days_left = (expiry_dt.date() - _dt.now().date()).days
+            expiry_days_str = f"{days_left}d left" if days_left >= 0 else "Expired"
+            expiry_days_col = '#00e676' if days_left > 3 else ('#ff9800' if days_left > 0 else '#ff4757')
+        except Exception:
+            expiry_days_str = '—'; expiry_days_col = '#ffb74d'
+        # VIX
+        vix_val   = d.get('vix_val')
+        vix_trend = d.get('vix_trend','')
+        vix_str   = f"{vix_val:.1f}" if vix_val else 'N/A'
+        vix_arrow = ' ▲' if vix_trend == 'rising' else (' ▼' if vix_trend == 'falling' else '')
+        vix_col   = '#ff9800' if vix_val and vix_val > 16 else ('#00e676' if vix_val and vix_val < 13 else '#ffb74d')
+        # FII/DII net
+        fii_summ  = d.get('fii_dii_summ', {})
+        fii_avg   = fii_summ.get('fii_avg', 0)
+        dii_avg   = fii_summ.get('dii_avg', 0)
+        fii_col   = '#ff4757' if fii_avg < 0 else '#00e676'
+        dii_col   = '#00e676' if dii_avg >= 0 else '#ff4757'
+        fii_hdr   = f"{'+'if fii_avg>=0 else ''}{fii_avg:,.0f}Cr"
+        dii_hdr   = f"{'+'if dii_avg>=0 else ''}{dii_avg:,.0f}Cr"
+        # Global bias
+        gb_str  = (global_bias or 'N/A').upper()
+        gb_col  = '#00e676' if gb_str=='BULLISH' else ('#ff4757' if gb_str=='BEARISH' else '#ffb74d')
+        # Spot + PCR colours
+        pcr_v   = d.get('pcr', 1.0) if d.get('has_option_data') else 1.0
+        pcr_col = '#00e676' if pcr_v > 1.2 else ('#ff4757' if pcr_v < 0.7 else '#ffb74d')
         sma20_bar ='bar-teal' if d['sma_20_above']  else 'bar-red'
         sma50_bar ='bar-teal' if d['sma_50_above']  else 'bar-red'
         sma200_bar='bar-teal' if d['sma_200_above'] else 'bar-red'
@@ -5562,21 +5592,59 @@ function mobNavTo(secId, tabId, label) {
         .tab-panel.active{{display:block;}}
 
         .container{{max-width:100%;width:100%;margin:0;background:rgba(15,32,39,0.85);backdrop-filter:blur(20px);border-radius:0;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:none;min-width:0;}}
-        .header{{background:linear-gradient(135deg,#0f2027,#203a43);padding:clamp(16px,3vw,32px) clamp(14px,3vw,30px) 0;text-align:center;position:relative;overflow:hidden;}}
-        .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(79,195,247,0.08) 0%,transparent 70%);pointer-events:none;}}
-        .header h1{{font-family:'Oxanium',sans-serif;font-size:clamp(16px,3.5vw,30px);font-weight:800;color:#4fc3f7;text-shadow:0 0 30px rgba(79,195,247,0.5);letter-spacing:clamp(0.5px,0.3vw,2px);position:relative;z-index:1;word-break:break-word;margin-bottom:clamp(10px,2vw,18px);}}
-        .status-bar{{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;background:rgba(0,0,0,0.30);border:1px solid rgba(79,195,247,0.15);border-radius:10px;padding:0;overflow:hidden;position:relative;z-index:1;box-shadow:inset 0 1px 0 rgba(79,195,247,0.12);margin-bottom:16px;}}
-        .sb-item{{display:flex;align-items:center;gap:8px;padding:10px clamp(10px,2vw,20px);flex:1 1 auto;min-width:0;border-right:1px solid rgba(79,195,247,0.10);white-space:nowrap;}}
-        .sb-item:last-child{{border-right:none;}}
-        .sb-dot{{width:8px;height:8px;border-radius:50%;flex-shrink:0;}}
+
+        /* ══ OPTION B HEADER ══════════════════════════════════════════ */
+        .header{{background:linear-gradient(180deg,#061828 0%,#04111f 100%);border-bottom:2px solid rgba(79,195,247,0.2);padding:0;position:relative;overflow:hidden;}}
+        .header::before{{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(79,195,247,0.05) 0%,transparent 60%);pointer-events:none;}}
+
+        /* Banner row */
+        .hb-banner{{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(79,195,247,0.1);flex-wrap:wrap;gap:10px;position:relative;z-index:1;}}
+        .hb-left{{display:flex;align-items:center;gap:10px;}}
+        .hb-nse-badge{{padding:3px 10px;border-radius:5px;font-family:'Oxanium',sans-serif;font-size:10px;font-weight:900;letter-spacing:2px;color:#000;background:linear-gradient(135deg,#4fc3f7,#00e5ff);flex-shrink:0;}}
+        .hb-title-main{{font-family:'Oxanium',sans-serif;font-size:clamp(13px,2vw,18px);font-weight:900;color:#ffffff;letter-spacing:0.5px;}}
+        .hb-title-sub{{font-size:9px;letter-spacing:2px;color:rgba(79,195,247,0.55);text-transform:uppercase;margin-top:2px;}}
+        .hb-chips{{display:flex;gap:6px;flex-wrap:wrap;}}
+        .hb-chip{{text-align:center;padding:5px 12px;border-radius:8px;background:rgba(0,0,0,0.35);border:1px solid rgba(79,195,247,0.14);flex-shrink:0;}}
+        .hb-chip-lbl{{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;color:rgba(128,222,234,0.5);text-transform:uppercase;margin-bottom:2px;}}
+        .hb-chip-val{{font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;line-height:1;}}
+
+        /* Status row */
+        .hb-status{{display:flex;align-items:center;justify-content:space-between;padding:6px 20px;background:rgba(0,0,0,0.25);flex-wrap:wrap;gap:6px;position:relative;z-index:1;border-bottom:1px solid rgba(79,195,247,0.07);}}
+        .hb-s-item{{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(176,190,197,0.5);white-space:nowrap;}}
+        .hb-s-dot{{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:sb-pulse 2s ease-in-out infinite;}}
+        .hb-s-val{{font-weight:700;color:#80deea;margin-left:2px;}}
+
+        /* Tabs */
+        .tab-nav{{display:flex;gap:0;border-bottom:none;overflow-x:auto;scrollbar-width:none;background:rgba(0,0,0,0.2);position:relative;z-index:1;}}
+        .tab-nav::-webkit-scrollbar{{display:none;}}
+        .tab-btn{{display:flex;align-items:center;gap:8px;padding:11px clamp(12px,2vw,22px);font-family:'Oxanium',sans-serif;font-size:clamp(9px,1.2vw,11px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(176,190,197,0.45);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s ease;position:relative;bottom:-1px;}}
+        .tab-btn:hover{{color:#4fc3f7;background:rgba(79,195,247,0.05);}}
+        .tab-btn.active{{color:#4fc3f7;border-bottom-color:#4fc3f7;background:rgba(79,195,247,0.07);}}
+        .tab-dot{{width:6px;height:6px;border-radius:50%;background:rgba(79,195,247,0.3);flex-shrink:0;transition:all 0.25s ease;}}
+        .tab-btn.active .tab-dot{{background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;}}
+        .tab-badge{{font-size:8px;padding:2px 6px;border-radius:8px;background:rgba(79,195,247,0.12);border:1px solid rgba(79,195,247,0.25);color:#4fc3f7;}}
+        .new-badge .tab-badge{{background:rgba(192,132,252,0.12);border-color:rgba(192,132,252,0.3);color:#c084fc;}}
+        .tab-panel{{display:none;}}
+        .tab-panel.active{{display:block;}}
+
+        /* Status bar dots kept for JS compatibility */
         .sb-dot-gen{{background:#00e676;box-shadow:0 0 8px #00e676;}}
         .sb-dot-clock{{background:#4fc3f7;box-shadow:0 0 8px #4fc3f7;}}
-        .sb-dot-updated{{background:#ffb74d;box-shadow:0 0 8px #ffb74d;animation:sb-pulse 2s ease-in-out infinite;}}
         .sb-dot-cd{{background:#b388ff;box-shadow:0 0 8px #b388ff;}}
-        @keyframes sb-pulse{{50%{{opacity:0.2;}}}}
-        .sb-label{{font-family:'JetBrains Mono',monospace;font-size:clamp(8px,1vw,9px);letter-spacing:1.8px;text-transform:uppercase;color:rgba(128,222,234,0.40);flex-shrink:0;}}
-        .sb-value{{font-family:'JetBrains Mono',monospace;font-size:clamp(10px,1.3vw,12px);font-weight:700;color:#e0f7fa;overflow:hidden;text-overflow:ellipsis;}}
-        .sb-value.gen-val{{color:#80deea;}} .sb-value.clock-val{{color:#4fc3f7;font-size:clamp(11px,1.5vw,13px);}} .sb-value.updated-val{{color:#ffb74d;}} .sb-value.cd-val{{color:#b388ff;min-width:28px;}}
+        @keyframes sb-pulse{{50%{{opacity:0.25;}}}}
+
+        /* Responsive header */
+        @media(max-width:900px){{
+            .hb-chips .hb-chip:nth-child(n+4){{display:none;}}
+        }}
+        @media(max-width:600px){{
+            .hb-banner{{padding:10px 12px;gap:8px;}}
+            .hb-chips{{display:none;}}
+            .hb-title-main{{font-size:13px;}}
+            .hb-status{{padding:6px 12px;gap:4px;}}
+            .hb-s-item{{font-size:9px;}}
+            .tab-btn{{padding:9px 10px;font-size:9px;letter-spacing:0.8px;}}
+        }}
 
         .section{{padding:clamp(14px,2.5vw,28px) clamp(12px,2.5vw,26px);border-bottom:1px solid rgba(79,195,247,0.08);}}
         .section:last-child{{border-bottom:none;}}
@@ -6187,14 +6255,13 @@ function mobNavTo(secId, tabId, label) {
             .page-body{{flex-direction:column;}}
             .page-content{{width:100%;min-width:0;}}
 
-            /* Header */
-            .header{{padding:12px 12px 0;}}
-            .header h1{{font-size:14px;letter-spacing:0.5px;margin-bottom:10px;line-height:1.4;}}
-            .status-bar{{margin-bottom:10px;border-radius:8px;}}
-            .sb-item{{padding:8px 10px;flex:1 1 45%;}}
-            .sb-label{{font-size:8px;}}
-            .sb-value{{font-size:11px;}}
-            .tab-btn{{padding:10px 12px;font-size:10px;letter-spacing:0.8px;gap:5px;}}
+            /* Header — Option B mobile */
+            .hb-banner{{padding:10px 12px;gap:8px;}}
+            .hb-chips{{display:none;}}
+            .hb-title-main{{font-size:13px;}}
+            .hb-status{{padding:5px 12px;gap:4px;flex-wrap:wrap;}}
+            .hb-s-item{{font-size:9px;}}
+            .tab-btn{{padding:9px 10px;font-size:9px;letter-spacing:0.8px;gap:5px;}}
             .tab-badge{{font-size:8px;padding:2px 5px;}}
 
             /* Sections */
@@ -6272,19 +6339,18 @@ function mobNavTo(secId, tabId, label) {
         }}
 
         @media(max-width:480px){{
-            .header h1{{font-size:13px;}}
+            .hb-title-main{{font-size:12px;}}
+            .hb-s-item{{font-size:8px;}}
             .grid-5,.grid-4{{grid-template-columns:1fr!important;}}
             .snap-grid{{grid-template-columns:1fr!important;}}
             .pf-grid{{grid-template-columns:1fr!important;}}
             .oi-summary-strip{{grid-template-columns:1fr 1fr;}}
             .hm-grid{{grid-template-columns:repeat(4,minmax(0,1fr))!important;}}
             .tab-btn{{padding:9px 9px;font-size:9px;letter-spacing:0.5px;}}
-            .sb-item{{flex:1 1 45%;border-right:none;border-bottom:1px solid rgba(79,195,247,0.08);}}
-            .sb-item:nth-child(odd){{border-right:1px solid rgba(79,195,247,0.08);}}
         }}
 
         @media(max-width:360px){{
-            .header h1{{font-size:12px;}}
+            .hb-title-main{{font-size:11px;}}
             .oi-summary-strip{{grid-template-columns:1fr;}}
             .hm-grid{{grid-template-columns:repeat(3,minmax(0,1fr))!important;}}
             .nsb-mob-title{{font-size:11px;}}
@@ -6294,25 +6360,70 @@ function mobNavTo(secId, tabId, label) {
 <body>
 <div class="container">
     <div class="header">
-        <h1>&#128202; NIFTY 50 OPEN INTEREST (OI) ANALYSIS &amp; DAILY SENTIMENT REPORT</h1>
-        <div class="status-bar">
-            <div class="sb-item">
-                <span class="sb-dot sb-dot-gen"></span>
-                <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">{d['timestamp']}</span>
+
+        <!-- Banner row: brand + live market chips -->
+        <div class="hb-banner">
+            <div class="hb-left">
+                <span class="hb-nse-badge">NSE</span>
+                <div>
+                    <div class="hb-title-main">&#128202; Nifty 50 &nbsp;&middot;&nbsp; OI Analysis &amp; Daily Sentiment</div>
+                    <div class="hb-title-sub">Algorithmic &nbsp;&middot;&nbsp; Auto-refresh &nbsp;&middot;&nbsp; IST Timestamps &nbsp;&middot;&nbsp; Deep Ocean v2</div>
+                </div>
             </div>
-            <div class="sb-item">
-                <span class="sb-dot sb-dot-clock"></span>
-                <span class="sb-label">IST Now</span>
-                <span class="sb-value clock-val" id="live-ist-clock">--:--:--</span>
-            </div>
-            
-            <div class="sb-item">
-                <span class="sb-dot sb-dot-cd"></span>
-                <span class="sb-label">Next Refresh</span>
-                <span class="sb-value cd-val" id="refresh-countdown">30s</span>
+            <div class="hb-chips">
+                <div class="hb-chip">
+                    <div class="hb-chip-lbl">Spot Price</div>
+                    <div class="hb-chip-val" style="color:#00e676;">&#8377;{d['current_price']:,.0f}</div>
+                </div>
+                <div class="hb-chip">
+                    <div class="hb-chip-lbl">PCR</div>
+                    <div class="hb-chip-val" style="color:{pcr_col};">{pcr_v:.3f}</div>
+                </div>
+                <div class="hb-chip">
+                    <div class="hb-chip-lbl">India VIX</div>
+                    <div class="hb-chip-val" style="color:{vix_col};">{vix_str}{vix_arrow}</div>
+                </div>
+                <div class="hb-chip">
+                    <div class="hb-chip-lbl">Max Pain</div>
+                    <div class="hb-chip-val" style="color:#ffb74d;">&#8377;{d.get('max_pain',0):,}</div>
+                </div>
+                <div class="hb-chip">
+                    <div class="hb-chip-lbl">Expiry</div>
+                    <div class="hb-chip-val" style="color:#4fc3f7;font-size:11px;">{d.get('expiry','N/A')}</div>
+                </div>
+                <div class="hb-chip">
+                    <div class="hb-chip-lbl">Days Left</div>
+                    <div class="hb-chip-val" style="color:{expiry_days_col};">{expiry_days_str}</div>
+                </div>
             </div>
         </div>
+
+        <!-- Status row: generated, clock, refresh, global bias, FII/DII -->
+        <div class="hb-status">
+            <div class="hb-s-item">
+                <div class="hb-s-dot" style="background:#00e676;box-shadow:0 0 6px #00e676;"></div>
+                Generated <span class="hb-s-val" id="hb-gen">{d['timestamp']}</span>
+            </div>
+            <div class="hb-s-item">
+                <div class="hb-s-dot" style="background:#4fc3f7;box-shadow:0 0 6px #4fc3f7;"></div>
+                IST Now <span class="hb-s-val" style="color:#4fc3f7;" id="live-ist-clock">--:--:--</span>
+            </div>
+            <div class="hb-s-item">
+                <div class="hb-s-dot" style="background:#b388ff;box-shadow:0 0 6px #b388ff;"></div>
+                Next Refresh <span class="hb-s-val" style="color:#b388ff;" id="refresh-countdown">30s</span>
+            </div>
+            <div class="hb-s-item">
+                &#127760; Global <span class="hb-s-val" style="color:{gb_col};">{gb_str}</span>
+            </div>
+            <div class="hb-s-item">
+                &#127982; FII <span class="hb-s-val" style="color:{fii_col};">{fii_hdr}</span>
+            </div>
+            <div class="hb-s-item">
+                &#127982; DII <span class="hb-s-val" style="color:{dii_col};">{dii_hdr}</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
         <div class="tab-nav" id="tabNav">
             <button class="tab-btn active" data-tab="main" onclick="switchTab('main')">
                 <span class="tab-dot"></span> &#128200; Main Analysis <span class="tab-badge">LIVE</span>
@@ -6321,13 +6432,13 @@ function mobNavTo(secId, tabId, label) {
                 <span class="tab-dot"></span> &#127956; Heatmap <span class="tab-badge">LIVE</span>
             </button>
             <button class="tab-btn" data-tab="oi-trend" onclick="switchTab('oi-trend')">
-                <span class="tab-dot"></span> &#128202; Intraday OI Trend <span class="tab-badge">IST</span>
+                <span class="tab-dot"></span> &#128202; Intraday OI <span class="tab-badge">IST</span>
             </button>
             <button class="tab-btn new-badge" data-tab="checklist" onclick="switchTab('checklist')">
-                <span class="tab-dot"></span> &#129504; Strategy Checklist <span class="tab-badge">NEW</span>
+                <span class="tab-dot"></span> &#129504; Strategy <span class="tab-badge">NEW</span>
             </button>
             <button class="tab-btn" data-tab="pretrade" onclick="switchTab('pretrade')">
-                <span class="tab-dot"></span> &#9989; Pre-Trade Rules <span class="tab-badge">23</span>
+                <span class="tab-dot"></span> &#9989; Pre-Trade <span class="tab-badge">23</span>
             </button>
         </div>
     </div>
