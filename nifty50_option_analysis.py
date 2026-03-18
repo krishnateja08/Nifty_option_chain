@@ -5103,7 +5103,7 @@ function renderOITable(data) {
                     // Look at up to 3 older snapshots (idx+1 … idx+3) and compare
                     // their spot_price with the current row's spot_price.
                     // Net positive drift → WATCH BULL, net negative → WATCH BEAR,
-                    // truly flat (< ±5 pts across all samples) → Flat momentum.
+                    // truly flat (< ±20 pts across all samples) → Flat momentum.
                     var curSpot  = row.spot_price || 0;
                     var momSum   = 0;
                     var momCount = 0;
@@ -5115,7 +5115,7 @@ function renderOITable(data) {
                         }
                     }
                     var momAvg = momCount > 0 ? momSum / momCount : 0;
-                    if (momAvg > 5) {
+                    if (momAvg > 20) {
                         // Price drifting upward across recent snapshots
                         wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                             + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
@@ -5125,7 +5125,7 @@ function renderOITable(data) {
                             + '</div>';
                         wdHtml = '<span style="font-size:9px;color:rgba(181,234,58,0.6);font-family:monospace;font-weight:600;">'
                             + '▲ +' + Math.abs(momAvg).toFixed(1) + ' pts<br>avg drift</span>';
-                    } else if (momAvg < -5) {
+                    } else if (momAvg < -20) {
                         // Price drifting downward
                         wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                             + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'

@@ -926,7 +926,7 @@
         <div class="hb-status">
             <div class="hb-s-item">
                 <div class="hb-s-dot" style="background:#00e676;box-shadow:0 0 6px #00e676;"></div>
-                Generated <span class="hb-s-val" id="hb-gen">19-Mar-2026 04:03 IST</span>
+                Generated <span class="hb-s-val" id="hb-gen">19-Mar-2026 04:16 IST</span>
             </div>
             <div class="hb-s-item">
                 <div class="hb-s-dot" style="background:#4fc3f7;box-shadow:0 0 6px #4fc3f7;"></div>
@@ -1055,7 +1055,7 @@
   <div class="ssb-wrap">
     <div class="ssb-header">
       <span class="ssb-title">&#9889; SIGNAL SUMMARY</span>
-      <span class="ssb-ts">19-Mar-2026 04:03 IST</span>
+      <span class="ssb-ts">19-Mar-2026 04:16 IST</span>
     </div>
     <div class="ssb-grid">
       <div class="ssb-cell"><span class="ssb-cell-lbl">OI Signal</span><span class="ssb-badge" style="color:#00e676;background:rgba(0,230,118,0.12);border:1px solid rgba(0,230,118,0.3);">&#9651; Bullish</span><span class="ssb-sub">Put Build-up Dominant</span></div>
@@ -2354,7 +2354,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 19-Mar-2026 04:03 IST</span>
+            <span>Stock data as of: 19-Mar-2026 04:16 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -3952,7 +3952,7 @@ function renderOITable(data) {
                     // Look at up to 3 older snapshots (idx+1 … idx+3) and compare
                     // their spot_price with the current row's spot_price.
                     // Net positive drift → WATCH BULL, net negative → WATCH BEAR,
-                    // truly flat (< ±5 pts across all samples) → Flat momentum.
+                    // truly flat (< ±20 pts across all samples) → Flat momentum.
                     var curSpot  = row.spot_price || 0;
                     var momSum   = 0;
                     var momCount = 0;
@@ -3964,7 +3964,7 @@ function renderOITable(data) {
                         }
                     }
                     var momAvg = momCount > 0 ? momSum / momCount : 0;
-                    if (momAvg > 5) {
+                    if (momAvg > 20) {
                         // Price drifting upward across recent snapshots
                         wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                             + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
@@ -3974,7 +3974,7 @@ function renderOITable(data) {
                             + '</div>';
                         wdHtml = '<span style="font-size:9px;color:rgba(181,234,58,0.6);font-family:monospace;font-weight:600;">'
                             + '▲ +' + Math.abs(momAvg).toFixed(1) + ' pts<br>avg drift</span>';
-                    } else if (momAvg < -5) {
+                    } else if (momAvg < -20) {
                         // Price drifting downward
                         wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                             + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
