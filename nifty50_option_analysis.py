@@ -1766,6 +1766,37 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
                 nearest_label = "R1"
                 distance_pts  = round(abs(r1 - spot), 1)
 
+    # ── RSI 14-period + EMA 5/13 on 15-min candles ────────────────────────
+    # Single yfinance fetch shared by both indicators — no double API call.
+    rsi_15m    = None
+    ema_signal = None   # "BUY" | "SELL"
+    ema5_val   = None
+    ema13_val  = None
+    try:
+        import yfinance as _yf
+        df_15 = _yf.Ticker("^NSEI").history(period="5d", interval="15m")
+        if df_15 is not None and len(df_15) >= 20:
+            close = df_15['Close'].dropna()
+            # ── RSI 14 ──────────────────────────────────────────────────
+            delta  = close.diff()
+            gain   = delta.where(delta > 0, 0.0).rolling(14).mean()
+            loss   = (-delta.where(delta < 0, 0.0)).rolling(14).mean()
+            rs     = gain / loss.replace(0, float('inf'))
+            rsi_s  = 100 - (100 / (1 + rs))
+            rsi_15m = round(float(rsi_s.iloc[-1]), 1) if not pd.isna(rsi_s.iloc[-1]) else None
+            # ── EMA 5 / 13 ──────────────────────────────────────────────
+            ema5  = close.ewm(span=5,  adjust=False).mean()
+            ema13 = close.ewm(span=13, adjust=False).mean()
+            ema5_val  = round(float(ema5.iloc[-1]),  2) if not pd.isna(ema5.iloc[-1])  else None
+            ema13_val = round(float(ema13.iloc[-1]), 2) if not pd.isna(ema13.iloc[-1]) else None
+            if ema5_val and ema13_val:
+                ema_signal = "BUY" if ema5_val > ema13_val else "SELL"
+            print(f"  ✅ RSI 15m: {rsi_15m} | EMA5: {ema5_val} EMA13: {ema13_val} → {ema_signal}")
+        else:
+            print(f"  ⚠️  RSI/EMA: insufficient 15m bars ({len(df_15) if df_15 is not None else 0})")
+    except Exception as e:
+        print(f"  ⚠️  RSI/EMA 15m calc failed: {e}")
+
     snapshot = {
         "time":          ist_now.strftime("%H:%M"),
         "timestamp":     ist_now.strftime("%d-%b-%Y %H:%M IST"),
@@ -1774,14 +1805,18 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
         "diff":          diff,
         "pcr":           pcr,
         "opt_signal":    opt_signal,
-        "vwap":            vwap,
-        "fut_price":       fut_price,
-        "spot_price":      spot,
-        "vwap_signal":     vwap_signal,
-        "nifty_move_pct":  nifty_move_pct,
-        "nearest_level":   nearest_level,
+        "vwap":          vwap,
+        "fut_price":     fut_price,
+        "spot_price":    spot,
+        "vwap_signal":   vwap_signal,
+        "nifty_move_pct": nifty_move_pct,
+        "nearest_level": nearest_level,
         "nearest_label": nearest_label,
         "distance_pts":  distance_pts,
+        "rsi_15m":       rsi_15m,
+        "ema_signal":    ema_signal,
+        "ema5":          ema5_val,
+        "ema13":         ema13_val,
     }
 
     log_file = "oi_log.json"
@@ -1969,11 +2004,13 @@ def build_intraday_oi_tab_html():
                 <th>STREAK</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
+                <th>RSI 15M</th>
+                <th>EMA 5/13</th>
                 <th class="col-detail">VWAP</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
-              <tr><td colspan="13" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
+              <tr><td colspan="15" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
             </tbody>
           </table>
         </div>
@@ -1987,6 +2024,8 @@ def build_intraday_oi_tab_html():
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
             <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
             <div class="logic-item"><span class="lc-bull">STREAK</span> Consecutive snapshots with same signal &nbsp;&middot;&nbsp; &#215;1 = just flipped &nbsp;&middot;&nbsp; &#215;5+ = strong trend</div>
+            <div class="logic-item"><span class="lc-info">RSI 15M</span> 14-period RSI on 15-min candles &nbsp;&middot;&nbsp; <span class="lc-bull">&lt;30 = Oversold (OS) &nbsp;BUY zone</span> &nbsp;<span class="lc-bear">&gt;70 = Overbought (OB) &nbsp;SELL zone</span> &nbsp;&middot;&nbsp; 55+ = mild bull &nbsp;45&minus; = mild bear</div>
+            <div class="logic-item"><span class="lc-info">EMA 5/13</span> 15-min EMA crossover &nbsp;&middot;&nbsp; <span class="lc-bull">▲ BUY = EMA5 &gt; EMA13 (uptrend)</span> &nbsp;<span class="lc-bear">▼ SELL = EMA5 &lt; EMA13 (downtrend)</span> &nbsp;&middot;&nbsp; Gap = distance between EMAs (bigger = stronger trend)</div>
             <div class="logic-item"><span class="lc-info">VWAP</span> Volume Weighted Avg Price &nbsp;&middot;&nbsp; <span class="lc-bull">▲ Above = Bullish bias</span> &nbsp;<span class="lc-bear">▼ Below = Bearish bias</span></div>
             <div class="logic-item"><span class="lc-info">Timestamps</span> All times shown in IST (Asia/Kolkata)</div>
           </div>
@@ -4752,7 +4791,7 @@ function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
     if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" class="oi-empty-state">&#128218; No data yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="15" class="oi-empty-state">&#128218; No data yet.</td></tr>';
         return;
     }
     var filtered = filterByInterval(data, _oiInterval);
@@ -4914,6 +4953,44 @@ function renderOITable(data) {
                 + '<td>' + streakHtml + '</td>'
                 + '<td>' + nlevelHtml + '</td>'
                 + '<td>' + distHtml + '</td>'
+                + (function(){
+                    var rsi = row.rsi_15m;
+                    if (rsi == null) return '<td><span style="color:rgba(176,190,197,0.25);">—</span></td>';
+                    var rsiCol, rsiBg, rsiBdr, rsiLbl;
+                    if (rsi >= 70) {
+                        rsiCol='#ff4757'; rsiBg='rgba(255,71,87,0.12)'; rsiBdr='rgba(255,71,87,0.3)'; rsiLbl='OB';
+                    } else if (rsi <= 30) {
+                        rsiCol='#00e676'; rsiBg='rgba(0,230,118,0.12)'; rsiBdr='rgba(0,230,118,0.3)'; rsiLbl='OS';
+                    } else if (rsi >= 55) {
+                        rsiCol='#69f0ae'; rsiBg='rgba(105,240,174,0.08)'; rsiBdr='rgba(105,240,174,0.25)'; rsiLbl='';
+                    } else if (rsi <= 45) {
+                        rsiCol='#fca5a5'; rsiBg='rgba(252,165,165,0.08)'; rsiBdr='rgba(252,165,165,0.25)'; rsiLbl='';
+                    } else {
+                        rsiCol='#ffb74d'; rsiBg='rgba(255,183,77,0.08)'; rsiBdr='rgba(255,183,77,0.2)'; rsiLbl='';
+                    }
+                    var badge = rsiLbl ? '<span style="font-size:8px;font-weight:700;letter-spacing:1px;padding:1px 5px;border-radius:3px;background:'+rsiBg+';color:'+rsiCol+';border:1px solid '+rsiBdr+';">'+rsiLbl+'</span>' : '';
+                    return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+                        + '<span style="font-family:\'JetBrains Mono\',monospace;font-size:12px;font-weight:700;color:'+rsiCol+';">'+rsi.toFixed(1)+'</span>'
+                        + (badge ? badge : '<span style="font-size:8px;color:rgba(128,222,234,0.3);">neutral</span>')
+                        + '</div></td>';
+                })()
+                + (function(){
+                    var sig = row.ema_signal;
+                    var e5  = row.ema5;
+                    var e13 = row.ema13;
+                    if (!sig || e5 == null || e13 == null) return '<td><span style="color:rgba(176,190,197,0.25);">—</span></td>';
+                    var isBuy = sig === 'BUY';
+                    var col   = isBuy ? '#00e676' : '#ff4757';
+                    var bg    = isBuy ? 'rgba(0,230,118,0.12)' : 'rgba(255,71,87,0.12)';
+                    var bdr   = isBuy ? 'rgba(0,230,118,0.3)'  : 'rgba(255,71,87,0.3)';
+                    var arrow = isBuy ? '▲' : '▼';
+                    var diff  = Math.abs(e5 - e13).toFixed(1);
+                    return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+                        + '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:700;background:'+bg+';color:'+col+';border:1px solid '+bdr+';">'
+                        + arrow + ' ' + sig + '</span>'
+                        + '<span style="font-size:8px;color:rgba(128,222,234,0.3);font-family:\'JetBrains Mono\',monospace;">gap '+diff+'</span>'
+                        + '</div></td>';
+                })()
                 + (function(){
                     var vwapVal = row.vwap;
                     if (vwapVal == null || vwapVal === 0) {
@@ -5208,7 +5285,7 @@ function loadOILog() {
         })
         .catch(function(e) {
             var tbody = document.getElementById('oiTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="13" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="15" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
         });
 }
 

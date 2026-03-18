@@ -811,7 +811,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">18-Mar-2026 06:27 IST</span>
+                <span class="sb-value gen-val">18-Mar-2026 06:39 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -2308,7 +2308,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 18-Mar-2026 06:27 IST</span>
+            <span>Stock data as of: 18-Mar-2026 06:39 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -2617,11 +2617,13 @@
                 <th>STREAK</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
+                <th>RSI 15M</th>
+                <th>EMA 5/13</th>
                 <th class="col-detail">VWAP</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
-              <tr><td colspan="13" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
+              <tr><td colspan="15" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
             </tbody>
           </table>
         </div>
@@ -2635,6 +2637,8 @@
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
             <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
             <div class="logic-item"><span class="lc-bull">STREAK</span> Consecutive snapshots with same signal &nbsp;&middot;&nbsp; &#215;1 = just flipped &nbsp;&middot;&nbsp; &#215;5+ = strong trend</div>
+            <div class="logic-item"><span class="lc-info">RSI 15M</span> 14-period RSI on 15-min candles &nbsp;&middot;&nbsp; <span class="lc-bull">&lt;30 = Oversold (OS) &nbsp;BUY zone</span> &nbsp;<span class="lc-bear">&gt;70 = Overbought (OB) &nbsp;SELL zone</span> &nbsp;&middot;&nbsp; 55+ = mild bull &nbsp;45&minus; = mild bear</div>
+            <div class="logic-item"><span class="lc-info">EMA 5/13</span> 15-min EMA crossover &nbsp;&middot;&nbsp; <span class="lc-bull">▲ BUY = EMA5 &gt; EMA13 (uptrend)</span> &nbsp;<span class="lc-bear">▼ SELL = EMA5 &lt; EMA13 (downtrend)</span> &nbsp;&middot;&nbsp; Gap = distance between EMAs (bigger = stronger trend)</div>
             <div class="logic-item"><span class="lc-info">VWAP</span> Volume Weighted Avg Price &nbsp;&middot;&nbsp; <span class="lc-bull">▲ Above = Bullish bias</span> &nbsp;<span class="lc-bear">▼ Below = Bearish bias</span></div>
             <div class="logic-item"><span class="lc-info">Timestamps</span> All times shown in IST (Asia/Kolkata)</div>
           </div>
@@ -3569,7 +3573,7 @@ function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
     if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" class="oi-empty-state">&#128218; No data yet.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="15" class="oi-empty-state">&#128218; No data yet.</td></tr>';
         return;
     }
     var filtered = filterByInterval(data, _oiInterval);
@@ -3731,6 +3735,44 @@ function renderOITable(data) {
                 + '<td>' + streakHtml + '</td>'
                 + '<td>' + nlevelHtml + '</td>'
                 + '<td>' + distHtml + '</td>'
+                + (function(){
+                    var rsi = row.rsi_15m;
+                    if (rsi == null) return '<td><span style="color:rgba(176,190,197,0.25);">—</span></td>';
+                    var rsiCol, rsiBg, rsiBdr, rsiLbl;
+                    if (rsi >= 70) {
+                        rsiCol='#ff4757'; rsiBg='rgba(255,71,87,0.12)'; rsiBdr='rgba(255,71,87,0.3)'; rsiLbl='OB';
+                    } else if (rsi <= 30) {
+                        rsiCol='#00e676'; rsiBg='rgba(0,230,118,0.12)'; rsiBdr='rgba(0,230,118,0.3)'; rsiLbl='OS';
+                    } else if (rsi >= 55) {
+                        rsiCol='#69f0ae'; rsiBg='rgba(105,240,174,0.08)'; rsiBdr='rgba(105,240,174,0.25)'; rsiLbl='';
+                    } else if (rsi <= 45) {
+                        rsiCol='#fca5a5'; rsiBg='rgba(252,165,165,0.08)'; rsiBdr='rgba(252,165,165,0.25)'; rsiLbl='';
+                    } else {
+                        rsiCol='#ffb74d'; rsiBg='rgba(255,183,77,0.08)'; rsiBdr='rgba(255,183,77,0.2)'; rsiLbl='';
+                    }
+                    var badge = rsiLbl ? '<span style="font-size:8px;font-weight:700;letter-spacing:1px;padding:1px 5px;border-radius:3px;background:'+rsiBg+';color:'+rsiCol+';border:1px solid '+rsiBdr+';">'+rsiLbl+'</span>' : '';
+                    return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+                        + '<span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:'+rsiCol+';">'+rsi.toFixed(1)+'</span>'
+                        + (badge ? badge : '<span style="font-size:8px;color:rgba(128,222,234,0.3);">neutral</span>')
+                        + '</div></td>';
+                })()
+                + (function(){
+                    var sig = row.ema_signal;
+                    var e5  = row.ema5;
+                    var e13 = row.ema13;
+                    if (!sig || e5 == null || e13 == null) return '<td><span style="color:rgba(176,190,197,0.25);">—</span></td>';
+                    var isBuy = sig === 'BUY';
+                    var col   = isBuy ? '#00e676' : '#ff4757';
+                    var bg    = isBuy ? 'rgba(0,230,118,0.12)' : 'rgba(255,71,87,0.12)';
+                    var bdr   = isBuy ? 'rgba(0,230,118,0.3)'  : 'rgba(255,71,87,0.3)';
+                    var arrow = isBuy ? '▲' : '▼';
+                    var diff  = Math.abs(e5 - e13).toFixed(1);
+                    return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+                        + '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:700;background:'+bg+';color:'+col+';border:1px solid '+bdr+';">'
+                        + arrow + ' ' + sig + '</span>'
+                        + '<span style="font-size:8px;color:rgba(128,222,234,0.3);font-family:'JetBrains Mono',monospace;">gap '+diff+'</span>'
+                        + '</div></td>';
+                })()
                 + (function(){
                     var vwapVal = row.vwap;
                     if (vwapVal == null || vwapVal === 0) {
@@ -4025,7 +4067,7 @@ function loadOILog() {
         })
         .catch(function(e) {
             var tbody = document.getElementById('oiTableBody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="13" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
+            if (tbody) tbody.innerHTML = '<tr><td colspan="15" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
         });
 }
 
