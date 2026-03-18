@@ -3273,12 +3273,12 @@ class NiftyHTMLAnalyzer:
                 'linear-gradient(90deg,#ffb74d,#ffdd66)'
             )
             sig_rows_html += f"""
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:9px;letter-spacing:1px;color:rgba(180,210,230,0.5);width:52px;text-align:right;flex-shrink:0;">{name}</span>
-              <div style="flex:1;height:6px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:9px;letter-spacing:1px;color:rgba(180,210,230,0.55);width:48px;text-align:right;flex-shrink:0;">{name}</span>
+              <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
                 <div style="height:100%;width:{bar_w}%;border-radius:3px;background:{bar_color_css};"></div>
               </div>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:{val_col};width:24px;flex-shrink:0;">{score_val}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:{val_col};width:22px;flex-shrink:0;">{score_val}</span>
             </div>"""
 
         # ── SVG needle angle: bear_score−bull_score mapped to ±80deg ────────
@@ -3365,29 +3365,29 @@ class NiftyHTMLAnalyzer:
     <div class="section">
         <div class="section-title"><span>&#129517;</span> MARKET DIRECTION (Algorithmic)</div>
 
-        <!-- Price Ticker Strip -->
+        <!-- Price Ticker Strip — compact -->
         <div style="background:linear-gradient(135deg,rgba(8,24,44,0.95),rgba(4,14,26,0.98));
-          border:1px solid {widget_border};border-radius:14px;padding:16px 22px;
-          display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
-          margin-bottom:16px;position:relative;overflow:hidden;">
+          border:1px solid {widget_border};border-radius:14px;padding:8px 16px;
+          display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+          margin-bottom:12px;position:relative;overflow:hidden;">
           <div style="position:absolute;top:0;left:0;right:0;height:2px;
             background:linear-gradient(90deg,transparent,{top_line},transparent);"></div>
           <div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2.5px;
-              color:rgba(120,160,180,0.45);text-transform:uppercase;margin-bottom:4px;">NIFTY 50 · SPOT PRICE</div>
-            <div style="display:flex;align-items:baseline;gap:12px;">
-              <span style="font-family:'Orbitron',monospace;font-size:clamp(26px,4vw,38px);font-weight:900;
+            <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;
+              color:rgba(120,160,180,0.45);text-transform:uppercase;margin-bottom:2px;">NIFTY 50 · SPOT PRICE</div>
+            <div style="display:flex;align-items:baseline;gap:10px;">
+              <span style="font-family:'Orbitron',monospace;font-size:clamp(18px,2.8vw,26px);font-weight:900;
                 color:{score_color};line-height:1;">&#8377;{d['current_price']:,.2f}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:rgba(180,210,230,0.5);">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(180,210,230,0.5);">
                 ATM &#8377;{d['atm_strike']:,} &nbsp;·&nbsp; {d.get('expiry','N/A')}</span>
             </div>
           </div>
-          <div style="display:flex;gap:20px;flex-wrap:wrap;">
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
             {''.join([
               f'<div style="text-align:center;">'
-              f'<div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;'
-              f'color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">{lbl}</div>'
-              f'<div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:{col};">{val}</div>'
+              f'<div style="font-family:JetBrains Mono,monospace;font-size:7px;letter-spacing:1.5px;'
+              f'color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:2px;">{lbl}</div>'
+              f'<div style="font-family:Orbitron,monospace;font-size:12px;font-weight:700;color:{col};">{val}</div>'
               f'</div>'
               for lbl, val, col in [
                 ('PCR (OI)', f"{d.get('pcr',0):.3f}" if d.get('has_option_data') else 'N/A',
@@ -3416,11 +3416,11 @@ class NiftyHTMLAnalyzer:
                 </div>
             </div>
 
-            <!-- Direction + Dial + Signals grid -->
-            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:28px;align-items:center;margin-top:16px;">
+            <!-- Direction + Dial + Signals grid — compact -->
+            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-top:10px;">
 
               <!-- Left: Direction label + score + confidence dots -->
-              <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;flex-direction:column;gap:7px;">
                 <div class="md-direction" style="background:{dir_gradient};
                   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
                   {bias}</div>
@@ -3428,18 +3428,18 @@ class NiftyHTMLAnalyzer:
                   Score: <span style="color:{score_color};font-weight:700;">{score_sign}{total_score}</span>
                   / {bull_score + bear_score} signals
                 </div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
+                <div style="display:flex;align-items:center;gap:5px;">
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:2px;
                     color:rgba(120,160,180,0.35);text-transform:uppercase;">Conf</span>
                   {dots_html}
                 </div>
               </div>
 
-              <!-- Centre: SVG Sentiment Dial -->
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
-                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
-                  color:rgba(120,160,180,0.35);text-transform:uppercase;">Sentiment Dial</div>
-                <svg width="150" height="90" viewBox="0 0 160 95" style="overflow:visible;">
+              <!-- Centre: SVG Sentiment Dial — smaller -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1.5px;
+                  color:rgba(120,160,180,0.35);text-transform:uppercase;">Sentiment</div>
+                <svg width="110" height="65" viewBox="0 0 160 95" style="overflow:visible;">
                   <defs>
                     <linearGradient id="gaugeGradMD" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stop-color="#00ff88"/>
@@ -3463,33 +3463,34 @@ class NiftyHTMLAnalyzer:
                   <text x="126" y="96" fill="#ff3355" font-size="8"
                     font-family="JetBrains Mono" font-weight="700">BEAR</text>
                 </svg>
-                <div style="text-align:center;margin-top:-4px;">
-                  <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:900;
-                    color:{score_color};">{score_sign}{total_score}</div>
-                  <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
-                    color:rgba(120,160,180,0.35);text-transform:uppercase;">Total Score</div>
+                <div style="text-align:center;margin-top:-2px;">
+                  <div style="font-family:'Orbitron',monospace;font-size:18px;font-weight:900;
+                    color:{score_color};line-height:1;">{score_sign}{total_score}</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1.5px;
+                    color:rgba(120,160,180,0.35);text-transform:uppercase;">Score</div>
                 </div>
                 {neutral_sr_html}
               </div>
 
-              <!-- Right: Signal breakdown bars -->
-              <div style="display:flex;flex-direction:column;gap:9px;">
-                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
-                  color:rgba(120,160,180,0.35);text-transform:uppercase;margin-bottom:4px;">
+              <!-- Right: Signal breakdown bars — compact gaps -->
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1.5px;
+                  color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:2px;">
                   Signal Breakdown</div>
                 {sig_rows_html}
               </div>
             </div>
         </div>
 
-        <div class="logic-box" style="margin-top:14px;">
-            <div class="logic-box-head">&#128202; SCORING LOGIC</div>
-            <div class="logic-grid">
-                <div class="logic-item"><span class="lc-bull">BULLISH</span><span class="lv">Diff &ge; +3</span> &middot; Above SMAs, oversold RSI, +MACD, PCR &gt; 1.2</div>
-                <div class="logic-item"><span class="lc-bear">BEARISH</span><span class="lv">Diff &le; &minus;3</span> &middot; Below SMAs, overbought RSI, &minus;MACD, PCR &lt; 0.7</div>
-                <div class="logic-item"><span class="lc-side">SIDEWAYS</span><span class="lv">Diff &minus;2 to +2</span> &middot; Mixed signals, consolidation</div>
-                <div class="logic-item"><span class="lc-info">CONFIDENCE</span> HIGH when gap &ge; 4 &nbsp;&middot;&nbsp; OI scope: ATM &plusmn;10 only</div>
-            </div>
+        <!-- Scoring logic — compact single line -->
+        <div style="margin-top:10px;padding:7px 14px;background:rgba(0,0,0,0.2);border:1px solid rgba(79,195,247,0.07);
+          border-radius:8px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;
+              color:rgba(79,195,247,0.5);text-transform:uppercase;font-weight:700;flex-shrink:0;">Scoring Logic</span>
+            <span style="font-size:9px;color:rgba(176,190,197,0.5);"><span style="color:#00ff88;font-weight:700;">BULLISH</span> &nbsp;Diff &ge; +3</span>
+            <span style="font-size:9px;color:rgba(176,190,197,0.5);"><span style="color:#ff5252;font-weight:700;">BEARISH</span> &nbsp;Diff &le; &minus;3</span>
+            <span style="font-size:9px;color:rgba(176,190,197,0.5);"><span style="color:#ffb74d;font-weight:700;">SIDEWAYS</span> &nbsp;&minus;2 to +2</span>
+            <span style="font-size:9px;color:rgba(176,190,197,0.5);"><span style="color:#4fc3f7;font-weight:700;">CONF</span> &nbsp;HIGH &ge; 4 gap &nbsp;&middot;&nbsp; OI: ATM &plusmn;10 only</span>
         </div>
     </div>
 """
@@ -5631,7 +5632,7 @@ function mobNavTo(secId, tabId, label) {
         .snap-card .card-top-row{{margin-bottom:8px;padding:0;}}
         .snap-card .val{{font-size:clamp(18px,3vw,26px);padding:0;margin-bottom:0;}}
 
-        .md-widget{{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:clamp(12px,2vw,16px) clamp(14px,2vw,20px);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:12px;}}
+        .md-widget{{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:clamp(10px,1.5vw,14px) clamp(12px,1.8vw,18px);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:8px;}}
         .md-glow{{position:absolute;top:-80%;left:-80%;width:260%;height:260%;background:conic-gradient(from 180deg,#ff6b35 0deg,#ffcd3c 120deg,#4ecdc4 240deg,#ff6b35 360deg);opacity:0.05;animation:md-rotate 8s linear infinite;border-radius:50%;pointer-events:none;}}
         @keyframes md-rotate{{to{{transform:rotate(360deg);}}}}
         .md-row-top{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}}
@@ -5646,7 +5647,7 @@ function mobNavTo(secId, tabId, label) {
         .md-pill-conf-med{{background:rgba(255,205,60,0.12);border:1px solid rgba(255,205,60,0.35);color:#ffcd3c;}}
         .md-pill-conf-low{{background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.35);color:#ff6b6b;}}
         .md-row-bottom{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:1;}}
-        .md-direction{{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(22px,5vw,36px);letter-spacing:clamp(1px,0.5vw,3px);line-height:1;}}
+        .md-direction{{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(18px,3.5vw,26px);letter-spacing:clamp(1px,0.3vw,2px);line-height:1;}}
 
         .logic-box{{background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.14);border-left:3px solid #4fc3f7;border-radius:10px;padding:10px 16px;margin-top:12px;}}
         .logic-box-head{{font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;color:#4fc3f7;letter-spacing:2px;margin-bottom:7px;}}
