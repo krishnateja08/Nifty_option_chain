@@ -479,6 +479,40 @@
         @media(max-width:700px){.disc-text{white-space:normal;}}
         .footer{text-align:center;padding:24px;color:#8faabe;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}
 
+        /* ══ SIGNAL SUMMARY BAR ═══════════════════════════════════════════ */
+        .ssb-section{padding:0 clamp(12px,2.5vw,26px) 16px;border-bottom:none!important;}
+        .ssb-wrap{background:rgba(6,13,20,0.9);border:1px solid rgba(79,195,247,0.18);border-radius:14px;overflow:hidden;}
+        .ssb-header{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:rgba(0,0,0,0.35);border-bottom:1px solid rgba(79,195,247,0.1);flex-wrap:wrap;gap:8px;}
+        .ssb-title{font-family:'Oxanium',sans-serif;font-size:11px;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;font-weight:700;}
+        .ssb-ts{font-size:9px;color:rgba(128,222,234,0.4);letter-spacing:1px;}
+        .ssb-grid{display:grid;grid-template-columns:repeat(5,1fr) 1.5fr;}
+        .ssb-cell{padding:14px 10px;border-right:1px solid rgba(79,195,247,0.08);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}
+        .ssb-cell:last-child{border-right:none;}
+        .ssb-cell-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#80deea;text-transform:uppercase;font-weight:700;}
+        .ssb-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:7px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.5px;white-space:nowrap;}
+        .ssb-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.55);letter-spacing:0.3px;max-width:100px;line-height:1.45;text-align:center;}
+        .ssb-verdict{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 12px;}
+        .ssb-verdict-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;}
+        .ssb-verdict-val{font-family:'Oxanium',sans-serif;font-size:clamp(12px,1.6vw,15px);font-weight:800;letter-spacing:1px;text-transform:uppercase;text-align:center;line-height:1.2;}
+        .ssb-score-dots{display:flex;gap:5px;}
+        .ssb-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+        .ssb-bar-wrap{width:100%;display:flex;flex-direction:column;gap:3px;}
+        .ssb-bar-track{height:4px;background:rgba(0,0,0,0.5);border-radius:2px;overflow:hidden;width:100%;display:flex;}
+        .ssb-bar-lbl{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.5px;}
+        @media(max-width:900px){
+            .ssb-grid{grid-template-columns:repeat(3,1fr) !important;}
+            .ssb-cell:nth-child(3){border-right:none;}
+            .ssb-cell:nth-child(4),.ssb-cell:nth-child(5){border-top:1px solid rgba(79,195,247,0.08);}
+            .ssb-verdict{grid-column:1/-1;border-left:none !important;border-top:1px solid rgba(79,195,247,0.1);flex-direction:row;flex-wrap:wrap;justify-content:center;gap:10px;padding:12px;}
+        }
+        @media(max-width:600px){
+            .ssb-grid{grid-template-columns:repeat(2,1fr) !important;}
+            .ssb-cell:nth-child(2n){border-right:none;}
+            .ssb-cell{border-top:1px solid rgba(79,195,247,0.07);}
+            .ssb-cell:nth-child(1),.ssb-cell:nth-child(2){border-top:none;}
+            .ssb-verdict-val{font-size:13px;}
+        }
+
         
         /* ══ NIFTY 50 HEATMAP ═══════════════════════════════════════ */
         .hm-breadth-strip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;background:rgba(6,13,20,0.7);border:1px solid rgba(79,195,247,0.14);border-radius:14px;padding:20px 24px;margin-bottom:20px;}
@@ -811,7 +845,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">18-Mar-2026 06:45 IST</span>
+                <span class="sb-value gen-val">18-Mar-2026 07:01 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -935,6 +969,38 @@
                 <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#128197;</span><div class="lbl">EXPIRY DATE</div></div><span class="val" style="font-size:20px">24-Mar-2026</span></div>
             </div>
         </div>
+
+<div class="section ssb-section" id="sec-signals">
+  <div class="ssb-wrap">
+    <div class="ssb-header">
+      <span class="ssb-title">&#9889; SIGNAL SUMMARY</span>
+      <span class="ssb-ts">18-Mar-2026 07:01 IST</span>
+    </div>
+    <div class="ssb-grid">
+      <div class="ssb-cell"><span class="ssb-cell-lbl">OI Signal</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);">&#9711; Neutral</span><span class="ssb-sub">Both Calls & Puts Building</span></div>
+      <div class="ssb-cell"><span class="ssb-cell-lbl">FII / DII</span><span class="ssb-badge" style="color:#69f0ae;background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);">&#9651; CAUTIOUSLY BULLISH</span><span class="ssb-sub">FII -6,769 / DII +7,975</span></div>
+      <div class="ssb-cell"><span class="ssb-cell-lbl">Technical</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);">&#8596; Sideways</span><span class="ssb-sub">Score +0 / 6 signals</span></div>
+      <div class="ssb-cell"><span class="ssb-cell-lbl">Strategy</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);">&#9711; Neutral</span><span class="ssb-sub">Score +0 / 5 factors</span></div>
+      <div class="ssb-cell"><span class="ssb-cell-lbl">PCR</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);"> 0.90</span><span class="ssb-sub">Neutral (0.8-1.2)</span></div>
+      <div class="ssb-verdict" style="background:rgba(255,183,77,0.06);border-left:3px solid rgba(255,183,77,0.4);">
+        <span class="ssb-verdict-lbl" style="color:rgba(255,255,255,0.45);">Overall Verdict</span>
+        <span class="ssb-verdict-val" style="color:#ffb74d;">NEUTRAL</span>
+        <div class="ssb-score-dots"><div class="ssb-dot" style="background:rgba(255,255,255,0.12);" title="OI"></div><div class="ssb-dot" style="background:#00e676;" title="FII/DII"></div><div class="ssb-dot" style="background:rgba(255,255,255,0.12);" title="Technical"></div><div class="ssb-dot" style="background:rgba(255,255,255,0.12);" title="Strategy"></div><div class="ssb-dot" style="background:rgba(255,255,255,0.12);" title="PCR"></div></div>
+        <div class="ssb-bar-wrap">
+          <div class="ssb-bar-lbl">
+            <span style="color:rgba(0,230,118,0.6);">Bull 1</span>
+            <span style="color:rgba(255,183,77,0.5);">Neu 4</span>
+            <span style="color:rgba(255,71,87,0.6);">Bear 0</span>
+          </div>
+          <div class="ssb-bar-track">
+            <div style="height:100%;width:20%;background:#00e676;border-radius:2px;display:inline-block;"></div>
+            <div style="height:100%;width:0%;background:#ff4757;border-radius:2px;float:right;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="sec-oi">
 <style>
 /* ── OI Navy Command — responsive ── */
@@ -2308,7 +2374,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 18-Mar-2026 06:45 IST</span>
+            <span>Stock data as of: 18-Mar-2026 07:01 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>

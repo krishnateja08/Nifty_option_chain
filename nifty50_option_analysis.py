@@ -3035,6 +3035,161 @@ class NiftyHTMLAnalyzer:
           </div>
         </div>"""
 
+    def _signal_summary_bar_html(self):
+        d = self.html_data
+
+        # ── 1. OI Signal ──────────────────────────────────────────────────
+        oi_cls = d.get('oi_class', 'neutral') if d.get('has_option_data') else 'neutral'
+        if   oi_cls == 'bullish':  oi_score=1;  oi_lbl='Bullish';  oi_sub='Put build dominant';       oi_col='#00e676'; oi_bg='rgba(0,230,118,0.12)';  oi_bdr='rgba(0,230,118,0.3)';  oi_arrow='&#9651;'
+        elif oi_cls == 'bearish':  oi_score=-1; oi_lbl='Bearish';  oi_sub='Call build dominant';      oi_col='#ff4757'; oi_bg='rgba(255,71,87,0.12)';  oi_bdr='rgba(255,71,87,0.3)';  oi_arrow='&#9661;'
+        else:                      oi_score=0;  oi_lbl='Neutral';  oi_sub='Both sides building';      oi_col='#ffb74d'; oi_bg='rgba(255,183,77,0.10)'; oi_bdr='rgba(255,183,77,0.25)'; oi_arrow='&#9711;'
+
+        # ── 2. FII/DII Signal ─────────────────────────────────────────────
+        fii_summ  = d.get('fii_dii_summ', {})
+        fii_badge = fii_summ.get('badge_cls', 'fii-neu')
+        fii_label = fii_summ.get('label', 'Neutral')
+        fii_avg   = fii_summ.get('fii_avg', 0)
+        dii_avg   = fii_summ.get('dii_avg', 0)
+        if   fii_badge in ('fii-bull',):  fii_score=1;  fii_col='#00e676'; fii_bg='rgba(0,230,118,0.12)';   fii_bdr='rgba(0,230,118,0.3)';   fii_arrow='&#9651;'
+        elif fii_badge in ('fii-cbull',): fii_score=1;  fii_col='#69f0ae'; fii_bg='rgba(105,240,174,0.10)'; fii_bdr='rgba(105,240,174,0.28)'; fii_arrow='&#9651;'
+        elif fii_badge in ('fii-bear',):  fii_score=-1; fii_col='#ff4757'; fii_bg='rgba(255,71,87,0.12)';   fii_bdr='rgba(255,71,87,0.3)';   fii_arrow='&#9661;'
+        else:                             fii_score=0;  fii_col='#ffb74d'; fii_bg='rgba(255,183,77,0.10)';  fii_bdr='rgba(255,183,77,0.25)'; fii_arrow='&#9711;'
+        fii_sub = f"FII {'+' if fii_avg>=0 else ''}{fii_avg:,.0f} / DII {'+' if dii_avg>=0 else ''}{dii_avg:,.0f}"
+
+        # ── 3. Technical Signal ───────────────────────────────────────────
+        bias       = d.get('bias', 'SIDEWAYS')
+        bull_score = d.get('bullish_score', 0)
+        bear_score = d.get('bearish_score', 0)
+        score_diff = bull_score - bear_score
+        if   bias in ('BULLISH',):    tech_score=1;  tech_lbl='Bullish';    tech_col='#00e676'; tech_bg='rgba(0,230,118,0.12)';   tech_bdr='rgba(0,230,118,0.3)';   tech_arrow='&#9651;'
+        elif bias in ('WATCH BULL',): tech_score=1;  tech_lbl='Watch Bull'; tech_col='#b5ea3a'; tech_bg='rgba(181,234,58,0.10)';  tech_bdr='rgba(181,234,58,0.28)'; tech_arrow='&#9651;'
+        elif bias in ('BEARISH',):    tech_score=-1; tech_lbl='Bearish';    tech_col='#ff4757'; tech_bg='rgba(255,71,87,0.12)';   tech_bdr='rgba(255,71,87,0.3)';   tech_arrow='&#9661;'
+        elif bias in ('WATCH BEAR',): tech_score=-1; tech_lbl='Watch Bear'; tech_col='#ff9800'; tech_bg='rgba(255,152,0,0.10)';   tech_bdr='rgba(255,152,0,0.28)';  tech_arrow='&#9661;'
+        else:                         tech_score=0;  tech_lbl='Sideways';   tech_col='#ffb74d'; tech_bg='rgba(255,183,77,0.10)';  tech_bdr='rgba(255,183,77,0.25)'; tech_arrow='&#8596;'
+        tech_sub = f"Score {score_diff:+d} / {bull_score+bear_score} signals"
+
+        # ── 4. Strategy Checklist Score ───────────────────────────────────
+        # Re-derive from existing html_data fields (same data checklist uses)
+        pcr_val  = d.get('pcr') if d.get('has_option_data') else None
+        rsi_val  = d.get('rsi')
+        macd_b   = d.get('macd_bullish')
+        sma20    = d.get('sma_20_above')
+        sma50    = d.get('sma_50_above')
+        sma200   = d.get('sma_200_above')
+        oi_dir   = d.get('oi_class') if d.get('has_option_data') else None
+        strat_sc = 0
+        if pcr_val is not None:
+            if   pcr_val > 1.5: strat_sc += 2
+            elif pcr_val > 1.2: strat_sc += 1
+            elif pcr_val < 0.5: strat_sc -= 2
+            elif pcr_val < 0.8: strat_sc -= 1
+        if rsi_val is not None:
+            if   rsi_val > 70:  strat_sc -= 1
+            elif rsi_val < 30:  strat_sc += 2
+            elif rsi_val >= 55: strat_sc += 1
+            elif rsi_val <= 45: strat_sc -= 1
+        if macd_b is not None: strat_sc += 1 if macd_b else -1
+        trend_pts = sum([1 if x else -1 for x in [sma20, sma50, sma200] if x is not None])
+        strat_sc += (1 if trend_pts > 0 else -1 if trend_pts < 0 else 0)
+        if oi_dir == 'bullish':  strat_sc += 1
+        elif oi_dir == 'bearish': strat_sc -= 1
+        if   strat_sc >= 3:  strat_score=1;  strat_lbl='Strong Bull'; strat_col='#00e676'; strat_bg='rgba(0,230,118,0.12)';  strat_bdr='rgba(0,230,118,0.3)';  strat_arrow='&#9651;'
+        elif strat_sc >= 1:  strat_score=1;  strat_lbl='Mild Bull';   strat_col='#69f0ae'; strat_bg='rgba(105,240,174,0.10)';strat_bdr='rgba(105,240,174,0.28)';strat_arrow='&#9651;'
+        elif strat_sc <= -3: strat_score=-1; strat_lbl='Strong Bear'; strat_col='#ff4757'; strat_bg='rgba(255,71,87,0.12)';  strat_bdr='rgba(255,71,87,0.3)';  strat_arrow='&#9661;'
+        elif strat_sc <= -1: strat_score=-1; strat_lbl='Mild Bear';   strat_col='#fca5a5'; strat_bg='rgba(252,165,165,0.10)';strat_bdr='rgba(252,165,165,0.25)';strat_arrow='&#9661;'
+        else:                strat_score=0;  strat_lbl='Neutral';     strat_col='#ffb74d'; strat_bg='rgba(255,183,77,0.10)'; strat_bdr='rgba(255,183,77,0.25)'; strat_arrow='&#9711;'
+        strat_sub = f"Score {strat_sc:+d} / 5 factors"
+
+        # ── 5. PCR Signal ─────────────────────────────────────────────────
+        pcr_disp = d.get('pcr', 0) if d.get('has_option_data') else None
+        if pcr_disp is not None:
+            if   pcr_disp > 1.5: pcr_score=1;  pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Strongly Bullish';  pcr_col='#00e676'; pcr_bg='rgba(0,230,118,0.12)';  pcr_bdr='rgba(0,230,118,0.3)'
+            elif pcr_disp > 1.2: pcr_score=1;  pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Bullish (>1.2)';    pcr_col='#69f0ae'; pcr_bg='rgba(105,240,174,0.10)';pcr_bdr='rgba(105,240,174,0.28)'
+            elif pcr_disp < 0.5: pcr_score=-1; pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Strongly Bearish';  pcr_col='#ff4757'; pcr_bg='rgba(255,71,87,0.12)';  pcr_bdr='rgba(255,71,87,0.3)'
+            elif pcr_disp < 0.8: pcr_score=-1; pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Bearish (<0.8)';    pcr_col='#ff9999'; pcr_bg='rgba(255,71,87,0.08)';  pcr_bdr='rgba(255,71,87,0.2)'
+            else:                pcr_score=0;  pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Neutral (0.8-1.2)'; pcr_col='#ffb74d'; pcr_bg='rgba(255,183,77,0.10)'; pcr_bdr='rgba(255,183,77,0.25)'
+        else:
+            pcr_score=0; pcr_lbl='N/A'; pcr_sub='No option data'; pcr_col='#8faabe'; pcr_bg='rgba(143,170,190,0.08)'; pcr_bdr='rgba(143,170,190,0.2)'
+
+        # ── Overall Verdict ───────────────────────────────────────────────
+        scores     = [oi_score, fii_score, tech_score, strat_score, pcr_score]
+        bull_count = sum(1 for s in scores if s > 0)
+        bear_count = sum(1 for s in scores if s < 0)
+        neu_count  = sum(1 for s in scores if s == 0)
+        total      = len(scores)
+        bull_pct   = round(bull_count / total * 100)
+        bear_pct   = round(bear_count / total * 100)
+
+        if   bull_count >= 4: vrd_lbl='STRONGLY BULLISH'; vrd_col='#00e676'; vrd_bg='rgba(0,230,118,0.08)';  vrd_bdr='#00e676';  vrd_lbdr='rgba(0,230,118,0.6)'
+        elif bull_count == 3: vrd_lbl='BULLISH';          vrd_col='#00e676'; vrd_bg='rgba(0,230,118,0.06)';  vrd_bdr='#00e676';  vrd_lbdr='rgba(0,230,118,0.5)'
+        elif bull_count == 2 and bear_count == 0: vrd_lbl='CAUTIOUSLY BULLISH'; vrd_col='#69f0ae'; vrd_bg='rgba(105,240,174,0.06)'; vrd_bdr='#69f0ae'; vrd_lbdr='rgba(105,240,174,0.4)'
+        elif bear_count >= 4: vrd_lbl='STRONGLY BEARISH'; vrd_col='#ff4757'; vrd_bg='rgba(255,71,87,0.08)';  vrd_bdr='#ff4757';  vrd_lbdr='rgba(255,71,87,0.6)'
+        elif bear_count == 3: vrd_lbl='BEARISH';          vrd_col='#ff4757'; vrd_bg='rgba(255,71,87,0.06)';  vrd_bdr='#ff4757';  vrd_lbdr='rgba(255,71,87,0.5)'
+        elif bear_count == 2 and bull_count == 0: vrd_lbl='CAUTIOUSLY BEARISH'; vrd_col='#fca5a5'; vrd_bg='rgba(252,165,165,0.06)'; vrd_bdr='#fca5a5'; vrd_lbdr='rgba(252,165,165,0.4)'
+        else:                 vrd_lbl='NEUTRAL';          vrd_col='#ffb74d'; vrd_bg='rgba(255,183,77,0.06)'; vrd_bdr='#ffb74d';  vrd_lbdr='rgba(255,183,77,0.4)'
+
+        # ── Dot indicators ────────────────────────────────────────────────
+        dot_scores = [
+            (oi_score,    'OI'),
+            (fii_score,   'FII/DII'),
+            (tech_score,  'Technical'),
+            (strat_score, 'Strategy'),
+            (pcr_score,   'PCR'),
+        ]
+        dots_html = ''
+        for sc, name in dot_scores:
+            if   sc > 0:  dc='#00e676'
+            elif sc < 0:  dc='#ff4757'
+            else:          dc='rgba(255,255,255,0.12)'
+            dots_html += f'<div class="ssb-dot" style="background:{dc};" title="{name}"></div>'
+
+        # ── Build one cell ────────────────────────────────────────────────
+        def cell(lbl, badge_lbl, arrow, col, bg, bdr, sub):
+            return (
+                f'<div class="ssb-cell">'
+                f'<span class="ssb-cell-lbl">{lbl}</span>'
+                f'<span class="ssb-badge" style="color:{col};background:{bg};border:1px solid {bdr};">'
+                f'{arrow} {badge_lbl}</span>'
+                f'<span class="ssb-sub">{sub}</span>'
+                f'</div>'
+            )
+
+        ts = d.get('timestamp', '')
+
+        return f"""
+<div class="section ssb-section" id="sec-signals">
+  <div class="ssb-wrap">
+    <div class="ssb-header">
+      <span class="ssb-title">&#9889; SIGNAL SUMMARY</span>
+      <span class="ssb-ts">{ts}</span>
+    </div>
+    <div class="ssb-grid">
+      {cell('OI Signal',   oi_lbl,    oi_arrow,    oi_col,    oi_bg,    oi_bdr,    d.get('oi_signal','—') if d.get('has_option_data') else 'No data')}
+      {cell('FII / DII',   fii_label, fii_arrow,   fii_col,   fii_bg,   fii_bdr,   fii_sub)}
+      {cell('Technical',   tech_lbl,  tech_arrow,  tech_col,  tech_bg,  tech_bdr,  tech_sub)}
+      {cell('Strategy',    strat_lbl, strat_arrow, strat_col, strat_bg, strat_bdr, strat_sub)}
+      {cell('PCR',         pcr_lbl,   '',          pcr_col,   pcr_bg,   pcr_bdr,   pcr_sub)}
+      <div class="ssb-verdict" style="background:{vrd_bg};border-left:3px solid {vrd_lbdr};">
+        <span class="ssb-verdict-lbl" style="color:rgba(255,255,255,0.45);">Overall Verdict</span>
+        <span class="ssb-verdict-val" style="color:{vrd_col};">{vrd_lbl}</span>
+        <div class="ssb-score-dots">{dots_html}</div>
+        <div class="ssb-bar-wrap">
+          <div class="ssb-bar-lbl">
+            <span style="color:rgba(0,230,118,0.6);">Bull {bull_count}</span>
+            <span style="color:rgba(255,183,77,0.5);">Neu {neu_count}</span>
+            <span style="color:rgba(255,71,87,0.6);">Bear {bear_count}</span>
+          </div>
+          <div class="ssb-bar-track">
+            <div style="height:100%;width:{bull_pct}%;background:#00e676;border-radius:2px;display:inline-block;"></div>
+            <div style="height:100%;width:{bear_pct}%;background:#ff4757;border-radius:2px;float:right;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+"""
+
     def _market_direction_widget_html(self):
         d          = self.html_data
         bias       = d['bias']
@@ -5861,6 +6016,40 @@ function mobNavTo(secId, tabId, label) {
         @media(max-width:700px){{.disc-text{{white-space:normal;}}}}
         .footer{{text-align:center;padding:24px;color:#8faabe;font-size:clamp(10px,1.3vw,12px);background:rgba(10,20,28,0.4);}}
 
+        /* ══ SIGNAL SUMMARY BAR ═══════════════════════════════════════════ */
+        .ssb-section{{padding:0 clamp(12px,2.5vw,26px) 16px;border-bottom:none!important;}}
+        .ssb-wrap{{background:rgba(6,13,20,0.9);border:1px solid rgba(79,195,247,0.18);border-radius:14px;overflow:hidden;}}
+        .ssb-header{{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:rgba(0,0,0,0.35);border-bottom:1px solid rgba(79,195,247,0.1);flex-wrap:wrap;gap:8px;}}
+        .ssb-title{{font-family:'Oxanium',sans-serif;font-size:11px;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;font-weight:700;}}
+        .ssb-ts{{font-size:9px;color:rgba(128,222,234,0.4);letter-spacing:1px;}}
+        .ssb-grid{{display:grid;grid-template-columns:repeat(5,1fr) 1.5fr;}}
+        .ssb-cell{{padding:14px 10px;border-right:1px solid rgba(79,195,247,0.08);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}}
+        .ssb-cell:last-child{{border-right:none;}}
+        .ssb-cell-lbl{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#80deea;text-transform:uppercase;font-weight:700;}}
+        .ssb-badge{{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:7px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.5px;white-space:nowrap;}}
+        .ssb-sub{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.55);letter-spacing:0.3px;max-width:100px;line-height:1.45;text-align:center;}}
+        .ssb-verdict{{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 12px;}}
+        .ssb-verdict-lbl{{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;}}
+        .ssb-verdict-val{{font-family:'Oxanium',sans-serif;font-size:clamp(12px,1.6vw,15px);font-weight:800;letter-spacing:1px;text-transform:uppercase;text-align:center;line-height:1.2;}}
+        .ssb-score-dots{{display:flex;gap:5px;}}
+        .ssb-dot{{width:9px;height:9px;border-radius:50%;flex-shrink:0;}}
+        .ssb-bar-wrap{{width:100%;display:flex;flex-direction:column;gap:3px;}}
+        .ssb-bar-track{{height:4px;background:rgba(0,0,0,0.5);border-radius:2px;overflow:hidden;width:100%;display:flex;}}
+        .ssb-bar-lbl{{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.5px;}}
+        @media(max-width:900px){{
+            .ssb-grid{{grid-template-columns:repeat(3,1fr) !important;}}
+            .ssb-cell:nth-child(3){{border-right:none;}}
+            .ssb-cell:nth-child(4),.ssb-cell:nth-child(5){{border-top:1px solid rgba(79,195,247,0.08);}}
+            .ssb-verdict{{grid-column:1/-1;border-left:none !important;border-top:1px solid rgba(79,195,247,0.1);flex-direction:row;flex-wrap:wrap;justify-content:center;gap:10px;padding:12px;}}
+        }}
+        @media(max-width:600px){{
+            .ssb-grid{{grid-template-columns:repeat(2,1fr) !important;}}
+            .ssb-cell:nth-child(2n){{border-right:none;}}
+            .ssb-cell{{border-top:1px solid rgba(79,195,247,0.07);}}
+            .ssb-cell:nth-child(1),.ssb-cell:nth-child(2){{border-top:none;}}
+            .ssb-verdict-val{{font-size:13px;}}
+        }}
+
         {heatmap_css}
         {pretrade_css}
 
@@ -6233,6 +6422,7 @@ function mobNavTo(secId, tabId, label) {
             </div>
         </div>
 """
+        html += self._signal_summary_bar_html()
         if d['has_option_data']:
             html += '<div id="sec-oi">' + self._oi_navy_command_section(d) + '</div>'
         html += '<div id="sec-keylevels">' + self._key_levels_visual_section(d,_pct_cp,_pts_to_res,_pts_to_sup,_mp_node) + '</div>'
