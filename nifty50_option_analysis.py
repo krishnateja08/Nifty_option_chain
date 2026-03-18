@@ -5049,19 +5049,60 @@ function renderOITable(data) {
             var isSell = (row.opt_signal||'').toUpperCase().indexOf('SELL') >= 0;
             var nlabel = row.nearest_label || (isBuy ? 'R1' : isSell ? 'S1' : '—');
             var nval   = row.nearest_level ? '₹' + row.nearest_level.toLocaleString('en-IN') : '—';
-            var nlevelHtml = row.nearest_level
-                ? '<span class="oi-nlevel-badge ' + (isBuy ? 'oi-nlevel-res' : 'oi-nlevel-sup') + '">'
+            var isNeutral = !isBuy && !isSell;
+            var nlevelHtml, distHtml;
+            if (row.nearest_level) {
+                nlevelHtml = '<span class="oi-nlevel-badge ' + (isBuy ? 'oi-nlevel-res' : 'oi-nlevel-sup') + '">'
                   + '<span class="oi-nlevel-label">' + nlabel + '</span>'
-                  + nval + '</span>'
-                : '<span style="color:rgba(176,190,197,0.3);">—</span>';
-            var distHtml = row.distance_pts != null
-                ? '<span class="oi-dist-val ' + (isBuy ? 'oi-dist-res' : 'oi-dist-sup') + '">'
+                  + nval + '</span>';
+                distHtml = '<span class="oi-dist-val ' + (isBuy ? 'oi-dist-res' : 'oi-dist-sup') + '">'
                   + (isBuy ? '+' : '-') + Math.abs(row.distance_pts) + ' pts'
                   + (row.nearest_label === 'S2' || row.nearest_label === 'R2'
                       ? ' <span style="font-size:8px;opacity:0.6;">(to ' + (row.nearest_label||'') + ')</span>'
                       : '')
-                  + '</span>'
-                : '<span style="color:rgba(176,190,197,0.3);">—</span>';
+                  + '</span>';
+            } else if (isNeutral && typeof _CURRENT_BIAS !== 'undefined') {
+                // NEUTRAL OI signal — show current market direction bias here
+                var wb = _CURRENT_BIAS;
+                var wbHtml, wdHtml;
+                if (wb === 'WATCH BULL') {
+                    wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+                        + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                        + 'font-size:10px;font-weight:800;background:rgba(181,234,58,0.12);color:#b5ea3a;'
+                        + 'border:1px solid rgba(181,234,58,0.3);">⚡ WATCH BULL</span>'
+                        + '<span style="font-size:8px;color:rgba(181,234,58,0.5);font-family:monospace;">tech bias</span>'
+                        + '</div>';
+                    wdHtml = '<span style="font-size:9px;color:rgba(181,234,58,0.55);font-family:monospace;font-weight:600;">'
+                        + 'Early bull<br>signal</span>';
+                } else if (wb === 'WATCH BEAR') {
+                    wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+                        + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                        + 'font-size:10px;font-weight:800;background:rgba(255,152,0,0.12);color:#ff9800;'
+                        + 'border:1px solid rgba(255,152,0,0.3);">⚠ WATCH BEAR</span>'
+                        + '<span style="font-size:8px;color:rgba(255,152,0,0.5);font-family:monospace;">tech bias</span>'
+                        + '</div>';
+                    wdHtml = '<span style="font-size:9px;color:rgba(255,152,0,0.55);font-family:monospace;font-weight:600;">'
+                        + 'Early bear<br>signal</span>';
+                } else if (wb === 'BULLISH') {
+                    wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                        + 'font-size:10px;font-weight:800;background:rgba(0,230,118,0.12);color:#00e676;'
+                        + 'border:1px solid rgba(0,230,118,0.3);">▲ BULLISH</span>';
+                    wdHtml = '<span style="font-size:9px;color:rgba(0,230,118,0.55);font-family:monospace;">tech bias</span>';
+                } else if (wb === 'BEARISH') {
+                    wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                        + 'font-size:10px;font-weight:800;background:rgba(255,71,87,0.12);color:#ff4757;'
+                        + 'border:1px solid rgba(255,71,87,0.3);">▼ BEARISH</span>';
+                    wdHtml = '<span style="font-size:9px;color:rgba(255,71,87,0.55);font-family:monospace;">tech bias</span>';
+                } else {
+                    wbHtml = '<span style="color:rgba(176,190,197,0.3);">—</span>';
+                    wdHtml = '<span style="color:rgba(176,190,197,0.3);">—</span>';
+                }
+                nlevelHtml = wbHtml;
+                distHtml   = wdHtml;
+            } else {
+                nlevelHtml = '<span style="color:rgba(176,190,197,0.3);">—</span>';
+                distHtml   = '<span style="color:rgba(176,190,197,0.3);">—</span>';
+            }
 
             // ── Spot Δ ──
             var prevRow = filtered[idx + 1];
@@ -6607,6 +6648,9 @@ function mobNavTo(secId, tabId, label) {
     </div>
 </div>
 """
+        # Inject current bias as JS variable so renderOITable can read it
+        bias_val = d.get('bias', 'SIDEWAYS')
+        html += f'\n<script>\nvar _CURRENT_BIAS = "{bias_val}";\n</script>\n'
         html += all_js
         html += f"\n<script>\n{heatmap_js}\n</script>\n"
         html += "\n</body></html>"
