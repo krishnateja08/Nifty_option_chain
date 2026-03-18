@@ -792,7 +792,7 @@ def _last_5_trading_days():
     ist_off = timedelta(hours=5, minutes=30)
     today   = (datetime.utcnow() + ist_off).date()
     days, d = [], today - timedelta(days=1)
-    while len(days) < 5:
+    while len(days) < 10:
         if d.weekday() < 5:
             days.append(d)
         d -= timedelta(days=1)
@@ -803,7 +803,7 @@ def _parse_nse_fiidii(raw):
     if not isinstance(raw, list) or not raw:
         return []
     days = []
-    for row in raw[:10]:
+    for row in raw[:15]:
         try:
             dt_obj  = datetime.strptime(row.get("date", ""), "%d-%b-%Y")
             fii_net = float(row.get("fiiBuyValue",0) or 0) - float(row.get("fiiSellValue",0) or 0)
@@ -814,7 +814,7 @@ def _parse_nse_fiidii(raw):
             continue
     if len(days) < 3:
         return []
-    days = days[:5]
+    days = days[:10]
     days.reverse()
     return days
 
@@ -848,7 +848,7 @@ def _fetch_from_groww():
                              'fii': round(fii_net,2), 'dii': round(dii_net,2)})
             except Exception:
                 continue
-            if len(days) == 5: break
+            if len(days) == 10: break
         if len(days) >= 3:
             days.reverse()
             print(f"  ✅ FII/DII from Groww: {days[0]['date']} → {days[-1]['date']}")
@@ -889,7 +889,10 @@ def fetch_fii_dii_data():
     if days: return days
     print("  📌 FII/DII: using date-corrected fallback")
     tdays = _last_5_trading_days()
-    placeholder = [(-1540.20,2103.50),(823.60,891.40),(-411.80,1478.30),(69.45,1174.21),(-972.13,1666.98)]
+    placeholder = [
+        (-1540.20,2103.50),(823.60,891.40),(-411.80,1478.30),(69.45,1174.21),(-972.13,1666.98),
+        (-2103.40,1845.60),(1245.30,2340.10),(-876.50,1923.40),(432.80,1654.20),(-1120.60,2010.80)
+    ]
     return [{'date': d.strftime('%b %d'), 'day': d.strftime('%a'),
              'fii': placeholder[i][0], 'dii': placeholder[i][1], 'fallback': True}
             for i, d in enumerate(tdays)]
@@ -3312,51 +3315,110 @@ class NiftyHTMLAnalyzer:
         data_src_html = ('<span class="pf-live-badge pf-estimated">\u26a0 ESTIMATED</span>'
                          if is_fallback else '<span class="pf-live-badge pf-live">\u25cf LIVE</span>')
         max_abs = summ['max_abs'] or 1
-        def day_card(row):
-            fii_v=row['fii']; dii_v=row['dii']; net_v=fii_v+dii_v
-            fii_w=round(min(100,abs(fii_v)/max_abs*100),1); dii_w=round(min(100,abs(dii_v)/max_abs*100),1)
-            fii_col='#00d4ff' if fii_v>=0 else '#ff4444'; fii_bar='linear-gradient(90deg,#00d4ff,#0090ff)' if fii_v>=0 else 'linear-gradient(90deg,#ff4444,#ff0055)'
-            dii_col='#ffb300' if dii_v>=0 else '#ff4444'; dii_bar='linear-gradient(90deg,#ffb300,#ff8f00)' if dii_v>=0 else 'linear-gradient(90deg,#ff4444,#ff0055)'
-            net_col='#34d399' if net_v>=0 else '#f87171'
-            fii_sign='+' if fii_v>=0 else ''; dii_sign='+' if dii_v>=0 else ''; net_sign='+' if net_v>=0 else ''
-            bdr='rgba(0,212,255,0.18)' if net_v>=0 else 'rgba(255,68,68,0.18)'
-            topL='linear-gradient(90deg,transparent,#00d4ff,transparent)' if net_v>=0 else 'linear-gradient(90deg,transparent,#ff4444,transparent)'
-            return (f'<div class="pf-card" style="border-color:{bdr};">'
-                    f'<div class="pf-card-topline" style="background:{topL};"></div>'
-                    f'<div class="pf-card-head"><span class="pf-card-date">{row["date"]}</span><span class="pf-card-day">{row["day"]}</span></div>'
-                    f'<div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:{fii_col};">{fii_sign}{fii_v:,.0f}</span></div>'
-                    f'<div class="pf-bar-track"><div class="pf-bar-fill" style="width:{fii_w}%;background:{fii_bar};"></div></div></div>'
-                    f'<div class="pf-divider"></div>'
-                    f'<div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:{dii_col};">{dii_sign}{dii_v:,.0f}</span></div>'
-                    f'<div class="pf-bar-track"><div class="pf-bar-fill" style="width:{dii_w}%;background:{dii_bar};"></div></div></div>'
-                    f'<div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:{net_col};">{net_sign}{net_v:,.0f}</span></div></div>')
-        cards_html = ''.join(day_card(r) for r in data)
+
+        # ── Avg values ────────────────────────────────────────────────────
         fa=summ['fii_avg']; da=summ['dii_avg']; na=summ['net_avg']
         fs='+' if fa>=0 else ''; ds='+' if da>=0 else ''; ns='+' if na>=0 else ''
-        fc='#00d4ff' if fa>=0 else '#ff4444'; dc='#ffb300' if da>=0 else '#ff4444'; nc='#c084fc' if na>=0 else '#f87171'
+        fc='#00d4ff' if fa>=0 else '#ff4444'
+        dc='#ffb300' if da>=0 else '#ff4444'
+        nc='#c084fc' if na>=0 else '#f87171'
+
+        # ── FII bar width (capped at 100%) ────────────────────────────────
+        fii_bar_w = round(min(100, abs(fa) / max_abs * 100), 1)
+        dii_bar_w = round(min(100, abs(da) / max_abs * 100), 1)
+        fii_bar_col = '#ff4444' if fa < 0 else '#00d4ff'
+        dii_bar_col = '#ffb300' if da >= 0 else '#ff4444'
+
+        # ── Daily dot chips (10 days) ─────────────────────────────────────
+        dots_html = ''
+        for row in data:
+            net_v = row['fii'] + row['dii']
+            dot_col  = '#00e676' if net_v >= 0 else '#ff4757'
+            dot_bg   = 'rgba(0,230,118,0.15)' if net_v >= 0 else 'rgba(255,71,87,0.15)'
+            dot_bdr  = 'rgba(0,230,118,0.3)'  if net_v >= 0 else 'rgba(255,71,87,0.3)'
+            net_sign = '+' if net_v >= 0 else ''
+            net_fmt  = f"{net_v/1000:+.1f}k" if abs(net_v) >= 1000 else f"{net_sign}{net_v:.0f}"
+            dots_html += (
+                f'<div class="pf2-dot" style="border-color:{dot_bdr};background:{dot_bg};">'
+                f'<div class="pf2-dot-date">{row["date"].split(" ")[1]}</div>'
+                f'<div class="pf2-dot-net" style="color:{dot_col};">{net_fmt}</div>'
+                f'</div>'
+            )
+
         verdict_badge = (f'<span class="pf-verdict-badge" style="color:{s_color};background:{s_bg};border:1px solid {s_border};">'
                          f'{summ["emoji"]} {summ["label"]}</span>')
-        return (
-            '\n<div class="section">\n'
-            '    <div class="section-title">\n'
-            f'        <span>\U0001f3e6</span> FII / DII INSTITUTIONAL FLOW\n'
-            f'        {data_src_html}\n'
-            f'        <span class="pf-date-range">Last 5 Trading Days &nbsp;\u00b7&nbsp; {date_range}</span>\n'
-            '    </div>\n'
-            f'    <div class="pf-grid">{cards_html}</div>\n'
-            '    <div class="pf-avg-strip">\n'
-            f'        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">FII 5D Avg</div><div class="pf-avg-val" style="color:{fc};">{fs}{fa:,.0f}</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>\n'
-            '        <div class="pf-avg-sep"></div>\n'
-            f'        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">DII 5D Avg</div><div class="pf-avg-val" style="color:{dc};">{ds}{da:,.0f}</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>\n'
-            '        <div class="pf-avg-sep"></div>\n'
-            f'        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">Net Combined</div><div class="pf-avg-val" style="color:{nc};">{ns}{na:,.0f}</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>\n'
-            '    </div>\n'
-            f'    <div class="pf-insight-box" style="background:{s_bg};border:1px solid {s_border};">\n'
-            f'        <div class="pf-insight-header"><span class="pf-insight-lbl" style="color:{s_color};">&#128202; 5-DAY INSIGHT &amp; DIRECTION</span>{verdict_badge}</div>\n'
-            f'        <div class="pf-insight-text">{summ["insight"]}</div>\n'
-            '    </div>\n'
-            '</div>\n'
-        )
+        n_days = len(data)
+
+        return f"""
+<div class="section">
+    <div class="section-title">
+        <span>&#127982;</span> FII / DII INSTITUTIONAL FLOW
+        {data_src_html}
+        <span class="pf-date-range">Last {n_days} Trading Days &nbsp;&middot;&nbsp; {date_range}</span>
+    </div>
+
+    <!-- FII Flow Meter -->
+    <div class="pf2-meter-row">
+        <div class="pf2-meter-head">
+            <div class="pf2-meter-labels">
+                <span class="pf2-lbl">FII</span>
+                <span class="pf2-sublbl">{('Sellers' if fa < 0 else 'Buyers')}</span>
+            </div>
+            <span class="pf2-val" style="color:{fc};">{fs}{fa:,.0f} <span class="pf2-unit">Cr/day avg</span></span>
+        </div>
+        <div class="pf2-track">
+            <div class="pf2-fill" style="width:{fii_bar_w}%;background:{fii_bar_col};{'float:right;' if fa < 0 else ''}"></div>
+        </div>
+    </div>
+
+    <!-- DII Flow Meter -->
+    <div class="pf2-meter-row">
+        <div class="pf2-meter-head">
+            <div class="pf2-meter-labels">
+                <span class="pf2-lbl">DII</span>
+                <span class="pf2-sublbl">{('Buyers' if da >= 0 else 'Sellers')}</span>
+            </div>
+            <span class="pf2-val" style="color:{dc};">{ds}{da:,.0f} <span class="pf2-unit">Cr/day avg</span></span>
+        </div>
+        <div class="pf2-track">
+            <div class="pf2-fill" style="width:{dii_bar_w}%;background:{dii_bar_col};"></div>
+        </div>
+    </div>
+
+    <!-- Daily net dot chips -->
+    <div class="pf2-dots-wrap">{dots_html}</div>
+
+    <!-- Avg strip -->
+    <div class="pf-avg-strip">
+        <div class="pf-avg-cell">
+            <div class="pf-avg-eyebrow">FII {n_days}D Avg</div>
+            <div class="pf-avg-val" style="color:{fc};">{fs}{fa:,.0f}</div>
+            <div class="pf-avg-unit">&#8377; Cr / day</div>
+        </div>
+        <div class="pf-avg-sep"></div>
+        <div class="pf-avg-cell">
+            <div class="pf-avg-eyebrow">DII {n_days}D Avg</div>
+            <div class="pf-avg-val" style="color:{dc};">{ds}{da:,.0f}</div>
+            <div class="pf-avg-unit">&#8377; Cr / day</div>
+        </div>
+        <div class="pf-avg-sep"></div>
+        <div class="pf-avg-cell">
+            <div class="pf-avg-eyebrow">Net Combined</div>
+            <div class="pf-avg-val" style="color:{nc};">{ns}{na:,.0f}</div>
+            <div class="pf-avg-unit">&#8377; Cr / day</div>
+        </div>
+    </div>
+
+    <!-- Insight box -->
+    <div class="pf-insight-box" style="background:{s_bg};border:1px solid {s_border};">
+        <div class="pf-insight-header">
+            <span class="pf-insight-lbl" style="color:{s_color};">&#128202; {n_days}-DAY INSIGHT &amp; DIRECTION</span>
+            {verdict_badge}
+        </div>
+        <div class="pf-insight-text">{summ['insight']}</div>
+    </div>
+</div>
+"""
 
     def _oi_navy_command_section(self, d):
         oi_cls=d['oi_class']; direction=d['oi_direction']; signal=d['oi_signal']
@@ -5381,35 +5443,51 @@ function mobNavTo(secId, tabId, label) {
         .pf-live{{background:rgba(0,230,118,0.1);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
         .pf-estimated{{background:rgba(255,138,101,0.1);color:#ff8a65;border:1px solid rgba(255,138,101,0.3);}}
         .pf-date-range{{font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;}}
-        .pf-grid{{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:18px;}}
-        .pf-card{{background:rgba(255,255,255,0.03);border:1px solid rgba(0,212,255,0.18);border-radius:16px;padding:16px 14px 14px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);min-width:0;}}
-        .pf-card:hover{{background:rgba(255,255,255,0.06);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.35);}}
-        .pf-card-topline{{position:absolute;top:0;left:0;right:0;height:1px;}}
-        .pf-card-head{{display:flex;justify-content:space-between;align-items:baseline;}}
-        .pf-card-date{{font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.5vw,12px);font-weight:700;color:#e0f7fa;letter-spacing:1px;}}
-        .pf-card-day{{font-size:9px;letter-spacing:1.5px;color:rgba(128,222,234,0.3);text-transform:uppercase;}}
-        .pf-block{{display:flex;flex-direction:column;gap:5px;}}
-        .pf-block-header{{display:flex;justify-content:space-between;align-items:baseline;}}
-        .pf-block-lbl{{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;}}
-        .pf-fii-lbl{{color:rgba(0,212,255,0.5);}} .pf-dii-lbl{{color:rgba(255,179,0,0.5);}}
-        .pf-block-val{{font-family:'JetBrains Mono',monospace;font-size:clamp(12px,1.8vw,15px);font-weight:700;line-height:1;word-break:break-all;}}
-        .pf-bar-track{{height:4px;background:rgba(0,0,0,0.35);border-radius:2px;overflow:hidden;}}
-        .pf-bar-fill{{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}}
-        .pf-divider{{height:1px;background:rgba(255,255,255,0.04);margin:0 -2px;}}
-        .pf-card-net{{display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px solid rgba(255,255,255,0.05);margin-top:auto;}}
-        .pf-net-lbl{{font-size:8px;letter-spacing:2px;color:rgba(255,255,255,0.2);text-transform:uppercase;font-weight:700;}}
-        .pf-net-val{{font-family:'JetBrains Mono',monospace;font-size:clamp(11px,1.5vw,13px);font-weight:700;word-break:break-all;}}
+
+        /* ── Option 2: Horizontal Flow Meters ── */
+        .pf2-meter-row{{margin-bottom:16px;}}
+        .pf2-meter-head{{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;}}
+        .pf2-meter-labels{{display:flex;align-items:baseline;gap:10px;}}
+        .pf2-lbl{{font-family:'Oxanium',sans-serif;font-size:18px;font-weight:800;color:#e0f7fa;letter-spacing:1px;}}
+        .pf2-sublbl{{font-size:11px;letter-spacing:1.5px;color:rgba(128,222,234,0.6);text-transform:uppercase;font-weight:600;}}
+        .pf2-val{{font-family:'JetBrains Mono',monospace;font-size:clamp(16px,2.5vw,22px);font-weight:700;letter-spacing:-0.5px;}}
+        .pf2-unit{{font-size:10px;color:rgba(128,222,234,0.4);font-weight:400;letter-spacing:1px;}}
+        .pf2-track{{height:10px;background:rgba(0,0,0,0.4);border-radius:5px;overflow:hidden;}}
+        .pf2-fill{{height:100%;border-radius:5px;transition:width 1s ease;}}
+
+        /* Daily net dot chips */
+        .pf2-dots-wrap{{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;margin:16px 0;}}
+        .pf2-dot{{border:1px solid;border-radius:8px;padding:6px 4px;text-align:center;}}
+        .pf2-dot-date{{font-size:9px;letter-spacing:0.5px;color:rgba(128,222,234,0.45);margin-bottom:4px;font-family:'JetBrains Mono',monospace;}}
+        .pf2-dot-net{{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;}}
+
         .pf-avg-strip{{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;background:rgba(6,13,20,0.75);border:1px solid rgba(79,195,247,0.1);border-radius:14px;padding:18px 24px;margin-bottom:16px;}}
         .pf-avg-cell{{text-align:center;min-width:0;}}
-        .pf-avg-eyebrow{{font-size:8px;letter-spacing:2.5px;color:rgba(0,229,255,0.4);text-transform:uppercase;margin-bottom:6px;font-weight:700;}}
-        .pf-avg-val{{font-family:'Oxanium',sans-serif;font-size:clamp(18px,3vw,26px);font-weight:800;line-height:1;letter-spacing:-0.5px;word-break:break-word;}}
+        .pf-avg-eyebrow{{font-size:10px;letter-spacing:2px;color:rgba(79,195,247,0.7);text-transform:uppercase;margin-bottom:6px;font-weight:700;}}
+        .pf-avg-val{{font-family:'Oxanium',sans-serif;font-size:clamp(20px,3vw,28px);font-weight:800;line-height:1;letter-spacing:-0.5px;word-break:break-word;}}
         .pf-avg-unit{{font-size:9px;color:#8899aa;margin-top:3px;letter-spacing:1px;}}
-        .pf-avg-sep{{width:1px;height:48px;background:linear-gradient(180deg,transparent,rgba(79,195,247,0.2),transparent);margin:0 16px;flex-shrink:0;}}
+        .pf-avg-sep{{width:1px;height:48px;background:rgba(79,195,247,0.2);margin:0 16px;flex-shrink:0;}}
         .pf-insight-box{{border-radius:12px;padding:16px 18px;}}
         .pf-insight-header{{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}}
-        .pf-insight-lbl{{font-size:9px;letter-spacing:2px;font-weight:700;text-transform:uppercase;}}
+        .pf-insight-lbl{{font-size:10px;letter-spacing:2px;font-weight:700;text-transform:uppercase;}}
         .pf-verdict-badge{{display:inline-block;padding:3px 14px;border-radius:20px;font-size:clamp(10px,1.5vw,11px);font-weight:800;letter-spacing:1px;white-space:nowrap;}}
         .pf-insight-text{{font-size:clamp(12px,1.5vw,13px);color:#cfd8dc;line-height:1.85;font-weight:500;}}
+
+        @media(max-width:768px){{
+            .pf2-dots-wrap{{grid-template-columns:repeat(5,minmax(0,1fr));}}
+            .pf2-lbl{{font-size:16px;}}
+            .pf2-val{{font-size:15px;}}
+            .pf-avg-strip{{grid-template-columns:1fr;gap:0;padding:14px;}}
+            .pf-avg-sep{{display:none;}}
+            .pf-avg-cell{{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(79,195,247,0.07);}}
+            .pf-avg-cell:last-child{{border-bottom:none;}}
+            .pf-avg-eyebrow{{margin-bottom:0;}}
+        }}
+        @media(max-width:480px){{
+            .pf2-dots-wrap{{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;}}
+            .pf2-dot{{padding:5px 2px;}}
+            .pf2-dot-net{{font-size:10px;}}
+        }}
 
         .nc-section-header{{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(79,195,247,0.14);}}
         .nc-header-left{{display:flex;align-items:center;gap:14px;}}
