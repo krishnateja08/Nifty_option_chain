@@ -5099,11 +5099,50 @@ function renderOITable(data) {
                     wdHtml = '<span style="font-size:9px;color:rgba(255,152,0,0.55);font-family:monospace;font-weight:600;">'
                         + 'Early bear<br>signal</span>';
                 } else {
-                    // SIDEWAYS or unknown — show a neutral range-bound message
-                    wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
-                        + 'font-size:10px;font-weight:800;background:rgba(176,190,197,0.08);color:#90a4ae;'
-                        + 'border:1px solid rgba(176,190,197,0.2);">↔ SIDEWAYS</span>';
-                    wdHtml = '<span style="font-size:9px;color:rgba(176,190,197,0.4);font-family:monospace;">range-bound</span>';
+                    // SIDEWAYS bias — derive direction from spot price momentum
+                    // Look at up to 3 older snapshots (idx+1 … idx+3) and compare
+                    // their spot_price with the current row's spot_price.
+                    // Net positive drift → WATCH BULL, net negative → WATCH BEAR,
+                    // truly flat (< ±5 pts across all samples) → Flat momentum.
+                    var curSpot  = row.spot_price || 0;
+                    var momSum   = 0;
+                    var momCount = 0;
+                    for (var mi = 1; mi <= 3; mi++) {
+                        var older = filtered[idx + mi];
+                        if (older && older.spot_price) {
+                            momSum += (curSpot - older.spot_price);
+                            momCount++;
+                        }
+                    }
+                    var momAvg = momCount > 0 ? momSum / momCount : 0;
+                    if (momAvg > 5) {
+                        // Price drifting upward across recent snapshots
+                        wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+                            + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                            + 'font-size:10px;font-weight:800;background:rgba(181,234,58,0.12);color:#b5ea3a;'
+                            + 'border:1px solid rgba(181,234,58,0.3);">⚡ WATCH BULL</span>'
+                            + '<span style="font-size:8px;color:rgba(181,234,58,0.5);font-family:monospace;">spot momentum</span>'
+                            + '</div>';
+                        wdHtml = '<span style="font-size:9px;color:rgba(181,234,58,0.6);font-family:monospace;font-weight:600;">'
+                            + '▲ +' + Math.abs(momAvg).toFixed(1) + ' pts<br>avg drift</span>';
+                    } else if (momAvg < -5) {
+                        // Price drifting downward
+                        wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+                            + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                            + 'font-size:10px;font-weight:800;background:rgba(255,152,0,0.12);color:#ff9800;'
+                            + 'border:1px solid rgba(255,152,0,0.3);">⚠ WATCH BEAR</span>'
+                            + '<span style="font-size:8px;color:rgba(255,152,0,0.5);font-family:monospace;">spot momentum</span>'
+                            + '</div>';
+                        wdHtml = '<span style="font-size:9px;color:rgba(255,152,0,0.6);font-family:monospace;font-weight:600;">'
+                            + '▼ -' + Math.abs(momAvg).toFixed(1) + ' pts<br>avg drift</span>';
+                    } else {
+                        // Truly flat — price barely moving, no actionable direction
+                        wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                            + 'font-size:10px;font-weight:700;background:rgba(176,190,197,0.06);color:#78909c;'
+                            + 'border:1px solid rgba(176,190,197,0.15);">→ Flat</span>';
+                        wdHtml = '<span style="font-size:9px;color:rgba(176,190,197,0.35);font-family:monospace;">'
+                            + (momCount > 0 ? '±' + Math.abs(momAvg).toFixed(1) + ' pts' : 'no data') + '</span>';
+                    }
                 }
                 nlevelHtml = wbHtml;
                 distHtml   = wdHtml;
