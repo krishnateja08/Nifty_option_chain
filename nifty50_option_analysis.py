@@ -5712,56 +5712,10 @@ function mobNavTo(secId, tabId, label) {
             .nc-meter-track{{width:140px;}}
             .oi-summary-strip{{grid-template-columns:repeat(2,minmax(0,1fr));}}
         }}
-        @media(max-width:768px){{
-            .snap-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
-            .logic-grid{{grid-template-columns:1fr;}}
-            .strat-grid-legacy{{grid-template-columns:repeat(2,minmax(0,1fr));}}
-            .sc-compact-grid{{grid-template-columns:1fr;}}
-            .nc-cards-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
-            .pf-grid{{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}}
-            .o5-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
-        }}
-        @media(max-width:600px){{
-            .grid-5,.grid-4{{grid-template-columns:minmax(0,1fr);}}
-            .snap-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}
-            .nc-cards-grid{{grid-template-columns:minmax(0,1fr);}}
-            .nc-section-header{{flex-direction:column;align-items:flex-start;}}
-            .nc-atm-badge{{align-self:flex-end;}}
-            .nc-dir-name{{font-size:clamp(18px,5vw,24px);}}
-            .nc-meters-panel{{min-width:unset;width:100%;}}
-            .nc-meter-track{{width:100%;max-width:280px;}}
-            .pf-avg-strip{{grid-template-columns:1fr;gap:0;padding:14px;}}
-            .pf-avg-sep{{display:none;}}
-            .pf-avg-cell{{text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(79,195,247,0.07);}}
-            .pf-avg-cell:last-child{{border-bottom:none;}}
-            .pf-avg-eyebrow{{margin-bottom:0;}}
-            .md-direction{{font-size:clamp(20px,6vw,28px);}}
-            .md-row-top,.md-row-bottom{{flex-direction:column;align-items:flex-start;}}
-            div[style*="grid-template-columns:1fr 1fr"]{{grid-template-columns:1fr !important;}}
-            .status-bar{{flex-wrap:wrap;}}
-            .sb-item{{flex:1 1 45%;border-right:none;border-bottom:1px solid rgba(79,195,247,0.08);}}
-            .sb-item:nth-child(odd){{border-right:1px solid rgba(79,195,247,0.08);}}
-            .sb-item:last-child,.sb-item:nth-last-child(-n+2):nth-child(odd){{border-bottom:none;}}
-            .pf-date-range{{display:none;}}
-            .strat-grid-legacy{{grid-template-columns:1fr;}}
-            .sc-dp-grid{{grid-template-columns:1fr 1fr;}}
-            .o5-grid{{grid-template-columns:1fr;}}
-            .o5-top-banner{{flex-direction:column;align-items:flex-start;}}
-            .oi-summary-strip{{grid-template-columns:1fr 1fr;}}
-            .oi-table thead th,.oi-table tbody td{{padding:6px 6px;font-size:9px;}}
-            .oi-int-btn{{padding:8px 14px;font-size:10px;}}
-            .oi-table-scroll-hint{{display:flex;}}
-        }}
-        @media(max-width:400px){{
-            .snap-grid{{grid-template-columns:minmax(0,1fr);}}
-            .pf-grid{{grid-template-columns:minmax(0,1fr);}}
-            .header h1{{letter-spacing:0;}}
-            .oi-summary-strip{{grid-template-columns:1fr;}}
-        }}
 
         /* ══ SIDEBAR NAV ══════════════════════════════════════════════ */
         .page-body{{display:flex;align-items:flex-start;position:relative;}}
-        .page-content{{flex:1;min-width:0;}}
+        .page-content{{flex:1;min-width:0;width:100%;}}
         .nav-sidebar{{
             width:190px;flex-shrink:0;
             background:#07111a;
@@ -5796,21 +5750,179 @@ function mobNavTo(secId, tabId, label) {
         .nav-sidebar.collapsed .nsb-item{{padding:8px 14px;}}
         .nsb-tip{{display:none;position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#0d1e2a;border:1px solid rgba(79,195,247,0.25);border-radius:6px;padding:4px 11px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#80deea;white-space:nowrap;z-index:999;pointer-events:none;}}
         .nav-sidebar.collapsed .nsb-item:hover .nsb-tip{{display:block;}}
-        /* Mobile: sidebar hidden, show bar+drawer */
-        .nsb-mob-bar{{display:none;align-items:center;gap:10px;padding:8px 14px;background:#07111a;border-bottom:1px solid rgba(79,195,247,0.12);position:sticky;top:0;z-index:90;}}
-        .nsb-mob-btn{{width:32px;height:32px;border-radius:6px;border:1px solid rgba(79,195,247,0.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;}}
-        .nsb-mob-title{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:rgba(79,195,247,0.6);text-transform:uppercase;}}
-        .nsb-drawer{{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(4,10,16,0.97);z-index:200;flex-direction:column;}}
+
+        /* ── Mobile nav bar + drawer ───────────────────────── */
+        .nsb-mob-bar{{
+            display:none;align-items:center;gap:10px;
+            padding:10px 14px;
+            background:#07111a;
+            border-bottom:1px solid rgba(79,195,247,0.18);
+            position:sticky;top:0;z-index:90;
+            width:100%;
+        }}
+        .nsb-mob-btn{{
+            width:36px;height:36px;border-radius:8px;
+            border:1px solid rgba(79,195,247,0.3);
+            background:rgba(79,195,247,0.06);
+            cursor:pointer;display:flex;align-items:center;justify-content:center;
+            flex-shrink:0;
+        }}
+        .nsb-mob-btn:active{{background:rgba(79,195,247,0.15);}}
+        .nsb-mob-title{{
+            font-family:'JetBrains Mono',monospace;
+            font-size:12px;letter-spacing:1.5px;
+            color:rgba(79,195,247,0.8);
+            text-transform:uppercase;
+            flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+        }}
+        .nsb-drawer{{
+            display:none;position:fixed;
+            top:0;left:0;width:100%;height:100%;
+            background:rgba(4,10,16,0.98);
+            z-index:200;flex-direction:column;
+        }}
         .nsb-drawer.open{{display:flex;}}
-        .nsb-drawer-head{{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(79,195,247,0.12);}}
-        .nsb-drawer-title{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:rgba(79,195,247,0.4);text-transform:uppercase;}}
-        .nsb-drawer-close{{width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,82,82,0.3);background:transparent;cursor:pointer;color:rgba(255,82,82,0.7);font-size:14px;display:flex;align-items:center;justify-content:center;}}
-        .nsb-drawer-nav{{flex:1;overflow-y:auto;padding:8px 0;}}
-        .nsb-mob-item{{padding:13px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(176,190,197,0.6);cursor:pointer;border-left:2px solid transparent;letter-spacing:0.5px;}}
-        .nsb-mob-item:hover,.nsb-mob-item.active{{background:rgba(79,195,247,0.08);border-left-color:#4fc3f7;color:#e0f7fa;}}
+        .nsb-drawer-head{{
+            display:flex;align-items:center;justify-content:space-between;
+            padding:16px 18px;
+            border-bottom:1px solid rgba(79,195,247,0.15);
+            flex-shrink:0;
+        }}
+        .nsb-drawer-title{{
+            font-family:'JetBrains Mono',monospace;font-size:10px;
+            letter-spacing:3px;color:rgba(79,195,247,0.5);text-transform:uppercase;
+        }}
+        .nsb-drawer-close{{
+            width:36px;height:36px;border-radius:8px;
+            border:1px solid rgba(255,82,82,0.35);
+            background:rgba(255,82,82,0.06);
+            cursor:pointer;color:rgba(255,82,82,0.8);
+            font-size:16px;display:flex;align-items:center;justify-content:center;
+        }}
+        .nsb-drawer-nav{{flex:1;overflow-y:auto;padding:6px 0;}}
+        .nsb-mob-item{{
+            padding:15px 20px;
+            font-family:'JetBrains Mono',monospace;font-size:13px;
+            color:rgba(176,190,197,0.65);
+            cursor:pointer;border-left:3px solid transparent;
+            letter-spacing:0.5px;
+            transition:all 0.15s ease;
+        }}
+        .nsb-mob-item:active,
+        .nsb-mob-item.active{{
+            background:rgba(79,195,247,0.1);
+            border-left-color:#4fc3f7;color:#e0f7fa;
+        }}
+
+        /* ══ MOBILE RESPONSIVE OVERRIDES ════════════════════════════ */
         @media(max-width:768px){{
+            /* Hide desktop sidebar, show mobile bar */
             .nav-sidebar{{display:none;}}
             .nsb-mob-bar{{display:flex;}}
+            .page-body{{flex-direction:column;}}
+            .page-content{{width:100%;min-width:0;}}
+
+            /* Header */
+            .header{{padding:12px 12px 0;}}
+            .header h1{{font-size:14px;letter-spacing:0.5px;margin-bottom:10px;line-height:1.4;}}
+            .status-bar{{margin-bottom:10px;border-radius:8px;}}
+            .sb-item{{padding:8px 10px;flex:1 1 45%;}}
+            .sb-label{{font-size:8px;}}
+            .sb-value{{font-size:11px;}}
+            .tab-btn{{padding:10px 12px;font-size:10px;letter-spacing:0.8px;gap:5px;}}
+            .tab-badge{{font-size:8px;padding:2px 5px;}}
+
+            /* Sections */
+            .section{{padding:12px 12px;}}
+            .section-title{{font-size:11px;letter-spacing:1px;margin-bottom:12px;padding-bottom:8px;gap:6px;}}
+
+            /* Grids → single or 2-col */
+            .grid-5,.grid-4{{grid-template-columns:1fr 1fr!important;}}
+            .snap-grid{{grid-template-columns:1fr 1fr!important;gap:8px;}}
+            .card-grid{{gap:8px;}}
+
+            /* OI table: full horizontal scroll */
+            .oi-table-wrap{{overflow-x:auto;-webkit-overflow-scrolling:touch;}}
+            .oi-table{{min-width:520px;}}
+            .oi-table thead th,.oi-table tbody td{{padding:7px 8px;font-size:10px;}}
+            .oi-table-scroll-hint{{display:flex;}}
+            .oi-view-btn{{padding:5px 10px;font-size:9px;}}
+
+            /* OI summary strip */
+            .oi-summary-strip{{grid-template-columns:1fr 1fr;gap:8px;}}
+            .oi-stat-strip{{grid-template-columns:1fr 1fr;gap:8px;}}
+            .oi-controls{{flex-direction:column;gap:8px;align-items:flex-start;}}
+            .oi-chart-wrap{{padding:10px;}}
+
+            /* NC / OI navy */
+            .nc-cards-grid{{grid-template-columns:1fr!important;gap:8px;}}
+            .nc-section-header{{flex-direction:column;align-items:flex-start;}}
+            .nc-meters-panel{{width:100%;min-width:unset;}}
+            .nc-meter-track{{width:100%;max-width:100%;}}
+            .nc-dir-name{{font-size:18px;}}
+            .nc-wrap{{padding:0;}}
+
+            /* Key levels */
+            div[style*="grid-template-columns:1fr 1fr"]{{grid-template-columns:1fr!important;}}
+
+            /* FII / DII */
+            .pf-grid{{grid-template-columns:1fr 1fr!important;gap:8px;}}
+            .pf-avg-strip{{grid-template-columns:1fr;gap:0;padding:12px;}}
+            .pf-avg-sep{{display:none;}}
+            .pf-avg-cell{{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(79,195,247,0.07);}}
+            .pf-avg-cell:last-child{{border-bottom:none;}}
+            .pf-date-range{{display:none;}}
+
+            /* Market direction */
+            .md-row-top,.md-row-bottom{{flex-direction:column;align-items:flex-start;}}
+            .md-direction{{font-size:22px;}}
+
+            /* Strategy checklist */
+            .o5-grid{{grid-template-columns:1fr!important;}}
+            .o5-top-banner{{flex-direction:column;align-items:flex-start;}}
+            .strat-grid-legacy{{grid-template-columns:1fr!important;}}
+            .sc-compact-grid{{grid-template-columns:1fr!important;}}
+            .sc-dp-grid{{grid-template-columns:1fr 1fr;}}
+            .logic-grid{{grid-template-columns:1fr;}}
+
+            /* Pre-trade checklist */
+            .ptc-item{{padding:10px 12px;gap:10px;}}
+            .ptc-text{{font-size:13px;}}
+            .ptc-mindset-box{{flex-direction:column;gap:10px;}}
+
+            /* Heatmap */
+            .hm-grid{{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:4px;}}
+            .hm-cell{{min-height:56px;padding:6px 4px;}}
+            .hm-cell-sym{{font-size:9px;}}
+            .hm-cell-price{{font-size:7px;}}
+            .hm-cell-chg{{font-size:9px;}}
+            .hm-breadth-strip{{flex-direction:column;gap:12px;padding:14px;}}
+            .hm-bs-donut-wrap{{align-self:center;}}
+
+            /* Disclaimer */
+            .disc-text{{white-space:normal;font-size:11px;}}
+
+            /* Footer */
+            .footer{{padding:16px 12px;font-size:11px;}}
+        }}
+
+        @media(max-width:480px){{
+            .header h1{{font-size:13px;}}
+            .grid-5,.grid-4{{grid-template-columns:1fr!important;}}
+            .snap-grid{{grid-template-columns:1fr!important;}}
+            .pf-grid{{grid-template-columns:1fr!important;}}
+            .oi-summary-strip{{grid-template-columns:1fr 1fr;}}
+            .hm-grid{{grid-template-columns:repeat(4,minmax(0,1fr))!important;}}
+            .tab-btn{{padding:9px 9px;font-size:9px;letter-spacing:0.5px;}}
+            .sb-item{{flex:1 1 45%;border-right:none;border-bottom:1px solid rgba(79,195,247,0.08);}}
+            .sb-item:nth-child(odd){{border-right:1px solid rgba(79,195,247,0.08);}}
+        }}
+
+        @media(max-width:360px){{
+            .header h1{{font-size:12px;}}
+            .oi-summary-strip{{grid-template-columns:1fr;}}
+            .hm-grid{{grid-template-columns:repeat(3,minmax(0,1fr))!important;}}
+            .nsb-mob-title{{font-size:11px;}}
         }}
     </style>
 </head>
@@ -5926,38 +6038,15 @@ function mobNavTo(secId, tabId, label) {
             </div>
         </div>
     </nav>
-    <!-- MOBILE HAMBURGER -->
+    <!-- MAIN PAGE CONTENT -->
+    <div class="page-content" id="pageContent">
+    <!-- MOBILE NAV BAR sticky top -->
     <div class="nsb-mob-bar" id="nsbMobBar">
         <button class="nsb-mob-btn" onclick="openNsbDrawer()">
-            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="rgba(79,195,247,0.7)" stroke-width="2" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg>
+            <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="rgba(79,195,247,0.8)" stroke-width="2" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg>
         </button>
         <span class="nsb-mob-title" id="nsbMobTitle">&#128200; Snapshot</span>
     </div>
-    <!-- MOBILE DRAWER -->
-    <div class="nsb-drawer" id="nsbDrawer">
-        <div class="nsb-drawer-head">
-            <span class="nsb-drawer-title">NAVIGATE</span>
-            <button class="nsb-drawer-close" onclick="closeNsbDrawer()">&#10005;</button>
-        </div>
-        <div class="nsb-drawer-nav" id="nsbDrawerNav">
-            <div class="nsb-group" style="padding:10px 18px 4px;">MAIN ANALYSIS</div>
-            <div class="nsb-mob-item active" id="nsmd-snapshot" onclick="mobNavTo('snapshot','main','&#128200; Snapshot')">&#128200; Snapshot</div>
-            <div class="nsb-mob-item" id="nsmd-oi" onclick="mobNavTo('oi','main','&#128202; OI Analysis')">&#128202; OI Analysis</div>
-            <div class="nsb-mob-item" id="nsmd-keylevels" onclick="mobNavTo('keylevels','main','&#128204; Key Levels')">&#128204; Key Levels</div>
-            <div class="nsb-mob-item" id="nsmd-fiidii" onclick="mobNavTo('fiidii','main','&#127982; FII / DII')">&#127982; FII / DII</div>
-            <div class="nsb-mob-item" id="nsmd-direction" onclick="mobNavTo('direction','main','&#129517; Direction')">&#129517; Direction</div>
-            <div class="nsb-mob-item" id="nsmd-technical" onclick="mobNavTo('technical','main','&#128269; Technical')">&#128269; Technical</div>
-            <div class="nsb-mob-item" id="nsmd-optchain" onclick="mobNavTo('optchain','main','&#127919; Option Chain')">&#127919; Option Chain</div>
-            <div class="nsb-group" style="padding:10px 18px 4px;">OTHER VIEWS</div>
-            <div class="nsb-mob-item" id="nsmd-heatmap" onclick="mobNavTo('heatmap','heatmap','&#127956; Heatmap')">&#127956; Heatmap</div>
-            <div class="nsb-mob-item" id="nsmd-oitrend" onclick="mobNavTo('oitrend','oi-trend','&#128202; Intraday OI')">&#128202; Intraday OI</div>
-            <div class="nsb-mob-item" id="nsmd-checklist" onclick="mobNavTo('checklist','checklist','&#129504; Strategy')">&#129504; Strategy</div>
-            <div class="nsb-mob-item" id="nsmd-pretrade" onclick="mobNavTo('pretrade','pretrade','&#9989; Pre-Trade')">&#9989; Pre-Trade</div>
-        </div>
-    </div>
-
-    <!-- MAIN PAGE CONTENT -->
-    <div class="page-content" id="pageContent">
 
     <!-- TAB 1: MAIN ANALYSIS -->
     <div class="tab-panel active" id="tab-main">
@@ -6007,6 +6096,28 @@ function mobNavTo(secId, tabId, label) {
     </div>
     </div><!-- /page-content -->
     </div><!-- /page-body -->
+</div>
+<!-- MOBILE DRAWER — fixed overlay, direct child of body for position:fixed to work on iOS -->
+<div class="nsb-drawer" id="nsbDrawer">
+    <div class="nsb-drawer-head">
+        <span class="nsb-drawer-title">NAVIGATE</span>
+        <button class="nsb-drawer-close" onclick="closeNsbDrawer()">&#10005;</button>
+    </div>
+    <div class="nsb-drawer-nav" id="nsbDrawerNav">
+        <div class="nsb-group" style="padding:10px 18px 4px;">MAIN ANALYSIS</div>
+        <div class="nsb-mob-item active" id="nsmd-snapshot" onclick="mobNavTo('snapshot','main','&#128200; Snapshot')">&#128200; Snapshot</div>
+        <div class="nsb-mob-item" id="nsmd-oi" onclick="mobNavTo('oi','main','&#128202; OI Analysis')">&#128202; OI Analysis</div>
+        <div class="nsb-mob-item" id="nsmd-keylevels" onclick="mobNavTo('keylevels','main','&#128204; Key Levels')">&#128204; Key Levels</div>
+        <div class="nsb-mob-item" id="nsmd-fiidii" onclick="mobNavTo('fiidii','main','&#127982; FII / DII')">&#127982; FII / DII</div>
+        <div class="nsb-mob-item" id="nsmd-direction" onclick="mobNavTo('direction','main','&#129517; Direction')">&#129517; Direction</div>
+        <div class="nsb-mob-item" id="nsmd-technical" onclick="mobNavTo('technical','main','&#128269; Technical')">&#128269; Technical</div>
+        <div class="nsb-mob-item" id="nsmd-optchain" onclick="mobNavTo('optchain','main','&#127919; Option Chain')">&#127919; Option Chain</div>
+        <div class="nsb-group" style="padding:10px 18px 4px;">OTHER VIEWS</div>
+        <div class="nsb-mob-item" id="nsmd-heatmap" onclick="mobNavTo('heatmap','heatmap','&#127956; Heatmap')">&#127956; Heatmap</div>
+        <div class="nsb-mob-item" id="nsmd-oitrend" onclick="mobNavTo('oitrend','oi-trend','&#128202; Intraday OI')">&#128202; Intraday OI</div>
+        <div class="nsb-mob-item" id="nsmd-checklist" onclick="mobNavTo('checklist','checklist','&#129504; Strategy')">&#129504; Strategy</div>
+        <div class="nsb-mob-item" id="nsmd-pretrade" onclick="mobNavTo('pretrade','pretrade','&#9989; Pre-Trade')">&#9989; Pre-Trade</div>
+    </div>
 </div>
 """
         html += all_js
