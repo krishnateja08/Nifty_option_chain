@@ -3170,7 +3170,7 @@ class NiftyHTMLAnalyzer:
       {cell('Strategy',    strat_lbl, strat_arrow, strat_col, strat_bg, strat_bdr, strat_sub)}
       {cell('PCR',         pcr_lbl,   '',          pcr_col,   pcr_bg,   pcr_bdr,   pcr_sub)}
       <div class="ssb-verdict" style="background:{vrd_bg};border-left:3px solid {vrd_lbdr};">
-        <span class="ssb-verdict-lbl" style="color:rgba(255,255,255,0.45);">Overall Verdict</span>
+        <span class="ssb-verdict-lbl" style="color:#80deea;">Overall Verdict</span>
         <span class="ssb-verdict-val" style="color:{vrd_col};">{vrd_lbl}</span>
         <div class="ssb-score-dots">{dots_html}</div>
         <div class="ssb-bar-wrap">
@@ -6020,22 +6020,22 @@ function mobNavTo(secId, tabId, label) {
         .ssb-section{{padding:0 clamp(12px,2.5vw,26px) 16px;border-bottom:none!important;}}
         .ssb-wrap{{background:rgba(6,13,20,0.9);border:1px solid rgba(79,195,247,0.18);border-radius:14px;overflow:hidden;}}
         .ssb-header{{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:rgba(0,0,0,0.35);border-bottom:1px solid rgba(79,195,247,0.1);flex-wrap:wrap;gap:8px;}}
-        .ssb-title{{font-family:'Oxanium',sans-serif;font-size:11px;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;font-weight:700;}}
-        .ssb-ts{{font-size:9px;color:rgba(128,222,234,0.4);letter-spacing:1px;}}
+        .ssb-title{{font-family:'Oxanium',sans-serif;font-size:12px;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;font-weight:700;}}
+        .ssb-ts{{font-size:12px;color:#80deea;letter-spacing:1px;font-family:'JetBrains Mono',monospace;font-weight:600;}}
         .ssb-grid{{display:grid;grid-template-columns:repeat(5,1fr) 1.5fr;}}
         .ssb-cell{{padding:14px 10px;border-right:1px solid rgba(79,195,247,0.08);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;}}
         .ssb-cell:last-child{{border-right:none;}}
-        .ssb-cell-lbl{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:#80deea;text-transform:uppercase;font-weight:700;}}
-        .ssb-badge{{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:7px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;letter-spacing:0.5px;white-space:nowrap;}}
-        .ssb-sub{{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.55);letter-spacing:0.3px;max-width:100px;line-height:1.45;text-align:center;}}
+        .ssb-cell-lbl{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#e0f7fa;text-transform:uppercase;font-weight:700;}}
+        .ssb-badge{{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:7px;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:800;letter-spacing:0.5px;white-space:nowrap;}}
+        .ssb-sub{{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(200,221,232,0.85);letter-spacing:0.3px;max-width:110px;line-height:1.5;text-align:center;}}
         .ssb-verdict{{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 12px;}}
-        .ssb-verdict-lbl{{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;}}
-        .ssb-verdict-val{{font-family:'Oxanium',sans-serif;font-size:clamp(12px,1.6vw,15px);font-weight:800;letter-spacing:1px;text-transform:uppercase;text-align:center;line-height:1.2;}}
+        .ssb-verdict-lbl{{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;color:#e0f7fa;}}
+        .ssb-verdict-val{{font-family:'Oxanium',sans-serif;font-size:clamp(13px,1.8vw,17px);font-weight:800;letter-spacing:1px;text-transform:uppercase;text-align:center;line-height:1.2;}}
         .ssb-score-dots{{display:flex;gap:5px;}}
-        .ssb-dot{{width:9px;height:9px;border-radius:50%;flex-shrink:0;}}
-        .ssb-bar-wrap{{width:100%;display:flex;flex-direction:column;gap:3px;}}
-        .ssb-bar-track{{height:4px;background:rgba(0,0,0,0.5);border-radius:2px;overflow:hidden;width:100%;display:flex;}}
-        .ssb-bar-lbl{{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:0.5px;}}
+        .ssb-dot{{width:10px;height:10px;border-radius:50%;flex-shrink:0;}}
+        .ssb-bar-wrap{{width:100%;display:flex;flex-direction:column;gap:4px;}}
+        .ssb-bar-track{{height:5px;background:rgba(0,0,0,0.5);border-radius:3px;overflow:hidden;width:100%;display:flex;}}
+        .ssb-bar-lbl{{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:0.5px;}}
         @media(max-width:900px){{
             .ssb-grid{{grid-template-columns:repeat(3,1fr) !important;}}
             .ssb-cell:nth-child(3){{border-right:none;}}
