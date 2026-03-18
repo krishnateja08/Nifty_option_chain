@@ -352,6 +352,15 @@
         .oi-table thead th:first-child{text-align:left;}
         .oi-table thead th.oi-th-divider{border-left:1px solid rgba(30,45,56,1);}
 
+        /* ── FOCUS / DETAIL toggle ── */
+        .oi-view-btn{padding:5px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(128,222,234,0.4);background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:20px;cursor:pointer;transition:all 0.2s ease;}
+        .oi-view-btn:hover{color:#4fc3f7;border-color:rgba(79,195,247,0.5);background:rgba(79,195,247,0.08);}
+        .oi-view-active{color:#00e5ff!important;border-color:rgba(79,195,247,0.6)!important;background:rgba(79,195,247,0.14)!important;box-shadow:0 0 10px rgba(79,195,247,0.12);}
+        /* FOCUS mode: hide col-detail columns (default) */
+        .col-detail{display:none;}
+        /* DETAIL mode: show col-detail columns */
+        .oi-detail-mode .col-detail{display:table-cell;}
+
         /* ── Body rows ── */
         .oi-table tbody tr{border-bottom:1px solid rgba(30,45,56,0.8);transition:background 0.15s ease;}
         .oi-table tbody tr:last-child{border-bottom:none;}
@@ -620,7 +629,7 @@
             <div class="sb-item">
                 <span class="sb-dot sb-dot-gen"></span>
                 <span class="sb-label">Generated</span>
-                <span class="sb-value gen-val">17-Mar-2026 16:42 IST</span>
+                <span class="sb-value gen-val">18-Mar-2026 05:45 IST</span>
             </div>
             <div class="sb-item">
                 <span class="sb-dot sb-dot-clock"></span>
@@ -832,16 +841,16 @@
         <div class="nc-bar-row">
           <div class="nc-bar-lbl" style="color:#00ff88;">&#9679; Bull</div>
           <div class="nc-bar-track">
-            <div style="height:100%;width:56%;background:linear-gradient(90deg,#00c96b,#00ff88);border-radius:99px;box-shadow:0 0 6px rgba(0,255,136,0.5);"></div>
+            <div style="height:100%;width:55%;background:linear-gradient(90deg,#00c96b,#00ff88);border-radius:99px;box-shadow:0 0 6px rgba(0,255,136,0.5);"></div>
           </div>
-          <div class="nc-bar-pct" style="color:#00ff88;">56%</div>
+          <div class="nc-bar-pct" style="color:#00ff88;">55%</div>
         </div>
         <div class="nc-bar-row">
           <div class="nc-bar-lbl" style="color:#ff3b5c;">&#9679; Bear</div>
           <div class="nc-bar-track">
-            <div style="height:100%;width:44%;background:linear-gradient(90deg,#c9003a,#ff3b5c);border-radius:99px;box-shadow:0 0 6px rgba(255,59,92,0.5);"></div>
+            <div style="height:100%;width:45%;background:linear-gradient(90deg,#c9003a,#ff3b5c);border-radius:99px;box-shadow:0 0 6px rgba(255,59,92,0.5);"></div>
           </div>
-          <div class="nc-bar-pct" style="color:#ff3b5c;">44%</div>
+          <div class="nc-bar-pct" style="color:#ff3b5c;">45%</div>
         </div>
       </div>
 
@@ -853,7 +862,7 @@
     <!-- Call OI -->
     <div class="nc-oi-cell nc-ce-cell" style="border-top:2px solid #fb7185;">
       <div class="nc-oi-label">Call OI &#916;</div>
-      <div class="nc-oi-value" style="color:#fb7185;">+113,279</div>
+      <div class="nc-oi-value" style="color:#fb7185;">+112,014</div>
       <div class="nc-oi-footer">
         <div class="nc-oi-sub">CE open interest</div>
         <div class="nc-oi-btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">Bearish Signal</div>
@@ -863,7 +872,7 @@
     <!-- Put OI -->
     <div class="nc-oi-cell nc-pe-cell" style="border-top:2px solid #34d399;">
       <div class="nc-oi-label">Put OI &#916;</div>
-      <div class="nc-oi-value" style="color:#34d399;">+142,343</div>
+      <div class="nc-oi-value" style="color:#34d399;">+139,242</div>
       <div class="nc-oi-footer">
         <div class="nc-oi-sub">PE open interest</div>
         <div class="nc-oi-btn" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);color:#10b981;">Bullish Signal</div>
@@ -873,7 +882,7 @@
     <!-- Net OI -->
     <div class="nc-oi-cell nc-net-cell" style="border-top:2px solid #34d399;">
       <div class="nc-oi-label">Net OI &#916;</div>
-      <div class="nc-oi-value" style="color:#34d399;">+29,064</div>
+      <div class="nc-oi-value" style="color:#34d399;">+27,228</div>
       <div class="nc-oi-footer">
         <div class="nc-oi-sub">PE &#916; &#8722; CE &#916;</div>
         <div class="nc-oi-btn" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);color:#10b981;">&#9878; Bullish Net</div>
@@ -918,36 +927,36 @@
                 <span style="font-size:11px;color:#f44336;font-weight:700;letter-spacing:1px;">RESISTANCE ZONE &#9658;</span>
             </div>
             <div style="position:relative;height:62px;">
-                <div class="rl-node-a" style="left:3%;"><div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div><div class="rl-val" style="color:#26c6da;">&#8377;23,325</div><div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div></div>
-                <div class="rl-node-a" style="left:22%;"><div class="rl-lbl" style="color:#00bcd4;">Support</div><div class="rl-val" style="color:#00bcd4;">&#8377;23,400</div><div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div></div>
-                <div style="position:absolute;left:56.92%;transform:translateX(-50%);bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;box-shadow:0 0 16px rgba(79,195,247,0.7);">&#9660; NOW &nbsp;&#8377;23,581</div>
-                <div class="rl-node-a" style="left:75%;"><div class="rl-lbl" style="color:#ff7043;">Resistance</div><div class="rl-val" style="color:#ff7043;">&#8377;23,750</div><div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div></div>
-                <div class="rl-node-a" style="left:95%;"><div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div><div class="rl-val" style="color:#f44336;">&#8377;23,775</div><div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div></div>
+                <div class="rl-node-a" style="left:3%;"><div class="rl-lbl" style="color:#26c6da;">Strong<br>Support</div><div class="rl-val" style="color:#26c6da;">&#8377;23,350</div><div class="rl-dot" style="background:#26c6da;margin:6px auto 0;"></div></div>
+                <div class="rl-node-a" style="left:22%;"><div class="rl-lbl" style="color:#00bcd4;">Support</div><div class="rl-val" style="color:#00bcd4;">&#8377;23,500</div><div class="rl-dot" style="background:#00bcd4;box-shadow:0 0 8px #00bcd4;margin:6px auto 0;"></div></div>
+                <div style="position:absolute;left:57.79%;transform:translateX(-50%);bottom:4px;background:#4fc3f7;color:#000;font-size:11px;font-weight:700;padding:4px 13px;border-radius:6px;white-space:nowrap;z-index:10;box-shadow:0 0 16px rgba(79,195,247,0.7);">&#9660; NOW &nbsp;&#8377;23,581</div>
+                <div class="rl-node-a" style="left:75%;"><div class="rl-lbl" style="color:#ff7043;">Resistance</div><div class="rl-val" style="color:#ff7043;">&#8377;23,650</div><div class="rl-dot" style="background:#ff7043;box-shadow:0 0 8px #ff7043;margin:6px auto 0;"></div></div>
+                <div class="rl-node-a" style="left:95%;"><div class="rl-lbl" style="color:#f44336;">Strong<br>Resistance</div><div class="rl-val" style="color:#f44336;">&#8377;23,750</div><div class="rl-dot" style="background:#f44336;margin:6px auto 0;"></div></div>
             </div>
             <div style="position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,#26c6da 0%,#00bcd4 20%,#4fc3f7 40%,#ffb74d 58%,#ff7043 76%,#f44336 100%);box-shadow:0 2px 14px rgba(0,0,0,0.5);">
-                <div style="position:absolute;left:56.92%;top:50%;transform:translate(-50%,-50%);width:4px;height:22px;background:#fff;border-radius:2px;box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
+                <div style="position:absolute;left:57.79%;top:50%;transform:translate(-50%,-50%);width:4px;height:22px;background:#fff;border-radius:2px;box-shadow:0 0 16px rgba(255,255,255,1);z-index:10;"></div>
             </div>
             <div style="position:relative;height:58px;"><div class="rl-node-b" style="left:43%;"><div class="rl-dot" style="background:#ffb74d;box-shadow:0 0 8px #ffb74d;margin:0 auto 5px;"></div><div class="rl-lbl" style="color:#ffb74d;">Max Pain</div><div class="rl-val" style="color:#ffb74d;">₹23,550</div></div></div>
         </div>
 
         <!-- Mobile: compact table (shown only on <520px) -->
         <table class="kl-mobile-table">
-            <tr><td style="color:#26c6da;">&#9660; Strong Support</td><td style="color:#26c6da;">&#8377;23,325</td></tr>
-            <tr><td style="color:#00bcd4;">&#9660; Support (S1)</td><td style="color:#00bcd4;">&#8377;23,400</td></tr>
+            <tr><td style="color:#26c6da;">&#9660; Strong Support</td><td style="color:#26c6da;">&#8377;23,350</td></tr>
+            <tr><td style="color:#00bcd4;">&#9660; Support (S1)</td><td style="color:#00bcd4;">&#8377;23,500</td></tr>
             <tr><td style="color:#4fc3f7;font-weight:700;">&#9654; NOW</td><td style="color:#4fc3f7;font-weight:700;">&#8377;23,581</td></tr>
             <tr><td style="color:#ffb74d;">&#127919; Max Pain</td><td style="color:#ffb74d;">&#8377;23,550</td></tr>
-            <tr><td style="color:#ff7043;">&#9650; Resistance (R1)</td><td style="color:#ff7043;">&#8377;23,750</td></tr>
-            <tr><td style="color:#f44336;">&#9650; Strong Resistance</td><td style="color:#f44336;">&#8377;23,775</td></tr>
+            <tr><td style="color:#ff7043;">&#9650; Resistance (R1)</td><td style="color:#ff7043;">&#8377;23,650</td></tr>
+            <tr><td style="color:#f44336;">&#9650; Strong Resistance</td><td style="color:#f44336;">&#8377;23,750</td></tr>
         </table>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;">
             <div style="background:rgba(244,67,54,0.08);border:1px solid rgba(244,67,54,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
                 <span style="font-size:12px;color:#c8d8e0;">&#128205; To Resistance</span>
-                <span style="font-size:15px;font-weight:700;color:#f44336;">+168 pts</span>
+                <span style="font-size:15px;font-weight:700;color:#f44336;">+68 pts</span>
             </div>
             <div style="background:rgba(0,188,212,0.08);border:1px solid rgba(0,188,212,0.25);border-radius:8px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;">
                 <span style="font-size:12px;color:#c8d8e0;">&#128205; To Support</span>
-                <span style="font-size:15px;font-weight:700;color:#00bcd4;">−181 pts</span>
+                <span style="font-size:15px;font-weight:700;color:#00bcd4;">−81 pts</span>
             </div>
         </div>
     </div>
@@ -971,7 +980,7 @@
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(0,200,255,0.06);border-radius:4px;overflow:hidden;margin-bottom:14px;">
                     <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
                         <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">Put / Call</div>
-                        <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:700;line-height:1;color:#ffb74d;text-shadow:0 0 16px #ffb74d99;">0.91</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:28px;font-weight:700;line-height:1;color:#ffb74d;text-shadow:0 0 16px #ffb74d99;">0.90</div>
                         <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">PCR RATIO</div>
                     </div>
                     <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
@@ -998,7 +1007,7 @@
                                 <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#ff4d6d;filter:brightness(2);box-shadow:0 0 8px #ff4d6d;"></span>
                             </div>
                         </div>
-                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;width:64px;text-align:right;flex-shrink:0;">+113K</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;width:64px;text-align:right;flex-shrink:0;">+112K</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#00e676;width:26px;flex-shrink:0;">PE</div>
@@ -1007,7 +1016,7 @@
                                 <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#00e676;filter:brightness(2);box-shadow:0 0 8px #00e676;"></span>
                             </div>
                         </div>
-                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;width:64px;text-align:right;flex-shrink:0;">+142K</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;width:64px;text-align:right;flex-shrink:0;">+139K</div>
                     </div>
                 </div>
 
@@ -1026,7 +1035,7 @@
                     <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
                         <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;background:rgba(255,77,109,0.08);color:rgba(255,100,130,0.85);border:1px solid rgba(255,77,109,0.2);width:32px;text-align:center;flex-shrink:0;">R2</span>
                         <div style="flex:1;height:6px;background:rgba(255,255,255,0.04);">
-                            <div style="height:100%;width:65%;background:linear-gradient(90deg,rgba(255,77,109,0.15),rgba(255,77,109,0.7));"></div>
+                            <div style="height:100%;width:64%;background:linear-gradient(90deg,rgba(255,77,109,0.15),rgba(255,77,109,0.7));"></div>
                         </div>
                         <span style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:rgba(255,143,163,0.85);flex-shrink:0;min-width:80px;text-align:right;">&#8377;23,500</span>
                     </div>
@@ -1250,19 +1259,19 @@
     <div class="section-title">
         <span>🏦</span> FII / DII INSTITUTIONAL FLOW
         <span class="pf-live-badge pf-live">● LIVE</span>
-        <span class="pf-date-range">Last 5 Trading Days &nbsp;·&nbsp; Mar 10 – Mar 16</span>
+        <span class="pf-date-range">Last 5 Trading Days &nbsp;·&nbsp; Mar 11 – Mar 17</span>
     </div>
-    <div class="pf-grid"><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 10</span><span class="pf-card-day">Tue</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-4,673</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:37.1%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+6,333</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:50.3%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+1,661</span></div></div><div class="pf-card" style="border-color:rgba(255,68,68,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#ff4444,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 11</span><span class="pf-card-day">Wed</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-6,267</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:49.8%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+4,966</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:39.4%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#f87171;">-1,302</span></div></div><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 12</span><span class="pf-card-day">Thu</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-7,050</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:56.0%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+7,450</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:59.2%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+400</span></div></div><div class="pf-card" style="border-color:rgba(255,68,68,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#ff4444,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 13</span><span class="pf-card-day">Fri</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-10,717</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:85.1%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+9,977</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:79.2%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#f87171;">-739</span></div></div><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 16</span><span class="pf-card-day">Mon</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-9,366</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:74.4%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+12,593</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:100%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+3,228</span></div></div></div>
+    <div class="pf-grid"><div class="pf-card" style="border-color:rgba(255,68,68,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#ff4444,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 11</span><span class="pf-card-day">Wed</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-6,267</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:49.8%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+4,966</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:39.4%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#f87171;">-1,302</span></div></div><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 12</span><span class="pf-card-day">Thu</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-7,050</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:56.0%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+7,450</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:59.2%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+400</span></div></div><div class="pf-card" style="border-color:rgba(255,68,68,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#ff4444,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 13</span><span class="pf-card-day">Fri</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-10,717</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:85.1%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+9,977</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:79.2%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#f87171;">-739</span></div></div><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 16</span><span class="pf-card-day">Mon</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-9,366</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:74.4%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+12,593</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:100%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+3,228</span></div></div><div class="pf-card" style="border-color:rgba(0,212,255,0.18);"><div class="pf-card-topline" style="background:linear-gradient(90deg,transparent,#00d4ff,transparent);"></div><div class="pf-card-head"><span class="pf-card-date">Mar 17</span><span class="pf-card-day">Tue</span></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-fii-lbl">FII</span><span class="pf-block-val" style="color:#ff4444;">-4,741</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:37.6%;background:linear-gradient(90deg,#ff4444,#ff0055);"></div></div></div><div class="pf-divider"></div><div class="pf-block"><div class="pf-block-header"><span class="pf-block-lbl pf-dii-lbl">DII</span><span class="pf-block-val" style="color:#ffb300;">+5,225</span></div><div class="pf-bar-track"><div class="pf-bar-fill" style="width:41.5%;background:linear-gradient(90deg,#ffb300,#ff8f00);"></div></div></div><div class="pf-card-net"><span class="pf-net-lbl">NET</span><span class="pf-net-val" style="color:#34d399;">+484</span></div></div></div>
     <div class="pf-avg-strip">
-        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">FII 5D Avg</div><div class="pf-avg-val" style="color:#ff4444;">-7,614</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>
+        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">FII 5D Avg</div><div class="pf-avg-val" style="color:#ff4444;">-7,628</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>
         <div class="pf-avg-sep"></div>
-        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">DII 5D Avg</div><div class="pf-avg-val" style="color:#ffb300;">+8,264</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>
+        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">DII 5D Avg</div><div class="pf-avg-val" style="color:#ffb300;">+8,042</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>
         <div class="pf-avg-sep"></div>
-        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">Net Combined</div><div class="pf-avg-val" style="color:#c084fc;">+649</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>
+        <div class="pf-avg-cell"><div class="pf-avg-eyebrow">Net Combined</div><div class="pf-avg-val" style="color:#c084fc;">+414</div><div class="pf-avg-unit">&#8377; Cr / day</div></div>
     </div>
     <div class="pf-insight-box" style="background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);">
         <div class="pf-insight-header"><span class="pf-insight-lbl" style="color:#69f0ae;">&#128202; 5-DAY INSIGHT &amp; DIRECTION</span><span class="pf-verdict-badge" style="color:#69f0ae;background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);">📈 CAUTIOUSLY BULLISH</span></div>
-        <div class="pf-insight-text">FIIs are net sellers (avg <span style="color:#ff5252;font-weight:700;">₹-7614 Cr/day</span>) but DIIs are absorbing strongly (avg <span style="color:#40c4ff;font-weight:700;">₹+8264 Cr/day</span>). DII support is cushioning downside — FII return is key for breakout. Net combined flow: <span style="color:#b388ff;font-weight:700;">₹+649 Cr/day</span>.</div>
+        <div class="pf-insight-text">FIIs are net sellers (avg <span style="color:#ff5252;font-weight:700;">₹-7628 Cr/day</span>) but DIIs are absorbing strongly (avg <span style="color:#40c4ff;font-weight:700;">₹+8042 Cr/day</span>). DII support is cushioning downside — FII return is key for breakout. Net combined flow: <span style="color:#b388ff;font-weight:700;">₹+414 Cr/day</span>.</div>
     </div>
 </div>
 
@@ -1287,7 +1296,7 @@
             </div>
           </div>
           <div style="display:flex;gap:20px;flex-wrap:wrap;">
-            <div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">PCR (OI)</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">0.907</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">Max Pain</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">&#8377;23,550</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">RSI (14)</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">26.3</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">MACD</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ff5252;">Bearish</div></div>
+            <div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">PCR (OI)</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">0.900</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">Max Pain</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">&#8377;23,550</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">RSI (14)</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ffb74d;">26.3</div></div><div style="text-align:center;"><div style="font-family:JetBrains Mono,monospace;font-size:8px;letter-spacing:2px;color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:3px;">MACD</div><div style="font-family:Orbitron,monospace;font-size:13px;font-weight:700;color:#ff5252;">Bearish</div></div>
           </div>
         </div>
 
@@ -1300,9 +1309,9 @@
                   MARKET DIRECTION &nbsp;·&nbsp; ALGORITHMIC
                 </div>
                 <div class="md-pills-top">
-                  <span class="md-pill md-pill-bull">BULL 2</span>
-                  <span class="md-pill md-pill-bear">BEAR 4</span>
-                  <span class="md-pill md-pill-conf-med">MEDIUM CONFIDENCE</span>
+                  <span class="md-pill md-pill-bull">BULL 3</span>
+                  <span class="md-pill md-pill-bear">BEAR 3</span>
+                  <span class="md-pill md-pill-conf-low">LOW CONFIDENCE</span>
                 </div>
             </div>
 
@@ -1315,13 +1324,13 @@
                   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
                   SIDEWAYS</div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(180,210,230,0.4);">
-                  Score: <span style="color:#ffb74d;font-weight:700;">-2</span>
+                  Score: <span style="color:#ffb74d;font-weight:700;">0</span>
                   / 6 signals
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;">
                   <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
                     color:rgba(120,160,180,0.35);text-transform:uppercase;">Conf</span>
-                  <div style="width:9px;height:9px;border-radius:50%;background:#ffb74d;box-shadow:0 0 6px #ffb74d;"></div><div style="width:9px;height:9px;border-radius:50%;background:#ffb74d;box-shadow:0 0 6px #ffb74d;"></div><div style="width:9px;height:9px;border-radius:50%;background:#ffb74d;box-shadow:0 0 6px #ffb74d;"></div><div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);"></div><div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);"></div>
+                  <div style="width:9px;height:9px;border-radius:50%;background:#ffb74d;box-shadow:0 0 6px #ffb74d;"></div><div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);"></div><div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);"></div><div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);"></div><div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);"></div>
                 </div>
               </div>
 
@@ -1341,7 +1350,7 @@
                     stroke="rgba(255,255,255,0.06)" stroke-width="10" stroke-linecap="round"/>
                   <path d="M 15 82 A 65 65 0 0 1 145 82" fill="none"
                     stroke="url(#gaugeGradMD)" stroke-width="10" stroke-linecap="round" opacity="0.65"/>
-                  <g style="transform:rotate(27deg);transform-origin:80px 82px;">
+                  <g style="transform:rotate(0deg);transform-origin:80px 82px;">
                     <line x1="80" y1="82" x2="80" y2="28" stroke="#ffb74d"
                       stroke-width="2.5" stroke-linecap="round"/>
                     <circle cx="80" cy="82" r="6" fill="#ffb74d"
@@ -1355,7 +1364,7 @@
                 </svg>
                 <div style="text-align:center;margin-top:-4px;">
                   <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:900;
-                    color:#ffb74d;">-2</div>
+                    color:#ffb74d;">0</div>
                   <div style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:2px;
                     color:rgba(120,160,180,0.35);text-transform:uppercase;">Total Score</div>
                 </div>
@@ -1375,8 +1384,8 @@
                         background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.3);
                         display:inline-block;margin-bottom:5px;">S1</div>
                       <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;
-                        color:#00e676;">&#8377;23,400</div>
-                      <span style="font-size:9px;color:rgba(0,230,118,0.55);">181 pts away</span>
+                        color:#00e676;">&#8377;23,500</div>
+                      <span style="font-size:9px;color:rgba(0,230,118,0.55);">81 pts away</span>
                     </div>
                     <!-- R1 card -->
                     <div style="flex:1;padding:8px 10px;border-radius:8px;
@@ -1388,8 +1397,8 @@
                         background:rgba(255,77,109,0.12);color:#ff4d6d;border:1px solid rgba(255,77,109,0.3);
                         display:inline-block;margin-bottom:5px;">R1</div>
                       <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;
-                        color:#ff4d6d;">&#8377;23,750</div>
-                      <span style="font-size:9px;color:rgba(255,77,109,0.55);">169 pts away</span>
+                        color:#ff4d6d;">&#8377;23,650</div>
+                      <span style="font-size:9px;color:rgba(255,77,109,0.55);">69 pts away</span>
                     </div>
                   </div>
                   <!-- Proximity hint -->
@@ -1629,12 +1638,12 @@
                                  color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
                   </td>
                   <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">55.5K</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">55.9K</div>
                     <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
                       <div style="height:100%;width:100%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+26,323</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+26,762</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;83.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">465.3K</td>
                 </tr>
@@ -1648,12 +1657,12 @@
                                  color:#ffb74d;background:rgba(255,183,77,0.12);border:1px solid rgba(255,183,77,0.35);">ITM</span>
                   </td>
                   <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">36.2K</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">35.5K</div>
                     <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:65%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
+                      <div style="height:100%;width:64%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+15,899</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+15,243</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;309.35</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">451.6K</td>
                 </tr>
@@ -1667,12 +1676,12 @@
                                  color:#00d4ff;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.4);">ATM</span>
                   </td>
                   <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">32.8K</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">32.7K</div>
                     <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:59%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
+                      <div style="height:100%;width:58%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+23,706</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+23,617</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;252.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">300.8K</td>
                 </tr>
@@ -1691,7 +1700,7 @@
                       <div style="height:100%;width:45%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+11,066</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+11,024</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;152.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">216.3K</td>
                 </tr>
@@ -1705,12 +1714,12 @@
                                  color:#546e7a;background:rgba(84,110,122,0.1);border:1px solid rgba(84,110,122,0.3);">OTM</span>
                   </td>
                   <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">20.3K</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#ff3355;margin-bottom:4px;">20.9K</div>
                     <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
                       <div style="height:100%;width:37%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+8,824</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+9,444</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;59.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">148.3K</td>
                 </tr></tbody>
@@ -1749,12 +1758,12 @@
                                  color:#ffb74d;background:rgba(255,183,77,0.12);border:1px solid rgba(255,183,77,0.35);">ITM</span>
                   </td>
                   <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">41.6K</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">41.5K</div>
                     <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
                       <div style="height:100%;width:100%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+26,608</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+26,505</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;215.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">408.3K</td>
                 </tr>
@@ -1768,12 +1777,12 @@
                                  color:#00d4ff;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.4);">ATM</span>
                   </td>
                   <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">31.3K</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">31.2K</div>
                     <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
                       <div style="height:100%;width:75%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+25,040</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+24,942</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;255.45</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">198.8K</td>
                 </tr>
@@ -1787,12 +1796,12 @@
                                  color:#ffb74d;background:rgba(255,183,77,0.12);border:1px solid rgba(255,183,77,0.35);">ITM</span>
                   </td>
                   <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">30.1K</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">29.4K</div>
                     <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:72%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
+                      <div style="height:100%;width:71%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+13,041</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+12,346</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;130.90</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">158.1K</td>
                 </tr>
@@ -1811,7 +1820,7 @@
                       <div style="height:100%;width:60%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+11,345</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+11,315</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;153.25</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">184.9K</td>
                 </tr>
@@ -1825,12 +1834,12 @@
                                  color:#ffb74d;background:rgba(255,183,77,0.12);border:1px solid rgba(255,183,77,0.35);">ITM</span>
                   </td>
                   <td style="padding:9px 14px 9px 10px;min-width:130px;">
-                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">24.0K</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#00e676;margin-bottom:4px;">22.8K</div>
                     <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;">
-                      <div style="height:100%;width:58%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
+                      <div style="height:100%;width:55%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+8,457</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+7,227</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;182.50</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">311.1K</td>
                 </tr></tbody>
@@ -1860,7 +1869,7 @@
             <div class="cc-lbl">PCR Ratio (OI)</div>
             <span class="tag tag-neu">Neutral</span>
           </div>
-          <div class="cc-val" style="color:#ffb74d;">0.907</div>
+          <div class="cc-val" style="color:#ffb74d;">0.900</div>
           <div class="cc-sub">Put/Call OI Ratio</div>
           <div style="position:relative;margin:8px 0 4px;">
             <div style="height:8px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,0.4);position:relative;">
@@ -1868,7 +1877,7 @@
                 background:linear-gradient(90deg,#ff3355 0%,#ff9900 35%,#ffcc00 50%,#88dd00 65%,#00e676 100%);opacity:0.75;"></div>
               <div style="position:absolute;left:35%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.4);"></div>
               <div style="position:absolute;left:60%;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.4);"></div>
-              <div style="position:absolute;top:-3px;left:45.4%;
+              <div style="position:absolute;top:-3px;left:45.0%;
                 transform:translateX(-50%);width:3px;height:14px;
                 background:white;border-radius:1.5px;box-shadow:0 0 8px white;"></div>
             </div>
@@ -1927,16 +1936,16 @@
               <div style="display:flex;align-items:center;gap:7px;">
                 <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:22px;">CE</span>
                 <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:44.3%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
+                  <div style="height:100%;width:44.6%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
                 </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:30px;text-align:right;">44%</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:30px;text-align:right;">45%</span>
               </div>
               <div style="display:flex;align-items:center;gap:7px;">
                 <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:22px;">PE</span>
                 <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:55.7%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
+                  <div style="height:100%;width:55.4%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
                 </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:30px;text-align:right;">56%</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:30px;text-align:right;">55%</span>
               </div>
             </div>
           </div>
@@ -1960,16 +1969,16 @@
               <div style="display:flex;align-items:center;gap:7px;">
                 <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff8899;width:22px;">CE</span>
                 <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:52.4%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
+                  <div style="height:100%;width:52.6%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
                 </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff8899;width:30px;text-align:right;">52%</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff8899;width:30px;text-align:right;">53%</span>
               </div>
               <div style="display:flex;align-items:center;gap:7px;">
                 <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#44ffaa;width:22px;">PE</span>
                 <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:47.6%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
+                  <div style="height:100%;width:47.4%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
                 </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#44ffaa;width:30px;text-align:right;">48%</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#44ffaa;width:30px;text-align:right;">47%</span>
               </div>
             </div>
           </div>
@@ -1987,7 +1996,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 17-Mar-2026 16:42 IST</span>
+            <span>Stock data as of: 18-Mar-2026 05:45 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
@@ -2274,14 +2283,20 @@
           </div>
         </div>
         <div class="oi-table-wrap">
+          <!-- FOCUS / DETAIL toggle -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;">VIEW</span>
+            <button id="btnFocus" onclick="setOIView('focus')" class="oi-view-btn oi-view-active">⚡ FOCUS</button>
+            <button id="btnDetail" onclick="setOIView('detail')" class="oi-view-btn">📊 DETAIL</button>
+          </div>
           <div class="oi-table-scroll-hint">&#8596; Scroll to see all columns</div>
           <table class="oi-table">
             <thead>
               <tr>
                 <th style="text-align:left;">TIME (IST)</th>
-                <th>CALL OI &#916;</th>
-                <th>PUT OI &#916;</th>
-                <th>DIFF</th>
+                <th class="col-detail">CALL OI &#916;</th>
+                <th class="col-detail">PUT OI &#916;</th>
+                <th class="col-detail">DIFF</th>
                 <th>PCR</th>
                 <th>OPTION SIGNAL</th>
                 <th>SPOT PRICE</th>
@@ -2290,7 +2305,7 @@
                 <th>STREAK</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
-                <th>VWAP</th>
+                <th class="col-detail">VWAP</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
@@ -2320,19 +2335,19 @@
             <div class="o5-wrap">
                 <div class="o5-top-banner">
                     <div class="o5-banner-left">
-                        <div class="o5-score-circle" style="border-color:#ff5252;box-shadow:0 0 20px #ff525244,inset 0 0 16px #ff525211;">
-                            <div class="o5-score-num" style="color:#ff5252;">-3</div>
+                        <div class="o5-score-circle" style="border-color:#ff8a65;box-shadow:0 0 20px #ff8a6544,inset 0 0 16px #ff8a6511;">
+                            <div class="o5-score-num" style="color:#ff8a65;">-2</div>
                             <div class="o5-score-lbl">SCORE</div>
                         </div>
                         <div>
-                            <div class="o5-verdict" style="color:#ff5252;text-shadow:0 0 20px #ff525266;">STRONGLY BEARISH</div>
-                            <div class="o5-sub">Score -3 from 7 signals (0 skipped as N/A). Strong directional conviction — proceed with caution and stop losses.</div>
+                            <div class="o5-verdict" style="color:#ff8a65;text-shadow:0 0 20px #ff8a6566;">MILDLY BEARISH</div>
+                            <div class="o5-sub">Score -2 from 7 signals (0 skipped as N/A). Moderate signal — size positions conservatively.</div>
                         </div>
                     </div>
                     <div class="o5-pills">
                         <span class="sc-pill sc-pill-bull">&#10003; BULL: 1</span>
-                        <span class="sc-pill sc-pill-bear">&#10007; BEAR: 4</span>
-                        <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: 2</span>
+                        <span class="sc-pill sc-pill-bear">&#10007; BEAR: 3</span>
+                        <span class="sc-pill sc-pill-neu">&#9633; NEUTRAL: 3</span>
                         
                     </div>
                 </div>
@@ -2342,8 +2357,8 @@
                 <span class="o5-tile-label">PCR (OI Ratio) <span class="auto-badge">AUTO</span></span>
                 <div class="o5-chip o5-chip-neu">0</div>
             </div>
-            <div class="o5-val" style="color:#fbbf24;">0.907</div>
-            <div class="o5-msg">PCR 0.907 → in 0.8–1.2 range — neutral/mixed sentiment</div>
+            <div class="o5-val" style="color:#fbbf24;">0.900</div>
+            <div class="o5-msg">PCR 0.900 → in 0.8–1.2 range — neutral/mixed sentiment</div>
             <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#f59e0b,transparent);"></div>
         </div>
         <div class="o5-tile o5-bear">
@@ -2391,14 +2406,14 @@
             <div class="o5-msg">Global indices (Dow/S&P/SGX Gift Nifty) showing bullish bias</div>
             <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#10b981,transparent);"></div>
         </div>
-        <div class="o5-tile o5-bear">
+        <div class="o5-tile o5-neu">
             <div class="o5-tile-top">
                 <span class="o5-tile-label">India VIX <span class="auto-badge">AUTO</span></span>
-                <div class="o5-chip o5-chip-bear">-1</div>
+                <div class="o5-chip o5-chip-neu">0</div>
             </div>
-            <div class="o5-val" style="color:#f87171;">21.6 (falling)</div>
-            <div class="o5-msg">VIX 21.6 above 20 — high fear, bearish/volatile market</div>
-            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#ef4444,transparent);"></div>
+            <div class="o5-val" style="color:#fbbf24;">19.8 (falling)</div>
+            <div class="o5-msg">VIX 19.8 elevated — stable watch zone</div>
+            <div class="o5-tile-bar" style="background:linear-gradient(90deg,transparent,#f59e0b,transparent);"></div>
         </div></div>
             </div>
         </div>
@@ -2411,9 +2426,9 @@
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
                 <div style="font-size:13px;color:rgba(176,190,197,0.7);">
-                    IV View: <strong style="color:#ff5252;">NORMAL</strong>
-                    &nbsp;&middot;&nbsp; Bias: <strong style="color:#ff5252;">STRONGLY BEARISH</strong>
-                    &nbsp;&middot;&nbsp; <span style="color:rgba(128,222,234,0.7);">11 strategies found</span>
+                    IV View: <strong style="color:#ff8a65;">NORMAL</strong>
+                    &nbsp;&middot;&nbsp; Bias: <strong style="color:#ff8a65;">MILDLY BEARISH</strong>
+                    &nbsp;&middot;&nbsp; <span style="color:rgba(128,222,234,0.7);">6 strategies found</span>
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <button class="filter-btn active" onclick="filterStrats('all',this)">All</button>
@@ -2435,13 +2450,13 @@
                 <div class="sc-ss-item">
                     <span class="sc-ss-dot" style="background:#ffb74d;"></span>
                     <span class="sc-ss-lbl">SECONDARY</span>
-                    <span class="sc-ss-val" style="color:#ffb74d;">4</span>
+                    <span class="sc-ss-val" style="color:#ffb74d;">2</span>
                 </div>
                 <div class="sc-ss-sep"></div>
                 <div class="sc-ss-item">
                     <span class="sc-ss-dot" style="background:#b388ff;"></span>
                     <span class="sc-ss-lbl">ADVANCED</span>
-                    <span class="sc-ss-val" style="color:#b388ff;">3</span>
+                    <span class="sc-ss-val" style="color:#b388ff;">0</span>
                 </div>
                 <div class="sc-ss-sep"></div>
                 <div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(128,222,234,0.65);">
@@ -2449,17 +2464,17 @@
                 </div>
             </div>
             <div class="sc-compact-grid" id="stratGrid">
-        <div class="sc-row" data-type="bearish" data-strat="Long Put" onclick="scToggle(this,'sc-dp-1')">
+        <div class="sc-row" data-type="bearish" data-strat="Bear Call Spread" onclick="scToggle(this,'sc-dp-1')">
             <div class="sc-row-bar" style="background:linear-gradient(180deg,#ff5252,#b71c1c);"></div>
             <div class="sc-row-num">01</div>
             <div class="sc-row-body">
-                <div class="sc-row-name">Long Put</div>
-                <div class="sc-row-strike">&#127919; <span>BUY 23600PE (ATM) or 23550PE (slight OTM)</span></div>
+                <div class="sc-row-name">Bear Call Spread</div>
+                <div class="sc-row-strike">&#127919; <span>SELL 23650CE  +  BUY 24000CE (call wall hedge)</span></div>
             </div>
             <div class="sc-row-meta">
                 <span class="sc-row-tag strat-tag-bear">🔴 Bearish</span>
                 <span class="sc-rb sc-rb-primary">PRIMARY</span>
-                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.44</span>
+                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.00</span>
             </div>
             <div class="sc-row-chevron" id="chev-sc-dp-1">&#8250;</div>
         </div>
@@ -2472,22 +2487,22 @@
                 </div>
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RISK : REWARD</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">1 : 1.44</div>
+                    <div class="sc-dp-val" style="color:#ffb74d;">1 : 1.00</div>
                     <div class="sc-dp-sub">&#9888; Acceptable</div>
-                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:48%;background:linear-gradient(180deg,#ff5252,#b71c1c);"></div></div>
+                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:33%;background:linear-gradient(180deg,#ff5252,#b71c1c);"></div></div>
                 </div>
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RANK</div>
                     <div class="sc-dp-val" style="color:#80deea;">PRIMARY</div>
-                    <div class="sc-dp-sub">#01 of 11</div>
+                    <div class="sc-dp-sub">#01 of 6</div>
                 </div>
             </div>
             <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 23600PE (ATM) or 23550PE (slight OTM)
+                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> SELL 23650CE  +  BUY 24000CE (call wall hedge)
             </div>
             <div class="sc-dp-actions">
                 <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-1',event)">&#10005; Close</button>
-                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Long Put',event)">&#128203; Load Trade Plan &#8599;</button>
+                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Bear Call Spread',event)">&#128203; Load Trade Plan &#8599;</button>
             </div>
         </div>
         <div class="sc-row" data-type="bearish" data-strat="Bear Put Spread" onclick="scToggle(this,'sc-dp-2')">
@@ -2520,7 +2535,7 @@
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RANK</div>
                     <div class="sc-dp-val" style="color:#80deea;">PRIMARY</div>
-                    <div class="sc-dp-sub">#02 of 11</div>
+                    <div class="sc-dp-sub">#02 of 6</div>
                 </div>
             </div>
             <div class="sc-dp-strike-box">
@@ -2531,17 +2546,17 @@
                 <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Bear Put Spread',event)">&#128203; Load Trade Plan &#8599;</button>
             </div>
         </div>
-        <div class="sc-row" data-type="bearish" data-strat="Bear Call Spread" onclick="scToggle(this,'sc-dp-3')">
+        <div class="sc-row" data-type="bearish" data-strat="Reverse Jade Lizard" onclick="scToggle(this,'sc-dp-3')">
             <div class="sc-row-bar" style="background:linear-gradient(180deg,#ff5252,#b71c1c);"></div>
             <div class="sc-row-num">03</div>
             <div class="sc-row-body">
-                <div class="sc-row-name">Bear Call Spread</div>
-                <div class="sc-row-strike">&#127919; <span>SELL 23650CE  +  BUY 24000CE (call wall hedge)</span></div>
+                <div class="sc-row-name">Reverse Jade Lizard</div>
+                <div class="sc-row-strike">&#127919; <span>SELL 23550PE  +  SELL 23650/23700CE spread</span></div>
             </div>
             <div class="sc-row-meta">
                 <span class="sc-row-tag strat-tag-bear">🔴 Bearish</span>
                 <span class="sc-rb sc-rb-primary">PRIMARY</span>
-                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.00</span>
+                <span class="sc-row-rr" style="color:#ff5252;">R:R 0.43</span>
             </div>
             <div class="sc-row-chevron" id="chev-sc-dp-3">&#8250;</div>
         </div>
@@ -2549,40 +2564,40 @@
             <div class="sc-dp-grid">
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">STRATEGY TYPE</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">Debit / Credit</div>
+                    <div class="sc-dp-val" style="color:#ff5252;">Debit / Credit</div>
                     <div class="sc-dp-sub">Directional</div>
                 </div>
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RISK : REWARD</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">1 : 1.00</div>
-                    <div class="sc-dp-sub">&#9888; Acceptable</div>
-                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:33%;background:linear-gradient(180deg,#ff5252,#b71c1c);"></div></div>
+                    <div class="sc-dp-val" style="color:#ff5252;">1 : 0.43</div>
+                    <div class="sc-dp-sub">&#10005; Poor</div>
+                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:14%;background:linear-gradient(180deg,#ff5252,#b71c1c);"></div></div>
                 </div>
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RANK</div>
                     <div class="sc-dp-val" style="color:#80deea;">PRIMARY</div>
-                    <div class="sc-dp-sub">#03 of 11</div>
+                    <div class="sc-dp-sub">#03 of 6</div>
                 </div>
             </div>
             <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> SELL 23650CE  +  BUY 24000CE (call wall hedge)
+                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> SELL 23550PE  +  SELL 23650/23700CE spread
             </div>
             <div class="sc-dp-actions">
                 <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-3',event)">&#10005; Close</button>
-                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Bear Call Spread',event)">&#128203; Load Trade Plan &#8599;</button>
+                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Reverse Jade Lizard',event)">&#128203; Load Trade Plan &#8599;</button>
             </div>
         </div>
-        <div class="sc-row" data-type="bearish" data-strat="Bear Put Ladder" onclick="scToggle(this,'sc-dp-4')">
-            <div class="sc-row-bar" style="background:linear-gradient(180deg,#ff5252,#b71c1c);"></div>
+        <div class="sc-row" data-type="advanced" data-strat="Call Ratio Spread" onclick="scToggle(this,'sc-dp-4')">
+            <div class="sc-row-bar" style="background:linear-gradient(180deg,#4fc3f7,#0277bd);"></div>
             <div class="sc-row-num">04</div>
             <div class="sc-row-body">
-                <div class="sc-row-name">Bear Put Ladder</div>
-                <div class="sc-row-strike">&#127919; <span>BUY 23600PE  +  SELL 23550PE  +  SELL 23500PE</span></div>
+                <div class="sc-row-name">Call Ratio Spread</div>
+                <div class="sc-row-strike">&#127919; <span>BUY 1× 23600CE  +  SELL 2× 23650CE</span></div>
             </div>
             <div class="sc-row-meta">
-                <span class="sc-row-tag strat-tag-bear">🔴 Bearish</span>
+                <span class="sc-row-tag strat-tag-misc">🔵 Advanced</span>
                 <span class="sc-rb sc-rb-primary">PRIMARY</span>
-                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.50</span>
+                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.60</span>
             </div>
             <div class="sc-row-chevron" id="chev-sc-dp-4">&#8250;</div>
         </div>
@@ -2590,40 +2605,40 @@
             <div class="sc-dp-grid">
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">STRATEGY TYPE</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">Debit / Credit</div>
-                    <div class="sc-dp-sub">Directional</div>
+                    <div class="sc-dp-val" style="color:#ffb74d;">Multi-leg</div>
+                    <div class="sc-dp-sub">Experienced</div>
                 </div>
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RISK : REWARD</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">1 : 1.50</div>
+                    <div class="sc-dp-val" style="color:#ffb74d;">1 : 1.60</div>
                     <div class="sc-dp-sub">&#9888; Acceptable</div>
-                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:50%;background:linear-gradient(180deg,#ff5252,#b71c1c);"></div></div>
+                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:53%;background:linear-gradient(180deg,#4fc3f7,#0277bd);"></div></div>
                 </div>
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RANK</div>
                     <div class="sc-dp-val" style="color:#80deea;">PRIMARY</div>
-                    <div class="sc-dp-sub">#04 of 11</div>
+                    <div class="sc-dp-sub">#04 of 6</div>
                 </div>
             </div>
             <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 23600PE  +  SELL 23550PE  +  SELL 23500PE
+                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 1× 23600CE  +  SELL 2× 23650CE
             </div>
             <div class="sc-dp-actions">
                 <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-4',event)">&#10005; Close</button>
-                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Bear Put Ladder',event)">&#128203; Load Trade Plan &#8599;</button>
+                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Call Ratio Spread',event)">&#128203; Load Trade Plan &#8599;</button>
             </div>
         </div>
-        <div class="sc-row" data-type="bearish" data-strat="Bear Call Ladder" onclick="scToggle(this,'sc-dp-5')">
-            <div class="sc-row-bar" style="background:linear-gradient(180deg,#ff5252,#b71c1c);"></div>
+        <div class="sc-row" data-type="advanced" data-strat="Put Ratio Spread" onclick="scToggle(this,'sc-dp-5')">
+            <div class="sc-row-bar" style="background:linear-gradient(180deg,#4fc3f7,#0277bd);"></div>
             <div class="sc-row-num">05</div>
             <div class="sc-row-body">
-                <div class="sc-row-name">Bear Call Ladder</div>
-                <div class="sc-row-strike">&#127919; <span>SELL 23600CE  +  BUY 23650CE  +  BUY 23700CE</span></div>
+                <div class="sc-row-name">Put Ratio Spread</div>
+                <div class="sc-row-strike">&#127919; <span>BUY 1× 23600PE  +  SELL 2× 23550PE</span></div>
             </div>
             <div class="sc-row-meta">
-                <span class="sc-row-tag strat-tag-bear">🔴 Bearish</span>
+                <span class="sc-row-tag strat-tag-misc">🔵 Advanced</span>
                 <span class="sc-rb sc-rb-secondary">SECONDARY</span>
-                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.00</span>
+                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.60</span>
             </div>
             <div class="sc-row-chevron" id="chev-sc-dp-5">&#8250;</div>
         </div>
@@ -2631,170 +2646,6 @@
             <div class="sc-dp-grid">
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">STRATEGY TYPE</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">Debit / Credit</div>
-                    <div class="sc-dp-sub">Directional</div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RISK : REWARD</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">1 : 1.00</div>
-                    <div class="sc-dp-sub">&#9888; Acceptable</div>
-                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:33%;background:linear-gradient(180deg,#ff5252,#b71c1c);"></div></div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RANK</div>
-                    <div class="sc-dp-val" style="color:#80deea;">SECONDARY</div>
-                    <div class="sc-dp-sub">#05 of 11</div>
-                </div>
-            </div>
-            <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> SELL 23600CE  +  BUY 23650CE  +  BUY 23700CE
-            </div>
-            <div class="sc-dp-actions">
-                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-5',event)">&#10005; Close</button>
-                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Bear Call Ladder',event)">&#128203; Load Trade Plan &#8599;</button>
-            </div>
-        </div>
-        <div class="sc-row" data-type="bearish" data-strat="Synthetic Short" onclick="scToggle(this,'sc-dp-6')">
-            <div class="sc-row-bar" style="background:linear-gradient(180deg,#ff5252,#b71c1c);"></div>
-            <div class="sc-row-num">06</div>
-            <div class="sc-row-body">
-                <div class="sc-row-name">Synthetic Short</div>
-                <div class="sc-row-strike">&#127919; <span>SELL 23600CE  +  BUY 23600PE  (same expiry)</span></div>
-            </div>
-            <div class="sc-row-meta">
-                <span class="sc-row-tag strat-tag-bear">🔴 Bearish</span>
-                <span class="sc-rb sc-rb-secondary">SECONDARY</span>
-                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.44</span>
-            </div>
-            <div class="sc-row-chevron" id="chev-sc-dp-6">&#8250;</div>
-        </div>
-        <div class="sc-dp" id="sc-dp-6">
-            <div class="sc-dp-grid">
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">STRATEGY TYPE</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">Debit / Credit</div>
-                    <div class="sc-dp-sub">Directional</div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RISK : REWARD</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">1 : 1.44</div>
-                    <div class="sc-dp-sub">&#9888; Acceptable</div>
-                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:48%;background:linear-gradient(180deg,#ff5252,#b71c1c);"></div></div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RANK</div>
-                    <div class="sc-dp-val" style="color:#80deea;">SECONDARY</div>
-                    <div class="sc-dp-sub">#06 of 11</div>
-                </div>
-            </div>
-            <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> SELL 23600CE  +  BUY 23600PE  (same expiry)
-            </div>
-            <div class="sc-dp-actions">
-                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-6',event)">&#10005; Close</button>
-                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Synthetic Short',event)">&#128203; Load Trade Plan &#8599;</button>
-            </div>
-        </div>
-        <div class="sc-row" data-type="bearish" data-strat="Put Ratio Backspread" onclick="scToggle(this,'sc-dp-7')">
-            <div class="sc-row-bar" style="background:linear-gradient(180deg,#ff5252,#b71c1c);"></div>
-            <div class="sc-row-num">07</div>
-            <div class="sc-row-body">
-                <div class="sc-row-name">Put Ratio Backspread</div>
-                <div class="sc-row-strike">&#127919; <span>SELL 1× 23600PE  +  BUY 2× 23550PE</span></div>
-            </div>
-            <div class="sc-row-meta">
-                <span class="sc-row-tag strat-tag-bear">🔴 Bearish</span>
-                <span class="sc-rb sc-rb-secondary">SECONDARY</span>
-                <span class="sc-row-rr" style="color:#00e676;">R:R 3.00</span>
-            </div>
-            <div class="sc-row-chevron" id="chev-sc-dp-7">&#8250;</div>
-        </div>
-        <div class="sc-dp" id="sc-dp-7">
-            <div class="sc-dp-grid">
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">STRATEGY TYPE</div>
-                    <div class="sc-dp-val" style="color:#00e676;">Debit / Credit</div>
-                    <div class="sc-dp-sub">Directional</div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RISK : REWARD</div>
-                    <div class="sc-dp-val" style="color:#00e676;">1 : 3.00</div>
-                    <div class="sc-dp-sub">&#10003; Good</div>
-                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:95%;background:linear-gradient(180deg,#ff5252,#b71c1c);"></div></div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RANK</div>
-                    <div class="sc-dp-val" style="color:#80deea;">SECONDARY</div>
-                    <div class="sc-dp-sub">#07 of 11</div>
-                </div>
-            </div>
-            <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> SELL 1× 23600PE  +  BUY 2× 23550PE
-            </div>
-            <div class="sc-dp-actions">
-                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-7',event)">&#10005; Close</button>
-                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Put Ratio Backspread',event)">&#128203; Load Trade Plan &#8599;</button>
-            </div>
-        </div>
-        <div class="sc-row" data-type="volatility" data-strat="Strip (Bearish Bias)" onclick="scToggle(this,'sc-dp-8')">
-            <div class="sc-row-bar" style="background:linear-gradient(180deg,#b388ff,#6200ea);"></div>
-            <div class="sc-row-num">08</div>
-            <div class="sc-row-body">
-                <div class="sc-row-name">Strip (Bearish Bias)</div>
-                <div class="sc-row-strike">&#127919; <span>BUY 1× 23600CE  +  BUY 2× 23600PE  (same strike & expiry)</span></div>
-            </div>
-            <div class="sc-row-meta">
-                <span class="sc-row-tag strat-tag-vol">🟣 Volatility</span>
-                <span class="sc-rb sc-rb-secondary">SECONDARY</span>
-                <span class="sc-row-rr" style="color:#00e676;">R:R 2.69</span>
-            </div>
-            <div class="sc-row-chevron" id="chev-sc-dp-8">&#8250;</div>
-        </div>
-        <div class="sc-dp" id="sc-dp-8">
-            <div class="sc-dp-grid">
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">STRATEGY TYPE</div>
-                    <div class="sc-dp-val" style="color:#00e676;">Debit</div>
-                    <div class="sc-dp-sub">Vol Breakout</div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RISK : REWARD</div>
-                    <div class="sc-dp-val" style="color:#00e676;">1 : 2.69</div>
-                    <div class="sc-dp-sub">&#10003; Good</div>
-                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:89%;background:linear-gradient(180deg,#b388ff,#6200ea);"></div></div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RANK</div>
-                    <div class="sc-dp-val" style="color:#80deea;">SECONDARY</div>
-                    <div class="sc-dp-sub">#08 of 11</div>
-                </div>
-            </div>
-            <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 1× 23600CE  +  BUY 2× 23600PE  (same strike & expiry)
-            </div>
-            <div class="sc-dp-actions">
-                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-8',event)">&#10005; Close</button>
-                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Strip (Bearish Bias)',event)">&#128203; Load Trade Plan &#8599;</button>
-            </div>
-        </div>
-        <div class="sc-row" data-type="advanced" data-strat="Call Ratio Spread" onclick="scToggle(this,'sc-dp-9')">
-            <div class="sc-row-bar" style="background:linear-gradient(180deg,#4fc3f7,#0277bd);"></div>
-            <div class="sc-row-num">09</div>
-            <div class="sc-row-body">
-                <div class="sc-row-name">Call Ratio Spread</div>
-                <div class="sc-row-strike">&#127919; <span>BUY 1× 23600CE  +  SELL 2× 23650CE</span></div>
-            </div>
-            <div class="sc-row-meta">
-                <span class="sc-row-tag strat-tag-misc">🔵 Advanced</span>
-                <span class="sc-rb sc-rb-advanced">ADVANCED</span>
-                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.60</span>
-            </div>
-            <div class="sc-row-chevron" id="chev-sc-dp-9">&#8250;</div>
-        </div>
-        <div class="sc-dp" id="sc-dp-9">
-            <div class="sc-dp-grid">
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">STRATEGY TYPE</div>
                     <div class="sc-dp-val" style="color:#ffb74d;">Multi-leg</div>
                     <div class="sc-dp-sub">Experienced</div>
                 </div>
@@ -2806,74 +2657,33 @@
                 </div>
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RANK</div>
-                    <div class="sc-dp-val" style="color:#80deea;">ADVANCED</div>
-                    <div class="sc-dp-sub">#09 of 11</div>
-                </div>
-            </div>
-            <div class="sc-dp-strike-box">
-                <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 1× 23600CE  +  SELL 2× 23650CE
-            </div>
-            <div class="sc-dp-actions">
-                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-9',event)">&#10005; Close</button>
-                <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Call Ratio Spread',event)">&#128203; Load Trade Plan &#8599;</button>
-            </div>
-        </div>
-        <div class="sc-row" data-type="advanced" data-strat="Put Ratio Spread" onclick="scToggle(this,'sc-dp-10')">
-            <div class="sc-row-bar" style="background:linear-gradient(180deg,#4fc3f7,#0277bd);"></div>
-            <div class="sc-row-num">10</div>
-            <div class="sc-row-body">
-                <div class="sc-row-name">Put Ratio Spread</div>
-                <div class="sc-row-strike">&#127919; <span>BUY 1× 23600PE  +  SELL 2× 23550PE</span></div>
-            </div>
-            <div class="sc-row-meta">
-                <span class="sc-row-tag strat-tag-misc">🔵 Advanced</span>
-                <span class="sc-rb sc-rb-advanced">ADVANCED</span>
-                <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.60</span>
-            </div>
-            <div class="sc-row-chevron" id="chev-sc-dp-10">&#8250;</div>
-        </div>
-        <div class="sc-dp" id="sc-dp-10">
-            <div class="sc-dp-grid">
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">STRATEGY TYPE</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">Multi-leg</div>
-                    <div class="sc-dp-sub">Experienced</div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RISK : REWARD</div>
-                    <div class="sc-dp-val" style="color:#ffb74d;">1 : 1.60</div>
-                    <div class="sc-dp-sub">&#9888; Acceptable</div>
-                    <div class="sc-dp-rr-track"><div class="sc-dp-rr-fill" style="width:53%;background:linear-gradient(180deg,#4fc3f7,#0277bd);"></div></div>
-                </div>
-                <div class="sc-dp-box">
-                    <div class="sc-dp-lbl">RANK</div>
-                    <div class="sc-dp-val" style="color:#80deea;">ADVANCED</div>
-                    <div class="sc-dp-sub">#10 of 11</div>
+                    <div class="sc-dp-val" style="color:#80deea;">SECONDARY</div>
+                    <div class="sc-dp-sub">#05 of 6</div>
                 </div>
             </div>
             <div class="sc-dp-strike-box">
                 <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 1× 23600PE  +  SELL 2× 23550PE
             </div>
             <div class="sc-dp-actions">
-                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-10',event)">&#10005; Close</button>
+                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-5',event)">&#10005; Close</button>
                 <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Put Ratio Spread',event)">&#128203; Load Trade Plan &#8599;</button>
             </div>
         </div>
-        <div class="sc-row" data-type="advanced" data-strat="Christmas Tree Spread" onclick="scToggle(this,'sc-dp-11')">
+        <div class="sc-row" data-type="advanced" data-strat="Christmas Tree Spread" onclick="scToggle(this,'sc-dp-6')">
             <div class="sc-row-bar" style="background:linear-gradient(180deg,#4fc3f7,#0277bd);"></div>
-            <div class="sc-row-num">11</div>
+            <div class="sc-row-num">06</div>
             <div class="sc-row-body">
                 <div class="sc-row-name">Christmas Tree Spread</div>
                 <div class="sc-row-strike">&#127919; <span>BUY 23600PE  +  SELL 23550PE  +  SELL 23450PE  (step-down strikes)</span></div>
             </div>
             <div class="sc-row-meta">
                 <span class="sc-row-tag strat-tag-misc">🔵 Advanced</span>
-                <span class="sc-rb sc-rb-advanced">ADVANCED</span>
+                <span class="sc-rb sc-rb-secondary">SECONDARY</span>
                 <span class="sc-row-rr" style="color:#ffb74d;">R:R 1.56</span>
             </div>
-            <div class="sc-row-chevron" id="chev-sc-dp-11">&#8250;</div>
+            <div class="sc-row-chevron" id="chev-sc-dp-6">&#8250;</div>
         </div>
-        <div class="sc-dp" id="sc-dp-11">
+        <div class="sc-dp" id="sc-dp-6">
             <div class="sc-dp-grid">
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">STRATEGY TYPE</div>
@@ -2888,21 +2698,21 @@
                 </div>
                 <div class="sc-dp-box">
                     <div class="sc-dp-lbl">RANK</div>
-                    <div class="sc-dp-val" style="color:#80deea;">ADVANCED</div>
-                    <div class="sc-dp-sub">#11 of 11</div>
+                    <div class="sc-dp-val" style="color:#80deea;">SECONDARY</div>
+                    <div class="sc-dp-sub">#06 of 6</div>
                 </div>
             </div>
             <div class="sc-dp-strike-box">
                 <span class="sc-dp-strike-lbl">&#127919; Strike Rec:</span> BUY 23600PE  +  SELL 23550PE  +  SELL 23450PE  (step-down strikes)
             </div>
             <div class="sc-dp-actions">
-                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-11',event)">&#10005; Close</button>
+                <button class="sc-dp-btn sc-dp-btn-close" onclick="scClose('sc-dp-6',event)">&#10005; Close</button>
                 <button class="sc-dp-btn sc-dp-btn-load" onclick="scLoadPlan('Christmas Tree Spread',event)">&#128203; Load Trade Plan &#8599;</button>
             </div>
         </div></div>
         </div>
         <!-- ══════════════ TRADE PLAN SECTION ══════════════ -->
-        <script id="stratDataMap" type="application/json">{"Long Put": {"strike": "BUY 23600PE (ATM) or 23550PE (slight OTM)", "type": "bearish", "rank": "PRIMARY", "rr": 1.44}, "Bear Put Spread": {"strike": "BUY 23600PE  +  SELL 23500PE (put wall)", "type": "bearish", "rank": "PRIMARY", "rr": 1.0}, "Bear Call Spread": {"strike": "SELL 23650CE  +  BUY 24000CE (call wall hedge)", "type": "bearish", "rank": "PRIMARY", "rr": 1.0}, "Bear Put Ladder": {"strike": "BUY 23600PE  +  SELL 23550PE  +  SELL 23500PE", "type": "bearish", "rank": "PRIMARY", "rr": 1.5}, "Bear Call Ladder": {"strike": "SELL 23600CE  +  BUY 23650CE  +  BUY 23700CE", "type": "bearish", "rank": "SECONDARY", "rr": 1.0}, "Synthetic Short": {"strike": "SELL 23600CE  +  BUY 23600PE  (same expiry)", "type": "bearish", "rank": "SECONDARY", "rr": 1.44}, "Put Ratio Backspread": {"strike": "SELL 1× 23600PE  +  BUY 2× 23550PE", "type": "bearish", "rank": "SECONDARY", "rr": 3.0}, "Strip (Bearish Bias)": {"strike": "BUY 1× 23600CE  +  BUY 2× 23600PE  (same strike & expiry)", "type": "volatility", "rank": "SECONDARY", "rr": 2.69}, "Call Ratio Spread": {"strike": "BUY 1× 23600CE  +  SELL 2× 23650CE", "type": "advanced", "rank": "ADVANCED", "rr": 1.6}, "Put Ratio Spread": {"strike": "BUY 1× 23600PE  +  SELL 2× 23550PE", "type": "advanced", "rank": "ADVANCED", "rr": 1.6}, "Christmas Tree Spread": {"strike": "BUY 23600PE  +  SELL 23550PE  +  SELL 23450PE  (step-down strikes)", "type": "advanced", "rank": "ADVANCED", "rr": 1.56}}</script>
+        <script id="stratDataMap" type="application/json">{"Bear Call Spread": {"strike": "SELL 23650CE  +  BUY 24000CE (call wall hedge)", "type": "bearish", "rank": "PRIMARY", "rr": 1.0}, "Bear Put Spread": {"strike": "BUY 23600PE  +  SELL 23500PE (put wall)", "type": "bearish", "rank": "PRIMARY", "rr": 1.0}, "Reverse Jade Lizard": {"strike": "SELL 23550PE  +  SELL 23650/23700CE spread", "type": "bearish", "rank": "PRIMARY", "rr": 0.43}, "Call Ratio Spread": {"strike": "BUY 1× 23600CE  +  SELL 2× 23650CE", "type": "advanced", "rank": "PRIMARY", "rr": 1.6}, "Put Ratio Spread": {"strike": "BUY 1× 23600PE  +  SELL 2× 23550PE", "type": "advanced", "rank": "SECONDARY", "rr": 1.6}, "Christmas Tree Spread": {"strike": "BUY 23600PE  +  SELL 23550PE  +  SELL 23450PE  (step-down strikes)", "type": "advanced", "rank": "SECONDARY", "rr": 1.56}}</script>
         <div class="section">
             <div class="section-title"><span>&#128203;</span> TRADE PLAN — AUTO FILLED
                 <span style="font-size:10px;color:rgba(176,190,197,0.4);font-weight:400;letter-spacing:1px;margin-left:auto;">
@@ -2915,8 +2725,8 @@
                 <div class="tp-banner" id="tp-banner">
                     <div class="tp-banner-left">
                         <div class="tp-banner-label">SELECTED STRATEGY <span id="tp-rank-badge" class="tp-rank-badge">PRIMARY</span></div>
-                        <div class="tp-banner-strat" id="tp-strat-name">Long Put</div>
-                        <div class="tp-banner-strike" id="tp-strike-rec">&#127919; BUY 23600PE (ATM) or 23550PE (slight OTM)</div>
+                        <div class="tp-banner-strat" id="tp-strat-name">Bear Call Spread</div>
+                        <div class="tp-banner-strike" id="tp-strike-rec">&#127919; SELL 23650CE  +  BUY 24000CE (call wall hedge)</div>
                     </div>
                     <div class="tp-banner-right">
                         <div class="tp-banner-label">EXPIRY</div>
@@ -2929,9 +2739,9 @@
                     <div class="tp-exit tp-exit-profit">
                         <div class="tp-exit-icon">&#9989;</div>
                         <div class="tp-exit-title">PROFIT EXIT</div>
-                        <div class="tp-exit-val">&#8377;23,750</div>
-                        <div class="tp-exit-sub">Target 1 · 168 pts from spot</div>
-                        <div class="tp-exit-val2">&#8377;23,400</div>
+                        <div class="tp-exit-val">&#8377;23,650</div>
+                        <div class="tp-exit-sub">Target 1 · 68 pts from spot</div>
+                        <div class="tp-exit-val2">&#8377;23,500</div>
                         <div class="tp-exit-sub">Target 2 (CE/PE wall)</div>
                         <div class="tp-exit-rule">&#128161; Take 50–60% profits at Target 1. Let the rest run to Target 2.</div>
                     </div>
@@ -3400,6 +3210,25 @@ function filterByInterval(data, mins) {
     });
 }
 
+/* ── FOCUS / DETAIL view toggle ───────────────────────────── */
+var _oiViewMode = 'focus';
+function setOIView(mode) {
+    _oiViewMode = mode;
+    var tableWrap = document.querySelector('.oi-table-wrap');
+    if (!tableWrap) return;
+    if (mode === 'detail') {
+        tableWrap.classList.add('oi-detail-mode');
+    } else {
+        tableWrap.classList.remove('oi-detail-mode');
+    }
+    var btnFocus  = document.getElementById('btnFocus');
+    var btnDetail = document.getElementById('btnDetail');
+    if (btnFocus)  btnFocus.classList.toggle('oi-view-active',  mode === 'focus');
+    if (btnDetail) btnDetail.classList.toggle('oi-view-active', mode === 'detail');
+}
+/* Apply FOCUS mode on page load */
+window.addEventListener('load', function(){ setOIView('focus'); });
+
 function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
@@ -3547,9 +3376,9 @@ function renderOITable(data) {
 
             newRowsHtml += '<tr class="' + (isLive ? 'oi-live-row' : '') + '" data-time="' + t + '">'
                 + '<td>' + timeCell + '</td>'
-                + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
-                + '<td class="oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
-                + '<td class="' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
+                + '<td class="col-detail oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
+                + '<td class="col-detail oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
+                + '<td class="col-detail ' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
                 + (function(){
                     var pcrV = parseFloat(row.pcr) || 0;
                     var pcrCls = pcrV >= 1.1 ? 'oi-pcr-bull' : pcrV <= 0.9 ? 'oi-pcr-bear' : 'oi-pcr-neu';
@@ -3569,14 +3398,14 @@ function renderOITable(data) {
                 + (function(){
                     var vwapVal = row.vwap;
                     if (vwapVal == null || vwapVal === 0) {
-                        return '<td><span style="color:rgba(176,190,197,0.3);">—</span></td>';
+                        return '<td class="col-detail"><span style="color:rgba(176,190,197,0.3);">—</span></td>';
                     }
                     var spot = row.spot_price || 0;
                     var aboveVwap = spot >= vwapVal;
                     var vwapCls = aboveVwap ? 'oi-vwap-bull' : 'oi-vwap-bear';
                     var vwapArrow = aboveVwap ? '▲' : '▼';
                     var vwapColor = aboveVwap ? '#4ade80' : '#f87171';
-                    return '<td class="oi-vwap-cell"><span style="color:' + vwapColor + ';font-weight:700;">'
+                    return '<td class="col-detail oi-vwap-cell"><span style="color:' + vwapColor + ';font-weight:700;">'
                         + vwapArrow + ' ₹' + vwapVal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})
                         + '</span><br><span style="font-size:8px;color:rgba(147,197,253,0.5);letter-spacing:0.5px;">'
                         + (aboveVwap ? 'Above' : 'Below') + '</span></td>';
