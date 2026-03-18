@@ -5492,7 +5492,7 @@ window.addEventListener('resize', function(){
 
 /* ══ SIDEBAR NAV JS ══════════════════════════════════════════════ */
 var _nsbCollapsed = false;
-var _nsbActiveId  = 'snapshot';
+var _nsbActiveId  = 'signals';
 var _currentTab   = 'main';   /* ← tracks active tab so navSidebarTo works correctly */
 
 /* Patch switchTab to keep _currentTab in sync */
@@ -6460,10 +6460,10 @@ function mobNavTo(secId, tabId, label) {
         </div>
         <div class="nsb-nav">
             <div class="nsb-group">MAIN ANALYSIS</div>
-            <div class="nsb-item active" id="nsi-snapshot" onclick="navSidebarTo('snapshot','main')">
-                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></div>
-                <span class="nsb-label">Snapshot</span>
-                <span class="nsb-tip">Snapshot</span>
+            <div class="nsb-item active" id="nsi-signals" onclick="navSidebarTo('signals','main')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,10 5,6 8,8 11,4 14,5"/><circle cx="5" cy="6" r="1.2" fill="currentColor"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><circle cx="11" cy="4" r="1.2" fill="currentColor"/></svg></div>
+                <span class="nsb-label">Signals</span>
+                <span class="nsb-tip">Signal Summary</span>
             </div>
             <div class="nsb-item" id="nsi-oi" onclick="navSidebarTo('oi','main')">
                 <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="10" width="3" height="4"/><rect x="6.5" y="6" width="3" height="8"/><rect x="11" y="2" width="3" height="12"/></svg></div>
@@ -6580,7 +6580,7 @@ function mobNavTo(secId, tabId, label) {
     </div>
     <div class="nsb-drawer-nav" id="nsbDrawerNav">
         <div class="nsb-group" style="padding:10px 18px 4px;">MAIN ANALYSIS</div>
-        <div class="nsb-mob-item active" id="nsmd-snapshot" onclick="mobNavTo('snapshot','main','&#128200; Snapshot')">&#128200; Snapshot</div>
+        <div class="nsb-mob-item active" id="nsmd-signals" onclick="mobNavTo('signals','main','&#9889; Signals')">&#9889; Signals</div>
         <div class="nsb-mob-item" id="nsmd-oi" onclick="mobNavTo('oi','main','&#128202; OI Analysis')">&#128202; OI Analysis</div>
         <div class="nsb-mob-item" id="nsmd-keylevels" onclick="mobNavTo('keylevels','main','&#128204; Key Levels')">&#128204; Key Levels</div>
         <div class="nsb-mob-item" id="nsmd-fiidii" onclick="mobNavTo('fiidii','main','&#127982; FII / DII')">&#127982; FII / DII</div>
