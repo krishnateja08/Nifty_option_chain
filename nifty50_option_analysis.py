@@ -1944,14 +1944,20 @@ def build_intraday_oi_tab_html():
           </div>
         </div>
         <div class="oi-table-wrap">
+          <!-- FOCUS / DETAIL toggle -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.4);text-transform:uppercase;">VIEW</span>
+            <button id="btnFocus" onclick="setOIView('focus')" class="oi-view-btn oi-view-active">⚡ FOCUS</button>
+            <button id="btnDetail" onclick="setOIView('detail')" class="oi-view-btn">📊 DETAIL</button>
+          </div>
           <div class="oi-table-scroll-hint">&#8596; Scroll to see all columns</div>
           <table class="oi-table">
             <thead>
               <tr>
                 <th style="text-align:left;">TIME (IST)</th>
-                <th>CALL OI &#916;</th>
-                <th>PUT OI &#916;</th>
-                <th>DIFF</th>
+                <th class="col-detail">CALL OI &#916;</th>
+                <th class="col-detail">PUT OI &#916;</th>
+                <th class="col-detail">DIFF</th>
                 <th>PCR</th>
                 <th>OPTION SIGNAL</th>
                 <th>SPOT PRICE</th>
@@ -1960,7 +1966,7 @@ def build_intraday_oi_tab_html():
                 <th>STREAK</th>
                 <th>NEAREST LEVEL</th>
                 <th>DISTANCE</th>
-                <th>VWAP</th>
+                <th class="col-detail">VWAP</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
@@ -2515,6 +2521,9 @@ class NiftyHTMLAnalyzer:
             latest = df.iloc[-1]
             macd_val   = float(df_clean['MACD'].iloc[-1])   if not df_clean.empty else float('nan')
             signal_val = float(df_clean['Signal'].iloc[-1]) if not df_clean.empty else float('nan')
+            # Previous row for histogram slope (early crossover detection)
+            macd_prev_val   = float(df_clean['MACD'].iloc[-2])   if len(df_clean) >= 2 else macd_val
+            signal_prev_val = float(df_clean['Signal'].iloc[-2]) if len(df_clean) >= 2 else signal_val
             current_price = latest['Close']
             print("  Fetching 1H candles for Key Levels (tiered lookback: 6M → 1Y → wide window)...")
             from datetime import datetime, timedelta
@@ -2611,6 +2620,8 @@ class NiftyHTMLAnalyzer:
                 'rsi':              latest['RSI'],
                 'macd':             macd_val,
                 'signal':           signal_val,
+                'macd_prev':        macd_prev_val,
+                'signal_prev':      signal_prev_val,
                 'resistance':       resistance,
                 'support':          support,
                 'strong_resistance':strong_resistance,
@@ -2643,8 +2654,15 @@ class NiftyHTMLAnalyzer:
         rsi = technical['rsi']
         if   rsi > 70: bearish_score += 1
         elif rsi < 30: bullish_score += 2
-        if technical['macd'] > technical['signal']: bullish_score += 1
-        else: bearish_score += 1
+        # ── MACD: histogram slope fires BEFORE full crossover ──────────────────
+        macd_hist      = technical['macd']      - technical['signal']
+        macd_hist_prev = technical['macd_prev'] - technical['signal_prev']
+        if technical['macd'] > technical['signal']:
+            bullish_score += 1          # full crossover — confirmed bull
+        elif macd_hist > macd_hist_prev:
+            bullish_score += 1          # histogram building — early bull momentum
+        else:
+            bearish_score += 1
         if option_analysis:
             pcr = option_analysis['pcr_oi']; max_pain = option_analysis['max_pain']
             if   pcr > 1.2: bullish_score += 2
@@ -2652,10 +2670,12 @@ class NiftyHTMLAnalyzer:
             if   current > max_pain+100: bearish_score += 1
             elif current < max_pain-100: bullish_score += 1
         score_diff = bullish_score - bearish_score
-        print(f"  📊 Bullish: {bullish_score} | Bearish: {bearish_score} | Diff: {score_diff}")
-        if   score_diff >= 3:  bias,bias_icon,bias_class="BULLISH","📈","bullish"; confidence="HIGH" if score_diff >= 4 else "MEDIUM"
-        elif score_diff <= -3: bias,bias_icon,bias_class="BEARISH","📉","bearish"; confidence="HIGH" if score_diff <= -4 else "MEDIUM"
-        else:                  bias,bias_icon,bias_class="SIDEWAYS","↔️","sideways"; confidence="MEDIUM"
+        print(f"  📊 Bullish: {bullish_score} | Bearish: {bearish_score} | Diff: {score_diff} | MACD hist: {macd_hist:.2f} prev: {macd_hist_prev:.2f}")
+        if   score_diff >= 3:  bias,bias_icon,bias_class="BULLISH","📈","bullish";    confidence="HIGH" if score_diff >= 4 else "MEDIUM"
+        elif score_diff == 2:  bias,bias_icon,bias_class="WATCH BULL","⚡","watchbull"; confidence="MEDIUM"
+        elif score_diff == -2: bias,bias_icon,bias_class="WATCH BEAR","⚠️","watchbear"; confidence="MEDIUM"
+        elif score_diff <= -3: bias,bias_icon,bias_class="BEARISH","📉","bearish";    confidence="HIGH" if score_diff <= -4 else "MEDIUM"
+        else:                  bias,bias_icon,bias_class="SIDEWAYS","↔️","sideways";   confidence="LOW"
         if   rsi > 70: rsi_status,rsi_badge,rsi_icon="Overbought","bearish","🔴"
         elif rsi < 30: rsi_status,rsi_badge,rsi_icon="Oversold","bullish","🟢"
         else:          rsi_status,rsi_badge,rsi_icon="Neutral","neutral","🟡"
@@ -2987,6 +3007,20 @@ class NiftyHTMLAnalyzer:
             top_line      = 'rgba(0,255,136,0.8)'
             pulse_color   = '#00ff88'
             score_color   = '#00ff88'
+        elif bias == 'WATCH BULL':
+            dir_gradient  = 'linear-gradient(135deg,#b5ea3a,#00d4ff)'
+            needle_rotate = '-30'
+            widget_border = 'rgba(181,234,58,0.35)'
+            top_line      = 'rgba(181,234,58,0.8)'
+            pulse_color   = '#b5ea3a'
+            score_color   = '#b5ea3a'
+        elif bias == 'WATCH BEAR':
+            dir_gradient  = 'linear-gradient(135deg,#ff9800,#ff3355)'
+            needle_rotate = '30'
+            widget_border = 'rgba(255,152,0,0.35)'
+            top_line      = 'rgba(255,152,0,0.8)'
+            pulse_color   = '#ff9800'
+            score_color   = '#ff9800'
         elif bias == 'BEARISH':
             dir_gradient  = 'linear-gradient(135deg,#ff3355,#ff9900)'
             needle_rotate = '60'
@@ -4633,6 +4667,25 @@ function filterByInterval(data, mins) {
     });
 }
 
+/* ── FOCUS / DETAIL view toggle ───────────────────────────── */
+var _oiViewMode = 'focus';
+function setOIView(mode) {
+    _oiViewMode = mode;
+    var tableWrap = document.querySelector('.oi-table-wrap');
+    if (!tableWrap) return;
+    if (mode === 'detail') {
+        tableWrap.classList.add('oi-detail-mode');
+    } else {
+        tableWrap.classList.remove('oi-detail-mode');
+    }
+    var btnFocus  = document.getElementById('btnFocus');
+    var btnDetail = document.getElementById('btnDetail');
+    if (btnFocus)  btnFocus.classList.toggle('oi-view-active',  mode === 'focus');
+    if (btnDetail) btnDetail.classList.toggle('oi-view-active', mode === 'detail');
+}
+/* Apply FOCUS mode on page load */
+window.addEventListener('load', function(){ setOIView('focus'); });
+
 function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
@@ -4780,9 +4833,9 @@ function renderOITable(data) {
 
             newRowsHtml += '<tr class="' + (isLive ? 'oi-live-row' : '') + '" data-time="' + t + '">'
                 + '<td>' + timeCell + '</td>'
-                + '<td class="oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
-                + '<td class="oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
-                + '<td class="' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
+                + '<td class="col-detail oi-call-val">' + fmtIN(row.call_oi_chg||0) + '</td>'
+                + '<td class="col-detail oi-put-val">'  + fmtIN(row.put_oi_chg||0)  + '</td>'
+                + '<td class="col-detail ' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
                 + (function(){
                     var pcrV = parseFloat(row.pcr) || 0;
                     var pcrCls = pcrV >= 1.1 ? 'oi-pcr-bull' : pcrV <= 0.9 ? 'oi-pcr-bear' : 'oi-pcr-neu';
@@ -4802,14 +4855,14 @@ function renderOITable(data) {
                 + (function(){
                     var vwapVal = row.vwap;
                     if (vwapVal == null || vwapVal === 0) {
-                        return '<td><span style="color:rgba(176,190,197,0.3);">—</span></td>';
+                        return '<td class="col-detail"><span style="color:rgba(176,190,197,0.3);">—</span></td>';
                     }
                     var spot = row.spot_price || 0;
                     var aboveVwap = spot >= vwapVal;
                     var vwapCls = aboveVwap ? 'oi-vwap-bull' : 'oi-vwap-bear';
                     var vwapArrow = aboveVwap ? '▲' : '▼';
                     var vwapColor = aboveVwap ? '#4ade80' : '#f87171';
-                    return '<td class="oi-vwap-cell"><span style="color:' + vwapColor + ';font-weight:700;">'
+                    return '<td class="col-detail oi-vwap-cell"><span style="color:' + vwapColor + ';font-weight:700;">'
                         + vwapArrow + ' ₹' + vwapVal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})
                         + '</span><br><span style="font-size:8px;color:rgba(147,197,253,0.5);letter-spacing:0.5px;">'
                         + (aboveVwap ? 'Above' : 'Below') + '</span></td>';
@@ -5464,6 +5517,15 @@ window.addEventListener('resize', function(){
         .oi-table thead th{{padding:12px 16px;font-size:9.5px;letter-spacing:1.5px;color:rgba(128,222,234,0.9);text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap;}}
         .oi-table thead th:first-child{{text-align:left;}}
         .oi-table thead th.oi-th-divider{{border-left:1px solid rgba(30,45,56,1);}}
+
+        /* ── FOCUS / DETAIL toggle ── */
+        .oi-view-btn{{padding:5px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(128,222,234,0.4);background:transparent;border:1px solid rgba(79,195,247,0.2);border-radius:20px;cursor:pointer;transition:all 0.2s ease;}}
+        .oi-view-btn:hover{{color:#4fc3f7;border-color:rgba(79,195,247,0.5);background:rgba(79,195,247,0.08);}}
+        .oi-view-active{{color:#00e5ff!important;border-color:rgba(79,195,247,0.6)!important;background:rgba(79,195,247,0.14)!important;box-shadow:0 0 10px rgba(79,195,247,0.12);}}
+        /* FOCUS mode: hide col-detail columns (default) */
+        .col-detail{{display:none;}}
+        /* DETAIL mode: show col-detail columns */
+        .oi-detail-mode .col-detail{{display:table-cell;}}
 
         /* ── Body rows ── */
         .oi-table tbody tr{{border-bottom:1px solid rgba(30,45,56,0.8);transition:background 0.15s ease;}}
