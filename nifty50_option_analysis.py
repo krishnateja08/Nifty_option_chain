@@ -2296,15 +2296,15 @@ def build_pretrade_checklist_tab_html():
         if (cnt)  cnt.textContent  = n;
         if (pct === 100) {{
           if (fill) fill.style.background = 'linear-gradient(90deg,#00e676,#00bfa5)';
-          if (icon) icon.textContent = '&#128640;';
+          if (icon) icon.innerHTML = '&#128640;';
           if (txt)  {{ txt.textContent = 'All checks passed \u2014 you may proceed!'; txt.style.color = '#00e676'; }}
         }} else if (pct >= 70) {{
           if (fill) fill.style.background = 'linear-gradient(90deg,#ffb74d,#ff8f00)';
-          if (icon) icon.textContent = '&#9888;&#65039;';
+          if (icon) icon.innerHTML = '&#9888;&#65039;';
           if (txt)  {{ txt.textContent = 'Almost there \u2014 complete remaining checks.'; txt.style.color = '#ffb74d'; }}
         }} else {{
           if (fill) fill.style.background = 'linear-gradient(90deg,#00e5ff,#0288d1)';
-          if (icon) icon.textContent = '&#11036;';
+          if (icon) icon.innerHTML = '&#11036;';
           if (txt)  {{ txt.textContent = 'Complete the checklist before entering any trade.'; txt.style.color = 'rgba(128,222,234,0.6)'; }}
         }}
       }}
