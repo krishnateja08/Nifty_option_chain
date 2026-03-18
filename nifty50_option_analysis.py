@@ -1604,7 +1604,7 @@ def build_strategy_checklist_html(html_data, vol_support=None, vol_resistance=No
 #  INTRADAY OI TREND — OI LOG HELPER
 # ═══════════════════════════════════════════════════════════════════════════════
 
-def log_oi_snapshot(option_analysis, technical, key_levels=None):
+def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     if not option_analysis or not technical:
         print("  ⚠️  OI snapshot skipped — missing option_analysis or technical data")
         return
@@ -1817,6 +1817,7 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None):
         "ema_signal":    ema_signal,
         "ema5":          ema5_val,
         "ema13":         ema13_val,
+        "bias":          bias or "SIDEWAYS",
     }
 
     log_file = "oi_log.json"
@@ -5072,11 +5073,14 @@ function renderOITable(data) {
                       ? ' <span style="font-size:8px;opacity:0.6;">(to ' + (row.nearest_label||'') + ')</span>'
                       : '')
                   + '</span>';
-            } else if (isNeutral && typeof _CURRENT_BIAS !== 'undefined') {
-                // NEUTRAL OI signal — show current market direction bias here
-                var wb = _CURRENT_BIAS;
+            } else if (isNeutral) {
+                // NEUTRAL OI signal — use per-row bias (from oi_log.json) if available,
+                // fallback to current run's _CURRENT_BIAS injected at HTML generation time.
+                var wb = row.bias || (typeof _CURRENT_BIAS !== 'undefined' ? _CURRENT_BIAS : '');
                 var wbHtml, wdHtml;
-                if (wb === 'WATCH BULL') {
+                // Map BULLISH → WATCH BULL and BEARISH → WATCH BEAR so the column
+                // always shows a meaningful direction hint whenever OI is neutral.
+                if (wb === 'WATCH BULL' || wb === 'BULLISH') {
                     wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                         + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
                         + 'font-size:10px;font-weight:800;background:rgba(181,234,58,0.12);color:#b5ea3a;'
@@ -5085,7 +5089,7 @@ function renderOITable(data) {
                         + '</div>';
                     wdHtml = '<span style="font-size:9px;color:rgba(181,234,58,0.55);font-family:monospace;font-weight:600;">'
                         + 'Early bull<br>signal</span>';
-                } else if (wb === 'WATCH BEAR') {
+                } else if (wb === 'WATCH BEAR' || wb === 'BEARISH') {
                     wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                         + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
                         + 'font-size:10px;font-weight:800;background:rgba(255,152,0,0.12);color:#ff9800;'
@@ -5094,19 +5098,12 @@ function renderOITable(data) {
                         + '</div>';
                     wdHtml = '<span style="font-size:9px;color:rgba(255,152,0,0.55);font-family:monospace;font-weight:600;">'
                         + 'Early bear<br>signal</span>';
-                } else if (wb === 'BULLISH') {
-                    wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
-                        + 'font-size:10px;font-weight:800;background:rgba(0,230,118,0.12);color:#00e676;'
-                        + 'border:1px solid rgba(0,230,118,0.3);">▲ BULLISH</span>';
-                    wdHtml = '<span style="font-size:9px;color:rgba(0,230,118,0.55);font-family:monospace;">tech bias</span>';
-                } else if (wb === 'BEARISH') {
-                    wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
-                        + 'font-size:10px;font-weight:800;background:rgba(255,71,87,0.12);color:#ff4757;'
-                        + 'border:1px solid rgba(255,71,87,0.3);">▼ BEARISH</span>';
-                    wdHtml = '<span style="font-size:9px;color:rgba(255,71,87,0.55);font-family:monospace;">tech bias</span>';
                 } else {
-                    wbHtml = '<span style="color:rgba(176,190,197,0.3);">—</span>';
-                    wdHtml = '<span style="color:rgba(176,190,197,0.3);">—</span>';
+                    // SIDEWAYS or unknown — show a neutral range-bound message
+                    wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                        + 'font-size:10px;font-weight:800;background:rgba(176,190,197,0.08);color:#90a4ae;'
+                        + 'border:1px solid rgba(176,190,197,0.2);">↔ SIDEWAYS</span>';
+                    wdHtml = '<span style="font-size:9px;color:rgba(176,190,197,0.4);font-family:monospace;">range-bound</span>';
                 }
                 nlevelHtml = wbHtml;
                 distHtml   = wdHtml;
@@ -6744,7 +6741,8 @@ function mobNavTo(secId, tabId, label) {
             "strong_support":    self.html_data.get("strong_support"),
             "strong_resistance": self.html_data.get("strong_resistance"),
         }
-        log_oi_snapshot(option_analysis, technical, key_levels=key_levels)
+        log_oi_snapshot(option_analysis, technical, key_levels=key_levels,
+                        bias=self.html_data.get('bias', 'SIDEWAYS'))
 
         # Fetch India VIX and store in html_data
         vix_val, vix_trend = fetch_india_vix()
