@@ -5161,6 +5161,64 @@ window.addEventListener('load', function(){
 window.addEventListener('resize', function(){
     if (_oiData.length > 0) drawSparkline(filterByInterval(_oiData, _oiInterval));
 });
+
+/* ══ SIDEBAR NAV JS ══════════════════════════════════════════════ */
+var _nsbCollapsed = false;
+var _nsbActiveId  = 'snapshot';
+
+function toggleNavSidebar() {
+    _nsbCollapsed = !_nsbCollapsed;
+    var sb = document.getElementById('navSidebar');
+    if (sb) sb.classList.toggle('collapsed', _nsbCollapsed);
+}
+
+function navSidebarTo(secId, tabId) {
+    // 1. Switch tab if needed
+    if (tabId !== _currentTab) {
+        switchTab(tabId);
+    }
+    // 2. Set active item
+    document.querySelectorAll('.nsb-item').forEach(function(el){ el.classList.remove('active'); });
+    var activeEl = document.getElementById('nsi-' + secId);
+    if (activeEl) activeEl.classList.add('active');
+    _nsbActiveId = secId;
+    // 3. Scroll to section (after tab switch paint)
+    setTimeout(function(){
+        var target = document.getElementById('sec-' + secId);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // For tab-only items (heatmap, oi-trend etc), scroll to top of content
+            var pc = document.getElementById('pageContent');
+            if (pc) pc.scrollTop = 0;
+        }
+    }, 80);
+}
+
+function openNsbDrawer()  { document.getElementById('nsbDrawer').classList.add('open'); }
+function closeNsbDrawer() { document.getElementById('nsbDrawer').classList.remove('open'); }
+
+function mobNavTo(secId, tabId, label) {
+    // Update mobile drawer active state
+    document.querySelectorAll('.nsb-mob-item').forEach(function(el){ el.classList.remove('active'); });
+    var el = document.getElementById('nsmd-' + secId);
+    if (el) el.classList.add('active');
+    // Update mobile title bar
+    var titleEl = document.getElementById('nsbMobTitle');
+    if (titleEl) titleEl.innerHTML = label;
+    closeNsbDrawer();
+    // Sync desktop sidebar active too
+    document.querySelectorAll('.nsb-item').forEach(function(el){ el.classList.remove('active'); });
+    var deskEl = document.getElementById('nsi-' + secId);
+    if (deskEl) deskEl.classList.add('active');
+    _nsbActiveId = secId;
+    // Switch tab then scroll
+    if (tabId !== _currentTab) { switchTab(tabId); }
+    setTimeout(function(){
+        var target = document.getElementById('sec-' + secId);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
+}
 </script>
 """
 
@@ -5700,6 +5758,60 @@ window.addEventListener('resize', function(){
             .header h1{{letter-spacing:0;}}
             .oi-summary-strip{{grid-template-columns:1fr;}}
         }}
+
+        /* ══ SIDEBAR NAV ══════════════════════════════════════════════ */
+        .page-body{{display:flex;align-items:flex-start;position:relative;}}
+        .page-content{{flex:1;min-width:0;}}
+        .nav-sidebar{{
+            width:190px;flex-shrink:0;
+            background:#07111a;
+            border-right:1px solid rgba(79,195,247,0.12);
+            position:sticky;top:0;height:100vh;
+            display:flex;flex-direction:column;
+            transition:width 0.22s ease;
+            z-index:100;overflow:hidden;
+        }}
+        .nav-sidebar.collapsed{{width:46px;}}
+        .nsb-header{{display:flex;align-items:center;justify-content:space-between;padding:12px 10px;border-bottom:1px solid rgba(79,195,247,0.1);flex-shrink:0;}}
+        .nsb-logo{{font-family:'Oxanium',sans-serif;font-size:10px;letter-spacing:3px;color:rgba(79,195,247,0.6);font-weight:700;white-space:nowrap;overflow:hidden;transition:opacity 0.2s;}}
+        .nav-sidebar.collapsed .nsb-logo{{opacity:0;pointer-events:none;}}
+        .nsb-toggle{{width:26px;height:26px;border-radius:6px;border:1px solid rgba(79,195,247,0.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}}
+        .nsb-toggle:hover{{background:rgba(79,195,247,0.1);}}
+        .nsb-toggle svg{{transition:transform 0.22s;}}
+        .nav-sidebar.collapsed .nsb-toggle svg{{transform:rotate(180deg);}}
+        .nsb-nav{{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0;scrollbar-width:thin;scrollbar-color:rgba(79,195,247,0.15) transparent;}}
+        .nsb-nav::-webkit-scrollbar{{width:3px;}}
+        .nsb-nav::-webkit-scrollbar-thumb{{background:rgba(79,195,247,0.2);border-radius:2px;}}
+        .nsb-group{{font-size:8px;letter-spacing:2px;color:rgba(79,195,247,0.25);padding:10px 12px 4px;text-transform:uppercase;white-space:nowrap;overflow:hidden;transition:opacity 0.2s;}}
+        .nav-sidebar.collapsed .nsb-group{{opacity:0;}}
+        .nsb-item{{display:flex;align-items:center;gap:9px;padding:8px 12px;cursor:pointer;border-left:2px solid transparent;transition:all 0.15s ease;position:relative;}}
+        .nsb-item:hover{{background:rgba(79,195,247,0.06);border-left-color:rgba(79,195,247,0.3);}}
+        .nsb-item.active{{background:rgba(79,195,247,0.1);border-left-color:#4fc3f7;}}
+        .nsb-icon{{width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:rgba(128,222,234,0.45);}}
+        .nsb-item.active .nsb-icon{{color:#4fc3f7;}}
+        .nsb-icon svg{{width:15px;height:15px;}}
+        .nsb-label{{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:rgba(176,190,197,0.55);white-space:nowrap;overflow:hidden;transition:opacity 0.15s;letter-spacing:0.3px;}}
+        .nsb-item.active .nsb-label{{color:#e0f7fa;}}
+        .nav-sidebar.collapsed .nsb-label{{opacity:0;width:0;pointer-events:none;}}
+        .nav-sidebar.collapsed .nsb-item{{padding:8px 14px;}}
+        .nsb-tip{{display:none;position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#0d1e2a;border:1px solid rgba(79,195,247,0.25);border-radius:6px;padding:4px 11px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#80deea;white-space:nowrap;z-index:999;pointer-events:none;}}
+        .nav-sidebar.collapsed .nsb-item:hover .nsb-tip{{display:block;}}
+        /* Mobile: sidebar hidden, show bar+drawer */
+        .nsb-mob-bar{{display:none;align-items:center;gap:10px;padding:8px 14px;background:#07111a;border-bottom:1px solid rgba(79,195,247,0.12);position:sticky;top:0;z-index:90;}}
+        .nsb-mob-btn{{width:32px;height:32px;border-radius:6px;border:1px solid rgba(79,195,247,0.2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;}}
+        .nsb-mob-title{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:rgba(79,195,247,0.6);text-transform:uppercase;}}
+        .nsb-drawer{{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(4,10,16,0.97);z-index:200;flex-direction:column;}}
+        .nsb-drawer.open{{display:flex;}}
+        .nsb-drawer-head{{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(79,195,247,0.12);}}
+        .nsb-drawer-title{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:rgba(79,195,247,0.4);text-transform:uppercase;}}
+        .nsb-drawer-close{{width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,82,82,0.3);background:transparent;cursor:pointer;color:rgba(255,82,82,0.7);font-size:14px;display:flex;align-items:center;justify-content:center;}}
+        .nsb-drawer-nav{{flex:1;overflow-y:auto;padding:8px 0;}}
+        .nsb-mob-item{{padding:13px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(176,190,197,0.6);cursor:pointer;border-left:2px solid transparent;letter-spacing:0.5px;}}
+        .nsb-mob-item:hover,.nsb-mob-item.active{{background:rgba(79,195,247,0.08);border-left-color:#4fc3f7;color:#e0f7fa;}}
+        @media(max-width:768px){{
+            .nav-sidebar{{display:none;}}
+            .nsb-mob-bar{{display:flex;}}
+        }}
     </style>
 </head>
 <body>
@@ -5743,9 +5855,113 @@ window.addEventListener('resize', function(){
         </div>
     </div>
 
+    <!-- ══ PAGE BODY: sidebar + content ══ -->
+    <div class="page-body">
+
+    <!-- LEFT SIDEBAR NAV -->
+    <nav class="nav-sidebar" id="navSidebar">
+        <div class="nsb-header">
+            <span class="nsb-logo">NIFTY</span>
+            <button class="nsb-toggle" id="nsbToggle" onclick="toggleNavSidebar()" title="Collapse">
+                <svg viewBox="0 0 16 16" fill="none" stroke="rgba(79,195,247,0.6)" stroke-width="2" stroke-linecap="round"><polyline points="10,4 6,8 10,12"/></svg>
+            </button>
+        </div>
+        <div class="nsb-nav">
+            <div class="nsb-group">MAIN ANALYSIS</div>
+            <div class="nsb-item active" id="nsi-snapshot" onclick="navSidebarTo('snapshot','main')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></div>
+                <span class="nsb-label">Snapshot</span>
+                <span class="nsb-tip">Snapshot</span>
+            </div>
+            <div class="nsb-item" id="nsi-oi" onclick="navSidebarTo('oi','main')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="10" width="3" height="4"/><rect x="6.5" y="6" width="3" height="8"/><rect x="11" y="2" width="3" height="12"/></svg></div>
+                <span class="nsb-label">OI Analysis</span>
+                <span class="nsb-tip">OI Analysis</span>
+            </div>
+            <div class="nsb-item" id="nsi-keylevels" onclick="navSidebarTo('keylevels','main')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="2" y1="8" x2="14" y2="8"/><line x1="5" y1="5" x2="5" y2="11"/><line x1="11" y1="5" x2="11" y2="11"/></svg></div>
+                <span class="nsb-label">Key Levels</span>
+                <span class="nsb-tip">Key Levels</span>
+            </div>
+            <div class="nsb-item" id="nsi-fiidii" onclick="navSidebarTo('fiidii','main')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="5" width="5" height="9" rx="1"/><rect x="9" y="2" width="5" height="12" rx="1"/></svg></div>
+                <span class="nsb-label">FII / DII</span>
+                <span class="nsb-tip">FII / DII</span>
+            </div>
+            <div class="nsb-item" id="nsi-direction" onclick="navSidebarTo('direction','main')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="8" r="5"/><polyline points="8,5 8,8 10,10"/></svg></div>
+                <span class="nsb-label">Direction</span>
+                <span class="nsb-tip">Market Direction</span>
+            </div>
+            <div class="nsb-item" id="nsi-technical" onclick="navSidebarTo('technical','main')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,12 5,7 8,9 11,5 14,3"/></svg></div>
+                <span class="nsb-label">Technical</span>
+                <span class="nsb-tip">Technical Indicators</span>
+            </div>
+            <div class="nsb-item" id="nsi-optchain" onclick="navSidebarTo('optchain','main')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="8" cy="8" r="5"/><line x1="8" y1="3" x2="8" y2="5"/><line x1="8" y1="11" x2="8" y2="13"/><line x1="3" y1="8" x2="5" y2="8"/><line x1="11" y1="8" x2="13" y2="8"/></svg></div>
+                <span class="nsb-label">Option Chain</span>
+                <span class="nsb-tip">Option Chain</span>
+            </div>
+            <div class="nsb-group">OTHER VIEWS</div>
+            <div class="nsb-item" id="nsi-heatmap" onclick="navSidebarTo('heatmap','heatmap')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="2" width="3" height="3" rx="0.5"/><rect x="6.5" y="2" width="3" height="3" rx="0.5"/><rect x="11" y="2" width="3" height="3" rx="0.5"/><rect x="2" y="6.5" width="3" height="3" rx="0.5"/><rect x="6.5" y="6.5" width="3" height="3" rx="0.5"/><rect x="11" y="6.5" width="3" height="3" rx="0.5"/><rect x="2" y="11" width="3" height="3" rx="0.5"/><rect x="6.5" y="11" width="3" height="3" rx="0.5"/><rect x="11" y="11" width="3" height="3" rx="0.5"/></svg></div>
+                <span class="nsb-label">Heatmap</span>
+                <span class="nsb-tip">Nifty 50 Heatmap</span>
+            </div>
+            <div class="nsb-item" id="nsi-oitrend" onclick="navSidebarTo('oitrend','oi-trend')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="2,13 5,8 8,10 11,5 14,7"/><line x1="2" y1="13" x2="14" y2="13"/></svg></div>
+                <span class="nsb-label">Intraday OI</span>
+                <span class="nsb-tip">Intraday OI Trend</span>
+            </div>
+            <div class="nsb-item" id="nsi-checklist" onclick="navSidebarTo('checklist','checklist')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="4,8 7,11 12,5"/><rect x="2" y="2" width="12" height="12" rx="2"/></svg></div>
+                <span class="nsb-label">Strategy</span>
+                <span class="nsb-tip">Strategy Checklist</span>
+            </div>
+            <div class="nsb-item" id="nsi-pretrade" onclick="navSidebarTo('pretrade','pretrade')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="5" y1="5" x2="13" y2="5"/><line x1="5" y1="8" x2="13" y2="8"/><line x1="5" y1="11" x2="13" y2="11"/><circle cx="2.5" cy="5" r="0.8" fill="currentColor"/><circle cx="2.5" cy="8" r="0.8" fill="currentColor"/><circle cx="2.5" cy="11" r="0.8" fill="currentColor"/></svg></div>
+                <span class="nsb-label">Pre-Trade</span>
+                <span class="nsb-tip">Pre-Trade Rules</span>
+            </div>
+        </div>
+    </nav>
+    <!-- MOBILE HAMBURGER -->
+    <div class="nsb-mob-bar" id="nsbMobBar">
+        <button class="nsb-mob-btn" onclick="openNsbDrawer()">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="rgba(79,195,247,0.7)" stroke-width="2" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg>
+        </button>
+        <span class="nsb-mob-title" id="nsbMobTitle">&#128200; Snapshot</span>
+    </div>
+    <!-- MOBILE DRAWER -->
+    <div class="nsb-drawer" id="nsbDrawer">
+        <div class="nsb-drawer-head">
+            <span class="nsb-drawer-title">NAVIGATE</span>
+            <button class="nsb-drawer-close" onclick="closeNsbDrawer()">&#10005;</button>
+        </div>
+        <div class="nsb-drawer-nav" id="nsbDrawerNav">
+            <div class="nsb-group" style="padding:10px 18px 4px;">MAIN ANALYSIS</div>
+            <div class="nsb-mob-item active" id="nsmd-snapshot" onclick="mobNavTo('snapshot','main','&#128200; Snapshot')">&#128200; Snapshot</div>
+            <div class="nsb-mob-item" id="nsmd-oi" onclick="mobNavTo('oi','main','&#128202; OI Analysis')">&#128202; OI Analysis</div>
+            <div class="nsb-mob-item" id="nsmd-keylevels" onclick="mobNavTo('keylevels','main','&#128204; Key Levels')">&#128204; Key Levels</div>
+            <div class="nsb-mob-item" id="nsmd-fiidii" onclick="mobNavTo('fiidii','main','&#127982; FII / DII')">&#127982; FII / DII</div>
+            <div class="nsb-mob-item" id="nsmd-direction" onclick="mobNavTo('direction','main','&#129517; Direction')">&#129517; Direction</div>
+            <div class="nsb-mob-item" id="nsmd-technical" onclick="mobNavTo('technical','main','&#128269; Technical')">&#128269; Technical</div>
+            <div class="nsb-mob-item" id="nsmd-optchain" onclick="mobNavTo('optchain','main','&#127919; Option Chain')">&#127919; Option Chain</div>
+            <div class="nsb-group" style="padding:10px 18px 4px;">OTHER VIEWS</div>
+            <div class="nsb-mob-item" id="nsmd-heatmap" onclick="mobNavTo('heatmap','heatmap','&#127956; Heatmap')">&#127956; Heatmap</div>
+            <div class="nsb-mob-item" id="nsmd-oitrend" onclick="mobNavTo('oitrend','oi-trend','&#128202; Intraday OI')">&#128202; Intraday OI</div>
+            <div class="nsb-mob-item" id="nsmd-checklist" onclick="mobNavTo('checklist','checklist','&#129504; Strategy')">&#129504; Strategy</div>
+            <div class="nsb-mob-item" id="nsmd-pretrade" onclick="mobNavTo('pretrade','pretrade','&#9989; Pre-Trade')">&#9989; Pre-Trade</div>
+        </div>
+    </div>
+
+    <!-- MAIN PAGE CONTENT -->
+    <div class="page-content" id="pageContent">
+
     <!-- TAB 1: MAIN ANALYSIS -->
     <div class="tab-panel active" id="tab-main">
-        <div class="section">
+        <div class="section" id="sec-snapshot">
             <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
             <div class="snap-grid">
                 <div class="g snap-card g-hi"><div class="card-top-row"><span class="card-ico">&#128185;</span><div class="lbl">NIFTY 50 SPOT</div></div><span class="val">&#8377;{d['current_price']:,.2f}</span></div>
@@ -5755,20 +5971,20 @@ window.addEventListener('resize', function(){
         </div>
 """
         if d['has_option_data']:
-            html += self._oi_navy_command_section(d)
-        html += self._key_levels_visual_section(d,_pct_cp,_pts_to_res,_pts_to_sup,_mp_node)
+            html += '<div id="sec-oi">' + self._oi_navy_command_section(d) + '</div>'
+        html += '<div id="sec-keylevels">' + self._key_levels_visual_section(d,_pct_cp,_pts_to_res,_pts_to_sup,_mp_node) + '</div>'
         html += self._option_chain_pivot_section_html(d)
-        html += self._fiidii_section_html()
-        html += self._market_direction_widget_html()
+        html += '<div id="sec-fiidii">' + self._fiidii_section_html() + '</div>'
+        html += '<div id="sec-direction">' + self._market_direction_widget_html() + '</div>'
         html += f"""
-        <div class="section">
+        <div class="section" id="sec-technical">
             <div class="section-title"><span>&#128269;</span> TECHNICAL INDICATORS</div>
             <div class="card-grid grid-5">{tech_cards}</div>
         </div>
 """
         if d['has_option_data']:
             html += f"""
-        <div class="section">
+        <div class="section" id="sec-optchain">
             <div class="section-title"><span>&#127919;</span> OPTION CHAIN ANALYSIS <span style="font-size:11px;color:#80deea;font-weight:400;letter-spacing:1px;">(ATM \u00b110 Strikes Only)</span></div>
             {self._top10_oi_widget_html(d)}
             <div class="card-grid grid-4">{oc_cards}</div>
@@ -5789,6 +6005,8 @@ window.addEventListener('resize', function(){
         <p>Automated Nifty 50 · Option Chain + Technical + Heatmap + Intraday OI Trend + Strategy Checklist</p>
         <p style="margin-top:6px;">&#169; 2026 · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · IST Timestamps · For Educational Purposes Only</p>
     </div>
+    </div><!-- /page-content -->
+    </div><!-- /page-body -->
 </div>
 """
         html += all_js
