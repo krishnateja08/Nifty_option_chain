@@ -6376,6 +6376,10 @@ function mobNavTo(secId, tabId, label) {
                     <div class="hb-chip-val" style="color:#00e676;">&#8377;{d['current_price']:,.0f}</div>
                 </div>
                 <div class="hb-chip">
+                    <div class="hb-chip-lbl">ATM Strike</div>
+                    <div class="hb-chip-val" style="color:#4fc3f7;">&#8377;{d['atm_strike']:,}</div>
+                </div>
+                <div class="hb-chip">
                     <div class="hb-chip-lbl">PCR</div>
                     <div class="hb-chip-val" style="color:{pcr_col};">{pcr_v:.3f}</div>
                 </div>
@@ -6408,7 +6412,7 @@ function mobNavTo(secId, tabId, label) {
                 <div class="hb-s-dot" style="background:#4fc3f7;box-shadow:0 0 6px #4fc3f7;"></div>
                 IST Now <span class="hb-s-val" style="color:#4fc3f7;" id="live-ist-clock">--:--:--</span>
             </div>
-            <div class="hb-s-item">
+            <div class="hb-s-item" style="display:none;">
                 <div class="hb-s-dot" style="background:#b388ff;box-shadow:0 0 6px #b388ff;"></div>
                 Next Refresh <span class="hb-s-val" style="color:#b388ff;" id="refresh-countdown">30s</span>
             </div>
@@ -6521,19 +6525,11 @@ function mobNavTo(secId, tabId, label) {
         <button class="nsb-mob-btn" onclick="openNsbDrawer()">
             <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="rgba(79,195,247,0.8)" stroke-width="2" stroke-linecap="round"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg>
         </button>
-        <span class="nsb-mob-title" id="nsbMobTitle">&#128200; Snapshot</span>
+        <span class="nsb-mob-title" id="nsbMobTitle">&#9889; Signal Summary</span>
     </div>
 
     <!-- TAB 1: MAIN ANALYSIS -->
     <div class="tab-panel active" id="tab-main">
-        <div class="section" id="sec-snapshot">
-            <div class="section-title"><span>&#128200;</span> MARKET SNAPSHOT</div>
-            <div class="snap-grid">
-                <div class="g snap-card g-hi"><div class="card-top-row"><span class="card-ico">&#128185;</span><div class="lbl">NIFTY 50 SPOT</div></div><span class="val">&#8377;{d['current_price']:,.2f}</span></div>
-                <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#127919;</span><div class="lbl">ATM STRIKE</div></div><span class="val">&#8377;{d['atm_strike']:,}</span></div>
-                <div class="g snap-card"><div class="card-top-row"><span class="card-ico">&#128197;</span><div class="lbl">EXPIRY DATE</div></div><span class="val" style="font-size:20px">{d['expiry']}</span></div>
-            </div>
-        </div>
 """
         html += self._signal_summary_bar_html()
         if d['has_option_data']:
