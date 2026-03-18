@@ -29,26 +29,26 @@
         .header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(79,195,247,0.05) 0%,transparent 60%);pointer-events:none;}
 
         /* Banner row */
-        .hb-banner{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(79,195,247,0.1);flex-wrap:wrap;gap:10px;position:relative;z-index:1;}
-        .hb-left{display:flex;align-items:center;gap:12px;}
-        .hb-nse-badge{padding:4px 13px;border-radius:5px;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:900;letter-spacing:2px;color:#000;background:linear-gradient(135deg,#4fc3f7,#00e5ff);flex-shrink:0;}
-        .hb-title-main{font-family:'Oxanium',sans-serif;font-size:clamp(15px,2.2vw,21px);font-weight:900;color:#ffffff;letter-spacing:0.5px;}
-        .hb-title-sub{font-size:10px;letter-spacing:2px;color:rgba(79,195,247,0.8);text-transform:uppercase;margin-top:3px;font-weight:600;}
-        .hb-chips{display:flex;gap:6px;flex-wrap:wrap;}
-        .hb-chip{text-align:center;padding:6px 14px;border-radius:8px;background:rgba(0,0,0,0.35);border:1px solid rgba(79,195,247,0.18);flex-shrink:0;}
-        .hb-chip-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:#80deea;text-transform:uppercase;margin-bottom:3px;font-weight:700;}
-        .hb-chip-val{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:800;line-height:1;}
+        .hb-banner{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid rgba(79,195,247,0.12);flex-wrap:wrap;gap:12px;position:relative;z-index:1;}
+        .hb-left{display:flex;align-items:center;gap:14px;}
+        .hb-nse-badge{padding:5px 14px;border-radius:6px;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:900;letter-spacing:2px;color:#000;background:linear-gradient(135deg,#4fc3f7,#00e5ff);flex-shrink:0;}
+        .hb-title-main{font-family:'Oxanium',sans-serif;font-size:clamp(18px,2.5vw,26px);font-weight:900;color:#ffffff;letter-spacing:0.5px;}
+        .hb-title-sub{font-size:11px;letter-spacing:2px;color:#4fc3f7;text-transform:uppercase;margin-top:4px;font-weight:700;}
+        .hb-chips{display:flex;gap:8px;flex-wrap:wrap;}
+        .hb-chip{text-align:center;padding:7px 16px;border-radius:9px;background:rgba(0,0,0,0.4);border:1px solid rgba(79,195,247,0.22);flex-shrink:0;}
+        .hb-chip-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;color:#80deea;text-transform:uppercase;margin-bottom:4px;font-weight:700;}
+        .hb-chip-val{font-family:'Oxanium',sans-serif;font-size:17px;font-weight:800;line-height:1;}
 
         /* Status row */
-        .hb-status{display:flex;align-items:center;justify-content:space-between;padding:7px 20px;background:rgba(0,0,0,0.25);flex-wrap:wrap;gap:6px;position:relative;z-index:1;border-bottom:1px solid rgba(79,195,247,0.07);}
-        .hb-s-item{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(200,221,232,0.75);white-space:nowrap;font-weight:600;}
-        .hb-s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;animation:sb-pulse 2s ease-in-out infinite;}
-        .hb-s-val{font-weight:700;color:#e0f7fa;margin-left:2px;font-size:12px;}
+        .hb-status{display:flex;align-items:center;justify-content:space-between;padding:9px 22px;background:rgba(0,0,0,0.3);flex-wrap:wrap;gap:8px;position:relative;z-index:1;border-bottom:1px solid rgba(79,195,247,0.08);}
+        .hb-s-item{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8dde8;white-space:nowrap;font-weight:600;}
+        .hb-s-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:sb-pulse 2s ease-in-out infinite;}
+        .hb-s-val{font-weight:700;color:#ffffff;margin-left:3px;font-size:13px;}
 
         /* Tabs */
         .tab-nav{display:flex;gap:0;border-bottom:none;overflow-x:auto;scrollbar-width:none;background:rgba(0,0,0,0.2);position:relative;z-index:1;}
         .tab-nav::-webkit-scrollbar{display:none;}
-        .tab-btn{display:flex;align-items:center;gap:8px;padding:11px clamp(12px,2vw,22px);font-family:'Oxanium',sans-serif;font-size:clamp(10px,1.3vw,12px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,221,232,0.6);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s ease;position:relative;bottom:-1px;}
+        .tab-btn{display:flex;align-items:center;gap:8px;padding:13px clamp(14px,2vw,24px);font-family:'Oxanium',sans-serif;font-size:clamp(11px,1.4vw,13px);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(200,221,232,0.65);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s ease;position:relative;bottom:-1px;}
         .tab-btn:hover{color:#4fc3f7;background:rgba(79,195,247,0.05);}
         .tab-btn.active{color:#4fc3f7;border-bottom-color:#4fc3f7;background:rgba(79,195,247,0.07);}
         .tab-dot{width:6px;height:6px;border-radius:50%;background:rgba(79,195,247,0.3);flex-shrink:0;transition:all 0.25s ease;}
@@ -918,7 +918,7 @@
         <div class="hb-status">
             <div class="hb-s-item">
                 <div class="hb-s-dot" style="background:#00e676;box-shadow:0 0 6px #00e676;"></div>
-                Generated <span class="hb-s-val" id="hb-gen">18-Mar-2026 08:02 IST</span>
+                Generated <span class="hb-s-val" id="hb-gen">18-Mar-2026 08:09 IST</span>
             </div>
             <div class="hb-s-item">
                 <div class="hb-s-dot" style="background:#4fc3f7;box-shadow:0 0 6px #4fc3f7;"></div>
@@ -1055,7 +1055,7 @@
   <div class="ssb-wrap">
     <div class="ssb-header">
       <span class="ssb-title">&#9889; SIGNAL SUMMARY</span>
-      <span class="ssb-ts">18-Mar-2026 08:02 IST</span>
+      <span class="ssb-ts">18-Mar-2026 08:09 IST</span>
     </div>
     <div class="ssb-grid">
       <div class="ssb-cell"><span class="ssb-cell-lbl">OI Signal</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);">&#9711; Neutral</span><span class="ssb-sub">Both Calls & Puts Building</span></div>
@@ -2354,7 +2354,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 18-Mar-2026 08:02 IST</span>
+            <span>Stock data as of: 18-Mar-2026 08:09 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
