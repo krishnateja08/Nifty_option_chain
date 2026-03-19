@@ -1,12 +1,12 @@
 {
-  "timestamp": "19-Mar-2026 09:17 IST",
-  "current_price": 23302.19921875,
-  "bias": "WATCH BULL",
+  "timestamp": "19-Mar-2026 09:19 IST",
+  "current_price": 23288.599609375,
+  "bias": "BULLISH",
   "confidence": "MEDIUM",
-  "rsi": 25.540329540279032,
-  "pcr": 3.716,
-  "stop_loss": null,
-  "risk_reward_ratio": 0,
-  "heatmap_advance": 1,
-  "heatmap_decline": 50
+  "rsi": 25.46313037280069,
+  "pcr": 2.095,
+  "stop_loss": 23139.0,
+  "risk_reward_ratio": 0.91,
+  "heatmap_advance": 2,
+  "heatmap_decline": 48
 }
