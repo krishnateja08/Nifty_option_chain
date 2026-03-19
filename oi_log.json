@@ -1,5 +1,27 @@
 [
   {
+    "time": "14:43",
+    "timestamp": "19-Mar-2026 14:43 IST",
+    "call_oi_chg": 541534,
+    "put_oi_chg": -3988,
+    "diff": -545522,
+    "pcr": 0.82,
+    "opt_signal": "STRONG SELL",
+    "vwap": 26350.32,
+    "fut_price": 15460.4,
+    "spot_price": 23089.5,
+    "vwap_signal": "SELL",
+    "nifty_move_pct": -2.89,
+    "nearest_level": 23050,
+    "nearest_label": "S1",
+    "distance_pts": 39.5,
+    "rsi_15m": 29.5,
+    "ema_signal": "SELL",
+    "ema5": 23125.46,
+    "ema13": 23193.52,
+    "bias": "WATCH BEAR"
+  },
+  {
     "time": "14:41",
     "timestamp": "19-Mar-2026 14:41 IST",
     "call_oi_chg": 541663,
