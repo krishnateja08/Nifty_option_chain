@@ -1,5 +1,5 @@
 {
-  "timestamp": "20-Mar-2026 09:07 IST",
+  "timestamp": "20-Mar-2026 09:10 IST",
   "current_price": 23110.150390625,
   "bias": "SIDEWAYS",
   "confidence": "LOW",
@@ -8,5 +8,5 @@
   "stop_loss": null,
   "risk_reward_ratio": 0,
   "heatmap_advance": 0,
-  "heatmap_decline": 2
+  "heatmap_decline": 0
 }
