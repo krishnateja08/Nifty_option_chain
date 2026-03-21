@@ -7,21 +7,9 @@ on:
     paths:
       - 'nifty50_option_analysis.py'   # ← only triggers if THIS file changed
   schedule:
-    # All times in UTC → IST = UTC + 5:30
-    # Runs at 04:08, 04:35 UTC  (IST: 09:38, 10:05)
-    - cron: '8,35 4 * * 1-5'
-    # Runs at 05:02, 05:29, 05:56 UTC  (IST: 10:32, 10:59, 11:26)
-    - cron: '2,29,56 5 * * 1-5'
-    # Runs at 06:23, 06:50 UTC  (IST: 11:53, 12:20)
-    - cron: '23,50 6 * * 1-5'
-    # Runs at 07:17, 07:44 UTC  (IST: 12:47, 13:14)
-    - cron: '17,44 7 * * 1-5'
-    # Runs at 08:11, 08:38 UTC  (IST: 13:41, 14:08)
-    - cron: '11,38 8 * * 1-5'
-    # Runs at 09:05, 09:32, 09:59 UTC  (IST: 14:35, 15:02, 15:29)
-    - cron: '5,32,59 9 * * 1-5'
-    # Runs at 10:26, 10:30 UTC  (IST: 15:56, 16:00)
-    - cron: '26,30 10 * * 1-5'
+   
+    - cron: '0 4 * * *'
+   
   workflow_dispatch:   # Allow manual trigger from GitHub UI
 
 # ── Concurrency control ───────────────────────────────────────────────────────
