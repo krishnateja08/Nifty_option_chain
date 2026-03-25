@@ -1942,47 +1942,88 @@ def build_intraday_oi_tab_html():
           </div>
         </div>
 
-        <!-- Signal History Bar -->
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span style="font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.9);text-transform:uppercase;white-space:nowrap;font-family:'JetBrains Mono',monospace;">SIGNAL HISTORY</span>
-          <div id="oiSignalBar" style="flex:1;display:flex;gap:3px;height:6px;border-radius:4px;overflow:hidden;"></div>
-        </div>
+        <!-- ══ SIDE-BY-SIDE: Signal History + Sparkline (left) | NIFTY Live Feed (right) ══ -->
+        <div class="nlf-side-by-side">
+          <!-- LEFT: Signal History + OI Sparkline -->
+          <div class="nlf-left">
+            <!-- Signal History Bar -->
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <span style="font-size:8px;letter-spacing:2px;color:rgba(128,222,234,0.9);text-transform:uppercase;white-space:nowrap;font-family:'JetBrains Mono',monospace;">SIGNAL HISTORY</span>
+              <div id="oiSignalBar" style="flex:1;display:flex;gap:3px;height:6px;border-radius:4px;overflow:hidden;"></div>
+            </div>
 
-        <div class="oi-chart-wrap">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <div class="oi-chart-label">NET OI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
-            <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.8);letter-spacing:1px;"></div>
-          </div>
-          <!-- Chart: Y-labels + Canvas + Crosshair + Tooltip -->
-          <div style="display:flex;gap:0;position:relative;">
-            <div id="oiYLabels" style="width:58px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;flex-shrink:0;"></div>
-            <div style="flex:1;position:relative;min-width:0;">
-              <canvas id="oiSparklineCanvas" style="width:100%;height:200px;display:block;"></canvas>
-              <div id="oiCrosshair" style="position:absolute;top:0;bottom:0;width:1px;background:rgba(79,195,247,0.3);pointer-events:none;display:none;z-index:10;"></div>
-              <div id="oiChartTooltip" style="position:absolute;pointer-events:none;background:rgba(6,13,20,0.97);border:1px solid rgba(79,195,247,0.35);border-radius:8px;padding:9px 13px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#e0f7fa;display:none;z-index:20;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.6);min-width:160px;">
-                <div id="oiTTTime" style="font-size:9px;color:rgba(128,222,234,0.45);letter-spacing:1px;margin-bottom:5px;"></div>
-                <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">NET DIFF</span><span id="oiTTDiff" style="font-weight:700;"></span></div>
-                <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">CE &#916;</span><span id="oiTTCE" style="font-weight:700;color:#f87171;"></span></div>
-                <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">PE &#916;</span><span id="oiTTPE" style="font-weight:700;color:#34d399;"></span></div>
-                <div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:rgba(176,190,197,0.5);">SIGNAL</span><span id="oiTTSignal" style="font-weight:700;"></span></div>
+            <div class="oi-chart-wrap" style="margin-bottom:0;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div class="oi-chart-label">NET OI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
+                <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.8);letter-spacing:1px;"></div>
+              </div>
+              <!-- Chart: Y-labels + Canvas + Crosshair + Tooltip -->
+              <div style="display:flex;gap:0;position:relative;">
+                <div id="oiYLabels" style="width:58px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;flex-shrink:0;"></div>
+                <div style="flex:1;position:relative;min-width:0;">
+                  <canvas id="oiSparklineCanvas" style="width:100%;height:200px;display:block;"></canvas>
+                  <div id="oiCrosshair" style="position:absolute;top:0;bottom:0;width:1px;background:rgba(79,195,247,0.3);pointer-events:none;display:none;z-index:10;"></div>
+                  <div id="oiChartTooltip" style="position:absolute;pointer-events:none;background:rgba(6,13,20,0.97);border:1px solid rgba(79,195,247,0.35);border-radius:8px;padding:9px 13px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#e0f7fa;display:none;z-index:20;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.6);min-width:160px;">
+                    <div id="oiTTTime" style="font-size:9px;color:rgba(128,222,234,0.45);letter-spacing:1px;margin-bottom:5px;"></div>
+                    <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">NET DIFF</span><span id="oiTTDiff" style="font-weight:700;"></span></div>
+                    <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">CE &#916;</span><span id="oiTTCE" style="font-weight:700;color:#f87171;"></span></div>
+                    <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:2px;"><span style="color:rgba(176,190,197,0.5);">PE &#916;</span><span id="oiTTPE" style="font-weight:700;color:#34d399;"></span></div>
+                    <div style="display:flex;justify-content:space-between;gap:16px;"><span style="color:rgba(176,190,197,0.5);">SIGNAL</span><span id="oiTTSignal" style="font-weight:700;"></span></div>
+                  </div>
+                </div>
+              </div>
+              <!-- X-axis time labels -->
+              <div id="oiXLabels" style="display:flex;justify-content:space-between;padding:4px 0 0 60px;"></div>
+              <!-- Legend -->
+              <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid rgba(79,195,247,0.08);">
+                <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
+                  <span style="display:inline-block;width:24px;height:2px;background:linear-gradient(90deg,#10b981,#34d399);border-radius:1px;"></span> Bullish Zone
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
+                  <span style="display:inline-block;width:24px;height:2px;background:linear-gradient(90deg,#ef4444,#f97316);border-radius:1px;"></span> Bearish Zone
+                </div>
+                <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
+                  <span style="display:inline-block;width:24px;height:2px;border-top:1px dashed rgba(79,195,247,0.5);"></span> Zero Line
+                </div>
               </div>
             </div>
-          </div>
-          <!-- X-axis time labels -->
-          <div id="oiXLabels" style="display:flex;justify-content:space-between;padding:4px 0 0 60px;"></div>
-          <!-- Legend -->
-          <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid rgba(79,195,247,0.08);">
-            <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
-              <span style="display:inline-block;width:24px;height:2px;background:linear-gradient(90deg,#10b981,#34d399);border-radius:1px;"></span> Bullish Zone
+          </div><!-- /nlf-left -->
+
+          <!-- RIGHT: NIFTY Live Feed -->
+          <div class="nlf-right">
+            <div class="nlf-panel" id="niftyLiveFeed">
+              <!-- Header -->
+              <div class="nlf-header">
+                <div class="nlf-title-row">
+                  <span class="nlf-live-dot"></span>
+                  <span class="nlf-title">NIFTY Live</span>
+                </div>
+                <div class="nlf-meta" id="nlfMeta">
+                  <span class="nlf-meta-spot">Spot <b id="nlfSpot">—</b></span>
+                  <span class="nlf-meta-item" id="nlfR1">R1 —</span>
+                  <span class="nlf-meta-sep">&middot;</span>
+                  <span class="nlf-meta-item">PCR <b id="nlfPCR">—</b></span>
+                </div>
+              </div>
+              <!-- Signal Badges -->
+              <div class="nlf-badges" id="nlfBadges"></div>
+              <!-- Table Header -->
+              <div class="nlf-thead">
+                <span class="nlf-th" style="text-align:left;">TIME</span>
+                <span class="nlf-th">SPOT</span>
+                <span class="nlf-th" style="text-align:right;">&#916;</span>
+                <span class="nlf-th" style="text-align:right;">NIFTY%</span>
+                <span class="nlf-th nlf-th-mom">MOMENTUM</span>
+                <span class="nlf-th" style="text-align:right;">STK</span>
+                <span class="nlf-th" style="text-align:right;">RSI</span>
+              </div>
+              <!-- Table Body (populated by JS) -->
+              <div id="nlfBody" class="nlf-tbody"></div>
+              <!-- Footer -->
+              <div class="nlf-footer" id="nlfFooter"></div>
             </div>
-            <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
-              <span style="display:inline-block;width:24px;height:2px;background:linear-gradient(90deg,#ef4444,#f97316);border-radius:1px;"></span> Bearish Zone
-            </div>
-            <div style="display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(176,190,197,0.45);">
-              <span style="display:inline-block;width:24px;height:2px;border-top:1px dashed rgba(79,195,247,0.5);"></span> Zero Line
-            </div>
-          </div>
-        </div>
+          </div><!-- /nlf-right -->
+        </div><!-- /nlf-side-by-side -->
         <div class="oi-table-wrap">
           <!-- FOCUS / DETAIL toggle -->
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
@@ -5341,8 +5382,172 @@ function renderOITable(data) {
     // Remove empty state row if present
     var emptyRow = tbody.querySelector('.oi-empty-state');
     if (emptyRow) emptyRow.closest('tr').remove();
+
+    // ── Render NIFTY Live Feed panel ──
+    renderNiftyLiveFeed(filtered);
 }
 
+/* ══ NIFTY LIVE FEED — Compact side panel ══════════════════════════════════ */
+function renderNiftyLiveFeed(filtered) {
+    var body = document.getElementById('nlfBody');
+    if (!body || !filtered || filtered.length === 0) return;
+
+    var latest = filtered[0];
+    var maxEntries = 7;
+    var entries = filtered.slice(0, maxEntries);
+
+    // ── Header: Spot, R1, PCR ──
+    var elSpot = document.getElementById('nlfSpot');
+    if (elSpot) elSpot.textContent = latest.spot_price ? latest.spot_price.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
+    var elPCR = document.getElementById('nlfPCR');
+    if (elPCR) elPCR.textContent = latest.pcr || '—';
+    var elR1 = document.getElementById('nlfR1');
+    if (elR1) {
+        var nlabel = latest.nearest_label || 'R1';
+        var nval = latest.nearest_level ? '₹' + latest.nearest_level.toLocaleString('en-IN') : '—';
+        elR1.innerHTML = nlabel + ' <b>' + nval + '</b>';
+    }
+
+    // ── Signal Badges ──
+    var badges = document.getElementById('nlfBadges');
+    if (badges) {
+        var bHtml = '';
+        var sig = (latest.opt_signal || '').toUpperCase();
+        var isBuy = sig.indexOf('BUY') >= 0;
+        var isSell = sig.indexOf('SELL') >= 0;
+        if (isBuy) bHtml += '<span class="nlf-badge nlf-badge-buy">Signal ▲ BUY</span>';
+        else if (isSell) bHtml += '<span class="nlf-badge nlf-badge-sell">Signal ▼ SELL</span>';
+        else bHtml += '<span class="nlf-badge nlf-badge-info">Signal → Neutral</span>';
+
+        var emaSig = latest.ema_signal;
+        if (emaSig === 'BUY') bHtml += '<span class="nlf-badge nlf-badge-buy">EMA 5/13 ▲ BUY</span>';
+        else if (emaSig === 'SELL') bHtml += '<span class="nlf-badge nlf-badge-sell">EMA 5/13 ▼ SELL</span>';
+
+        // Streak
+        var streakCount = 1;
+        for (var si = 1; si < filtered.length; si++) {
+            if ((filtered[si].opt_signal || '').toUpperCase() === sig) streakCount++;
+            else break;
+        }
+        bHtml += '<span class="nlf-badge nlf-badge-warn">Streak *' + streakCount + '</span>';
+
+        // RSI
+        var rsi = latest.rsi_15m;
+        if (rsi != null) {
+            var rsiCls = rsi >= 70 ? 'nlf-badge-danger' : rsi <= 30 ? 'nlf-badge-buy' : 'nlf-badge-info';
+            bHtml += '<span class="nlf-badge ' + rsiCls + '">RSI 15m ' + rsi.toFixed(1) + '</span>';
+        }
+
+        // VWAP
+        var vwapVal = latest.vwap;
+        var spot = latest.spot_price || 0;
+        if (vwapVal && vwapVal > 0) {
+            var aboveVwap = spot >= vwapVal;
+            bHtml += '<span class="nlf-badge ' + (aboveVwap ? 'nlf-badge-buy' : 'nlf-badge-danger') + '">VWAP ' + (aboveVwap ? 'Above' : 'Below') + '</span>';
+        }
+
+        // Distance
+        if (latest.distance_pts != null && latest.nearest_level) {
+            bHtml += '<span class="nlf-badge nlf-badge-info">Dist ' + (latest.distance_pts >= 0 ? '+' : '') + Math.round(latest.distance_pts) + ' pts</span>';
+        }
+
+        badges.innerHTML = bHtml;
+    }
+
+    // ── Compute momentum max for bar scaling ──
+    var nmpMax = 0;
+    entries.forEach(function(r) {
+        var v = Math.abs(r.nifty_move_pct || 0);
+        if (v > nmpMax) nmpMax = v;
+    });
+    if (nmpMax < 0.5) nmpMax = 0.5;
+
+    // ── Table rows ──
+    var html = '';
+    entries.forEach(function(row, idx) {
+        var isLive = (idx === 0);
+        var t = row.time || '';
+
+        // Spot
+        var spotStr = row.spot_price ? row.spot_price.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2}) : '';
+        if (isLive) spotStr = '';
+
+        // Delta
+        var prevRow = entries[idx + 1];
+        var spotDelta = (prevRow && prevRow.spot_price && row.spot_price)
+            ? Math.round((row.spot_price - prevRow.spot_price) * 10) / 10
+            : null;
+        var dHtml;
+        if (spotDelta === null) {
+            dHtml = '<span style="color:rgba(176,190,197,0.25);">—</span>';
+        } else if (spotDelta >= 0) {
+            dHtml = '<span style="color:#00e676;">▲+' + spotDelta.toFixed(1) + '</span>';
+        } else {
+            dHtml = '<span style="color:#ff4757;">▼' + spotDelta.toFixed(1) + '</span>';
+        }
+
+        // Nifty Move %
+        var nmp = row.nifty_move_pct;
+        var nmpHtml, nmpColor;
+        if (nmp == null) {
+            nmpHtml = '—'; nmpColor = 'rgba(176,190,197,0.25)';
+        } else {
+            nmpColor = nmp >= 0 ? '#00e676' : '#ff4757';
+            nmpHtml = '<span style="color:' + nmpColor + ';">' + (nmp >= 0 ? '+' : '') + nmp.toFixed(2) + '%</span>';
+        }
+
+        // Momentum bar
+        var momPct = nmp != null ? Math.abs(nmp) / nmpMax * 100 : 0;
+        var momGreenW = Math.round(momPct);
+        var momGrayW = 100 - momGreenW;
+        var momColor = (nmp != null && nmp >= 0) ? '#00c853' : '#ff4757';
+        var momBarHtml = '<div class="nlf-row-mom">'
+            + '<span class="nlf-mom-green" style="width:' + momGreenW + '%;background:' + momColor + ';"></span>'
+            + '<span class="nlf-mom-gray" style="width:' + momGrayW + '%;"></span>'
+            + '</div>';
+
+        // Streak
+        var sCount = 1;
+        var curSig = (row.opt_signal || '').toUpperCase();
+        for (var si = idx + 1; si < entries.length; si++) {
+            if ((entries[si].opt_signal || '').toUpperCase() === curSig) sCount++;
+            else break;
+        }
+        // Add total streak from full filtered data for first entry
+        if (idx === 0) sCount = streakCount;
+
+        // RSI
+        var rsiVal = row.rsi_15m;
+        var rsiHtml, rsiColor;
+        if (rsiVal == null) {
+            rsiHtml = '—'; rsiColor = 'rgba(176,190,197,0.25)';
+        } else {
+            rsiColor = rsiVal >= 70 ? '#ff4757' : rsiVal >= 55 ? '#69f0ae' : rsiVal <= 30 ? '#00e676' : rsiVal <= 45 ? '#fca5a5' : '#ffb74d';
+            rsiHtml = rsiVal.toFixed(1);
+        }
+
+        html += '<div class="nlf-row' + (isLive ? ' nlf-row-live' : '') + '">'
+            + '<span class="nlf-row-time">' + t + '</span>'
+            + '<span class="nlf-row-spot">' + spotStr + '</span>'
+            + '<span class="nlf-row-delta">' + dHtml + '</span>'
+            + '<span class="nlf-row-nifty">' + nmpHtml + '</span>'
+            + momBarHtml
+            + '<span class="nlf-row-stk">*' + sCount + '</span>'
+            + '<span class="nlf-row-rsi" style="color:' + rsiColor + ';">' + rsiHtml + '</span>'
+            + '</div>';
+    });
+    body.innerHTML = html;
+
+    // ── Footer ──
+    var footer = document.getElementById('nlfFooter');
+    if (footer) {
+        var nmp0 = latest.nifty_move_pct;
+        var nmpFmt = (nmp0 != null) ? ((nmp0 >= 0 ? '+' : '') + nmp0.toFixed(2) + '% from prev close') : '';
+        var nmpFootColor = (nmp0 != null && nmp0 >= 0) ? '#00e676' : '#ff4757';
+        footer.innerHTML = '<span class="nlf-footer-left">' + filtered.length + ' candles &middot; signals active</span>'
+            + '<span class="nlf-footer-right" style="color:' + nmpFootColor + ';">▲ ' + nmpFmt + '</span>';
+    }
+}
 function fmtOI(n) {
     var abs = Math.abs(n);
     var sign = n >= 0 ? '+' : '-';
@@ -6238,6 +6443,54 @@ function mobNavTo(secId, tabId, label) {
         @media(max-width:600px){{.oi-stat-strip{{grid-template-columns:repeat(2,1fr);}}}}
         @media(max-width:380px){{.oi-stat-strip{{grid-template-columns:1fr;}}}}
 
+        /* ══ NIFTY LIVE FEED — Side-by-Side Panel ════════════════════ */
+        .nlf-side-by-side{{display:flex;gap:14px;margin-bottom:20px;align-items:stretch;}}
+        .nlf-left{{flex:1;min-width:0;display:flex;flex-direction:column;}}
+        .nlf-left .oi-chart-wrap{{flex:1;margin-bottom:0;}}
+        .nlf-right{{width:420px;flex-shrink:0;display:flex;}}
+        .nlf-panel{{flex:1;background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:16px;display:flex;flex-direction:column;font-family:'JetBrains Mono',monospace;}}
+        .nlf-header{{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap;}}
+        .nlf-title-row{{display:flex;align-items:center;gap:7px;}}
+        .nlf-live-dot{{width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:sb-pulse 1.5s ease-in-out infinite;flex-shrink:0;}}
+        .nlf-title{{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;color:#e0f7fa;letter-spacing:1px;}}
+        .nlf-meta{{text-align:right;font-size:11px;color:rgba(200,221,232,0.7);line-height:1.6;}}
+        .nlf-meta b{{color:#fff;font-weight:700;}}
+        .nlf-meta-spot{{display:block;font-size:12px;}}
+        .nlf-meta-item{{font-size:11px;}}
+        .nlf-meta-sep{{color:rgba(128,222,234,0.3);margin:0 2px;}}
+        .nlf-badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}}
+        .nlf-badge{{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}}
+        .nlf-badge-buy{{background:rgba(0,200,83,0.12);color:#00c853;border:1px solid rgba(0,200,83,0.4);}}
+        .nlf-badge-sell{{background:rgba(255,58,74,0.12);color:#ff3a4a;border:1px solid rgba(255,58,74,0.4);}}
+        .nlf-badge-warn{{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
+        .nlf-badge-info{{background:rgba(200,221,232,0.06);color:#c8dde8;border:1px solid rgba(200,221,232,0.2);}}
+        .nlf-badge-danger{{background:rgba(255,58,74,0.1);color:#ff6b6b;border:1px solid rgba(255,58,74,0.3);}}
+        .nlf-thead{{display:grid;grid-template-columns:44px 82px 52px 56px minmax(0,1fr) 38px 40px;gap:0;font-size:9px;letter-spacing:1.2px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
+        .nlf-th-mom{{text-align:center;}}
+        .nlf-tbody{{flex:1;display:flex;flex-direction:column;}}
+        .nlf-row{{display:grid;grid-template-columns:44px 82px 52px 56px minmax(0,1fr) 38px 40px;gap:0;padding:5px 0;align-items:center;font-size:12px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
+        .nlf-row-live{{background:rgba(0,200,83,0.04);border-left:2px solid rgba(0,230,118,0.5);padding-left:4px;}}
+        .nlf-row-time{{color:rgba(176,190,197,0.5);font-size:11px;}}
+        .nlf-row-spot{{font-weight:700;color:#fff;font-size:12px;}}
+        .nlf-row-delta{{font-weight:700;font-size:11px;text-align:right;}}
+        .nlf-row-nifty{{font-size:11px;font-weight:700;text-align:right;}}
+        .nlf-row-mom{{display:flex;align-items:center;gap:2px;padding:0 6px;}}
+        .nlf-mom-green{{height:4px;background:#00c853;border-radius:2px;}}
+        .nlf-mom-gray{{height:4px;background:rgba(79,195,247,0.12);border-radius:2px;}}
+        .nlf-row-stk{{text-align:right;color:#ffd32a;font-weight:700;font-size:11px;}}
+        .nlf-row-rsi{{text-align:right;font-weight:700;font-size:11px;}}
+        .nlf-footer{{display:flex;justify-content:space-between;padding-top:8px;margin-top:auto;border-top:1px solid rgba(79,195,247,0.08);font-size:11px;}}
+        .nlf-footer-left{{color:rgba(176,190,197,0.45);}}
+        .nlf-footer-right{{font-weight:700;}}
+        @media(max-width:1100px){{
+            .nlf-side-by-side{{flex-direction:column;}}
+            .nlf-right{{width:100%;}}
+        }}
+        @media(max-width:600px){{
+            .nlf-thead,.nlf-row{{grid-template-columns:38px minmax(0,1fr) 44px 48px minmax(0,1fr) 32px 36px;}}
+            .nlf-row-spot{{font-size:11px;}}
+            .nlf-panel{{padding:10px;}}
+        }}
         @media(max-width:1024px){{
             .grid-5{{grid-template-columns:repeat(3,minmax(0,1fr));}}
             .grid-4{{grid-template-columns:repeat(2,minmax(0,1fr));}}
