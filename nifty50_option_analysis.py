@@ -6447,7 +6447,7 @@ function mobNavTo(secId, tabId, label) {
         .nlf-side-by-side{{display:flex;gap:14px;margin-bottom:20px;align-items:stretch;}}
         .nlf-left{{flex:1;min-width:0;display:flex;flex-direction:column;}}
         .nlf-left .oi-chart-wrap{{flex:1;margin-bottom:0;}}
-        .nlf-right{{width:420px;flex-shrink:0;display:flex;}}
+        .nlf-right{{flex:1;min-width:0;display:flex;}}
         .nlf-panel{{flex:1;background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:14px;padding:16px;display:flex;flex-direction:column;font-family:'JetBrains Mono',monospace;}}
         .nlf-header{{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap;}}
         .nlf-title-row{{display:flex;align-items:center;gap:7px;}}
