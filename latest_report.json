@@ -1,12 +1,12 @@
 {
-  "timestamp": "30-Mar-2026 10:44 IST",
-  "current_price": 22517.75,
-  "bias": "BEARISH",
-  "confidence": "HIGH",
-  "rsi": 35.02606052672549,
-  "pcr": 1.168,
-  "stop_loss": 22605.0,
-  "risk_reward_ratio": 0.2,
-  "heatmap_advance": 6,
-  "heatmap_decline": 45
+  "timestamp": "30-Mar-2026 10:47 IST",
+  "current_price": 22516.80078125,
+  "bias": "WATCH BEAR",
+  "confidence": "MEDIUM",
+  "rsi": 35.01946911427147,
+  "pcr": 1.401,
+  "stop_loss": null,
+  "risk_reward_ratio": 0,
+  "heatmap_advance": 5,
+  "heatmap_decline": 46
 }
