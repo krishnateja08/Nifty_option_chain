@@ -1797,6 +1797,82 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     except Exception as e:
         print(f"  ⚠️  RSI/EMA 15m calc failed: {e}")
 
+    # ── Step 5: Technical Override — when OI says NEUTRAL but technicals unanimously agree ──
+    # OI can stay NEUTRAL all day when both sides build evenly (PCR 0.8–1.2).
+    # In a strong trending day (e.g. -1.5%), that perpetual NEUTRAL is misleading.
+    # Fix: if 3 out of 4 independent technicals agree on direction, override to SELL/BUY.
+    if opt_signal == "NEUTRAL":
+        _tech_bear = 0
+        _tech_bull = 0
+
+        # 1. VWAP: spot vs intraday VWAP
+        if not spot_above_vwap:
+            _tech_bear += 1
+        else:
+            _tech_bull += 1
+
+        # 2. RSI 15m: below 40 = bearish momentum, above 60 = bullish momentum
+        if rsi_15m is not None:
+            if rsi_15m < 40:
+                _tech_bear += 1
+            elif rsi_15m > 60:
+                _tech_bull += 1
+
+        # 3. EMA 5/13 crossover on 15m
+        if ema_signal == "SELL":
+            _tech_bear += 1
+        elif ema_signal == "BUY":
+            _tech_bull += 1
+
+        # 4. Nifty intraday move % (from previous close)
+        if nifty_move_pct is not None:
+            if nifty_move_pct <= -0.5:
+                _tech_bear += 1
+            elif nifty_move_pct >= 0.5:
+                _tech_bull += 1
+
+        # Override: require 3+ of 4 technicals to agree (strong consensus only)
+        if _tech_bear >= 3:
+            opt_signal = "SELL"
+            print(f"  🔄 OI NEUTRAL overridden → SELL (tech consensus: {_tech_bear}/4 bearish | "
+                  f"VWAP={'below' if not spot_above_vwap else 'above'} | "
+                  f"RSI={rsi_15m} | EMA={ema_signal} | Move={nifty_move_pct}%)")
+        elif _tech_bull >= 3:
+            opt_signal = "BUY"
+            print(f"  🔄 OI NEUTRAL overridden → BUY (tech consensus: {_tech_bull}/4 bullish | "
+                  f"VWAP={'above' if spot_above_vwap else 'below'} | "
+                  f"RSI={rsi_15m} | EMA={ema_signal} | Move={nifty_move_pct}%)")
+
+        # Re-compute nearest level & distance if signal was overridden from NEUTRAL
+        if opt_signal != "NEUTRAL" and key_levels:
+            nearest_level = None
+            distance_pts  = None
+            nearest_label = None
+            if opt_signal in ("SELL", "STRONG SELL"):
+                s1 = key_levels.get("support")
+                s2 = key_levels.get("strong_support")
+                if s1 is not None and spot > s1:
+                    nearest_level = s1; nearest_label = "S1"
+                    distance_pts  = round(spot - s1, 1)
+                elif s2 is not None:
+                    nearest_level = s2; nearest_label = "S2"
+                    distance_pts  = round(max(spot - s2, 0), 1)
+                elif s1 is not None:
+                    nearest_level = s1; nearest_label = "S1"
+                    distance_pts  = round(abs(spot - s1), 1)
+            elif opt_signal in ("BUY", "STRONG BUY"):
+                r1 = key_levels.get("resistance")
+                r2 = key_levels.get("strong_resistance")
+                if r1 is not None and spot < r1:
+                    nearest_level = r1; nearest_label = "R1"
+                    distance_pts  = round(r1 - spot, 1)
+                elif r2 is not None:
+                    nearest_level = r2; nearest_label = "R2"
+                    distance_pts  = round(max(r2 - spot, 0), 1)
+                elif r1 is not None:
+                    nearest_level = r1; nearest_label = "R1"
+                    distance_pts  = round(abs(r1 - spot), 1)
+
     snapshot = {
         "time":          ist_now.strftime("%H:%M"),
         "timestamp":     ist_now.strftime("%d-%b-%Y %H:%M IST"),
@@ -5267,7 +5343,25 @@ function renderOITable(data) {
                 + '<td class="col-detail ' + diffCls + '">' + fmtIN(row.diff||0) + '</td>'
                 + (function(){
                     var pcrV = parseFloat(row.pcr) || 0;
-                    var pcrCls = pcrV >= 1.1 ? 'oi-pcr-bull' : pcrV <= 0.9 ? 'oi-pcr-bear' : 'oi-pcr-neu';
+                    // Context-aware PCR coloring: cross-reference with VWAP
+                    // High PCR + price above VWAP = genuine institutional put support → bullish
+                    // High PCR + price below VWAP = retail panic buying puts → bearish
+                    // Low PCR + price below VWAP = call writing as ceiling confirmed → bearish
+                    // Low PCR + price above VWAP = call writing but price defying it → bullish
+                    var pcrCls;
+                    var spotV = row.spot_price || 0;
+                    var vwapV = row.vwap || spotV;
+                    if (pcrV > 1.2 && spotV >= vwapV) {
+                        pcrCls = 'oi-pcr-bull';
+                    } else if (pcrV > 1.2 && spotV < vwapV) {
+                        pcrCls = 'oi-pcr-bear';
+                    } else if (pcrV < 0.8 && spotV <= vwapV) {
+                        pcrCls = 'oi-pcr-bear';
+                    } else if (pcrV < 0.8 && spotV > vwapV) {
+                        pcrCls = 'oi-pcr-bull';
+                    } else {
+                        pcrCls = 'oi-pcr-neu';
+                    }
                     var barW = Math.min(100, Math.round((pcrV / 2) * 100));
                     return '<td class="oi-pcr-val ' + pcrCls + '"><span class="oi-pcr-cell">'
                         + (row.pcr || '—')
