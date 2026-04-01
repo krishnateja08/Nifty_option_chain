@@ -1656,39 +1656,65 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
 
     spot_above_vwap = spot >= vwap
 
-    # ── OI Signal Logic: Step 1 — direction, Step 2 — ratio, Step 3 — PCR+VWAP tiebreaker ──
-    # Step 1: CE and PE moving in OPPOSITE directions → clear signal
+    # ── Premium-aware OI classification ──────────────────────────────
+    # The old logic assumed all OI buildup = writing (contrarian).
+    # This fails when buyers dominate (especially at market open).
+    # Fix: use premium change to distinguish buying from writing.
+    #   OI ↑ + Premium ↑ = BUYING (directional — go WITH the signal)
+    #   OI ↑ + Premium ↓ = WRITING (contrarian — go AGAINST the signal)
+    ce_buy_pct = option_analysis.get('ce_buying_pct', 0) if option_analysis else 0
+    pe_buy_pct = option_analysis.get('pe_buying_pct', 0) if option_analysis else 0
+
+    # Determine if CE/PE buildup is primarily buying or writing (>60% threshold)
+    ce_is_buying  = ce_buy_pct > 60   # Calls being BOUGHT → bullish intent
+    ce_is_writing = ce_buy_pct < 40   # Calls being WRITTEN → bearish (capping)
+    pe_is_buying  = pe_buy_pct > 60   # Puts being BOUGHT → bearish intent
+    pe_is_writing = pe_buy_pct < 40   # Puts being WRITTEN → bullish (support)
+
+    print(f"  📊 Premium-aware | CE: {'BUYING' if ce_is_buying else 'WRITING' if ce_is_writing else 'MIXED'}({ce_buy_pct}%) | "
+          f"PE: {'BUYING' if pe_is_buying else 'WRITING' if pe_is_writing else 'MIXED'}({pe_buy_pct}%)")
+
+    # ── OI Signal Logic (Premium-Aware) ──────────────────────────────
+    # Step 1: Opposite directions → clearest signals
     if   ce_chg > 0 and pe_chg < 0:
-        # Calls building + Puts unwinding = true bearish
-        opt_signal = "STRONG SELL"
-    elif ce_chg < 0 and pe_chg > 0:
-        # Calls unwinding + Puts building = true bullish
-        opt_signal = "STRONG BUY"
-
-    # Step 2: Both building → check if one side clearly dominates (1.5× ratio)
-    elif ce_chg > 0 and pe_chg > 0:
-        if   pe_chg > ce_chg * 1.5:
-            opt_signal = "BUY"           # Put build clearly dominant
-        elif ce_chg > pe_chg * 1.5:
-            opt_signal = "SELL"          # Call build clearly dominant
+        # Calls building + Puts unwinding
+        if ce_is_buying:
+            opt_signal = "STRONG BUY"    # Calls being BOUGHT → bullish
         else:
-            # Step 3: Neither dominates → use PCR + VWAP as tiebreaker
-            # PCR > 1.8 (panic zone): VWAP decides — if spot below VWAP,
-            #   floor has broken and retail fear is valid → SELL
-            # PCR 1.2–1.8 (normal institutional put writing): bullish only
-            #   if price is respecting that floor (spot above VWAP)
-            # PCR 0.8–1.2: neutral regardless
-            # PCR < 0.8: bearish only if price confirms (spot below VWAP)
-            if pcr > 1.8:
-                opt_signal = "SELL"      if not spot_above_vwap else "BUY"
-            elif pcr > 1.2:
-                opt_signal = "BUY"       if spot_above_vwap     else "NEUTRAL"
-            elif pcr < 0.8:
-                opt_signal = "SELL"      if not spot_above_vwap else "NEUTRAL"
-            else:
-                opt_signal = "NEUTRAL"   # PCR 0.8–1.2: truly ambiguous
+            opt_signal = "STRONG SELL"   # Calls being WRITTEN → bearish (cap)
+    elif ce_chg < 0 and pe_chg > 0:
+        # Calls unwinding + Puts building
+        if pe_is_buying:
+            opt_signal = "STRONG SELL"   # Puts being BOUGHT → bearish
+        else:
+            opt_signal = "STRONG BUY"   # Puts being WRITTEN → bullish (floor)
 
-    # Step 4: Both unwinding → no conviction either way
+    # Step 2: Both building → premium direction decides meaning
+    elif ce_chg > 0 and pe_chg > 0:
+        # Count net bullish vs bearish signals from premium direction
+        bull_score = 0; bear_score = 0
+        if ce_is_buying:  bull_score += 1   # Call buying = bullish
+        if ce_is_writing: bear_score += 1   # Call writing = bearish (cap)
+        if pe_is_buying:  bear_score += 1   # Put buying = bearish
+        if pe_is_writing: bull_score += 1   # Put writing = bullish (floor)
+
+        # Also factor in which side dominates by volume
+        if pe_chg > ce_chg * 1.5:
+            if pe_is_writing: bull_score += 1    # Heavy put WRITING = strong support
+            elif pe_is_buying: bear_score += 1   # Heavy put BUYING = strong fear
+        elif ce_chg > pe_chg * 1.5:
+            if ce_is_writing: bear_score += 1    # Heavy call WRITING = strong cap
+            elif ce_is_buying: bull_score += 1   # Heavy call BUYING = strong demand
+
+        if bull_score > bear_score:
+            opt_signal = "BUY" if bull_score >= 2 else "BUY"
+        elif bear_score > bull_score:
+            opt_signal = "SELL" if bear_score >= 2 else "SELL"
+        else:
+            # Tied → use VWAP as tiebreaker
+            opt_signal = "BUY" if spot_above_vwap else "SELL"
+
+    # Step 3: Both unwinding → no conviction
     elif ce_chg < 0 and pe_chg < 0:
         opt_signal = "NEUTRAL"
 
@@ -1894,6 +1920,8 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
         "ema5":          ema5_val,
         "ema13":         ema13_val,
         "bias":          bias or "SIDEWAYS",
+        "ce_buying_pct": ce_buy_pct,
+        "pe_buying_pct": pe_buy_pct,
     }
 
     log_file = "oi_log.json"
@@ -2136,8 +2164,8 @@ def build_intraday_oi_tab_html():
           <div class="logic-box" style="margin-top:16px;">
           <div class="logic-box-head">&#128214; HOW TO READ THIS TABLE</div>
           <div class="logic-grid">
-            <div class="logic-item"><span class="lc-bear">Call OI +</span> Writers adding calls &#8594; Bearish pressure</div>
-            <div class="logic-item"><span class="lc-bull">Put OI +</span> Writers adding puts &#8594; Bullish support</div>
+            <div class="logic-item"><span class="lc-bear">Call OI +</span> Premium &#8593; = Buying (Bullish) &nbsp;&middot;&nbsp; Premium &#8595; = Writing (Bearish cap)</div>
+            <div class="logic-item"><span class="lc-bull">Put OI +</span> Premium &#8593; = Buying (Bearish) &nbsp;&middot;&nbsp; Premium &#8595; = Writing (Bullish floor)</div>
             <div class="logic-item"><span class="lc-info">DIFF</span> = PE &#916; &#8722; CE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
             <div class="logic-item"><span class="lc-info">3/5/15 Min · 1 Hr</span> filters raw rows or aggregates into time slots</div>
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
@@ -2595,6 +2623,8 @@ class NiftyHTMLAnalyzer:
                         'PE_Vol': pe.get('totalTradedVolume', 0),
                         'CE_OI_Change': ce.get('changeinOpenInterest', 0),
                         'PE_OI_Change': pe.get('changeinOpenInterest', 0),
+                        'CE_Price_Change': ce.get('change', 0),
+                        'PE_Price_Change': pe.get('change', 0),
                     })
                 df_full    = pd.DataFrame(rows).sort_values('Strike').reset_index(drop=True)
                 underlying = json_data.get('records', {}).get('underlyingValue', 0)
@@ -2625,6 +2655,35 @@ class NiftyHTMLAnalyzer:
         total_ce_oi_change = int(df['CE_OI_Change'].sum())
         total_pe_oi_change = int(df['PE_OI_Change'].sum())
         net_oi_change = total_pe_oi_change - total_ce_oi_change
+
+        # ── Premium-aware OI classification ──────────────────────────────
+        # OI ↑ + Premium ↑ = BUYING (directional intent)
+        # OI ↑ + Premium ↓ = WRITING (contrarian/institutional)
+        # Weight by OI change magnitude so high-OI strikes dominate the signal
+        ce_buying_wt  = 0; ce_writing_wt = 0
+        pe_buying_wt  = 0; pe_writing_wt = 0
+        for _, row in df.iterrows():
+            ce_oi_chg = row.get('CE_OI_Change', 0)
+            pe_oi_chg = row.get('PE_OI_Change', 0)
+            ce_px_chg = row.get('CE_Price_Change', 0)
+            pe_px_chg = row.get('PE_Price_Change', 0)
+            if ce_oi_chg > 0:
+                if ce_px_chg > 0:
+                    ce_buying_wt  += ce_oi_chg   # CE bought → bullish
+                else:
+                    ce_writing_wt += ce_oi_chg   # CE written → bearish
+            if pe_oi_chg > 0:
+                if pe_px_chg > 0:
+                    pe_buying_wt  += pe_oi_chg   # PE bought → bearish
+                else:
+                    pe_writing_wt += pe_oi_chg   # PE written → bullish
+        total_ce_build = ce_buying_wt + ce_writing_wt
+        total_pe_build = pe_buying_wt + pe_writing_wt
+        ce_buying_pct = round(ce_buying_wt / total_ce_build * 100, 1) if total_ce_build > 0 else 0
+        pe_buying_pct = round(pe_buying_wt / total_pe_build * 100, 1) if total_pe_build > 0 else 0
+        print(f"  📊 Premium Check | CE: {ce_buying_pct}% buying {100-ce_buying_pct}% writing | "
+              f"PE: {pe_buying_pct}% buying {100-pe_buying_pct}% writing")
+
         if   total_ce_oi_change > 0 and total_pe_oi_change < 0:
             oi_direction,oi_signal,oi_icon,oi_class="Strong Bearish","Call Build-up + Put Unwinding","🔴","bearish"
         elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
@@ -2651,12 +2710,13 @@ class NiftyHTMLAnalyzer:
             'pcr_oi': round(pcr_oi,3), 'pcr_volume': round(pcr_vol,3),
             'total_ce_oi': int(total_ce_oi), 'total_pe_oi': int(total_pe_oi),
             'max_ce_oi_strike': int(max_ce_oi_row['Strike']), 'max_ce_oi_value': int(max_ce_oi_row['CE_OI']),
-            'max_pe_oi_strike': int(max_pe_oi_row['Strike']), 'max_pe_oi_value': int(max_pe_oi_row['CE_OI']),
+            'max_pe_oi_strike': int(max_pe_oi_row['Strike']), 'max_pe_oi_value': int(max_pe_oi_row['PE_OI']),
             'max_pain': int(max_pain_row['Strike']),
             'total_ce_oi_change': total_ce_oi_change, 'total_pe_oi_change': total_pe_oi_change,
             'net_oi_change': net_oi_change,
             'oi_direction': oi_direction, 'oi_signal': oi_signal,
             'oi_icon': oi_icon, 'oi_class': oi_class, 'df': df,
+            'ce_buying_pct': ce_buying_pct, 'pe_buying_pct': pe_buying_pct,
         }
 
     def get_technical_data(self):
