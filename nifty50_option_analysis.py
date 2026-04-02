@@ -2025,7 +2025,8 @@ def build_intraday_oi_tab_html():
                 <span class="nlf-th">SPOT</span>
                 <span class="nlf-th" style="text-align:right;">&#916;</span>
                 <span class="nlf-th" style="text-align:right;">NIFTY%</span>
-                <span class="nlf-th nlf-th-mom">MOMENTUM</span>
+                <span class="nlf-th" style="text-align:center;">VWAP</span>
+                <span class="nlf-th" style="text-align:right;">NET OI</span>
                 <span class="nlf-th" style="text-align:right;">STK</span>
                 <span class="nlf-th" style="text-align:right;">RSI</span>
               </div>
@@ -5510,14 +5511,6 @@ function renderNiftyLiveFeed(filtered) {
         badges.innerHTML = bHtml;
     }
 
-    // ── Compute momentum max for bar scaling ──
-    var nmpMax = 0;
-    entries.forEach(function(r) {
-        var v = Math.abs(r.nifty_move_pct || 0);
-        if (v > nmpMax) nmpMax = v;
-    });
-    if (nmpMax < 0.5) nmpMax = 0.5;
-
     // ── Table rows ──
     var html = '';
     entries.forEach(function(row, idx) {
@@ -5552,15 +5545,38 @@ function renderNiftyLiveFeed(filtered) {
             nmpHtml = '<span style="color:' + nmpColor + ';">' + (nmp >= 0 ? '+' : '') + nmp.toFixed(2) + '%</span>';
         }
 
-        // Momentum bar
-        var momPct = nmp != null ? Math.abs(nmp) / nmpMax * 100 : 0;
-        var momGreenW = Math.round(momPct);
-        var momGrayW = 100 - momGreenW;
-        var momColor = (nmp != null && nmp >= 0) ? '#00c853' : '#ff4757';
-        var momBarHtml = '<div class="nlf-row-mom">'
-            + '<span class="nlf-mom-green" style="width:' + momGreenW + '%;background:' + momColor + ';"></span>'
-            + '<span class="nlf-mom-gray" style="width:' + momGrayW + '%;"></span>'
-            + '</div>';
+        // VWAP gap (spot vs VWAP distance in points)
+        var vwapVal = row.vwap;
+        var spotVal = row.spot_price || 0;
+        var vwapHtml;
+        if (vwapVal && vwapVal > 0 && spotVal > 0) {
+            var vwapGap = Math.round(spotVal - vwapVal);
+            var aboveVwap = vwapGap >= 0;
+            var vwapColor = aboveVwap ? '#00e676' : '#ff4757';
+            var vwapArrow = aboveVwap ? '▲' : '▼';
+            vwapHtml = '<span style="color:' + vwapColor + ';">' + vwapArrow + Math.abs(vwapGap) + '</span>'
+                + '<br><span style="font-size:9px;color:' + (aboveVwap ? 'rgba(0,230,118,0.45)' : 'rgba(255,71,87,0.45)') + ';">'
+                + (aboveVwap ? 'above' : 'below') + '</span>';
+        } else {
+            vwapHtml = '<span style="color:rgba(176,190,197,0.25);">—</span>';
+        }
+
+        // Net OI diff (PE change - CE change)
+        var diff = row.diff;
+        var netOiHtml;
+        if (diff == null) {
+            netOiHtml = '<span style="color:rgba(176,190,197,0.25);">—</span>';
+        } else {
+            var absDiff = Math.abs(diff);
+            var diffSign = diff >= 0 ? '+' : '-';
+            var diffColor = diff >= 0 ? '#00e676' : '#ff4757';
+            var diffStr;
+            if (absDiff >= 10000000) diffStr = diffSign + (absDiff/10000000).toFixed(1) + 'Cr';
+            else if (absDiff >= 100000) diffStr = diffSign + (absDiff/100000).toFixed(1) + 'L';
+            else if (absDiff >= 1000) diffStr = diffSign + (absDiff/1000).toFixed(1) + 'K';
+            else diffStr = (diff >= 0 ? '+' : '') + diff;
+            netOiHtml = '<span style="color:' + diffColor + ';">' + diffStr + '</span>';
+        }
 
         // Streak
         var sCount = 1;
@@ -5587,7 +5603,8 @@ function renderNiftyLiveFeed(filtered) {
             + '<span class="nlf-row-spot">' + spotStr + '</span>'
             + '<span class="nlf-row-delta">' + dHtml + '</span>'
             + '<span class="nlf-row-nifty">' + nmpHtml + '</span>'
-            + momBarHtml
+            + '<span class="nlf-row-vwap">' + vwapHtml + '</span>'
+            + '<span class="nlf-row-netoi">' + netOiHtml + '</span>'
             + '<span class="nlf-row-stk">*' + sCount + '</span>'
             + '<span class="nlf-row-rsi" style="color:' + rsiColor + ';">' + rsiHtml + '</span>'
             + '</div>';
@@ -6512,34 +6529,33 @@ function mobNavTo(secId, tabId, label) {
         .nlf-header{{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap;}}
         .nlf-title-row{{display:flex;align-items:center;gap:7px;}}
         .nlf-live-dot{{width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:sb-pulse 1.5s ease-in-out infinite;flex-shrink:0;}}
-        .nlf-title{{font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;color:#e0f7fa;letter-spacing:1px;}}
-        .nlf-meta{{text-align:right;font-size:11px;color:rgba(200,221,232,0.7);line-height:1.6;}}
+        .nlf-title{{font-family:'Oxanium',sans-serif;font-size:16px;font-weight:700;color:#e0f7fa;letter-spacing:1px;}}
+        .nlf-meta{{text-align:right;font-size:12px;color:rgba(200,221,232,0.7);line-height:1.6;}}
         .nlf-meta b{{color:#fff;font-weight:700;}}
-        .nlf-meta-spot{{display:block;font-size:12px;}}
-        .nlf-meta-item{{font-size:11px;}}
+        .nlf-meta-spot{{display:block;font-size:13px;}}
+        .nlf-meta-item{{font-size:12px;}}
         .nlf-meta-sep{{color:rgba(128,222,234,0.3);margin:0 2px;}}
         .nlf-badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}}
-        .nlf-badge{{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:5px;font-size:11px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}}
+        .nlf-badge{{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}}
         .nlf-badge-buy{{background:rgba(0,200,83,0.12);color:#00c853;border:1px solid rgba(0,200,83,0.4);}}
         .nlf-badge-sell{{background:rgba(255,58,74,0.12);color:#ff3a4a;border:1px solid rgba(255,58,74,0.4);}}
         .nlf-badge-warn{{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
         .nlf-badge-info{{background:rgba(200,221,232,0.06);color:#c8dde8;border:1px solid rgba(200,221,232,0.2);}}
         .nlf-badge-danger{{background:rgba(255,58,74,0.1);color:#ff6b6b;border:1px solid rgba(255,58,74,0.3);}}
-        .nlf-thead{{display:grid;grid-template-columns:44px 82px 52px 56px minmax(0,1fr) 38px 40px;gap:0;font-size:9px;letter-spacing:1.2px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
+        .nlf-thead{{display:grid;grid-template-columns:56px 90px 58px 62px 72px 68px 40px 44px;gap:0;font-size:10px;letter-spacing:1.2px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
         .nlf-th-mom{{text-align:center;}}
         .nlf-tbody{{flex:1;display:flex;flex-direction:column;}}
-        .nlf-row{{display:grid;grid-template-columns:44px 82px 52px 56px minmax(0,1fr) 38px 40px;gap:0;padding:5px 0;align-items:center;font-size:12px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
+        .nlf-row{{display:grid;grid-template-columns:56px 90px 58px 62px 72px 68px 40px 44px;gap:0;padding:7px 0;align-items:center;font-size:13px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
         .nlf-row-live{{background:rgba(0,200,83,0.04);border-left:2px solid rgba(0,230,118,0.5);padding-left:4px;}}
-        .nlf-row-time{{color:rgba(176,190,197,0.5);font-size:11px;display:inline-flex;align-items:center;gap:4px;}}
-        .nlf-row-spot{{font-weight:700;color:#fff;font-size:12px;}}
-        .nlf-row-delta{{font-weight:700;font-size:11px;text-align:right;}}
-        .nlf-row-nifty{{font-size:11px;font-weight:700;text-align:right;}}
-        .nlf-row-mom{{display:flex;align-items:center;gap:2px;padding:0 6px;}}
-        .nlf-mom-green{{height:4px;background:#00c853;border-radius:2px;}}
-        .nlf-mom-gray{{height:4px;background:rgba(79,195,247,0.12);border-radius:2px;}}
-        .nlf-row-stk{{text-align:right;color:#ffd32a;font-weight:700;font-size:11px;}}
-        .nlf-row-rsi{{text-align:right;font-weight:700;font-size:11px;}}
-        .nlf-footer{{display:flex;justify-content:space-between;padding-top:8px;margin-top:auto;border-top:1px solid rgba(79,195,247,0.08);font-size:11px;}}
+        .nlf-row-time{{color:rgba(176,190,197,0.6);font-size:13px;display:inline-flex;align-items:center;gap:4px;}}
+        .nlf-row-spot{{font-weight:700;color:#fff;font-size:13px;}}
+        .nlf-row-delta{{font-weight:700;font-size:12px;text-align:right;}}
+        .nlf-row-nifty{{font-size:12px;font-weight:700;text-align:right;}}
+        .nlf-row-vwap{{text-align:center;font-size:11px;font-weight:700;}}
+        .nlf-row-netoi{{text-align:right;font-size:11px;font-weight:700;}}
+        .nlf-row-stk{{text-align:right;color:#ffd32a;font-weight:700;font-size:12px;}}
+        .nlf-row-rsi{{text-align:right;font-weight:700;font-size:12px;}}
+        .nlf-footer{{display:flex;justify-content:space-between;padding-top:8px;margin-top:auto;border-top:1px solid rgba(79,195,247,0.08);font-size:12px;}}
         .nlf-footer-left{{color:rgba(176,190,197,0.45);}}
         .nlf-footer-right{{font-weight:700;}}
         @media(max-width:1100px){{
@@ -6547,8 +6563,8 @@ function mobNavTo(secId, tabId, label) {
             .nlf-right{{width:100%;}}
         }}
         @media(max-width:600px){{
-            .nlf-thead,.nlf-row{{grid-template-columns:38px minmax(0,1fr) 44px 48px minmax(0,1fr) 32px 36px;}}
-            .nlf-row-spot{{font-size:11px;}}
+            .nlf-thead,.nlf-row{{grid-template-columns:44px minmax(0,1fr) 48px 52px 60px 58px 34px 38px;}}
+            .nlf-row-spot{{font-size:12px;}}
             .nlf-panel{{padding:10px;}}
         }}
         @media(max-width:1024px){{
