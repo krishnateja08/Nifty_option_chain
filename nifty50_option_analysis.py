@@ -10,6 +10,14 @@ STRATEGY CHECKLIST TAB: Rules-based scoring · Auto-filled from live data · N/A
 INTRADAY OI TREND TAB: Every-run snapshot → oi_log.json · 3/5/15 Min/1 Hr filter · IST timestamps
 NIFTY 50 HEATMAP TAB: Live yfinance data · Color-coded by % change · Market Breadth · High Weightage Movers
 
+FIX v7: Intraday OI Trend aggregation fix — grouped intervals (5/15/60 min) now use latest
+         snapshot values instead of summing cumulative OI (was inflating CE/PE Δ by N×).
+         Also fixed grouped rows using oldest entry instead of newest for pcr/signal/spot.
+         Auto-scheduler removed from main() — use external cron/scheduler instead.
+FIX v6: Three signal-accuracy improvements applied
+         1. PCR > 1.8 signal corrected: extreme put writing = institutional floor → BUY/NEUTRAL (was wrongly SELL)
+         2. VWAP dynamic calibration: uses live spot/ETF ratio instead of fixed ×100 to avoid intraday drift
+         3. Momentum override thresholds lowered: 1.0%→0.5% (hard), 0.5%→0.25% (soft) for faster V-reversal detection
 FIX v5: Nifty 50 Heatmap tab added
 FIX v4: Intraday OI Trend tab + oi_log.json persistence
 FIX v3: Holiday-aware expiry logic
@@ -1628,7 +1636,8 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     # ── VWAP calculation (moved up — needed for signal logic below) ──
     # ^NSEI is an index with zero volume → VWAP always equals spot (wrong).
     # NIFTYBEES.NS is the Nifty ETF trading at ~Nifty/100 with real volume.
-    # Multiply its VWAP by 100 to get Nifty-equivalent VWAP.
+    # FIX v6: Use dynamic calibration ratio (spot / last_etf_close) instead of fixed ×100
+    # to avoid drift where NIFTYBEES trades at 99.5×–100.5× Nifty, causing false VWAP signals.
     vwap = spot
     try:
         import yfinance as _yf
@@ -1642,11 +1651,14 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                 cum_vol = df_1m['Volume'].cumsum()
                 vwap_series = cum_tpv / cum_vol
                 last_vwap = vwap_series.iloc[-1]
-                if not pd.isna(last_vwap) and last_vwap > 0:
-                    vwap = round(float(last_vwap) * 100, 2)   # scale ETF → Nifty
-                    print(f"  ✅ VWAP (NIFTYBEES×100): {vwap}")
+                last_etf_close = float(df_1m['Close'].iloc[-1])
+                if not pd.isna(last_vwap) and last_vwap > 0 and last_etf_close > 0 and spot > 0:
+                    # Dynamic calibration: use live spot/ETF ratio to avoid fixed ×100 drift
+                    calibration = spot / last_etf_close
+                    vwap = round(float(last_vwap) * calibration, 2)
+                    print(f"  ✅ VWAP (NIFTYBEES × {calibration:.4f} dynamic): {vwap}")
                 else:
-                    print(f"  ⚠️  VWAP: series NaN — fallback to spot")
+                    print(f"  ⚠️  VWAP: series NaN or zero — fallback to spot")
             else:
                 print(f"  ⚠️  VWAP: insufficient 1m bars ({len(df_1m)}) — fallback to spot")
         else:
@@ -1673,14 +1685,17 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
             opt_signal = "SELL"          # Call build clearly dominant
         else:
             # Step 3: Neither dominates → use PCR + VWAP as tiebreaker
-            # PCR > 1.8 (panic zone): VWAP decides — if spot below VWAP,
-            #   floor has broken and retail fear is valid → SELL
+            # PCR > 1.8 (extreme put writing zone): massive institutional put selling = strong floor.
+            #   BUY if spot is above VWAP (floor is holding), NEUTRAL if spot broke below VWAP.
+            #   NOTE: PCR > 1.8 is rarely a genuine SELL — it usually signals a panic bottom.
             # PCR 1.2–1.8 (normal institutional put writing): bullish only
             #   if price is respecting that floor (spot above VWAP)
             # PCR 0.8–1.2: neutral regardless
             # PCR < 0.8: bearish only if price confirms (spot below VWAP)
             if pcr > 1.8:
-                opt_signal = "SELL"      if not spot_above_vwap else "BUY"
+                # FIX v6: Extreme put writing = institutional floor. BUY if holding VWAP, else NEUTRAL.
+                # Previous logic was inverted (SELL when not above VWAP) — corrected here.
+                opt_signal = "BUY" if spot_above_vwap else "NEUTRAL"
             elif pcr > 1.2:
                 # Zone 2: High put activity — BUY if above VWAP,
                 # SELL only if spot broke significantly below VWAP (>0.3%)
@@ -1746,23 +1761,25 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                 _down_pct = ((_high6 - spot) / _high6 * 100) if _high6 > 0 else 0
 
                 # Override: Price rising but signal is SELL
+                # FIX v6: Lowered thresholds from 1.0%/0.5% → 0.5%/0.25%
+                # At Nifty ~22700, old 1.0% = 227 pts — too slow to catch V-shaped reversals.
                 if _consec_up and opt_signal in ("SELL", "STRONG SELL"):
-                    if _up_pct > 1.0:
+                    if _up_pct > 0.5:
                         opt_signal = "BUY"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → BUY "
                               f"(4 consecutive ▲ deltas, +{_up_pct:.2f}% from 6-reading low)")
-                    elif _up_pct > 0.5:
+                    elif _up_pct > 0.25:
                         opt_signal = "NEUTRAL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → NEUTRAL "
                               f"(4 consecutive ▲ deltas, +{_up_pct:.2f}% from 6-reading low)")
 
                 # Override: Price falling but signal is BUY
                 elif _consec_down and opt_signal in ("BUY", "STRONG BUY"):
-                    if _down_pct > 1.0:
+                    if _down_pct > 0.5:
                         opt_signal = "SELL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → SELL "
                               f"(4 consecutive ▼ deltas, -{_down_pct:.2f}% from 6-reading high)")
-                    elif _down_pct > 0.5:
+                    elif _down_pct > 0.25:
                         opt_signal = "NEUTRAL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → NEUTRAL "
                               f"(4 consecutive ▼ deltas, -{_down_pct:.2f}% from 6-reading high)")
@@ -5070,30 +5087,31 @@ function filterByInterval(data, mins) {
     var keys = Object.keys(grouped).sort().reverse();
     return keys.map(function(key) {
         var rows    = grouped[key];
-        var last    = rows[rows.length - 1];
-        var totalCE = rows.reduce(function(a,r){ return a+(r.call_oi_chg||0); }, 0);
-        var totalPE = rows.reduce(function(a,r){ return a+(r.put_oi_chg||0); }, 0);
-        var displayTime = key.split('|')[1] + ' IST';
+        // rows[0] = newest snapshot in this window (data is reverse-chronological)
+        var latest  = rows[0];
+        var displayTime = key.split('|')[1];
         return {
             time:          displayTime,
-            call_oi_chg:   totalCE,
-            put_oi_chg:    totalPE,
-            diff:          totalPE - totalCE,
-            pcr:           last.pcr,
-            opt_signal:    last.opt_signal,
-            vwap:           last.vwap,
-            spot_price:     last.spot_price,
-            nifty_move_pct: last.nifty_move_pct,
-            nearest_level:  last.nearest_level,
-            nearest_label:  last.nearest_label,
-            distance_pts:   last.distance_pts,
-            vwap_signal:    last.vwap_signal,
-            rsi_15m:        last.rsi_15m,
-            ema_signal:     last.ema_signal,
-            ema5:           last.ema5,
-            ema13:          last.ema13,
-            bias:           last.bias,
-            timestamp:      last.timestamp,
+            // FIX: OI values are cumulative snapshots (today vs yesterday), NOT deltas.
+            // Summing them across snapshots was wrong (5x inflation). Use latest snapshot.
+            call_oi_chg:   latest.call_oi_chg || 0,
+            put_oi_chg:    latest.put_oi_chg  || 0,
+            diff:          (latest.put_oi_chg||0) - (latest.call_oi_chg||0),
+            pcr:           latest.pcr,
+            opt_signal:    latest.opt_signal,
+            vwap:           latest.vwap,
+            spot_price:     latest.spot_price,
+            nifty_move_pct: latest.nifty_move_pct,
+            nearest_level:  latest.nearest_level,
+            nearest_label:  latest.nearest_label,
+            distance_pts:   latest.distance_pts,
+            vwap_signal:    latest.vwap_signal,
+            rsi_15m:        latest.rsi_15m,
+            ema_signal:     latest.ema_signal,
+            ema5:           latest.ema5,
+            ema13:          latest.ema13,
+            bias:           latest.bias,
+            timestamp:      latest.timestamp,
             _isLive:       rows[0]._isLive,
         };
     });
