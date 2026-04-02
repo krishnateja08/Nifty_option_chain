@@ -6350,7 +6350,7 @@ function mobNavTo(secId, tabId, label) {
 
         /* ── Header ── */
         .oi-table thead tr{{background:rgba(18,26,33,0.95);border-bottom:2px solid rgba(36,53,68,0.9);}}
-        .oi-table thead th{{padding:12px 16px;font-size:9.5px;letter-spacing:1.5px;color:rgba(128,222,234,0.9);text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap;}}
+        .oi-table thead th{{padding:14px 16px;font-size:11px;letter-spacing:1.5px;color:rgba(178,235,242,1);text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap;}}
         .oi-table thead th:first-child{{text-align:left;}}
         .oi-table thead th.oi-th-divider{{border-left:1px solid rgba(30,45,56,1);}}
 
@@ -6368,19 +6368,19 @@ function mobNavTo(secId, tabId, label) {
         .oi-table tbody tr:last-child{{border-bottom:none;}}
         .oi-table tbody tr:hover{{background:rgba(18,26,33,0.9);}}
         .oi-table tbody tr.oi-live-row{{background:linear-gradient(90deg,rgba(0,212,255,0.04) 0%,transparent 60%);border-bottom:1px solid rgba(0,212,255,0.18);}}
-        .oi-table tbody td{{padding:13px 16px;font-size:12.5px;text-align:right;color:#c8dde8;white-space:nowrap;}}
+        .oi-table tbody td{{padding:14px 16px;font-size:13px;text-align:right;color:#dce8f0;white-space:nowrap;}}
         .oi-table tbody td:first-child{{text-align:left;}}
         .oi-table tbody td.oi-th-divider{{border-left:1px solid rgba(30,45,56,0.8);}}
 
         /* ── Time cell ── */
         .oi-time-cell{{display:flex;align-items:center;gap:10px;}}
-        .oi-time-val{{font-size:13px;font-weight:700;color:#fff;letter-spacing:0.5px;}}
+        .oi-time-val{{font-size:14px;font-weight:700;color:#fff;letter-spacing:0.5px;}}
         .oi-live-ind{{display:inline-flex;align-items:center;gap:5px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.5);border-radius:20px;padding:2px 8px;font-size:9px;color:#00e676;letter-spacing:1px;font-weight:700;}}
         .oi-live-ind::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
-        .oi-elapsed{{display:inline-flex;align-items:center;gap:5px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.35);border-radius:20px;padding:2px 10px;font-size:10px;color:#00e676;letter-spacing:0.5px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:58px;}}
-        .oi-elapsed::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
-        .nlf-elapsed{{display:inline-flex;align-items:center;gap:4px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.35);border-radius:12px;padding:1px 7px;font-size:9px;color:#00e676;letter-spacing:0.3px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:48px;}}
-        .nlf-elapsed::before{{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#00e676;box-shadow:0 0 4px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
+        .oi-elapsed{{display:inline-flex;align-items:center;gap:6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.45);border-radius:20px;padding:3px 12px;font-size:12px;color:#00e676;letter-spacing:0.5px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:68px;}}
+        .oi-elapsed::before{{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
+        .nlf-elapsed{{display:inline-flex;align-items:center;gap:4px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.4);border-radius:12px;padding:2px 8px;font-size:11px;color:#00e676;letter-spacing:0.3px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:54px;}}
+        .nlf-elapsed::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
 
         /* ── OI value cells ── */
         .oi-call-val{{color:#00e676;font-weight:500;}}
