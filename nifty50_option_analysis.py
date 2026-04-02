@@ -10,6 +10,13 @@ STRATEGY CHECKLIST TAB: Rules-based scoring · Auto-filled from live data · N/A
 INTRADAY OI TREND TAB: Every-run snapshot → oi_log.json · 3/5/15 Min/1 Hr filter · IST timestamps
 NIFTY 50 HEATMAP TAB: Live yfinance data · Color-coded by % change · Market Breadth · High Weightage Movers
 
+FIX v6: Four signal-accuracy improvements applied
+         1. PCR > 1.8 signal corrected: extreme put writing = institutional floor → BUY/NEUTRAL (was wrongly SELL)
+         2. VWAP dynamic calibration: uses live spot/ETF ratio instead of fixed ×100 to avoid intraday drift
+         3. Momentum override thresholds lowered: 1.0%→0.5% (hard), 0.5%→0.25% (soft) for faster V-reversal detection
+         4. Auto-scheduler added to main(): runs every 3 min during market hours (09:00–15:30 IST)
+            Usage: python script.py         ← continuous 3-min loop
+                   python script.py --once  ← single run (original behaviour)
 FIX v5: Nifty 50 Heatmap tab added
 FIX v4: Intraday OI Trend tab + oi_log.json persistence
 FIX v3: Holiday-aware expiry logic
@@ -1628,7 +1635,8 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     # ── VWAP calculation (moved up — needed for signal logic below) ──
     # ^NSEI is an index with zero volume → VWAP always equals spot (wrong).
     # NIFTYBEES.NS is the Nifty ETF trading at ~Nifty/100 with real volume.
-    # Multiply its VWAP by 100 to get Nifty-equivalent VWAP.
+    # FIX v6: Use dynamic calibration ratio (spot / last_etf_close) instead of fixed ×100
+    # to avoid drift where NIFTYBEES trades at 99.5×–100.5× Nifty, causing false VWAP signals.
     vwap = spot
     try:
         import yfinance as _yf
@@ -1642,11 +1650,14 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                 cum_vol = df_1m['Volume'].cumsum()
                 vwap_series = cum_tpv / cum_vol
                 last_vwap = vwap_series.iloc[-1]
-                if not pd.isna(last_vwap) and last_vwap > 0:
-                    vwap = round(float(last_vwap) * 100, 2)   # scale ETF → Nifty
-                    print(f"  ✅ VWAP (NIFTYBEES×100): {vwap}")
+                last_etf_close = float(df_1m['Close'].iloc[-1])
+                if not pd.isna(last_vwap) and last_vwap > 0 and last_etf_close > 0 and spot > 0:
+                    # Dynamic calibration: use live spot/ETF ratio to avoid fixed ×100 drift
+                    calibration = spot / last_etf_close
+                    vwap = round(float(last_vwap) * calibration, 2)
+                    print(f"  ✅ VWAP (NIFTYBEES × {calibration:.4f} dynamic): {vwap}")
                 else:
-                    print(f"  ⚠️  VWAP: series NaN — fallback to spot")
+                    print(f"  ⚠️  VWAP: series NaN or zero — fallback to spot")
             else:
                 print(f"  ⚠️  VWAP: insufficient 1m bars ({len(df_1m)}) — fallback to spot")
         else:
@@ -1673,14 +1684,17 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
             opt_signal = "SELL"          # Call build clearly dominant
         else:
             # Step 3: Neither dominates → use PCR + VWAP as tiebreaker
-            # PCR > 1.8 (panic zone): VWAP decides — if spot below VWAP,
-            #   floor has broken and retail fear is valid → SELL
+            # PCR > 1.8 (extreme put writing zone): massive institutional put selling = strong floor.
+            #   BUY if spot is above VWAP (floor is holding), NEUTRAL if spot broke below VWAP.
+            #   NOTE: PCR > 1.8 is rarely a genuine SELL — it usually signals a panic bottom.
             # PCR 1.2–1.8 (normal institutional put writing): bullish only
             #   if price is respecting that floor (spot above VWAP)
             # PCR 0.8–1.2: neutral regardless
             # PCR < 0.8: bearish only if price confirms (spot below VWAP)
             if pcr > 1.8:
-                opt_signal = "SELL"      if not spot_above_vwap else "BUY"
+                # FIX v6: Extreme put writing = institutional floor. BUY if holding VWAP, else NEUTRAL.
+                # Previous logic was inverted (SELL when not above VWAP) — corrected here.
+                opt_signal = "BUY" if spot_above_vwap else "NEUTRAL"
             elif pcr > 1.2:
                 # Zone 2: High put activity — BUY if above VWAP,
                 # SELL only if spot broke significantly below VWAP (>0.3%)
@@ -1746,23 +1760,25 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                 _down_pct = ((_high6 - spot) / _high6 * 100) if _high6 > 0 else 0
 
                 # Override: Price rising but signal is SELL
+                # FIX v6: Lowered thresholds from 1.0%/0.5% → 0.5%/0.25%
+                # At Nifty ~22700, old 1.0% = 227 pts — too slow to catch V-shaped reversals.
                 if _consec_up and opt_signal in ("SELL", "STRONG SELL"):
-                    if _up_pct > 1.0:
+                    if _up_pct > 0.5:
                         opt_signal = "BUY"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → BUY "
                               f"(4 consecutive ▲ deltas, +{_up_pct:.2f}% from 6-reading low)")
-                    elif _up_pct > 0.5:
+                    elif _up_pct > 0.25:
                         opt_signal = "NEUTRAL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → NEUTRAL "
                               f"(4 consecutive ▲ deltas, +{_up_pct:.2f}% from 6-reading low)")
 
                 # Override: Price falling but signal is BUY
                 elif _consec_down and opt_signal in ("BUY", "STRONG BUY"):
-                    if _down_pct > 1.0:
+                    if _down_pct > 0.5:
                         opt_signal = "SELL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → SELL "
                               f"(4 consecutive ▼ deltas, -{_down_pct:.2f}% from 6-reading high)")
-                    elif _down_pct > 0.5:
+                    elif _down_pct > 0.25:
                         opt_signal = "NEUTRAL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → NEUTRAL "
                               f"(4 consecutive ▼ deltas, -{_down_pct:.2f}% from 6-reading high)")
@@ -7177,7 +7193,8 @@ function mobNavTo(secId, tabId, label) {
         return option_analysis
 
 
-def main():
+def run_once():
+    """Single analysis run — called by main() and the scheduler loop."""
     try:
         print("\n🚀 Starting Nifty 50 Analysis...\n")
         analyzer = NiftyHTMLAnalyzer()
@@ -7201,13 +7218,76 @@ def main():
         else:
             print("\n⚠️  Skipping email due to save failure")
         print("\n✅ Done! Open index.html in your browser.")
-        print("\n💡 AUTO-REFRESH (Option 2) is active.")
-        print("   ➤ Serve the folder with:  python -m http.server 8000")
-        print("   ➤ Then open:              http://localhost:8000")
-        print("   ➤ Page will auto-reload whenever you re-run this script.\n")
     except Exception as e:
         print(f"\n❌ Critical Error: {e}")
         import traceback; traceback.print_exc()
+
+
+def main():
+    """
+    FIX v6: Auto-scheduler loop — runs every 3 minutes during market hours (09:00–15:30 IST).
+    Pass --once on the command line to run a single time and exit (original behaviour).
+    Usage:
+        python nifty50_option_analysis.py          ← loops every 3 min during market hours
+        python nifty50_option_analysis.py --once   ← single run and exit
+    """
+    import sys
+    single_run = "--once" in sys.argv
+
+    if single_run:
+        run_once()
+        print("\n💡 Ran in single-shot mode (--once). Re-run without --once for continuous mode.")
+        return
+
+    # ── Continuous scheduler mode ──────────────────────────────────────────
+    INTERVAL_MINUTES = 3   # change to 5 if you prefer 5-min granularity
+    ist_tz = pytz.timezone('Asia/Kolkata')
+
+    print("\n" + "=" * 70)
+    print("  📅 CONTINUOUS MODE — auto-runs every 3 min during market hours")
+    print("  ⏰ Market hours: 09:00 – 15:30 IST (Mon–Fri, non-holiday)")
+    print("  🛑 Press Ctrl+C to stop")
+    print(f"  💡 Serve folder:  python -m http.server 8000")
+    print(f"  💡 Then open:     http://localhost:8000")
+    print("=" * 70 + "\n")
+
+    while True:
+        try:
+            now = datetime.now(ist_tz)
+            is_weekday = now.weekday() < 5
+            today_str  = now.strftime('%d-%b-%Y')
+            is_holiday = today_str in NSE_FO_HOLIDAYS
+            market_open  = now.replace(hour=9,  minute=0,  second=0, microsecond=0)
+            market_close = now.replace(hour=15, minute=30, second=0, microsecond=0)
+            in_market_hours = market_open <= now <= market_close
+
+            if is_weekday and not is_holiday and in_market_hours:
+                print(f"\n⏱️  [{now.strftime('%H:%M:%S IST')}] Running scheduled analysis...")
+                run_once()
+                next_run = datetime.now(ist_tz) + timedelta(minutes=INTERVAL_MINUTES)
+                print(f"\n⏳ Next run at {next_run.strftime('%H:%M IST')} "
+                      f"(every {INTERVAL_MINUTES} min). Press Ctrl+C to stop.")
+            else:
+                if not is_weekday or is_holiday:
+                    reason = "holiday" if is_holiday else "weekend"
+                    print(f"\r  💤 [{now.strftime('%H:%M IST')}] Market closed ({reason}) — "
+                          f"waiting for next trading day...    ", end="", flush=True)
+                elif now < market_open:
+                    opens_in = int((market_open - now).total_seconds() // 60)
+                    print(f"\r  🌅 [{now.strftime('%H:%M IST')}] Market opens in {opens_in} min "
+                          f"— standing by...    ", end="", flush=True)
+                else:
+                    print(f"\r  🌙 [{now.strftime('%H:%M IST')}] Market closed for today "
+                          f"— see you tomorrow...    ", end="", flush=True)
+
+            time.sleep(INTERVAL_MINUTES * 60)
+
+        except KeyboardInterrupt:
+            print("\n\n🛑 Scheduler stopped by user. Goodbye!\n")
+            break
+        except Exception as e:
+            print(f"\n⚠️  Scheduler loop error: {e} — retrying in {INTERVAL_MINUTES} min...")
+            time.sleep(INTERVAL_MINUTES * 60)
 
 
 if __name__ == "__main__":
