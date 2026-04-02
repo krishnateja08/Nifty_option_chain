@@ -974,7 +974,7 @@
         <div class="hb-status">
             <div class="hb-s-item">
                 <div class="hb-s-dot" style="background:#00e676;box-shadow:0 0 6px #00e676;"></div>
-                Generated <span class="hb-s-val" id="hb-gen">02-Apr-2026 09:11 IST</span>
+                Generated <span class="hb-s-val" id="hb-gen">02-Apr-2026 09:14 IST</span>
             </div>
             <div class="hb-s-item">
                 <div class="hb-s-dot" style="background:#4fc3f7;box-shadow:0 0 6px #4fc3f7;"></div>
@@ -1103,10 +1103,10 @@
   <div class="ssb-wrap">
     <div class="ssb-header">
       <span class="ssb-title">&#9889; SIGNAL SUMMARY</span>
-      <span class="ssb-ts">02-Apr-2026 09:11 IST</span>
+      <span class="ssb-ts">02-Apr-2026 09:14 IST</span>
     </div>
     <div class="ssb-grid">
-      <div class="ssb-cell"><span class="ssb-cell-lbl">OI Signal</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);">&#9711; Neutral</span><span class="ssb-sub">Both Calls & Puts Building</span></div>
+      <div class="ssb-cell"><span class="ssb-cell-lbl">OI Signal</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);">&#9711; Neutral</span><span class="ssb-sub">Balanced OI Changes</span></div>
       <div class="ssb-cell"><span class="ssb-cell-lbl">FII / DII</span><span class="ssb-badge" style="color:#69f0ae;background:rgba(105,240,174,0.10);border:1px solid rgba(105,240,174,0.28);">&#9651; CAUTIOUSLY BULLISH</span><span class="ssb-sub">FII -6,566 / DII +7,243</span></div>
       <div class="ssb-cell"><span class="ssb-cell-lbl">Technical</span><span class="ssb-badge" style="color:#ffb74d;background:rgba(255,183,77,0.10);border:1px solid rgba(255,183,77,0.25);">&#8596; Sideways</span><span class="ssb-sub">Score -1 / 5 signals</span></div>
       <div class="ssb-cell"><span class="ssb-cell-lbl">Strategy</span><span class="ssb-badge" style="color:#ff4757;background:rgba(255,71,87,0.12);border:1px solid rgba(255,71,87,0.3);">&#9661; Strong Bear</span><span class="ssb-sub">Score -3 / 5 factors</span></div>
@@ -1246,19 +1246,19 @@
     /* CE / PE / Net — equal thirds in row 2 */
     .nc-ce-cell {
         grid-column:1 / 2; grid-row:2;
-        border-top:2px solid #fb7185;
+        border-top:2px solid #34d399;
         border-right:1px solid rgba(0,200,255,0.08);
         padding:10px 10px;
     }
     .nc-pe-cell {
         grid-column:2 / 3; grid-row:2;
-        border-top:2px solid #34d399;
+        border-top:2px solid #fb7185;
         border-right:1px solid rgba(0,200,255,0.08);
         padding:10px 10px;
     }
     .nc-net-cell {
         grid-column:3 / 4; grid-row:2;
-        border-top:2px solid #34d399;
+        border-top:2px solid #fbbf24;
         padding:10px 10px;
     }
 
@@ -1290,8 +1290,8 @@
       <!-- Left: text -->
       <div class="nc-dir-text">
         <div class="nc-dir-label">Market Direction</div>
-        <div class="nc-dir-name">Neutral (High Vol)</div>
-        <div class="nc-dir-sig">Both Calls & Puts Building</div>
+        <div class="nc-dir-name">Neutral</div>
+        <div class="nc-dir-sig">Balanced OI Changes</div>
       </div>
 
       <!-- Right: bars -->
@@ -1299,16 +1299,16 @@
         <div class="nc-bar-row">
           <div class="nc-bar-lbl" style="color:#00ff88;">&#9679; Bull</div>
           <div class="nc-bar-track">
-            <div style="height:100%;width:57%;background:linear-gradient(90deg,#00c96b,#00ff88);border-radius:99px;box-shadow:0 0 6px rgba(0,255,136,0.5);"></div>
+            <div style="height:100%;width:50%;background:linear-gradient(90deg,#00c96b,#00ff88);border-radius:99px;box-shadow:0 0 6px rgba(0,255,136,0.5);"></div>
           </div>
-          <div class="nc-bar-pct" style="color:#00ff88;">57%</div>
+          <div class="nc-bar-pct" style="color:#00ff88;">50%</div>
         </div>
         <div class="nc-bar-row">
           <div class="nc-bar-lbl" style="color:#ff3b5c;">&#9679; Bear</div>
           <div class="nc-bar-track">
-            <div style="height:100%;width:43%;background:linear-gradient(90deg,#c9003a,#ff3b5c);border-radius:99px;box-shadow:0 0 6px rgba(255,59,92,0.5);"></div>
+            <div style="height:100%;width:50%;background:linear-gradient(90deg,#c9003a,#ff3b5c);border-radius:99px;box-shadow:0 0 6px rgba(255,59,92,0.5);"></div>
           </div>
-          <div class="nc-bar-pct" style="color:#ff3b5c;">43%</div>
+          <div class="nc-bar-pct" style="color:#ff3b5c;">50%</div>
         </div>
       </div>
 
@@ -1318,32 +1318,32 @@
     <div class="nc-divider"></div>
 
     <!-- Call OI -->
-    <div class="nc-oi-cell nc-ce-cell" style="border-top:2px solid #fb7185;">
+    <div class="nc-oi-cell nc-ce-cell" style="border-top:2px solid #34d399;">
       <div class="nc-oi-label">Call OI &#916;</div>
-      <div class="nc-oi-value" style="color:#fb7185;">+107,242</div>
+      <div class="nc-oi-value" style="color:#34d399;">+0</div>
       <div class="nc-oi-footer">
         <div class="nc-oi-sub">CE open interest</div>
-        <div class="nc-oi-btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">Bearish Signal</div>
-      </div>
-    </div>
-
-    <!-- Put OI -->
-    <div class="nc-oi-cell nc-pe-cell" style="border-top:2px solid #34d399;">
-      <div class="nc-oi-label">Put OI &#916;</div>
-      <div class="nc-oi-value" style="color:#34d399;">+141,655</div>
-      <div class="nc-oi-footer">
-        <div class="nc-oi-sub">PE open interest</div>
         <div class="nc-oi-btn" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);color:#10b981;">Bullish Signal</div>
       </div>
     </div>
 
+    <!-- Put OI -->
+    <div class="nc-oi-cell nc-pe-cell" style="border-top:2px solid #fb7185;">
+      <div class="nc-oi-label">Put OI &#916;</div>
+      <div class="nc-oi-value" style="color:#fb7185;">+0</div>
+      <div class="nc-oi-footer">
+        <div class="nc-oi-sub">PE open interest</div>
+        <div class="nc-oi-btn" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);color:#ef4444;">Bearish Signal</div>
+      </div>
+    </div>
+
     <!-- Net OI -->
-    <div class="nc-oi-cell nc-net-cell" style="border-top:2px solid #34d399;">
+    <div class="nc-oi-cell nc-net-cell" style="border-top:2px solid #fbbf24;">
       <div class="nc-oi-label">Net OI &#916;</div>
-      <div class="nc-oi-value" style="color:#34d399;">+34,413</div>
+      <div class="nc-oi-value" style="color:#fbbf24;">+0</div>
       <div class="nc-oi-footer">
         <div class="nc-oi-sub">PE &#916; &#8722; CE &#916;</div>
-        <div class="nc-oi-btn" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.4);color:#10b981;">&#9878; Bullish Net</div>
+        <div class="nc-oi-btn" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);color:#f59e0b;">&#9878; Balanced</div>
       </div>
     </div>
 
@@ -1444,7 +1444,7 @@
                     <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
                         <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">OI Sentiment</div>
                         <div style="font-family:'Orbitron',monospace;font-size:22px;font-weight:700;line-height:1;color:#ffb74d;text-shadow:0 0 16px #ffb74d99;">&#8596; NEUTRAL</div>
-                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">Neutral (High Vol)</div>
+                        <div style="font-family:'Space Mono',monospace;font-size:9px;color:rgba(200,216,224,0.6);margin-top:6px;">Neutral</div>
                     </div>
                     <div style="background:rgba(0,8,16,0.9);padding:14px 16px;">
                         <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:rgba(0,200,255,0.6);text-transform:uppercase;margin-bottom:8px;">Max Pain</div>
@@ -1461,20 +1461,20 @@
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
                         <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#ff4d6d;width:26px;flex-shrink:0;">CE</div>
                         <div style="flex:1;height:7px;background:rgba(255,255,255,0.06);position:relative;overflow:hidden;">
-                            <div style="height:100%;width:76%;background:linear-gradient(90deg,rgba(255,77,109,0.4),#ff4d6d);position:relative;">
+                            <div style="height:100%;width:0%;background:linear-gradient(90deg,rgba(255,77,109,0.4),#ff4d6d);position:relative;">
                                 <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#ff4d6d;filter:brightness(2);box-shadow:0 0 8px #ff4d6d;"></span>
                             </div>
                         </div>
-                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;width:64px;text-align:right;flex-shrink:0;">+107K</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#ff6b85;width:64px;text-align:right;flex-shrink:0;">0</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#00e676;width:26px;flex-shrink:0;">PE</div>
                         <div style="flex:1;height:7px;background:rgba(255,255,255,0.06);position:relative;overflow:hidden;">
-                            <div style="height:100%;width:100%;background:linear-gradient(90deg,rgba(0,230,118,0.4),#00e676);position:relative;">
+                            <div style="height:100%;width:0%;background:linear-gradient(90deg,rgba(0,230,118,0.4),#00e676);position:relative;">
                                 <span style="position:absolute;right:0;top:0;bottom:0;width:2px;background:#00e676;filter:brightness(2);box-shadow:0 0 8px #00e676;"></span>
                             </div>
                         </div>
-                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;width:64px;text-align:right;flex-shrink:0;">+142K</div>
+                        <div style="font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#00e676;width:64px;text-align:right;flex-shrink:0;">0</div>
                     </div>
                 </div>
 
@@ -2049,8 +2049,8 @@
                       <div style="height:100%;width:100%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+24,548</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;190.00</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.7M</td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -2068,8 +2068,8 @@
                       <div style="height:100%;width:63%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+8,429</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;123.60</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">867.3K</td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -2087,8 +2087,8 @@
                       <div style="height:100%;width:51%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+22,523</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;333.35</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">621.5K</td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -2106,8 +2106,8 @@
                       <div style="height:100%;width:49%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+22,293</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;233.50</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.5M</td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -2125,8 +2125,8 @@
                       <div style="height:100%;width:47%;background:linear-gradient(90deg,#ff3355,#ff6b6b);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+14,966</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;279.65</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.4M</td>
                 </tr></tbody>
       </table>
@@ -2169,8 +2169,8 @@
                       <div style="height:100%;width:100%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+6,069</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;200.40</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.1M</td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -2188,8 +2188,8 @@
                       <div style="height:100%;width:77%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+27,823</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;276.00</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.1M</td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -2207,8 +2207,8 @@
                       <div style="height:100%;width:68%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+9,288</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;431.35</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">556.7K</td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -2226,8 +2226,8 @@
                       <div style="height:100%;width:51%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+14,961</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;321.95</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">1.6M</td>
                 </tr>
                 <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
@@ -2245,8 +2245,8 @@
                       <div style="height:100%;width:44%;background:linear-gradient(90deg,#00e676,#69f0ae);border-radius:99px;"></div>
                     </div>
                   </td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#00e676;">+4,323</td>
-                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;167.65</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#546e7a;">0</td>
+                  <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#c8d8e0;">&#8377;0.00</td>
                   <td style="padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#8faabe;">522.2K</td>
                 </tr></tbody>
       </table>
@@ -2340,18 +2340,18 @@
               color:rgba(120,160,180,0.4);text-transform:uppercase;margin-bottom:6px;">OI Change Today</div>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <div style="display:flex;align-items:center;gap:7px;">
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:22px;">CE</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:22px;">CE</span>
                 <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:43.1%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
+                  <div style="height:100%;width:0.0%;border-radius:3px;background:linear-gradient(90deg,#ff5252,#ff6680);"></div>
                 </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:30px;text-align:right;">43%</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:30px;text-align:right;">0%</span>
               </div>
               <div style="display:flex;align-items:center;gap:7px;">
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:22px;">PE</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:22px;">PE</span>
                 <div style="flex:1;height:5px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;">
-                  <div style="height:100%;width:56.9%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
+                  <div style="height:100%;width:0.0%;border-radius:3px;background:linear-gradient(90deg,#00e676,#44ffaa);"></div>
                 </div>
-                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#00e676;width:30px;text-align:right;">57%</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;color:#ff5252;width:30px;text-align:right;">0%</span>
               </div>
             </div>
           </div>
@@ -2402,7 +2402,7 @@
         <div class="section-title">
           <span>🟩</span> NIFTY 50 HEATMAP
           <span style="font-size:10px;color:rgba(128,222,234,0.35);font-weight:400;margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-            <span>Stock data as of: 02-Apr-2026 09:11 IST</span>
+            <span>Stock data as of: 02-Apr-2026 09:14 IST</span>
             <span style="font-size:9px;color:rgba(239,68,68,0.45);letter-spacing:0.5px;">⟳ OI chart auto-refreshes · Stock tiles update on script re-run</span>
           </span>
         </div>
