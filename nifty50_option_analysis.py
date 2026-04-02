@@ -5042,6 +5042,43 @@ function setOIView(mode) {
 /* Apply FOCUS mode on page load */
 window.addEventListener('load', function(){ setOIView('focus'); });
 
+/* ══ ELAPSED TIMER SYSTEM — replaces static LIVE badge ══════════════════ */
+var _elapsedTimerRef = null;   // Date.now() when current live entry was first seen
+var _elapsedTimerKey = '';     // time string of the current live entry (e.g. "09:20")
+var _elapsedTimerInterval = null;
+
+function _startElapsedTimer(entryTime) {
+    // If the live entry changed, reset the reference
+    if (entryTime !== _elapsedTimerKey) {
+        _elapsedTimerKey = entryTime;
+        _elapsedTimerRef = Date.now();
+    }
+    // Clear any previous interval
+    if (_elapsedTimerInterval) clearInterval(_elapsedTimerInterval);
+    // Tick every second
+    _elapsedTimerInterval = setInterval(_updateElapsedDisplays, 1000);
+    _updateElapsedDisplays();
+}
+
+function _fmtElapsed(ms) {
+    var totalSec = Math.floor(ms / 1000);
+    var m = Math.floor(totalSec / 60);
+    var s = totalSec % 60;
+    return m + 'm:' + (s < 10 ? '0' : '') + s + 's';
+}
+
+function _updateElapsedDisplays() {
+    if (!_elapsedTimerRef) return;
+    var elapsed = Date.now() - _elapsedTimerRef;
+    var txt = _fmtElapsed(elapsed);
+    // Update all elapsed badges in OI table
+    var oiBadges = document.querySelectorAll('.oi-elapsed');
+    oiBadges.forEach(function(el){ el.textContent = txt; });
+    // Update all elapsed badges in NLF panel
+    var nlfBadges = document.querySelectorAll('.nlf-elapsed');
+    nlfBadges.forEach(function(el){ el.textContent = txt; });
+}
+
 function renderOITable(data) {
     var tbody = document.getElementById('oiTableBody');
     if (!tbody) return;
@@ -5085,12 +5122,14 @@ function renderOITable(data) {
         existingTimes = {};
     }
 
-    // Remove LIVE badge from previous live row
+    // Remove elapsed badge from previous live row
     var prevLive = tbody.querySelector('.oi-live-row');
     if (prevLive) {
         prevLive.classList.remove('oi-live-row');
         var liveInd = prevLive.querySelector('.oi-live-ind');
         if (liveInd) liveInd.remove();
+        var elapsedInd = prevLive.querySelector('.oi-elapsed');
+        if (elapsedInd) elapsedInd.remove();
         var td = prevLive.querySelector('td:first-child');
         if (td) { var div = td.querySelector('.oi-time-cell'); if (div) td.textContent = div.textContent.replace('LIVE','').trim(); }
     }
@@ -5103,7 +5142,7 @@ function renderOITable(data) {
             var isLive  = (idx === 0);
             var diffCls = (row.diff||0) >= 0 ? 'oi-diff-pos' : 'oi-diff-neg';
             var timeCell = isLive
-                ? '<div class="oi-time-cell"><span class="oi-time-val">' + t + '</span>&nbsp;<span class="oi-live-ind">LIVE</span></div>'
+                ? '<div class="oi-time-cell"><span class="oi-time-val">' + t + '</span>&nbsp;<span class="oi-elapsed"></span></div>'
                 : '<div class="oi-time-cell"><span class="oi-time-val">' + t + '</span></div>';
             var isBuy = (row.opt_signal||'').toUpperCase().indexOf('BUY') >= 0;
             var isSell = (row.opt_signal||'').toUpperCase().indexOf('SELL') >= 0;
@@ -5338,12 +5377,12 @@ function renderOITable(data) {
                 })()
                 + '</tr>';
         } else if (idx === 0) {
-            // Mark existing top row as LIVE
+            // Mark existing top row as LIVE with elapsed timer
             var r = existingTimes[t];
             r.classList.add('oi-live-row');
             var td = r.querySelector('td:first-child');
-            if (td && !td.querySelector('.oi-live-ind')) {
-                td.innerHTML = '<div class="oi-time-cell"><span class="oi-time-val">' + t + '</span>&nbsp;<span class="oi-live-ind">LIVE</span></div>';
+            if (td && !td.querySelector('.oi-elapsed')) {
+                td.innerHTML = '<div class="oi-time-cell"><span class="oi-time-val">' + t + '</span>&nbsp;<span class="oi-elapsed"></span></div>';
             }
         }
     });
@@ -5382,6 +5421,11 @@ function renderOITable(data) {
     // Remove empty state row if present
     var emptyRow = tbody.querySelector('.oi-empty-state');
     if (emptyRow) emptyRow.closest('tr').remove();
+
+    // ── Start elapsed timer for latest entry ──
+    if (filtered.length > 0 && filtered[0].time) {
+        _startElapsedTimer(filtered[0].time);
+    }
 
     // ── Render NIFTY Live Feed panel ──
     renderNiftyLiveFeed(filtered);
@@ -5527,7 +5571,7 @@ function renderNiftyLiveFeed(filtered) {
         }
 
         html += '<div class="nlf-row' + (isLive ? ' nlf-row-live' : '') + '">'
-            + '<span class="nlf-row-time">' + t + '</span>'
+            + '<span class="nlf-row-time">' + t + (isLive ? '&nbsp;<span class="nlf-elapsed"></span>' : '') + '</span>'
             + '<span class="nlf-row-spot">' + spotStr + '</span>'
             + '<span class="nlf-row-delta">' + dHtml + '</span>'
             + '<span class="nlf-row-nifty">' + nmpHtml + '</span>'
@@ -6304,6 +6348,10 @@ function mobNavTo(secId, tabId, label) {
         .oi-time-val{{font-size:13px;font-weight:700;color:#fff;letter-spacing:0.5px;}}
         .oi-live-ind{{display:inline-flex;align-items:center;gap:5px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.5);border-radius:20px;padding:2px 8px;font-size:9px;color:#00e676;letter-spacing:1px;font-weight:700;}}
         .oi-live-ind::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
+        .oi-elapsed{{display:inline-flex;align-items:center;gap:5px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.35);border-radius:20px;padding:2px 10px;font-size:10px;color:#00e676;letter-spacing:0.5px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:58px;}}
+        .oi-elapsed::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
+        .nlf-elapsed{{display:inline-flex;align-items:center;gap:4px;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.35);border-radius:12px;padding:1px 7px;font-size:9px;color:#00e676;letter-spacing:0.3px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:48px;}}
+        .nlf-elapsed::before{{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:#00e676;box-shadow:0 0 4px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
 
         /* ── OI value cells ── */
         .oi-call-val{{color:#00e676;font-weight:500;}}
@@ -6470,7 +6518,7 @@ function mobNavTo(secId, tabId, label) {
         .nlf-tbody{{flex:1;display:flex;flex-direction:column;}}
         .nlf-row{{display:grid;grid-template-columns:44px 82px 52px 56px minmax(0,1fr) 38px 40px;gap:0;padding:5px 0;align-items:center;font-size:12px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
         .nlf-row-live{{background:rgba(0,200,83,0.04);border-left:2px solid rgba(0,230,118,0.5);padding-left:4px;}}
-        .nlf-row-time{{color:rgba(176,190,197,0.5);font-size:11px;}}
+        .nlf-row-time{{color:rgba(176,190,197,0.5);font-size:11px;display:inline-flex;align-items:center;gap:4px;}}
         .nlf-row-spot{{font-weight:700;color:#fff;font-size:12px;}}
         .nlf-row-delta{{font-weight:700;font-size:11px;text-align:right;}}
         .nlf-row-nifty{{font-size:11px;font-weight:700;text-align:right;}}
