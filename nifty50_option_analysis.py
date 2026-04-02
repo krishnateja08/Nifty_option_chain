@@ -1707,6 +1707,69 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     else:
         opt_signal = "NEUTRAL"
 
+    # ══ MOMENTUM OVERRIDE ═══════════════════════════════════════════════════
+    # When price action clearly contradicts the OI signal for 4+ consecutive
+    # readings, override to prevent stale signals during V-shaped reversals.
+    # Read last 6 entries from oi_log.json to compute spot deltas.
+    # ═════════════════════════════════════════════════════════════════════════
+    _oi_signal_before_override = opt_signal   # preserve for logging
+    try:
+        _log_path = "oi_log.json"
+        _prev_entries = []
+        if os.path.exists(_log_path):
+            with open(_log_path, "r", encoding="utf-8") as _f:
+                _prev_entries = json.load(_f)
+            if not isinstance(_prev_entries, list):
+                _prev_entries = []
+            # Keep only today's entries
+            _today_str = ist_now.strftime('%d-%b-%Y')
+            _prev_entries = [e for e in _prev_entries if e.get('timestamp', '').startswith(_today_str)]
+
+        if len(_prev_entries) >= 4 and spot > 0:
+            # Collect last 6 spot prices (most recent first, current spot not yet in log)
+            _recent_spots = [spot]  # current reading
+            for _e in _prev_entries[:5]:
+                _sp = _e.get('spot_price', 0)
+                if _sp and _sp > 0:
+                    _recent_spots.append(_sp)
+
+            if len(_recent_spots) >= 5:
+                # Compute consecutive deltas: spots[0]-spots[1], spots[1]-spots[2], ...
+                _deltas = [_recent_spots[i] - _recent_spots[i+1] for i in range(len(_recent_spots)-1)]
+                _consec_up   = all(d > 0 for d in _deltas[:4])
+                _consec_down = all(d < 0 for d in _deltas[:4])
+
+                # Compute move % from 6-reading low/high
+                _low6  = min(_recent_spots)
+                _high6 = max(_recent_spots)
+                _up_pct   = ((spot - _low6) / _low6 * 100) if _low6 > 0 else 0
+                _down_pct = ((_high6 - spot) / _high6 * 100) if _high6 > 0 else 0
+
+                # Override: Price rising but signal is SELL
+                if _consec_up and opt_signal in ("SELL", "STRONG SELL"):
+                    if _up_pct > 1.0:
+                        opt_signal = "BUY"
+                        print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → BUY "
+                              f"(4 consecutive ▲ deltas, +{_up_pct:.2f}% from 6-reading low)")
+                    elif _up_pct > 0.5:
+                        opt_signal = "NEUTRAL"
+                        print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → NEUTRAL "
+                              f"(4 consecutive ▲ deltas, +{_up_pct:.2f}% from 6-reading low)")
+
+                # Override: Price falling but signal is BUY
+                elif _consec_down and opt_signal in ("BUY", "STRONG BUY"):
+                    if _down_pct > 1.0:
+                        opt_signal = "SELL"
+                        print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → SELL "
+                              f"(4 consecutive ▼ deltas, -{_down_pct:.2f}% from 6-reading high)")
+                    elif _down_pct > 0.5:
+                        opt_signal = "NEUTRAL"
+                        print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → NEUTRAL "
+                              f"(4 consecutive ▼ deltas, -{_down_pct:.2f}% from 6-reading high)")
+
+    except Exception as _e:
+        print(f"  ⚠️  Momentum override check failed: {_e} — using OI signal as-is")
+
     fut_price = round(spot - 25, 2)
     try:
         import yfinance as _yf
