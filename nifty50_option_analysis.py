@@ -5291,25 +5291,24 @@ function renderOITable(data) {
                     + arrow + ' ' + sign + nmp.toFixed(2) + '%</span>';
             }
 
-            // ── Signal Streak ──
+            // ── Signal Streak — Intensity Badge ──
             var streakCount = 1;
             var curSig = (row.opt_signal || '').toUpperCase();
             for (var si = idx + 1; si < filtered.length; si++) {
                 if ((filtered[si].opt_signal || '').toUpperCase() === curSig) streakCount++;
                 else break;
             }
-            var streakCls = isBuy ? 'oi-streak-buy' : isSell ? 'oi-streak-sell' : 'oi-streak-neu';
-            var streakLbl = streakCount === 1 ? 'NEW<br>signal' : 'streak';
-            var pips = '';
-            for (var pi = 0; pi < 6; pi++) {
-                var pipIdx = idx + pi;
-                var pipSig = pipIdx < filtered.length ? (filtered[pipIdx].opt_signal || '').toUpperCase() : '';
-                var pipCls = pipSig.indexOf('BUY') >= 0 ? 'oi-pip-buy' : pipSig.indexOf('SELL') >= 0 ? 'oi-pip-sell' : pipSig ? 'oi-pip-neu' : 'oi-pip-old';
-                pips += '<div class="oi-pip ' + pipCls + '"></div>';
-            }
-            var streakHtml = '<div class="oi-streak ' + streakCls + '">'
-                + '<div><div class="oi-streak-num">×' + streakCount + '</div><div class="oi-streak-lbl">' + streakLbl + '</div></div>'
-                + '<div class="oi-pips">' + pips + '</div>'
+            // Intensity: opacity scales with streak count (min 0.06, max 0.30)
+            var intensity = Math.min(0.30, 0.06 + streakCount * 0.04);
+            var sColor, sBorder, sLabel;
+            if (isBuy)       { sColor = '0,200,83';  sBorder = '#00c853'; sLabel = 'BUY'; }
+            else if (isSell) { sColor = '255,58,74';  sBorder = '#ff3a4a'; sLabel = 'SELL'; }
+            else             { sColor = '255,183,77'; sBorder = 'rgba(255,183,77,0.5)'; sLabel = streakCount === 1 ? 'NEW' : 'HOLD'; }
+            // Dim the border for low streaks, full for high
+            var borderOpacity = Math.min(1, 0.4 + streakCount * 0.12);
+            var streakHtml = '<div class="oi-streak-int" style="background:rgba(' + sColor + ',' + intensity + ');border-left:3px solid rgba(' + sColor + ',' + borderOpacity + ');">'
+                + '<span class="oi-streak-int-num" style="color:rgba(' + sColor + ',' + Math.min(1, 0.5 + streakCount * 0.1) + ');">' + streakCount + '</span>'
+                + '<span class="oi-streak-int-lbl" style="color:rgba(' + sColor + ',' + Math.min(0.85, 0.3 + streakCount * 0.1) + ');">' + sLabel + '</span>'
                 + '</div>';
 
             newRowsHtml += '<tr class="' + (isLive ? 'oi-live-row' : '') + '" data-time="' + t + '">'
@@ -6429,18 +6428,9 @@ function mobNavTo(secId, tabId, label) {
         .oi-nifty-flat{{background:rgba(120,144,156,0.1);color:#a8c0cc;border:1px solid rgba(120,144,156,0.2);}}
 
         /* ── Signal Streak ── */
-        .oi-streak{{display:inline-flex;flex-direction:column;align-items:flex-end;gap:4px;}}
-        .oi-streak-num{{font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;line-height:1;letter-spacing:0.5px;}}
-        .oi-streak-sell .oi-streak-num{{color:#ffd32a;}}
-        .oi-streak-buy  .oi-streak-num{{color:#ffd32a;}}
-        .oi-streak-neu  .oi-streak-num{{color:#ffd32a;}}
-        .oi-streak-lbl{{font-size:8px;letter-spacing:0.8px;color:rgba(176,190,197,0.35);text-transform:uppercase;line-height:1.4;}}
-        .oi-pips{{display:flex;gap:3px;align-items:center;}}
-        .oi-pip{{width:7px;height:7px;border-radius:50%;flex-shrink:0;}}
-        .oi-pip-sell{{background:#ff3a4a;opacity:0.85;}}
-        .oi-pip-buy{{background:#00c853;opacity:0.85;}}
-        .oi-pip-neu{{background:#fbbf24;opacity:0.85;}}
-        .oi-pip-old{{background:rgba(74,100,120,0.3);}}
+        .oi-streak-int{{display:inline-flex;align-items:center;gap:8px;border-radius:0;padding:6px 12px;white-space:nowrap;}}
+        .oi-streak-int-num{{font-family:'Oxanium',sans-serif;font-size:16px;font-weight:800;line-height:1;}}
+        .oi-streak-int-lbl{{font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;line-height:1;}}
 
         /* ── Nearest Level badge ── */
         .oi-nlevel-badge{{display:inline-flex;align-items:center;gap:6px;background:rgba(10,26,37,0.9);border:1px solid rgba(36,53,68,1);border-radius:7px;padding:4px 10px;font-size:11.5px;font-weight:700;letter-spacing:0.3px;white-space:nowrap;}}
