@@ -1682,9 +1682,21 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
             if pcr > 1.8:
                 opt_signal = "SELL"      if not spot_above_vwap else "BUY"
             elif pcr > 1.2:
-                opt_signal = "BUY"       if spot_above_vwap     else "NEUTRAL"
+                # Zone 2: High put activity — BUY if above VWAP,
+                # SELL only if spot broke significantly below VWAP (>0.3%)
+                if spot_above_vwap:
+                    opt_signal = "BUY"
+                else:
+                    vwap_gap_pct = ((vwap - spot) / vwap) * 100 if vwap > 0 else 0
+                    opt_signal = "SELL" if vwap_gap_pct > 0.3 else "NEUTRAL"
             elif pcr < 0.8:
-                opt_signal = "SELL"      if not spot_above_vwap else "NEUTRAL"
+                # Zone 4: Call-heavy — SELL if below VWAP,
+                # BUY only if spot is significantly above VWAP (>0.3%)
+                if not spot_above_vwap:
+                    opt_signal = "SELL"
+                else:
+                    vwap_gap_pct = ((spot - vwap) / vwap) * 100 if vwap > 0 else 0
+                    opt_signal = "BUY" if vwap_gap_pct > 0.3 else "NEUTRAL"
             else:
                 opt_signal = "NEUTRAL"   # PCR 0.8–1.2: truly ambiguous
 
