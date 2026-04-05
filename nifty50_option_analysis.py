@@ -1790,10 +1790,28 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     fut_price = round(spot - 25, 2)
     try:
         import yfinance as _yf
-        gift = _yf.Ticker("^NSEMDCP50")
-        gift_hist = gift.history(period="1d", interval="1m")
-        if not gift_hist.empty:
-            fut_price = round(float(gift_hist['Close'].iloc[-1]), 2)
+        # Try Nifty near-month futures first, then NIFTYBEES ETF × calibration
+        _fut_fetched = False
+        for _fut_sym in ("0NIFTY.NS", "NIFTYBEES.NS"):
+            try:
+                _fut_df = _yf.Ticker(_fut_sym).history(period="1d", interval="1m")
+                if _fut_df is not None and not _fut_df.empty:
+                    _last_close = float(_fut_df['Close'].dropna().iloc[-1])
+                    if _last_close > 0:
+                        if _fut_sym == "NIFTYBEES.NS" and spot > 0:
+                            # ETF trades at ~Nifty/100 — scale up using live calibration
+                            _calibration = spot / _last_close
+                            fut_price = round(_last_close * _calibration, 2)
+                            print(f"  ✅ Futures proxy via NIFTYBEES × {_calibration:.2f}: {fut_price}")
+                        else:
+                            fut_price = round(_last_close, 2)
+                            print(f"  ✅ Futures price via {_fut_sym}: {fut_price}")
+                        _fut_fetched = True
+                        break
+            except Exception:
+                continue
+        if not _fut_fetched:
+            print(f"  ⚠️  Futures price: all tickers failed — using spot - 25 as proxy ({fut_price})")
     except Exception as e:
         print(f"  ⚠️  Futures price fetch failed: {e} — using spot - 25 as proxy")
 
@@ -2660,7 +2678,28 @@ class NiftyHTMLAnalyzer:
             elif net_oi_change < 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bearish","Net Call Accumulation","🔴","bearish"
             else:                   oi_direction,oi_signal,oi_icon,oi_class="Neutral","Balanced OI Changes","🟡","neutral"
         max_ce_oi_row = df.loc[df['CE_OI'].idxmax()]; max_pe_oi_row = df.loc[df['PE_OI'].idxmax()]
-        df['pain']    = abs(df['CE_OI'] - df['PE_OI']); max_pain_row = df.loc[df['pain'].idxmin()]
+
+        # ── Max Pain: correct industry formula ──────────────────────────────
+        # For each candidate expiry price K, calculate total intrinsic payout
+        # to option holders:
+        #   CE payout at K = Σ max(0, K - strike) × CE_OI   for all strikes
+        #   PE payout at K = Σ max(0, strike - K) × PE_OI   for all strikes
+        # Max pain = strike K where total payout is MINIMUM
+        # (i.e., option writers lose the least → max pain for buyers)
+        strikes   = df['Strike'].values
+        ce_oi_arr = df['CE_OI'].values
+        pe_oi_arr = df['PE_OI'].values
+        min_payout    = float('inf')
+        max_pain_strike = int(df['Strike'].iloc[len(df)//2])   # fallback: middle strike
+
+        for k in strikes:
+            ce_payout = sum(max(0, k - s) * oi for s, oi in zip(strikes, ce_oi_arr))
+            pe_payout = sum(max(0, s - k) * oi for s, oi in zip(strikes, pe_oi_arr))
+            total_payout = ce_payout + pe_payout
+            if total_payout < min_payout:
+                min_payout = total_payout
+                max_pain_strike = int(k)
+
         df['Total_OI'] = df['CE_OI'] + df['PE_OI']
         return {
             'expiry': oc_data['expiry'], 'underlying_value': oc_data['underlying'],
@@ -2668,8 +2707,8 @@ class NiftyHTMLAnalyzer:
             'pcr_oi': round(pcr_oi,3), 'pcr_volume': round(pcr_vol,3),
             'total_ce_oi': int(total_ce_oi), 'total_pe_oi': int(total_pe_oi),
             'max_ce_oi_strike': int(max_ce_oi_row['Strike']), 'max_ce_oi_value': int(max_ce_oi_row['CE_OI']),
-            'max_pe_oi_strike': int(max_pe_oi_row['Strike']), 'max_pe_oi_value': int(max_pe_oi_row['CE_OI']),
-            'max_pain': int(max_pain_row['Strike']),
+            'max_pe_oi_strike': int(max_pe_oi_row['Strike']), 'max_pe_oi_value': int(max_pe_oi_row['PE_OI']),
+            'max_pain': max_pain_strike,
             'total_ce_oi_change': total_ce_oi_change, 'total_pe_oi_change': total_pe_oi_change,
             'net_oi_change': net_oi_change,
             'oi_direction': oi_direction, 'oi_signal': oi_signal,
