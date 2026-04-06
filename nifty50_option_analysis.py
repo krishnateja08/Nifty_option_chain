@@ -2141,7 +2141,7 @@ def build_intraday_oi_tab_html():
               <div style="display:flex;gap:0;position:relative;">
                 <div id="oiYLabels" style="width:58px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0;pointer-events:none;flex-shrink:0;"></div>
                 <div style="flex:1;position:relative;min-width:0;">
-                  <canvas id="oiSparklineCanvas" style="width:100%;height:200px;display:block;"></canvas>
+                  <canvas id="oiSparklineCanvas" style="width:100%;height:300px;display:block;"></canvas>
                   <div id="oiCrosshair" style="position:absolute;top:0;bottom:0;width:1px;background:rgba(79,195,247,0.3);pointer-events:none;display:none;z-index:10;"></div>
                   <div id="oiChartTooltip" style="position:absolute;pointer-events:none;background:rgba(6,13,20,0.97);border:1px solid rgba(79,195,247,0.35);border-radius:8px;padding:9px 13px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#e0f7fa;display:none;z-index:20;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,0.6);min-width:160px;">
                     <div id="oiTTTime" style="font-size:9px;color:rgba(128,222,234,0.45);letter-spacing:1px;margin-bottom:5px;"></div>
@@ -5874,7 +5874,7 @@ function drawSparkline(data) {
     /* ── Canvas sizing ── */
     var wrap = canvas.parentElement;
     var W = wrap ? wrap.clientWidth : 600;
-    var H = 200;
+    var H = 300;
     canvas.width  = W * dpr;
     canvas.height = H * dpr;
     canvas.style.width  = W + 'px';
