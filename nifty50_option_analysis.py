@@ -1652,11 +1652,22 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                 vwap_series = cum_tpv / cum_vol
                 last_vwap = vwap_series.iloc[-1]
                 last_etf_close = float(df_1m['Close'].iloc[-1])
-                if not pd.isna(last_vwap) and last_vwap > 0 and last_etf_close > 0 and spot > 0:
-                    # Dynamic calibration: use live spot/ETF ratio to avoid fixed ×100 drift
-                    calibration = spot / last_etf_close
+                first_etf_open = float(df_1m['Open'].iloc[0])
+                if not pd.isna(last_vwap) and last_vwap > 0 and first_etf_open > 0 and spot > 0:
+                    # FIX v8: Use day-open ETF price for calibration so VWAP doesn't
+                    # track spot in real-time (which made spot >= vwap almost always true).
+                    # We approximate Nifty open from first ETF bar's open price.
+                    # This locks calibration for the day, letting VWAP move independently.
+                    nifty_approx_open = spot  # fallback
+                    try:
+                        df_nifty_1d = _yf.Ticker("^NSEI").history(period="1d", interval="1d")
+                        if not df_nifty_1d.empty:
+                            nifty_approx_open = float(df_nifty_1d['Open'].iloc[-1])
+                    except Exception:
+                        pass
+                    calibration = nifty_approx_open / first_etf_open
                     vwap = round(float(last_vwap) * calibration, 2)
-                    print(f"  ✅ VWAP (NIFTYBEES × {calibration:.4f} dynamic): {vwap}")
+                    print(f"  ✅ VWAP (NIFTYBEES × {calibration:.4f} day-open locked): {vwap}")
                 else:
                     print(f"  ⚠️  VWAP: series NaN or zero — fallback to spot")
             else:
