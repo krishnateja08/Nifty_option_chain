@@ -5021,28 +5021,23 @@ class NiftyHTMLAnalyzer:
         var savedTab = sessionStorage.getItem('activeTab');
         var savedScroll = sessionStorage.getItem('scrollY');
 
-        // If we're restoring from an auto-refresh, hide page immediately
-        // to prevent visible scroll jump (page briefly shows at top)
-        if (savedScroll) {
-            document.body.style.opacity = '0';
-            document.body.style.transition = 'none';
-        }
-
         if (savedTab) {
             sessionStorage.removeItem('activeTab');
             setTimeout(function() { switchTab(savedTab); }, 50);
         }
         if (savedScroll) {
             sessionStorage.removeItem('scrollY');
-            // Restore scroll position first, then fade in
-            setTimeout(function() {
-                window.scrollTo(0, parseInt(savedScroll, 10));
-                // Small delay to let browser paint at correct position
+            // Restore scroll while page is still hidden (hidden by <head> script)
+            window.scrollTo(0, parseInt(savedScroll, 10));
+            // Wait for browser to apply scroll, then fade in
+            requestAnimationFrame(function() {
                 requestAnimationFrame(function() {
-                    document.body.style.transition = 'opacity 0.3s ease';
+                    document.documentElement.style.transition = 'opacity 0.3s ease';
+                    document.documentElement.style.opacity = '1';
+                    document.documentElement.style.overflow = '';
                     document.body.style.opacity = '1';
                 });
-            }, 80);
+            });
         }
     })();
 })();
@@ -6997,6 +6992,16 @@ function mobNavTo(secId, tabId, label) {
             .nsb-mob-title{{font-size:11px;}}
         }}
     </style>
+    <script>
+    // Instant-hide: if we're restoring from auto-refresh, hide body BEFORE it renders
+    // This prevents the flash/jump to top that occurs when JS runs after first paint
+    try {{
+        if (sessionStorage.getItem('scrollY')) {{
+            document.documentElement.style.opacity = '0';
+            document.documentElement.style.overflow = 'hidden';
+        }}
+    }} catch(e) {{}}
+    </script>
 </head>
 <body>
 <div class="container">
