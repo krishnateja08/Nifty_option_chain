@@ -1994,6 +1994,10 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
         "ema5":          ema5_val,
         "ema13":         ema13_val,
         "bias":          bias or "SIDEWAYS",
+        "support":       key_levels.get("support") if key_levels else None,
+        "resistance":    key_levels.get("resistance") if key_levels else None,
+        "strong_support":    key_levels.get("strong_support") if key_levels else None,
+        "strong_resistance": key_levels.get("strong_resistance") if key_levels else None,
     }
 
     log_file = "oi_log.json"
@@ -5201,7 +5205,7 @@ function filterByInterval(data, mins) {
             // Summing them across snapshots was wrong (5x inflation). Use latest snapshot.
             call_oi_chg:   latest.call_oi_chg || 0,
             put_oi_chg:    latest.put_oi_chg  || 0,
-            diff:          (latest.put_oi_chg||0) - (latest.call_oi_chg||0),
+            diff:          (latest.call_oi_chg||0) - (latest.put_oi_chg||0),
             pcr:           latest.pcr,
             opt_signal:    latest.opt_signal,
             vwap:           latest.vwap,
@@ -5216,6 +5220,10 @@ function filterByInterval(data, mins) {
             ema5:           latest.ema5,
             ema13:          latest.ema13,
             bias:           latest.bias,
+            support:        latest.support,
+            resistance:     latest.resistance,
+            strong_support:     latest.strong_support,
+            strong_resistance:  latest.strong_resistance,
             timestamp:      latest.timestamp,
             _isLive:       rows[0]._isLive,
         };
@@ -5367,23 +5375,31 @@ function renderOITable(data) {
                 // Map BULLISH → WATCH BULL and BEARISH → WATCH BEAR so the column
                 // always shows a meaningful direction hint whenever OI is neutral.
                 if (wb === 'WATCH BULL' || wb === 'BULLISH') {
+                    // Show nearest resistance value
+                    var wbR1 = row.resistance || row.nearest_level;
+                    var wbRDist = (wbR1 && row.spot_price) ? Math.round(wbR1 - row.spot_price) : null;
                     wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                         + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
                         + 'font-size:10px;font-weight:800;background:rgba(181,234,58,0.12);color:#b5ea3a;'
                         + 'border:1px solid rgba(181,234,58,0.3);">⚡ WATCH BULL</span>'
-                        + '<span style="font-size:8px;color:rgba(181,234,58,0.5);font-family:monospace;">tech bias</span>'
+                        + (wbR1 ? '<span style="font-size:9px;color:rgba(181,234,58,0.7);font-family:monospace;font-weight:700;">R1 ₹' + Number(wbR1).toLocaleString('en-IN') + '</span>' : '<span style="font-size:8px;color:rgba(181,234,58,0.5);font-family:monospace;">tech bias</span>')
                         + '</div>';
-                    wdHtml = '<span style="font-size:9px;color:rgba(181,234,58,0.55);font-family:monospace;font-weight:600;">'
-                        + 'Early bull<br>signal</span>';
+                    wdHtml = (wbRDist !== null && wbRDist > 0)
+                        ? '<span style="font-size:10px;color:rgba(181,234,58,0.7);font-family:monospace;font-weight:700;">▲ +' + wbRDist + ' pts</span>'
+                        : '<span style="font-size:9px;color:rgba(181,234,58,0.55);font-family:monospace;font-weight:600;">Early bull<br>signal</span>';
                 } else if (wb === 'WATCH BEAR' || wb === 'BEARISH') {
+                    // Show nearest support value
+                    var wbS1 = row.support || row.nearest_level;
+                    var wbSDist = (wbS1 && row.spot_price) ? Math.round(row.spot_price - wbS1) : null;
                     wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                         + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
                         + 'font-size:10px;font-weight:800;background:rgba(255,152,0,0.12);color:#ff9800;'
                         + 'border:1px solid rgba(255,152,0,0.3);">⚠ WATCH BEAR</span>'
-                        + '<span style="font-size:8px;color:rgba(255,152,0,0.5);font-family:monospace;">tech bias</span>'
+                        + (wbS1 ? '<span style="font-size:9px;color:rgba(255,152,0,0.7);font-family:monospace;font-weight:700;">S1 ₹' + Number(wbS1).toLocaleString('en-IN') + '</span>' : '<span style="font-size:8px;color:rgba(255,152,0,0.5);font-family:monospace;">tech bias</span>')
                         + '</div>';
-                    wdHtml = '<span style="font-size:9px;color:rgba(255,152,0,0.55);font-family:monospace;font-weight:600;">'
-                        + 'Early bear<br>signal</span>';
+                    wdHtml = (wbSDist !== null && wbSDist > 0)
+                        ? '<span style="font-size:10px;color:rgba(255,152,0,0.7);font-family:monospace;font-weight:700;">▼ -' + wbSDist + ' pts</span>'
+                        : '<span style="font-size:9px;color:rgba(255,152,0,0.55);font-family:monospace;font-weight:600;">Early bear<br>signal</span>';
                 } else {
                     // SIDEWAYS bias — derive direction from spot price momentum
                     // Look at up to 3 older snapshots (idx+1 … idx+3) and compare
