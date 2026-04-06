@@ -22,7 +22,7 @@ FIX v5: Nifty 50 Heatmap tab added
 FIX v4: Intraday OI Trend tab + oi_log.json persistence
 FIX v3: Holiday-aware expiry logic
 FIX v2: Expiry date now time-aware
-FIX v1: Net OI = PE Δ - CE Δ
+FIX v1: Net OI = CE Δ - PE Δ
 """
 from curl_cffi import requests
 import pandas as pd
@@ -1629,7 +1629,7 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
 
     ce_chg  = option_analysis.get('total_ce_oi_change', 0)
     pe_chg  = option_analysis.get('total_pe_oi_change', 0)
-    diff    = pe_chg - ce_chg
+    diff    = ce_chg - pe_chg
     pcr     = round(option_analysis.get('pcr_oi', 0), 2)
     spot    = round(float(technical.get('current_price', 0)), 2)
 
@@ -2075,7 +2075,7 @@ def build_intraday_oi_tab_html():
 
             <div class="oi-chart-wrap" style="margin-bottom:0;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <div class="oi-chart-label">NET OI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
+                <div class="oi-chart-label">NET OI DIFF (CE &#916; &#8722; PE &#916;) &mdash; INTRADAY SPARKLINE</div>
                 <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.8);letter-spacing:1px;"></div>
               </div>
               <!-- Chart: Y-labels + Canvas + Crosshair + Tooltip -->
@@ -2184,7 +2184,7 @@ def build_intraday_oi_tab_html():
           <div class="logic-grid">
             <div class="logic-item"><span class="lc-bear">Call OI +</span> Writers adding calls &#8594; Bearish pressure</div>
             <div class="logic-item"><span class="lc-bull">Put OI +</span> Writers adding puts &#8594; Bullish support</div>
-            <div class="logic-item"><span class="lc-info">DIFF</span> = PE &#916; &#8722; CE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
+            <div class="logic-item"><span class="lc-info">DIFF</span> = CE &#916; &#8722; PE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
             <div class="logic-item"><span class="lc-info">3/5/15 Min · 1 Hr</span> filters raw rows or aggregates into time slots</div>
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
             <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
@@ -2670,7 +2670,7 @@ class NiftyHTMLAnalyzer:
         pcr_vol = total_pe_vol / total_ce_vol if total_ce_vol > 0 else 0
         total_ce_oi_change = int(df['CE_OI_Change'].sum())
         total_pe_oi_change = int(df['PE_OI_Change'].sum())
-        net_oi_change = total_pe_oi_change - total_ce_oi_change
+        net_oi_change = total_ce_oi_change - total_pe_oi_change
         if   total_ce_oi_change > 0 and total_pe_oi_change < 0:
             oi_direction,oi_signal,oi_icon,oi_class="Strong Bearish","Call Build-up + Put Unwinding","🔴","bearish"
         elif total_ce_oi_change < 0 and total_pe_oi_change > 0:
@@ -2685,8 +2685,8 @@ class NiftyHTMLAnalyzer:
         elif total_ce_oi_change < 0 and total_pe_oi_change < 0:
             oi_direction,oi_signal,oi_icon,oi_class="Neutral (Unwinding)","Both Calls & Puts Unwinding","🟡","neutral"
         else:
-            if   net_oi_change > 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bullish","Net Put Accumulation","🟢","bullish"
-            elif net_oi_change < 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bearish","Net Call Accumulation","🔴","bearish"
+            if   net_oi_change > 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bearish","Net Call Accumulation","🔴","bearish"
+            elif net_oi_change < 0: oi_direction,oi_signal,oi_icon,oi_class="Moderately Bullish","Net Put Accumulation","🟢","bullish"
             else:                   oi_direction,oi_signal,oi_icon,oi_class="Neutral","Balanced OI Changes","🟡","neutral"
         max_ce_oi_row = df.loc[df['CE_OI'].idxmax()]; max_pe_oi_row = df.loc[df['PE_OI'].idxmax()]
 
@@ -3805,8 +3805,8 @@ class NiftyHTMLAnalyzer:
         pe_col='#34d399' if pe_is_bull else '#fb7185'; pe_dot_col='#10b981' if pe_is_bull else '#ef4444'
         pe_lbl='Bullish Signal' if pe_is_bull else 'Bearish Signal'; pe_btn_col='#10b981' if pe_is_bull else '#ef4444'
         pe_btn_bg='rgba(16,185,129,0.12)' if pe_is_bull else 'rgba(239,68,68,0.12)'; pe_btn_bdr='rgba(16,185,129,0.4)' if pe_is_bull else 'rgba(239,68,68,0.4)'
-        if net_val > 0: net_col='#34d399';net_dot_col='#10b981';net_lbl='Bullish Net';net_btn_col='#10b981';net_btn_bg='rgba(16,185,129,0.12)';net_btn_bdr='rgba(16,185,129,0.4)'
-        elif net_val < 0: net_col='#fb7185';net_dot_col='#ef4444';net_lbl='Bearish Net';net_btn_col='#ef4444';net_btn_bg='rgba(239,68,68,0.12)';net_btn_bdr='rgba(239,68,68,0.4)'
+        if net_val > 0: net_col='#fb7185';net_dot_col='#ef4444';net_lbl='Bearish Net';net_btn_col='#ef4444';net_btn_bg='rgba(239,68,68,0.12)';net_btn_bdr='rgba(239,68,68,0.4)'
+        elif net_val < 0: net_col='#34d399';net_dot_col='#10b981';net_lbl='Bullish Net';net_btn_col='#10b981';net_btn_bg='rgba(16,185,129,0.12)';net_btn_bdr='rgba(16,185,129,0.4)'
         else: net_col='#fbbf24';net_dot_col='#f59e0b';net_lbl='Balanced';net_btn_col='#f59e0b';net_btn_bg='rgba(245,158,11,0.12)';net_btn_bdr='rgba(245,158,11,0.4)'
         def nc_card(label,idc,value,val_col,sub,btn_lbl,btn_col,btn_bg,btn_bdr,icon_char):
             return (f'<div class="nc-card"><div class="nc-card-header">'
@@ -3817,7 +3817,7 @@ class NiftyHTMLAnalyzer:
         cards_html = (
             nc_card('CALL OI CHANGE',ce_dot_col,ce_val,ce_col,'CE open interest \u0394',ce_lbl,ce_btn_col,ce_btn_bg,ce_btn_bdr,'🔴' if ce_is_bear else '🟢') +
             nc_card('PUT OI CHANGE',pe_dot_col,pe_val,pe_col,'PE open interest \u0394',pe_lbl,pe_btn_col,pe_btn_bg,pe_btn_bdr,'🟢' if pe_is_bull else '🔴') +
-            nc_card('NET OI CHANGE',net_dot_col,net_val,net_col,'PE \u0394 \u2212 CE \u0394',net_lbl,net_btn_col,net_btn_bg,net_btn_bdr,'\u2696\ufe0f')
+            nc_card('NET OI CHANGE',net_dot_col,net_val,net_col,'CE \u0394 \u2212 PE \u0394',net_lbl,net_btn_col,net_btn_bg,net_btn_bdr,'\u2696\ufe0f')
         )
         dual_meters = (
             f'<div class="nc-meters-panel">'
@@ -5691,7 +5691,7 @@ function renderNiftyLiveFeed(filtered) {
             vwapHtml = '<span style="color:rgba(176,190,197,0.25);">—</span>';
         }
 
-        // Net OI diff (PE change - CE change)
+        // Net OI diff (CE change - PE change)
         var diff = row.diff;
         var netOiHtml;
         if (diff == null) {
