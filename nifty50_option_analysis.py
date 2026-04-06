@@ -1696,15 +1696,16 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
             opt_signal = "SELL"          # Call build clearly dominant
         else:
             # Step 3: Neither dominates → use PCR threshold + trend + VWAP tiebreaker
-            # FIX v9: Tightened neutral band 0.8–1.2 → 0.9–1.1 for earlier signals.
+            # FIX v10: 5-reading PCR trend with strength detection.
             #   PCR > 1.5: STRONG BUY (extreme put writing = institutional floor)
             #   PCR 1.1–1.5: BUY (put-heavy, bullish bias)
-            #   PCR 0.9–1.1: Check PCR trend across last 3 candles for direction
+            #   PCR 0.9–1.1: Check PCR trend across last 5 candles (~15 min) for direction
             #   PCR 0.5–0.9: SELL (call-heavy, bearish bias)
             #   PCR < 0.5: STRONG SELL (extreme call writing = ceiling)
 
-            # ── PCR trend detection: read last 3 PCR values from oi_log.json ──
-            _pcr_trend = "FLAT"  # default
+            # ── PCR trend detection: read last 5 PCR values from oi_log.json ──
+            _pcr_trend = "FLAT"       # FLAT | MILD_RISING | STRONG_RISING | MILD_FALLING | STRONG_FALLING
+            _pcr_shift = 0.0          # total PCR change across window
             try:
                 _pcr_log_path = "oi_log.json"
                 if os.path.exists(_pcr_log_path):
@@ -1716,16 +1717,38 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                                         if e.get('timestamp', '').startswith(_today_str_pcr)
                                         and e.get('pcr') is not None and e.get('pcr') > 0]
                         # Most recent entries are at the front (prepended)
-                        _recent_pcrs = [e['pcr'] for e in _pcr_entries[:3]]
-                        if len(_recent_pcrs) >= 3:
-                            # Check if PCR is consistently rising or falling
-                            _pcr_rising  = all(_recent_pcrs[i] > _recent_pcrs[i+1] for i in range(len(_recent_pcrs)-1))
-                            _pcr_falling = all(_recent_pcrs[i] < _recent_pcrs[i+1] for i in range(len(_recent_pcrs)-1))
-                            if _pcr_rising:
-                                _pcr_trend = "RISING"   # puts building = bullish
-                            elif _pcr_falling:
-                                _pcr_trend = "FALLING"  # calls building = bearish
-                            print(f"  📈 PCR Trend: {_pcr_trend} (last 3: {_recent_pcrs})")
+                        _recent_pcrs = [e['pcr'] for e in _pcr_entries[:5]]
+                        if len(_recent_pcrs) >= 5:
+                            # Count how many consecutive pairs are rising/falling
+                            _pairs = len(_recent_pcrs) - 1  # 4 pairs for 5 readings
+                            _rising_count  = sum(1 for i in range(_pairs) if _recent_pcrs[i] > _recent_pcrs[i+1])
+                            _falling_count = sum(1 for i in range(_pairs) if _recent_pcrs[i] < _recent_pcrs[i+1])
+                            _pcr_shift = _recent_pcrs[0] - _recent_pcrs[-1]  # newest minus oldest
+
+                            # Strong trend: all 4 pairs consistent AND shift > 0.15
+                            # Mild trend: 4 of 4 OR 3 of 4 consistent, shift 0.08–0.15
+                            if _rising_count >= 4 and _pcr_shift > 0.15:
+                                _pcr_trend = "STRONG_RISING"
+                            elif _rising_count >= 3 and _pcr_shift > 0.08:
+                                _pcr_trend = "MILD_RISING"
+                            elif _falling_count >= 4 and _pcr_shift < -0.15:
+                                _pcr_trend = "STRONG_FALLING"
+                            elif _falling_count >= 3 and _pcr_shift < -0.08:
+                                _pcr_trend = "MILD_FALLING"
+
+                            print(f"  📈 PCR Trend: {_pcr_trend} | shift={_pcr_shift:+.3f} | "
+                                  f"rising={_rising_count}/4 falling={_falling_count}/4 | "
+                                  f"last 5: {_recent_pcrs}")
+                        elif len(_recent_pcrs) >= 3:
+                            # Fallback: if less than 5 readings available, use 3
+                            _pcr_shift = _recent_pcrs[0] - _recent_pcrs[-1]
+                            _rising_count  = sum(1 for i in range(len(_recent_pcrs)-1) if _recent_pcrs[i] > _recent_pcrs[i+1])
+                            _falling_count = sum(1 for i in range(len(_recent_pcrs)-1) if _recent_pcrs[i] < _recent_pcrs[i+1])
+                            if _rising_count == len(_recent_pcrs)-1 and _pcr_shift > 0.08:
+                                _pcr_trend = "MILD_RISING"
+                            elif _falling_count == len(_recent_pcrs)-1 and _pcr_shift < -0.08:
+                                _pcr_trend = "MILD_FALLING"
+                            print(f"  📈 PCR Trend (3-bar fallback): {_pcr_trend} | shift={_pcr_shift:+.3f} | last {len(_recent_pcrs)}: {_recent_pcrs}")
             except Exception as _te:
                 print(f"  ⚠️  PCR trend detection failed: {_te}")
 
@@ -1746,10 +1769,14 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                     vwap_gap_pct = ((spot - vwap) / vwap) * 100 if vwap > 0 else 0
                     opt_signal = "BUY" if vwap_gap_pct > 0.3 else "NEUTRAL"
             else:
-                # PCR 0.9–1.1: use trend to break the tie
-                if _pcr_trend == "RISING":
+                # PCR 0.9–1.1: use trend strength to break the tie
+                if _pcr_trend == "STRONG_RISING":
+                    opt_signal = "BUY"                          # strong conviction, no VWAP needed
+                elif _pcr_trend == "MILD_RISING":
                     opt_signal = "BUY" if spot_above_vwap else "NEUTRAL"
-                elif _pcr_trend == "FALLING":
+                elif _pcr_trend == "STRONG_FALLING":
+                    opt_signal = "SELL"                         # strong conviction, no VWAP needed
+                elif _pcr_trend == "MILD_FALLING":
                     opt_signal = "SELL" if not spot_above_vwap else "NEUTRAL"
                 else:
                     opt_signal = "NEUTRAL"   # PCR 0.9–1.1 + flat trend
