@@ -5019,13 +5019,26 @@ class NiftyHTMLAnalyzer:
     // ── Restore tab + scroll position after reload ────────────────────────
     (function restoreTabAfterReload() {
         var savedTab = sessionStorage.getItem('activeTab');
-        // Tab restore happens immediately, scroll is deferred to after oi_log.json loads
+        var savedScroll = sessionStorage.getItem('scrollY');
+
         if (savedTab) {
             sessionStorage.removeItem('activeTab');
             setTimeout(function() { switchTab(savedTab); }, 50);
         }
-        // Scroll restore is handled by _restoreScrollAfterDataLoad() called from loadOILog()
-    
+        if (savedScroll) {
+            sessionStorage.removeItem('scrollY');
+            // Restore scroll while page is still hidden (hidden by <head> script)
+            window.scrollTo(0, parseInt(savedScroll, 10));
+            // Wait for browser to apply scroll, then fade in
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    document.documentElement.style.transition = 'opacity 0.3s ease';
+                    document.documentElement.style.opacity = '1';
+                    document.documentElement.style.overflow = '';
+                    document.body.style.opacity = '1';
+                });
+            });
+        }
     })();
 })();
 
@@ -6034,26 +6047,6 @@ function drawSparkline(data) {
     };
 }
 
-function _restoreScrollAfterDataLoad() {
-    var savedScroll = sessionStorage.getItem('scrollY');
-    if (savedScroll) {
-        sessionStorage.removeItem('scrollY');
-        window.scrollTo(0, parseInt(savedScroll, 10));
-        requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
-                document.documentElement.style.transition = 'opacity 0.3s ease';
-                document.documentElement.style.opacity = '1';
-                document.documentElement.style.overflow = '';
-                document.body.style.opacity = '1';
-            });
-        });
-    } else {
-        // No saved scroll (first load) — ensure page is visible
-        document.documentElement.style.opacity = '1';
-        document.documentElement.style.overflow = '';
-    }
-}
-
 function loadOILog() {
     var url = 'oi_log.json?_t=' + Date.now();
     fetch(url, {cache:'no-store'})
@@ -6064,7 +6057,6 @@ function loadOILog() {
                 _oiData = data;
                 window._oiData = data;
                 renderOITable(data);
-                _restoreScrollAfterDataLoad();
                 var now = new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));
                 var el  = document.getElementById('oiLastFetch');
                 if (el) el.textContent = 'Last fetch: ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0') + ' IST';
@@ -6073,7 +6065,6 @@ function loadOILog() {
         .catch(function(e) {
             var tbody = document.getElementById('oiTableBody');
             if (tbody) tbody.innerHTML = '<tr><td colspan="15" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
-            _restoreScrollAfterDataLoad();
         });
 }
 
