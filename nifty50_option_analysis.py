@@ -6480,7 +6480,7 @@ function mobNavTo(secId, tabId, label) {
 
         /* ── Header ── */
         .oi-table thead tr{{background:rgba(18,26,33,0.95);border-bottom:2px solid rgba(36,53,68,0.9);}}
-        .oi-table thead th{{padding:14px 16px;font-size:11px;letter-spacing:1.5px;color:rgba(178,235,242,1);text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap;}}
+        .oi-table thead th{{padding:14px 16px;font-size:13px;letter-spacing:1.5px;color:rgba(178,235,242,1);text-transform:uppercase;font-weight:700;text-align:right;white-space:nowrap;}}
         .oi-table thead th:first-child{{text-align:left;}}
         .oi-table thead th.oi-th-divider{{border-left:1px solid rgba(30,45,56,1);}}
 
@@ -6498,16 +6498,16 @@ function mobNavTo(secId, tabId, label) {
         .oi-table tbody tr:last-child{{border-bottom:none;}}
         .oi-table tbody tr:hover{{background:rgba(18,26,33,0.9);}}
         .oi-table tbody tr.oi-live-row{{background:linear-gradient(90deg,rgba(0,212,255,0.04) 0%,transparent 60%);border-bottom:1px solid rgba(0,212,255,0.18);}}
-        .oi-table tbody td{{padding:14px 16px;font-size:13px;text-align:right;color:#dce8f0;white-space:nowrap;}}
+        .oi-table tbody td{{padding:14px 16px;font-size:15px;text-align:right;color:#dce8f0;white-space:nowrap;}}
         .oi-table tbody td:first-child{{text-align:left;}}
         .oi-table tbody td.oi-th-divider{{border-left:1px solid rgba(30,45,56,0.8);}}
 
         /* ── Time cell ── */
         .oi-time-cell{{display:flex;align-items:center;gap:10px;}}
-        .oi-time-val{{font-size:14px;font-weight:700;color:#fff;letter-spacing:0.5px;}}
+        .oi-time-val{{font-size:16px;font-weight:700;color:#fff;letter-spacing:0.5px;}}
         .oi-live-ind{{display:inline-flex;align-items:center;gap:5px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.5);border-radius:20px;padding:2px 8px;font-size:9px;color:#00e676;letter-spacing:1px;font-weight:700;}}
         .oi-live-ind::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 6px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
-        .oi-elapsed{{display:inline-flex;align-items:center;gap:6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.45);border-radius:20px;padding:3px 12px;font-size:12px;color:#00e676;letter-spacing:0.5px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:68px;}}
+        .oi-elapsed{{display:inline-flex;align-items:center;gap:6px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.45);border-radius:20px;padding:3px 12px;font-size:13px;color:#00e676;letter-spacing:0.5px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:68px;}}
         .oi-elapsed::before{{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
         .nlf-elapsed{{display:inline-flex;align-items:center;gap:4px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.4);border-radius:12px;padding:2px 8px;font-size:11px;color:#00e676;letter-spacing:0.3px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:54px;}}
         .nlf-elapsed::before{{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#00e676;box-shadow:0 0 5px #00e676;animation:sb-pulse 1.2s ease-in-out infinite;}}
@@ -6519,7 +6519,7 @@ function mobNavTo(secId, tabId, label) {
         .oi-diff-pos{{color:#00e676;font-weight:700;}}
 
         /* ── PCR with mini bar ── */
-        .oi-pcr-val{{font-weight:700;font-size:12px;}}
+        .oi-pcr-val{{font-weight:700;font-size:14px;}}
         .oi-pcr-val.oi-pcr-bull,.oi-pcr-bull{{color:#00e676 !important;}}
         .oi-pcr-val.oi-pcr-bear,.oi-pcr-bear{{color:#ff4757 !important;}}
         .oi-pcr-val.oi-pcr-neu,.oi-pcr-neu{{color:#ffd32a !important;}}
@@ -6531,25 +6531,25 @@ function mobNavTo(secId, tabId, label) {
         .oi-pcr-neu-bar{{background:rgba(255,211,42,0.75);}}
 
         /* ── Signal badges — bigger, glowing ── */
-        .oi-signal-ssell{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:#ff3a4a;color:#fff;box-shadow:0 0 14px rgba(255,58,74,0.55);}}
-        .oi-signal-sell{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:#ff3a4a;color:#fff;box-shadow:0 0 10px rgba(255,58,74,0.35);}}
-        .oi-signal-sbuy{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:#00c853;color:#000;box-shadow:0 0 14px rgba(0,200,83,0.55);}}
-        .oi-signal-buy{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:#00c853;color:#000;box-shadow:0 0 10px rgba(0,200,83,0.35);}}
-        .oi-signal-neutral{{display:inline-block;padding:5px 14px;border-radius:7px;font-size:10.5px;font-weight:800;letter-spacing:1.2px;background:rgba(245,158,11,0.15);color:#fde68a;border:1px solid rgba(245,158,11,0.3);}}
+        .oi-signal-ssell{{display:inline-block;padding:6px 16px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:1.2px;background:#ff3a4a;color:#fff;box-shadow:0 0 14px rgba(255,58,74,0.55);}}
+        .oi-signal-sell{{display:inline-block;padding:6px 16px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:1.2px;background:#ff3a4a;color:#fff;box-shadow:0 0 10px rgba(255,58,74,0.35);}}
+        .oi-signal-sbuy{{display:inline-block;padding:6px 16px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:1.2px;background:#00c853;color:#000;box-shadow:0 0 14px rgba(0,200,83,0.55);}}
+        .oi-signal-buy{{display:inline-block;padding:6px 16px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:1.2px;background:#00c853;color:#000;box-shadow:0 0 10px rgba(0,200,83,0.35);}}
+        .oi-signal-neutral{{display:inline-block;padding:6px 16px;border-radius:7px;font-size:12px;font-weight:800;letter-spacing:1.2px;background:rgba(245,158,11,0.15);color:#fde68a;border:1px solid rgba(245,158,11,0.3);}}
 
         /* ── Spot price ── */
         .oi-vwap-cell{{color:#93c5fd;font-weight:600;}}
         .oi-fut-cell{{color:#c4b5fd;}}
-        .oi-spot-cell{{color:#fff;font-weight:700;font-size:13px;}}
+        .oi-spot-cell{{color:#fff;font-weight:700;font-size:15px;}}
 
         /* ── Spot Δ — pill style ── */
-        .oi-sdelta{{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:6px;font-size:11.5px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;}}
+        .oi-sdelta{{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;}}
         .oi-sdelta-up{{background:rgba(0,230,118,0.12);color:#00e676;border:1px solid rgba(0,230,118,0.3);}}
         .oi-sdelta-dn{{background:rgba(255,71,87,0.12);color:#ff4757;border:1px solid rgba(255,71,87,0.3);}}
         .oi-sdelta-fl{{background:rgba(100,116,139,0.1);color:#64748b;border:1px solid rgba(100,116,139,0.2);}}
 
         /* ── Nifty Move % — rounded pill ── */
-        .oi-nifty-move{{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;letter-spacing:0.3px;}}
+        .oi-nifty-move{{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:20px;font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;letter-spacing:0.3px;}}
         .oi-nifty-up-strong{{background:rgba(0,230,118,0.18);color:#00e676;border:1px solid rgba(0,230,118,0.35);}}
         .oi-nifty-up-mid{{background:rgba(0,200,83,0.12);color:#69f0ae;border:1px solid rgba(0,200,83,0.25);}}
         .oi-nifty-up-weak{{background:rgba(105,240,174,0.07);color:#a7f3d0;border:1px solid rgba(105,240,174,0.18);}}
@@ -6560,25 +6560,25 @@ function mobNavTo(secId, tabId, label) {
 
         /* ── Signal Streak ── */
         .oi-streak-int{{display:inline-flex;align-items:center;gap:8px;border-radius:0;padding:6px 12px;white-space:nowrap;}}
-        .oi-streak-int-num{{font-family:'Oxanium',sans-serif;font-size:16px;font-weight:800;line-height:1;}}
-        .oi-streak-int-lbl{{font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;line-height:1;}}
+        .oi-streak-int-num{{font-family:'Oxanium',sans-serif;font-size:18px;font-weight:800;line-height:1;}}
+        .oi-streak-int-lbl{{font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;line-height:1;}}
 
         /* ── Nearest Level badge ── */
-        .oi-nlevel-badge{{display:inline-flex;align-items:center;gap:6px;background:rgba(10,26,37,0.9);border:1px solid rgba(36,53,68,1);border-radius:7px;padding:4px 10px;font-size:11.5px;font-weight:700;letter-spacing:0.3px;white-space:nowrap;}}
-        .oi-nlevel-badge .oi-nlevel-label{{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:0.5px;}}
+        .oi-nlevel-badge{{display:inline-flex;align-items:center;gap:6px;background:rgba(10,26,37,0.9);border:1px solid rgba(36,53,68,1);border-radius:7px;padding:5px 12px;font-size:13px;font-weight:700;letter-spacing:0.3px;white-space:nowrap;}}
+        .oi-nlevel-badge .oi-nlevel-label{{font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:0.5px;}}
         .oi-nlevel-res{{color:#00d4ff;}}
         .oi-nlevel-res .oi-nlevel-label{{background:rgba(0,153,204,0.9);color:#000;}}
         .oi-nlevel-sup{{color:#00d4ff;}}
         .oi-nlevel-sup .oi-nlevel-label{{background:rgba(0,153,204,0.9);color:#000;}}
 
         /* ── Distance ── */
-        .oi-dist-val{{display:inline-block;font-size:12px;font-weight:600;font-family:'JetBrains Mono',monospace;}}
+        .oi-dist-val{{display:inline-block;font-size:13px;font-weight:600;font-family:'JetBrains Mono',monospace;}}
         .oi-dist-res{{color:#ff4757;}}
         .oi-dist-sup{{color:#ff4757;}}
 
         /* ── Misc ── */
-        .oi-vsig-sell{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
-        .oi-vsig-buy{{display:inline-block;padding:2px 8px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}}
+        .oi-vsig-sell{{display:inline-block;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.25);}}
+        .oi-vsig-buy{{display:inline-block;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;background:rgba(16,185,129,0.12);color:#6ee7b7;border:1px solid rgba(16,185,129,0.25);}}
         .oi-empty-state{{text-align:center;padding:60px 20px;color:rgba(176,190,197,0.3);font-family:'JetBrains Mono',monospace;font-size:13px;}}
 
         .disclaimer{{background:rgba(255,183,77,0.08);border:1px solid rgba(255,183,77,0.25);border-left:3px solid #ffb74d;border-radius:8px;padding:9px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}}
@@ -6650,33 +6650,33 @@ function mobNavTo(secId, tabId, label) {
         .nlf-header{{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px;flex-wrap:wrap;}}
         .nlf-title-row{{display:flex;align-items:center;gap:7px;}}
         .nlf-live-dot{{width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 8px #00e676;animation:sb-pulse 1.5s ease-in-out infinite;flex-shrink:0;}}
-        .nlf-title{{font-family:'Oxanium',sans-serif;font-size:16px;font-weight:700;color:#e0f7fa;letter-spacing:1px;}}
-        .nlf-meta{{text-align:right;font-size:12px;color:rgba(200,221,232,0.7);line-height:1.6;}}
+        .nlf-title{{font-family:'Oxanium',sans-serif;font-size:18px;font-weight:700;color:#e0f7fa;letter-spacing:1px;}}
+        .nlf-meta{{text-align:right;font-size:14px;color:rgba(200,221,232,0.7);line-height:1.6;}}
         .nlf-meta b{{color:#fff;font-weight:700;}}
-        .nlf-meta-spot{{display:block;font-size:13px;}}
-        .nlf-meta-item{{font-size:12px;}}
+        .nlf-meta-spot{{display:block;font-size:15px;}}
+        .nlf-meta-item{{font-size:14px;}}
         .nlf-meta-sep{{color:rgba(128,222,234,0.3);margin:0 2px;}}
         .nlf-badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}}
-        .nlf-badge{{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}}
+        .nlf-badge{{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:5px;font-size:13px;font-weight:700;letter-spacing:0.5px;white-space:nowrap;}}
         .nlf-badge-buy{{background:rgba(0,200,83,0.12);color:#00c853;border:1px solid rgba(0,200,83,0.4);}}
         .nlf-badge-sell{{background:rgba(255,58,74,0.12);color:#ff3a4a;border:1px solid rgba(255,58,74,0.4);}}
         .nlf-badge-warn{{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
         .nlf-badge-info{{background:rgba(200,221,232,0.06);color:#c8dde8;border:1px solid rgba(200,221,232,0.2);}}
         .nlf-badge-danger{{background:rgba(255,58,74,0.1);color:#ff6b6b;border:1px solid rgba(255,58,74,0.3);}}
-        .nlf-thead{{display:grid;grid-template-columns:56px 90px 58px 62px 72px 68px 40px 44px;gap:0;font-size:10px;letter-spacing:1.2px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
+        .nlf-thead{{display:grid;grid-template-columns:60px 96px 62px 66px 76px 72px 44px 48px;gap:0;font-size:12px;letter-spacing:1.2px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
         .nlf-th-mom{{text-align:center;}}
         .nlf-tbody{{flex:1;display:flex;flex-direction:column;}}
-        .nlf-row{{display:grid;grid-template-columns:56px 90px 58px 62px 72px 68px 40px 44px;gap:0;padding:7px 0;align-items:center;font-size:13px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
+        .nlf-row{{display:grid;grid-template-columns:60px 96px 62px 66px 76px 72px 44px 48px;gap:0;padding:8px 0;align-items:center;font-size:14px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
         .nlf-row-live{{background:rgba(0,200,83,0.04);border-left:2px solid rgba(0,230,118,0.5);padding-left:4px;}}
-        .nlf-row-time{{color:rgba(176,190,197,0.6);font-size:13px;display:inline-flex;align-items:center;gap:4px;}}
-        .nlf-row-spot{{font-weight:700;color:#fff;font-size:13px;}}
-        .nlf-row-delta{{font-weight:700;font-size:12px;text-align:right;}}
-        .nlf-row-nifty{{font-size:12px;font-weight:700;text-align:right;}}
-        .nlf-row-vwap{{text-align:center;font-size:11px;font-weight:700;}}
-        .nlf-row-netoi{{text-align:right;font-size:11px;font-weight:700;}}
-        .nlf-row-stk{{text-align:right;color:#ffd32a;font-weight:700;font-size:12px;}}
-        .nlf-row-rsi{{text-align:right;font-weight:700;font-size:12px;}}
-        .nlf-footer{{display:flex;justify-content:space-between;padding-top:8px;margin-top:auto;border-top:1px solid rgba(79,195,247,0.08);font-size:12px;}}
+        .nlf-row-time{{color:rgba(176,190,197,0.6);font-size:14px;display:inline-flex;align-items:center;gap:4px;}}
+        .nlf-row-spot{{font-weight:700;color:#fff;font-size:14px;}}
+        .nlf-row-delta{{font-weight:700;font-size:13px;text-align:right;}}
+        .nlf-row-nifty{{font-size:13px;font-weight:700;text-align:right;}}
+        .nlf-row-vwap{{text-align:center;font-size:13px;font-weight:700;}}
+        .nlf-row-netoi{{text-align:right;font-size:13px;font-weight:700;}}
+        .nlf-row-stk{{text-align:right;color:#ffd32a;font-weight:700;font-size:13px;}}
+        .nlf-row-rsi{{text-align:right;font-weight:700;font-size:13px;}}
+        .nlf-footer{{display:flex;justify-content:space-between;padding-top:8px;margin-top:auto;border-top:1px solid rgba(79,195,247,0.08);font-size:13px;}}
         .nlf-footer-left{{color:rgba(176,190,197,0.45);}}
         .nlf-footer-right{{font-weight:700;}}
         @media(max-width:1100px){{
