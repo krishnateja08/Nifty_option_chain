@@ -948,12 +948,12 @@ def compute_fii_dii_summary(data):
 def score_pcr(pcr):
     if pcr is None:
         return 0, "N/A", "PCR not available"
-    if pcr < 0.8:
-        return -1, f"{pcr:.3f}", f"PCR {pcr:.3f} → below 0.8 — excess call writing, bearish sentiment"
-    elif pcr > 1.2:
-        return +1, f"{pcr:.3f}", f"PCR {pcr:.3f} → above 1.2 — excess put writing, bullish sentiment"
+    if pcr < 0.9:
+        return -1, f"{pcr:.3f}", f"PCR {pcr:.3f} → below 0.9 — excess call writing, bearish sentiment"
+    elif pcr > 1.1:
+        return +1, f"{pcr:.3f}", f"PCR {pcr:.3f} → above 1.1 — excess put writing, bullish sentiment"
     else:
-        return 0, f"{pcr:.3f}", f"PCR {pcr:.3f} → in 0.8–1.2 range — neutral/mixed sentiment"
+        return 0, f"{pcr:.3f}", f"PCR {pcr:.3f} → in 0.9–1.1 range — neutral/mixed sentiment"
 
 def score_rsi(rsi):
     if rsi is None:
@@ -1695,36 +1695,64 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
         elif ce_chg > pe_chg * 1.5:
             opt_signal = "SELL"          # Call build clearly dominant
         else:
-            # Step 3: Neither dominates → use PCR + VWAP as tiebreaker
-            # PCR > 1.8 (extreme put writing zone): massive institutional put selling = strong floor.
-            #   BUY if spot is above VWAP (floor is holding), NEUTRAL if spot broke below VWAP.
-            #   NOTE: PCR > 1.8 is rarely a genuine SELL — it usually signals a panic bottom.
-            # PCR 1.2–1.8 (normal institutional put writing): bullish only
-            #   if price is respecting that floor (spot above VWAP)
-            # PCR 0.8–1.2: neutral regardless
-            # PCR < 0.8: bearish only if price confirms (spot below VWAP)
-            if pcr > 1.8:
-                # FIX v6: Extreme put writing = institutional floor. BUY if holding VWAP, else NEUTRAL.
-                # Previous logic was inverted (SELL when not above VWAP) — corrected here.
-                opt_signal = "BUY" if spot_above_vwap else "NEUTRAL"
-            elif pcr > 1.2:
-                # Zone 2: High put activity — BUY if above VWAP,
-                # SELL only if spot broke significantly below VWAP (>0.3%)
+            # Step 3: Neither dominates → use PCR threshold + trend + VWAP tiebreaker
+            # FIX v9: Tightened neutral band 0.8–1.2 → 0.9–1.1 for earlier signals.
+            #   PCR > 1.5: STRONG BUY (extreme put writing = institutional floor)
+            #   PCR 1.1–1.5: BUY (put-heavy, bullish bias)
+            #   PCR 0.9–1.1: Check PCR trend across last 3 candles for direction
+            #   PCR 0.5–0.9: SELL (call-heavy, bearish bias)
+            #   PCR < 0.5: STRONG SELL (extreme call writing = ceiling)
+
+            # ── PCR trend detection: read last 3 PCR values from oi_log.json ──
+            _pcr_trend = "FLAT"  # default
+            try:
+                _pcr_log_path = "oi_log.json"
+                if os.path.exists(_pcr_log_path):
+                    with open(_pcr_log_path, "r", encoding="utf-8") as _pf:
+                        _pcr_entries = json.load(_pf)
+                    if isinstance(_pcr_entries, list):
+                        _today_str_pcr = ist_now.strftime('%d-%b-%Y')
+                        _pcr_entries = [e for e in _pcr_entries
+                                        if e.get('timestamp', '').startswith(_today_str_pcr)
+                                        and e.get('pcr') is not None and e.get('pcr') > 0]
+                        # Most recent entries are at the front (prepended)
+                        _recent_pcrs = [e['pcr'] for e in _pcr_entries[:3]]
+                        if len(_recent_pcrs) >= 3:
+                            # Check if PCR is consistently rising or falling
+                            _pcr_rising  = all(_recent_pcrs[i] > _recent_pcrs[i+1] for i in range(len(_recent_pcrs)-1))
+                            _pcr_falling = all(_recent_pcrs[i] < _recent_pcrs[i+1] for i in range(len(_recent_pcrs)-1))
+                            if _pcr_rising:
+                                _pcr_trend = "RISING"   # puts building = bullish
+                            elif _pcr_falling:
+                                _pcr_trend = "FALLING"  # calls building = bearish
+                            print(f"  📈 PCR Trend: {_pcr_trend} (last 3: {_recent_pcrs})")
+            except Exception as _te:
+                print(f"  ⚠️  PCR trend detection failed: {_te}")
+
+            if pcr > 1.5:
+                opt_signal = "STRONG BUY" if spot_above_vwap else "BUY"
+            elif pcr > 1.1:
                 if spot_above_vwap:
                     opt_signal = "BUY"
                 else:
                     vwap_gap_pct = ((vwap - spot) / vwap) * 100 if vwap > 0 else 0
                     opt_signal = "SELL" if vwap_gap_pct > 0.3 else "NEUTRAL"
-            elif pcr < 0.8:
-                # Zone 4: Call-heavy — SELL if below VWAP,
-                # BUY only if spot is significantly above VWAP (>0.3%)
+            elif pcr < 0.5:
+                opt_signal = "STRONG SELL" if not spot_above_vwap else "SELL"
+            elif pcr < 0.9:
                 if not spot_above_vwap:
                     opt_signal = "SELL"
                 else:
                     vwap_gap_pct = ((spot - vwap) / vwap) * 100 if vwap > 0 else 0
                     opt_signal = "BUY" if vwap_gap_pct > 0.3 else "NEUTRAL"
             else:
-                opt_signal = "NEUTRAL"   # PCR 0.8–1.2: truly ambiguous
+                # PCR 0.9–1.1: use trend to break the tie
+                if _pcr_trend == "RISING":
+                    opt_signal = "BUY" if spot_above_vwap else "NEUTRAL"
+                elif _pcr_trend == "FALLING":
+                    opt_signal = "SELL" if not spot_above_vwap else "NEUTRAL"
+                else:
+                    opt_signal = "NEUTRAL"   # PCR 0.9–1.1 + flat trend
 
     # Step 4: Both unwinding → no conviction either way
     elif ce_chg < 0 and pe_chg < 0:
@@ -2893,8 +2921,8 @@ class NiftyHTMLAnalyzer:
             bearish_score += 1
         if option_analysis:
             pcr = option_analysis['pcr_oi']; max_pain = option_analysis['max_pain']
-            if   pcr > 1.2: bullish_score += 2
-            elif pcr < 0.7: bearish_score += 2
+            if   pcr > 1.1: bullish_score += 2
+            elif pcr < 0.9: bearish_score += 2
             if   current > max_pain+100: bearish_score += 1
             elif current < max_pain-100: bullish_score += 1
         score_diff = bullish_score - bearish_score
@@ -2910,8 +2938,8 @@ class NiftyHTMLAnalyzer:
         macd_bullish = technical['macd'] > technical['signal']
         if option_analysis:
             pcr = option_analysis['pcr_oi']
-            if   pcr > 1.2: pcr_status,pcr_badge,pcr_icon="Bullish","bullish","🟢"
-            elif pcr < 0.7: pcr_status,pcr_badge,pcr_icon="Bearish","bearish","🔴"
+            if   pcr > 1.1: pcr_status,pcr_badge,pcr_icon="Bullish","bullish","🟢"
+            elif pcr < 0.9: pcr_status,pcr_badge,pcr_icon="Bearish","bearish","🔴"
             else:           pcr_status,pcr_badge,pcr_icon="Neutral","neutral","🟡"
         else:
             pcr_status,pcr_badge,pcr_icon="N/A","neutral","🟡"
@@ -3073,10 +3101,10 @@ class NiftyHTMLAnalyzer:
         ce_pct  = d['ce_oi_pct']
         pe_pct  = d['pe_oi_pct']
 
-        pcr_tag    = 'Bearish' if pcr < 0.7 else ('Bullish' if pcr > 1.2 else 'Neutral')
-        pcr_col    = '#ff5252' if pcr < 0.7 else ('#00e676' if pcr > 1.2 else '#ffb74d')
-        pcr_border = 'rgba(255,82,82,0.35)' if pcr < 0.7 else ('rgba(0,230,118,0.35)' if pcr > 1.2 else 'rgba(255,183,77,0.3)')
-        pcr_tag_cls= 'tag-bear' if pcr < 0.7 else ('tag-bull' if pcr > 1.2 else 'tag-neu')
+        pcr_tag    = 'Bearish' if pcr < 0.9 else ('Bullish' if pcr > 1.1 else 'Neutral')
+        pcr_col    = '#ff5252' if pcr < 0.9 else ('#00e676' if pcr > 1.1 else '#ffb74d')
+        pcr_border = 'rgba(255,82,82,0.35)' if pcr < 0.9 else ('rgba(0,230,118,0.35)' if pcr > 1.1 else 'rgba(255,183,77,0.3)')
+        pcr_tag_cls= 'tag-bear' if pcr < 0.9 else ('tag-bull' if pcr > 1.1 else 'tag-neu')
         pcr_needle_pct = round(min(97, max(3, pcr / 2.0 * 100)), 1)
 
         level_min = min(spot, max_pain) - 200
@@ -3266,9 +3294,9 @@ class NiftyHTMLAnalyzer:
         strat_sc = 0
         if pcr_val is not None:
             if   pcr_val > 1.5: strat_sc += 2
-            elif pcr_val > 1.2: strat_sc += 1
+            elif pcr_val > 1.1: strat_sc += 1
             elif pcr_val < 0.5: strat_sc -= 2
-            elif pcr_val < 0.8: strat_sc -= 1
+            elif pcr_val < 0.9: strat_sc -= 1
         if rsi_val is not None:
             if   rsi_val > 70:  strat_sc -= 1
             elif rsi_val < 30:  strat_sc += 2
@@ -3290,10 +3318,10 @@ class NiftyHTMLAnalyzer:
         pcr_disp = d.get('pcr', 0) if d.get('has_option_data') else None
         if pcr_disp is not None:
             if   pcr_disp > 1.5: pcr_score=1;  pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Strongly Bullish';  pcr_col='#00e676'; pcr_bg='rgba(0,230,118,0.12)';  pcr_bdr='rgba(0,230,118,0.3)'
-            elif pcr_disp > 1.2: pcr_score=1;  pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Bullish (>1.2)';    pcr_col='#69f0ae'; pcr_bg='rgba(105,240,174,0.10)';pcr_bdr='rgba(105,240,174,0.28)'
+            elif pcr_disp > 1.1: pcr_score=1;  pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Bullish (>1.1)';    pcr_col='#69f0ae'; pcr_bg='rgba(105,240,174,0.10)';pcr_bdr='rgba(105,240,174,0.28)'
             elif pcr_disp < 0.5: pcr_score=-1; pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Strongly Bearish';  pcr_col='#ff4757'; pcr_bg='rgba(255,71,87,0.12)';  pcr_bdr='rgba(255,71,87,0.3)'
-            elif pcr_disp < 0.8: pcr_score=-1; pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Bearish (<0.8)';    pcr_col='#ff9999'; pcr_bg='rgba(255,71,87,0.08)';  pcr_bdr='rgba(255,71,87,0.2)'
-            else:                pcr_score=0;  pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Neutral (0.8-1.2)'; pcr_col='#ffb74d'; pcr_bg='rgba(255,183,77,0.10)'; pcr_bdr='rgba(255,183,77,0.25)'
+            elif pcr_disp < 0.9: pcr_score=-1; pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Bearish (<0.9)';    pcr_col='#ff9999'; pcr_bg='rgba(255,71,87,0.08)';  pcr_bdr='rgba(255,71,87,0.2)'
+            else:                pcr_score=0;  pcr_lbl=f'{pcr_disp:.2f}'; pcr_sub='Neutral (0.9-1.1)'; pcr_col='#ffb74d'; pcr_bg='rgba(255,183,77,0.10)'; pcr_bdr='rgba(255,183,77,0.25)'
         else:
             pcr_score=0; pcr_lbl='N/A'; pcr_sub='No option data'; pcr_col='#8faabe'; pcr_bg='rgba(143,170,190,0.08)'; pcr_bdr='rgba(143,170,190,0.2)'
 
@@ -3444,7 +3472,7 @@ class NiftyHTMLAnalyzer:
                 val_col = '#00ff88' if is_bull else ('#ff5252' if is_bear else '#ffb74d')
             elif kind == 'pcr':
                 pcr = d.get('pcr', 1.0)
-                is_bull = pcr > 1.2; is_bear = pcr < 0.7
+                is_bull = pcr > 1.1; is_bear = pcr < 0.9
                 score_val = '+1' if is_bull else ('-1' if is_bear else '0')
                 bar_w = 45 if not is_bull and not is_bear else 85
                 bar_cls = 'bull' if is_bull else ('bear' if is_bear else 'neutral')
@@ -3556,7 +3584,7 @@ class NiftyHTMLAnalyzer:
               f'</div>'
               for lbl, val, col in [
                 ('PCR (OI)', f"{d.get('pcr',0):.3f}" if d.get('has_option_data') else 'N/A',
-                 '#ff5252' if d.get('pcr',1)<0.7 else '#00e676' if d.get('pcr',1)>1.2 else '#ffb74d'),
+                 '#ff5252' if d.get('pcr',1)<0.9 else '#00e676' if d.get('pcr',1)>1.1 else '#ffb74d'),
                 ('Max Pain', f"&#8377;{d.get('max_pain',0):,}" if d.get('has_option_data') else 'N/A', '#ffb74d'),
                 ('RSI (14)', f"{d.get('rsi',0):.1f}", '#ffb74d'),
                 ('MACD', 'Bullish' if d.get('macd_bullish') else 'Bearish',
@@ -4792,7 +4820,7 @@ class NiftyHTMLAnalyzer:
         gb_col  = '#00e676' if gb_str=='BULLISH' else ('#ff4757' if gb_str=='BEARISH' else '#ffb74d')
         # Spot + PCR colours
         pcr_v   = d.get('pcr', 1.0) if d.get('has_option_data') else 1.0
-        pcr_col = '#00e676' if pcr_v > 1.2 else ('#ff4757' if pcr_v < 0.7 else '#ffb74d')
+        pcr_col = '#00e676' if pcr_v > 1.1 else ('#ff4757' if pcr_v < 0.9 else '#ffb74d')
         sma20_bar ='bar-teal' if d['sma_20_above']  else 'bar-red'
         sma50_bar ='bar-teal' if d['sma_50_above']  else 'bar-red'
         sma200_bar='bar-teal' if d['sma_200_above'] else 'bar-red'
@@ -4834,8 +4862,8 @@ class NiftyHTMLAnalyzer:
         )
         if d.get('has_option_data'):
             pcr_v = d.get('pcr', 1.0)
-            pcr_badge_cls = 'bullish' if pcr_v > 1.2 else ('bearish' if pcr_v < 0.7 else 'neutral')
-            pcr_lbl = 'Bullish' if pcr_v > 1.2 else ('Bearish' if pcr_v < 0.7 else 'Neutral')
+            pcr_badge_cls = 'bullish' if pcr_v > 1.1 else ('bearish' if pcr_v < 0.9 else 'neutral')
+            pcr_lbl = 'Bullish' if pcr_v > 1.1 else ('Bearish' if pcr_v < 0.9 else 'Neutral')
             tech_pills += _pill('PCR', f"{pcr_v:.3f}", pcr_lbl, pcr_badge_cls)
         tech_cards = tech_pills  # kept same variable name so injection point unchanged
         oc_cards = self._build_enhanced_oc_cards()
