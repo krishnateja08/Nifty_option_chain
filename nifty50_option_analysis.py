@@ -5383,6 +5383,30 @@ function renderOITable(data) {
                 // fallback to current run's _CURRENT_BIAS injected at HTML generation time.
                 var wb = row.bias || (typeof _CURRENT_BIAS !== 'undefined' ? _CURRENT_BIAS : '');
                 var wbHtml, wdHtml;
+
+                // FIX v11: MOMENTUM OVERRIDE for NEUTRAL OI signal.
+                // Technical bias (SMA/RSI/MACD score) can lag behind real price action.
+                // If bias says WATCH BEAR but spot has been rising across recent snapshots
+                // (or vice versa), override the bias with actual momentum direction.
+                // This prevents showing "WATCH BEAR + S1 target" while price is clearly rising.
+                var _momCurSpot = row.spot_price || 0;
+                var _momOldestRow = null;
+                for (var _mi = 3; _mi >= 1; _mi--) {
+                    if (filtered[idx + _mi] && filtered[idx + _mi].spot_price) {
+                        _momOldestRow = filtered[idx + _mi]; break;
+                    }
+                }
+                var _momDelta = _momOldestRow ? (_momCurSpot - _momOldestRow.spot_price) : 0;
+
+                // Override: bias says bear but price rising > 15 pts → treat as momentum bull
+                if ((wb === 'WATCH BEAR' || wb === 'BEARISH') && _momDelta > 15) {
+                    wb = '_MOMENTUM_BULL';  // special key → handled below
+                }
+                // Override: bias says bull but price falling > 15 pts → treat as momentum bear
+                if ((wb === 'WATCH BULL' || wb === 'BULLISH') && _momDelta < -15) {
+                    wb = '_MOMENTUM_BEAR';
+                }
+
                 // Map BULLISH → WATCH BULL and BEARISH → WATCH BEAR so the column
                 // always shows a meaningful direction hint whenever OI is neutral.
                 if (wb === 'WATCH BULL' || wb === 'BULLISH') {
