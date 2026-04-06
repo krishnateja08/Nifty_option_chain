@@ -2231,10 +2231,11 @@ def build_intraday_oi_tab_html():
                 <th>RSI 15M</th>
                 <th>EMA 5/13</th>
                 <th class="col-detail">VWAP</th>
+                <th>CONFLUENCE</th>
               </tr>
             </thead>
             <tbody id="oiTableBody">
-              <tr><td colspan="15" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
+              <tr><td colspan="16" class="oi-empty-state">&#8987; Loading oi_log.json&hellip;</td></tr>
             </tbody>
           </table>
         </div>
@@ -2251,6 +2252,8 @@ def build_intraday_oi_tab_html():
             <div class="logic-item"><span class="lc-info">RSI 15M</span> 14-period RSI on 15-min candles &nbsp;&middot;&nbsp; <span class="lc-bull">&lt;30 = Oversold (OS) &nbsp;BUY zone</span> &nbsp;<span class="lc-bear">&gt;70 = Overbought (OB) &nbsp;SELL zone</span> &nbsp;&middot;&nbsp; 55+ = mild bull &nbsp;45&minus; = mild bear</div>
             <div class="logic-item"><span class="lc-info">EMA 5/13</span> 15-min EMA crossover &nbsp;&middot;&nbsp; <span class="lc-bull">▲ BUY = EMA5 &gt; EMA13 (uptrend)</span> &nbsp;<span class="lc-bear">▼ SELL = EMA5 &lt; EMA13 (downtrend)</span> &nbsp;&middot;&nbsp; Gap = distance between EMAs (bigger = stronger trend)</div>
             <div class="logic-item"><span class="lc-info">VWAP</span> Volume Weighted Avg Price &nbsp;&middot;&nbsp; <span class="lc-bull">▲ Above = Bullish bias</span> &nbsp;<span class="lc-bear">▼ Below = Bearish bias</span></div>
+            <div class="logic-item"><span class="lc-info">CONFLUENCE</span> Counts 5 signals (PCR, OI, VWAP, RSI, EMA) &nbsp;&middot;&nbsp; <span class="lc-bull">4-5/5 = STRONG</span> &nbsp;<span class="lc-side">3/5 = Moderate</span> &nbsp;<span class="lc-bear">&lt;3 = WEAK &mdash; avoid trade</span></div>
+            <div class="logic-item"><span class="lc-bear">⚠ NOISY</span> Signals at 9:15&ndash;9:30 and 3:15&ndash;3:30 are unreliable &mdash; opening/closing auction noise</div>
             <div class="logic-item"><span class="lc-info">Timestamps</span> All times shown in IST (Asia/Kolkata)</div>
           </div>
         </div>
@@ -5572,6 +5575,90 @@ function renderOITable(data) {
                         + '</span><br><span style="font-size:8px;color:rgba(147,197,253,0.5);letter-spacing:0.5px;">'
                         + (aboveVwap ? 'Above' : 'Below') + '</span></td>';
                 })()
+                + (function(){
+                    // ══ CONFLUENCE SCORE ══════════════════════════════════════
+                    // Counts how many of 5 independent signals agree on direction.
+                    // Only shows strong BUY/SELL when 3+ signals align.
+                    var cBuy = 0, cSell = 0, cTotal = 0;
+
+                    // 1. PCR: >1.0 = buy bias, <0.9 = sell bias
+                    var pcrV = parseFloat(row.pcr) || 0;
+                    if (pcrV > 0) { cTotal++;
+                        if (pcrV > 1.0) cBuy++; else if (pcrV < 0.9) cSell++;
+                    }
+
+                    // 2. OI Signal
+                    var oiSig = (row.opt_signal || '').toUpperCase();
+                    if (oiSig.indexOf('BUY') >= 0) { cTotal++; cBuy++; }
+                    else if (oiSig.indexOf('SELL') >= 0) { cTotal++; cSell++; }
+                    else if (oiSig === 'NEUTRAL') { cTotal++; }
+
+                    // 3. VWAP: spot above = buy, below = sell
+                    var cVwap = row.vwap;
+                    var cSpot = row.spot_price || 0;
+                    if (cVwap && cVwap > 0 && cSpot > 0) { cTotal++;
+                        if (cSpot >= cVwap) cBuy++; else cSell++;
+                    }
+
+                    // 4. RSI: >55 = buy momentum, <45 = sell momentum
+                    var cRsi = row.rsi_15m;
+                    if (cRsi != null) { cTotal++;
+                        if (cRsi >= 55) cBuy++; else if (cRsi <= 45) cSell++;
+                    }
+
+                    // 5. EMA 5/13: BUY or SELL
+                    var cEma = row.ema_signal;
+                    if (cEma === 'BUY') { cTotal++; cBuy++; }
+                    else if (cEma === 'SELL') { cTotal++; cSell++; }
+
+                    // Determine confluence verdict
+                    var cMax = Math.max(cBuy, cSell);
+                    var cDir = cBuy > cSell ? 'BUY' : (cSell > cBuy ? 'SELL' : 'MIXED');
+                    var cScore = cBuy > cSell ? cBuy : cSell;
+                    var cLabel, cColor, cBg, cBdr, cIcon, cStrength;
+
+                    // Time-of-day penalty: 9:15-9:30 and 15:15-15:30 are noisy
+                    var cTimeParts = (row.time || '00:00').split(':');
+                    var cHour = parseInt(cTimeParts[0] || 0);
+                    var cMin  = parseInt(cTimeParts[1] || 0);
+                    var cTimeMinutes = cHour * 60 + cMin;
+                    var cIsNoisy = (cTimeMinutes >= 555 && cTimeMinutes <= 570)    // 9:15-9:30
+                                || (cTimeMinutes >= 915 && cTimeMinutes <= 930);   // 15:15-15:30
+
+                    if (cTotal === 0) {
+                        cLabel = '—'; cColor = 'rgba(176,190,197,0.3)'; cBg = 'transparent'; cBdr = 'transparent'; cIcon = ''; cStrength = '';
+                    } else if (cScore >= 4) {
+                        cStrength = 'STRONG';
+                        if (cDir === 'BUY') {
+                            cLabel = cScore + '/' + cTotal; cColor = '#00e676'; cBg = 'rgba(0,230,118,0.18)'; cBdr = 'rgba(0,230,118,0.45)'; cIcon = '▲';
+                        } else {
+                            cLabel = cScore + '/' + cTotal; cColor = '#ff4757'; cBg = 'rgba(255,71,87,0.18)'; cBdr = 'rgba(255,71,87,0.45)'; cIcon = '▼';
+                        }
+                    } else if (cScore >= 3) {
+                        cStrength = cDir;
+                        if (cDir === 'BUY') {
+                            cLabel = cScore + '/' + cTotal; cColor = '#69f0ae'; cBg = 'rgba(105,240,174,0.12)'; cBdr = 'rgba(105,240,174,0.3)'; cIcon = '▲';
+                        } else {
+                            cLabel = cScore + '/' + cTotal; cColor = '#fca5a5'; cBg = 'rgba(252,165,165,0.12)'; cBdr = 'rgba(252,165,165,0.3)'; cIcon = '▼';
+                        }
+                    } else {
+                        cStrength = 'WEAK';
+                        cLabel = cScore + '/' + cTotal; cColor = '#ffb74d'; cBg = 'rgba(255,183,77,0.08)'; cBdr = 'rgba(255,183,77,0.2)'; cIcon = '~';
+                    }
+
+                    // Time-of-day noise warning overrides strength display
+                    var cTimeWarn = cIsNoisy
+                        ? '<div style="font-size:7px;color:#ff9800;letter-spacing:0.5px;margin-top:2px;">⚠ NOISY</div>'
+                        : '';
+
+                    return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:2px;">'
+                        + '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;'
+                        + 'font-size:12px;font-weight:800;background:' + cBg + ';color:' + cColor + ';border:1px solid ' + cBdr + ';">'
+                        + cIcon + ' ' + cLabel + '</span>'
+                        + '<span style="font-size:8px;font-weight:700;color:' + cColor + ';letter-spacing:0.5px;">' + cStrength + '</span>'
+                        + cTimeWarn
+                        + '</div></td>';
+                })()
                 + '</tr>';
         } else if (idx === 0) {
             // Mark existing top row as LIVE with elapsed timer
@@ -5691,6 +5778,20 @@ function renderNiftyLiveFeed(filtered) {
         if (latest.distance_pts != null && latest.nearest_level) {
             bHtml += '<span class="nlf-badge nlf-badge-info">Dist ' + (latest.distance_pts >= 0 ? '+' : '') + Math.round(latest.distance_pts) + ' pts</span>';
         }
+
+        // Confluence badge for NLF
+        var nlfCBuy = 0, nlfCSell = 0, nlfCT = 0;
+        var nlfPcr = parseFloat(latest.pcr) || 0;
+        if (nlfPcr > 0) { nlfCT++; if (nlfPcr > 1.0) nlfCBuy++; else if (nlfPcr < 0.9) nlfCSell++; }
+        var nlfOi = (latest.opt_signal || '').toUpperCase();
+        if (nlfOi.indexOf('BUY') >= 0) { nlfCT++; nlfCBuy++; } else if (nlfOi.indexOf('SELL') >= 0) { nlfCT++; nlfCSell++; } else { nlfCT++; }
+        if (latest.vwap && latest.vwap > 0 && spot > 0) { nlfCT++; if (spot >= latest.vwap) nlfCBuy++; else nlfCSell++; }
+        if (rsi != null) { nlfCT++; if (rsi >= 55) nlfCBuy++; else if (rsi <= 45) nlfCSell++; }
+        if (latest.ema_signal === 'BUY') { nlfCT++; nlfCBuy++; } else if (latest.ema_signal === 'SELL') { nlfCT++; nlfCSell++; }
+        var nlfCMax = Math.max(nlfCBuy, nlfCSell);
+        var nlfCDir = nlfCBuy > nlfCSell ? 'BUY' : (nlfCSell > nlfCBuy ? 'SELL' : 'MIXED');
+        var nlfCCls = nlfCMax >= 4 ? (nlfCDir === 'BUY' ? 'nlf-badge-buy' : 'nlf-badge-sell') : nlfCMax >= 3 ? (nlfCDir === 'BUY' ? 'nlf-badge-buy' : 'nlf-badge-danger') : 'nlf-badge-warn';
+        bHtml += '<span class="nlf-badge ' + nlfCCls + '">⚡ ' + nlfCMax + '/' + nlfCT + ' ' + (nlfCMax >= 3 ? nlfCDir : 'WEAK') + '</span>';
 
         badges.innerHTML = bHtml;
     }
@@ -6529,7 +6630,7 @@ function mobNavTo(secId, tabId, label) {
         .oi-chart-label{{font-size:9px;letter-spacing:2px;color:rgba(128,222,234,0.9);text-transform:uppercase;font-weight:700;}}
         /* ══ OPTION FLOW TABLE — POLISHED UI ════════════════════════════════ */
         .oi-table-wrap{{background:rgba(6,13,20,0.85);border:1px solid rgba(79,195,247,0.18);border-radius:16px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;box-shadow:0 4px 40px rgba(0,0,0,0.5);overflow-anchor:none;}}
-        .oi-table{{width:100%;min-width:1160px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;overflow-anchor:none;}}
+        .oi-table{{width:100%;min-width:1260px;border-collapse:collapse;font-family:'JetBrains Mono',monospace;overflow-anchor:none;}}
         .oi-table-scroll-hint{{display:none;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:rgba(79,195,247,0.4);padding:6px 14px 0;text-transform:uppercase;}}
 
         /* ── Header ── */
