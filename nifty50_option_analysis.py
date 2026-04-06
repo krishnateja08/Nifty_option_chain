@@ -5379,104 +5379,52 @@ function renderOITable(data) {
                       : '')
                   + '</span>';
             } else if (isNeutral) {
-                // NEUTRAL OI signal — use per-row bias (from oi_log.json) if available,
-                // fallback to current run's _CURRENT_BIAS injected at HTML generation time.
-                var wb = row.bias || (typeof _CURRENT_BIAS !== 'undefined' ? _CURRENT_BIAS : '');
+                // FIX v11: NEUTRAL OI signal → use ONLY spot price momentum.
+                // Technical bias (SMA/RSI/MACD) is ignored here because it can lag.
+                // Simple rule: price rising → WATCH BULL, price falling → WATCH BEAR.
                 var wbHtml, wdHtml;
-
-                // FIX v11: MOMENTUM OVERRIDE for NEUTRAL OI signal.
-                // Technical bias (SMA/RSI/MACD score) can lag behind real price action.
-                // If bias says WATCH BEAR but spot has been rising across recent snapshots
-                // (or vice versa), override the bias with actual momentum direction.
-                // This prevents showing "WATCH BEAR + S1 target" while price is clearly rising.
-                var _momCurSpot = row.spot_price || 0;
-                var _momOldestRow = null;
-                for (var _mi = 3; _mi >= 1; _mi--) {
-                    if (filtered[idx + _mi] && filtered[idx + _mi].spot_price) {
-                        _momOldestRow = filtered[idx + _mi]; break;
+                var curSpot  = row.spot_price || 0;
+                var oldestRow = null;
+                for (var mi = 3; mi >= 1; mi--) {
+                    if (filtered[idx + mi] && filtered[idx + mi].spot_price) {
+                        oldestRow = filtered[idx + mi]; break;
                     }
                 }
-                var _momDelta = _momOldestRow ? (_momCurSpot - _momOldestRow.spot_price) : 0;
+                var momDelta = oldestRow ? (curSpot - oldestRow.spot_price) : 0;
 
-                // Override: bias says bear but price rising > 15 pts → treat as momentum bull
-                if ((wb === 'WATCH BEAR' || wb === 'BEARISH') && _momDelta > 15) {
-                    wb = '_MOMENTUM_BULL';  // special key → handled below
-                }
-                // Override: bias says bull but price falling > 15 pts → treat as momentum bear
-                if ((wb === 'WATCH BULL' || wb === 'BULLISH') && _momDelta < -15) {
-                    wb = '_MOMENTUM_BEAR';
-                }
-
-                // Map BULLISH → WATCH BULL and BEARISH → WATCH BEAR so the column
-                // always shows a meaningful direction hint whenever OI is neutral.
-                if (wb === 'WATCH BULL' || wb === 'BULLISH') {
-                    // Show nearest resistance value
+                if (momDelta > 15) {
+                    // Price rising → WATCH BULL with R1 target
                     var wbR1 = row.resistance || row.nearest_level;
-                    var wbRDist = (wbR1 && row.spot_price) ? Math.round(wbR1 - row.spot_price) : null;
+                    var wbRDist = (wbR1 && curSpot) ? Math.round(wbR1 - curSpot) : null;
                     wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                         + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
                         + 'font-size:10px;font-weight:800;background:rgba(181,234,58,0.12);color:#b5ea3a;'
                         + 'border:1px solid rgba(181,234,58,0.3);">⚡ WATCH BULL</span>'
-                        + (wbR1 ? '<span style="font-size:11px;font-family:monospace;font-weight:700;"><span style="color:#00e676;font-weight:800;">R1</span> <span style="color:#00e676;">₹' + Number(wbR1).toLocaleString('en-IN') + '</span></span>' : '<span style="font-size:8px;color:rgba(181,234,58,0.5);font-family:monospace;">tech bias</span>')
+                        + (wbR1 ? '<span style="font-size:11px;font-family:monospace;font-weight:700;"><span style="color:#00e676;font-weight:800;">R1</span> <span style="color:#00e676;">₹' + Number(wbR1).toLocaleString('en-IN') + '</span></span>' : '<span style="font-size:8px;color:rgba(181,234,58,0.5);font-family:monospace;">spot momentum</span>')
                         + '</div>';
                     wdHtml = (wbRDist !== null && wbRDist > 0)
                         ? '<span style="font-size:13px;color:#00e676;font-family:monospace;font-weight:700;">▲ +' + wbRDist + ' pts</span>'
-                        : '<span style="font-size:9px;color:rgba(181,234,58,0.55);font-family:monospace;font-weight:600;">Early bull<br>signal</span>';
-                } else if (wb === 'WATCH BEAR' || wb === 'BEARISH') {
-                    // Show nearest support value
+                        : '<span style="font-size:9px;color:rgba(181,234,58,0.6);font-family:monospace;font-weight:600;">▲ +' + Math.abs(momDelta).toFixed(1) + ' pts drift</span>';
+                } else if (momDelta < -15) {
+                    // Price falling → WATCH BEAR with S1 target
                     var wbS1 = row.support || row.nearest_level;
-                    var wbSDist = (wbS1 && row.spot_price) ? Math.round(row.spot_price - wbS1) : null;
+                    var wbSDist = (wbS1 && curSpot) ? Math.round(curSpot - wbS1) : null;
                     wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                         + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
                         + 'font-size:10px;font-weight:800;background:rgba(255,152,0,0.12);color:#ff9800;'
                         + 'border:1px solid rgba(255,152,0,0.3);">⚠ WATCH BEAR</span>'
-                        + (wbS1 ? '<span style="font-size:11px;font-family:monospace;font-weight:700;"><span style="color:#ff4757;font-weight:800;">S1</span> <span style="color:#ff4757;">₹' + Number(wbS1).toLocaleString('en-IN') + '</span></span>' : '<span style="font-size:8px;color:rgba(255,152,0,0.5);font-family:monospace;">tech bias</span>')
+                        + (wbS1 ? '<span style="font-size:11px;font-family:monospace;font-weight:700;"><span style="color:#ff4757;font-weight:800;">S1</span> <span style="color:#ff4757;">₹' + Number(wbS1).toLocaleString('en-IN') + '</span></span>' : '<span style="font-size:8px;color:rgba(255,152,0,0.5);font-family:monospace;">spot momentum</span>')
                         + '</div>';
                     wdHtml = (wbSDist !== null && wbSDist > 0)
                         ? '<span style="font-size:13px;color:#ff4757;font-family:monospace;font-weight:700;">▼ -' + wbSDist + ' pts</span>'
-                        : '<span style="font-size:9px;color:rgba(255,152,0,0.55);font-family:monospace;font-weight:600;">Early bear<br>signal</span>';
+                        : '<span style="font-size:9px;color:rgba(255,152,0,0.6);font-family:monospace;font-weight:600;">▼ -' + Math.abs(momDelta).toFixed(1) + ' pts drift</span>';
                 } else {
-                    // SIDEWAYS bias — derive direction from spot price momentum
-                    // Look at up to 3 older snapshots (idx+1 … idx+3) and compare
-                    // current spot vs the OLDEST available row — net move over the window.
-                    // Averaging was diluting the signal; net move is more meaningful.
-                    // truly flat (< ±15 pts net move) → Flat momentum.
-                    var curSpot  = row.spot_price || 0;
-                    var oldestRow = null;
-                    for (var mi = 3; mi >= 1; mi--) {
-                        if (filtered[idx + mi] && filtered[idx + mi].spot_price) {
-                            oldestRow = filtered[idx + mi]; break;
-                        }
-                    }
-                    var momAvg = oldestRow ? (curSpot - oldestRow.spot_price) : 0;
-                    if (momAvg > 15) {
-                        // Price drifting upward across recent snapshots
-                        wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
-                            + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
-                            + 'font-size:10px;font-weight:800;background:rgba(181,234,58,0.12);color:#b5ea3a;'
-                            + 'border:1px solid rgba(181,234,58,0.3);">⚡ WATCH BULL</span>'
-                            + '<span style="font-size:8px;color:rgba(181,234,58,0.5);font-family:monospace;">spot momentum</span>'
-                            + '</div>';
-                        wdHtml = '<span style="font-size:9px;color:rgba(181,234,58,0.6);font-family:monospace;font-weight:600;">'
-                            + '▲ +' + Math.abs(momAvg).toFixed(1) + ' pts<br>avg drift</span>';
-                    } else if (momAvg < -15) {
-                        // Price drifting downward
-                        wbHtml = '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
-                            + '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
-                            + 'font-size:10px;font-weight:800;background:rgba(255,152,0,0.12);color:#ff9800;'
-                            + 'border:1px solid rgba(255,152,0,0.3);">⚠ WATCH BEAR</span>'
-                            + '<span style="font-size:8px;color:rgba(255,152,0,0.5);font-family:monospace;">spot momentum</span>'
-                            + '</div>';
-                        wdHtml = '<span style="font-size:9px;color:rgba(255,152,0,0.6);font-family:monospace;font-weight:600;">'
-                            + '▼ -' + Math.abs(momAvg).toFixed(1) + ' pts<br>avg drift</span>';
-                    } else {
-                        // Truly flat — price barely moving, no actionable direction
-                        wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
-                            + 'font-size:10px;font-weight:700;background:rgba(176,190,197,0.06);color:#78909c;'
-                            + 'border:1px solid rgba(176,190,197,0.15);">→ Flat</span>';
-                        wdHtml = '<span style="font-size:9px;color:rgba(176,190,197,0.35);font-family:monospace;">'
-                            + (oldestRow ? '±' + Math.abs(momAvg).toFixed(1) + ' pts' : 'no data') + '</span>';
-                    }
+                    // Truly flat — price barely moving
+                    wbHtml = '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;'
+                        + 'font-size:10px;font-weight:700;background:rgba(176,190,197,0.06);color:#78909c;'
+                        + 'border:1px solid rgba(176,190,197,0.15);">→ Flat</span>';
+                    wdHtml = '<span style="font-size:9px;color:rgba(176,190,197,0.35);font-family:monospace;">'
+                        + (oldestRow ? '±' + Math.abs(momDelta).toFixed(1) + ' pts' : 'no data') + '</span>';
                 }
                 nlevelHtml = wbHtml;
                 distHtml   = wdHtml;
