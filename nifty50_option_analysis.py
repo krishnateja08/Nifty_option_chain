@@ -2253,7 +2253,7 @@ def build_intraday_oi_tab_html():
             <div class="logic-item"><span class="lc-info">EMA 5/13</span> 15-min EMA crossover &nbsp;&middot;&nbsp; <span class="lc-bull">▲ BUY = EMA5 &gt; EMA13 (uptrend)</span> &nbsp;<span class="lc-bear">▼ SELL = EMA5 &lt; EMA13 (downtrend)</span> &nbsp;&middot;&nbsp; Gap = distance between EMAs (bigger = stronger trend)</div>
             <div class="logic-item"><span class="lc-info">VWAP</span> Volume Weighted Avg Price &nbsp;&middot;&nbsp; <span class="lc-bull">▲ Above = Bullish bias</span> &nbsp;<span class="lc-bear">▼ Below = Bearish bias</span></div>
             <div class="logic-item"><span class="lc-info">CONFLUENCE</span> Counts 5 signals (PCR, OI, VWAP, RSI, EMA) &nbsp;&middot;&nbsp; <span class="lc-bull">4-5/5 = STRONG</span> &nbsp;<span class="lc-side">3/5 = Moderate</span> &nbsp;<span class="lc-bear">&lt;3 = WEAK &mdash; avoid trade</span></div>
-            <div class="logic-item"><span class="lc-bear">⚠ NOISY</span> Signals at 9:15&ndash;9:30 and 3:15&ndash;3:30 are unreliable &mdash; opening/closing auction noise</div>
+            <div class="logic-item"><span class="lc-bear">⚠ NOISY</span> Signals at 9:15&ndash;9:20 and 3:25&ndash;3:30 are unreliable &mdash; opening/closing auction noise</div>
             <div class="logic-item"><span class="lc-info">Timestamps</span> All times shown in IST (Asia/Kolkata)</div>
           </div>
         </div>
@@ -5557,7 +5557,7 @@ function renderOITable(data) {
                     return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
                         + '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:6px;font-size:11px;font-weight:700;background:'+eBg+';color:'+eCol+';border:1px solid '+eBdr+';">'
                         + eArr + ' ' + emaSig + '</span>'
-                        + '<span style="font-size:8px;color:rgba(128,222,234,0.3);font-family:monospace;">gap '+eGap+'</span>'
+                        + '<span style="font-size:10px;color:' + (emaIsBuy ? 'rgba(105,240,174,0.7)' : 'rgba(252,165,165,0.7)') + ';font-family:monospace;font-weight:600;">gap '+eGap+'</span>'
                         + '</div></td>';
                 })()
                 + (function(){
@@ -5622,8 +5622,8 @@ function renderOITable(data) {
                     var cHour = parseInt(cTimeParts[0] || 0);
                     var cMin  = parseInt(cTimeParts[1] || 0);
                     var cTimeMinutes = cHour * 60 + cMin;
-                    var cIsNoisy = (cTimeMinutes >= 555 && cTimeMinutes <= 570)    // 9:15-9:30
-                                || (cTimeMinutes >= 915 && cTimeMinutes <= 930);   // 15:15-15:30
+                    var cIsNoisy = (cTimeMinutes >= 555 && cTimeMinutes <= 560)    // 9:15-9:20
+                                || (cTimeMinutes >= 925 && cTimeMinutes <= 930);   // 15:25-15:30
 
                     if (cTotal === 0) {
                         cLabel = '—'; cColor = 'rgba(176,190,197,0.3)'; cBg = 'transparent'; cBdr = 'transparent'; cIcon = ''; cStrength = '';
@@ -5648,14 +5648,14 @@ function renderOITable(data) {
 
                     // Time-of-day noise warning overrides strength display
                     var cTimeWarn = cIsNoisy
-                        ? '<div style="font-size:7px;color:#ff9800;letter-spacing:0.5px;margin-top:2px;">⚠ NOISY</div>'
+                        ? '<div style="font-size:10px;color:#ff9800;letter-spacing:1px;margin-top:3px;font-weight:700;background:rgba(255,152,0,0.12);border:1px solid rgba(255,152,0,0.3);border-radius:4px;padding:2px 6px;">⚠ NOISY</div>'
                         : '';
 
                     return '<td><div style="display:flex;flex-direction:column;align-items:center;gap:2px;">'
                         + '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;'
                         + 'font-size:12px;font-weight:800;background:' + cBg + ';color:' + cColor + ';border:1px solid ' + cBdr + ';">'
                         + cIcon + ' ' + cLabel + '</span>'
-                        + '<span style="font-size:8px;font-weight:700;color:' + cColor + ';letter-spacing:0.5px;">' + cStrength + '</span>'
+                        + '<span style="font-size:10px;font-weight:700;color:' + cColor + ';letter-spacing:0.5px;">' + cStrength + '</span>'
                         + cTimeWarn
                         + '</div></td>';
                 })()
