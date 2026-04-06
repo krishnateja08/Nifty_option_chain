@@ -6995,12 +6995,12 @@ function mobNavTo(secId, tabId, label) {
     <script>
     // Instant-hide: if we're restoring from auto-refresh, hide body BEFORE it renders
     // This prevents the flash/jump to top that occurs when JS runs after first paint
-    try {
-        if (sessionStorage.getItem('scrollY')) {
+    try {{
+        if (sessionStorage.getItem('scrollY')) {{
             document.documentElement.style.opacity = '0';
             document.documentElement.style.overflow = 'hidden';
-        }
-    } catch(e) {}
+        }}
+    }} catch(e) {{}}
     </script>
 </head>
 <body>
