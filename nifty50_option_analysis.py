@@ -5020,13 +5020,29 @@ class NiftyHTMLAnalyzer:
     (function restoreTabAfterReload() {
         var savedTab = sessionStorage.getItem('activeTab');
         var savedScroll = sessionStorage.getItem('scrollY');
+
+        // If we're restoring from an auto-refresh, hide page immediately
+        // to prevent visible scroll jump (page briefly shows at top)
+        if (savedScroll) {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'none';
+        }
+
         if (savedTab) {
             sessionStorage.removeItem('activeTab');
-            setTimeout(function() { switchTab(savedTab); }, 100);
+            setTimeout(function() { switchTab(savedTab); }, 50);
         }
         if (savedScroll) {
             sessionStorage.removeItem('scrollY');
-            setTimeout(function() { window.scrollTo(0, parseInt(savedScroll, 10)); }, 120);
+            // Restore scroll position first, then fade in
+            setTimeout(function() {
+                window.scrollTo(0, parseInt(savedScroll, 10));
+                // Small delay to let browser paint at correct position
+                requestAnimationFrame(function() {
+                    document.body.style.transition = 'opacity 0.3s ease';
+                    document.body.style.opacity = '1';
+                });
+            }, 80);
         }
     })();
 })();
