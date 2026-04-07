@@ -8,6 +8,7 @@ KEY LEVELS: 1H Candles · Last 120 bars · ±200 pts from price · Rounded to 25
 AUTO REFRESH: JSON timestamp polling every 30s · Reloads ONLY when script re-runs · No flicker · No scroll jump
 STRATEGY CHECKLIST TAB: Rules-based scoring · Auto-filled from live data · N/A safe
 INTRADAY OI TREND TAB: Every-run snapshot → oi_log.json · 3/5/15 Min/1 Hr filter · IST timestamps
+WEEKLY OUTLOOK TAB: Pivot Points (Classic/Fibonacci/Camarilla) · Fibonacci Retracement · ATR/VIX range · OI walls · SMA zones · Confluence clustering
 NIFTY 50 HEATMAP TAB: Live yfinance data · Color-coded by % change · Market Breadth · High Weightage Movers
 
 FIX v7: Intraday OI Trend aggregation fix — grouped intervals (5/15/60 min) now use latest
@@ -308,6 +309,668 @@ def fetch_volume_at_levels(technical):
     except Exception as e:
         print(f"  ❌ Volume at levels fetch failed: {e}")
         return None, None
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  WEEKLY OUTLOOK — Projection Engine
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def compute_weekly_outlook(html_data, vix_val=None):
+    """
+    Computes weekly support/resistance projections using:
+      1. Weekly Pivot Points (Classic + Fibonacci + Camarilla)
+      2. Fibonacci Retracement (20-day swing high/low)
+      3. ATR-14 based expected range
+      4. VIX-implied expected range
+      5. OI walls from current option chain
+      6. SMA zones (20/50/200)
+      7. Level clustering (confluence detection)
+    Returns a dict with all computed levels and scenario projections.
+    """
+    import yfinance as yf
+    import numpy as np
+    print("\n🔮 Computing Weekly Outlook projections...")
+    outlook = {
+        'weekly_pivots': {}, 'fib_levels': {}, 'atr': None,
+        'atr_weekly_range': None, 'vix_weekly_range': None,
+        'clusters_bull': [], 'clusters_bear': [], 'clusters_neutral': [],
+        'scenarios': {}, 'current_price': 0, 'prev_week': {},
+        'sma_zones': {}, 'oi_walls': {},
+    }
+    try:
+        nifty = yf.Ticker("^NSEI")
+        # ── Fetch daily data (1 year) ──────────────────────────────────
+        df = nifty.history(period="1y")
+        if df.empty or len(df) < 30:
+            print("  ⚠️  Insufficient daily data for weekly outlook")
+            return outlook
+        current_price = float(df['Close'].iloc[-1])
+        outlook['current_price'] = current_price
+
+        # ── Previous WEEK high/low/close ───────────────────────────────
+        df_idx = df.copy()
+        df_idx.index = pd.to_datetime(df_idx.index)
+        if df_idx.index.tz is not None:
+            df_idx.index = df_idx.index.tz_localize(None)
+        df_idx['week'] = df_idx.index.isocalendar().week.values
+        df_idx['year'] = df_idx.index.year
+        current_yw = (df_idx['year'].iloc[-1], df_idx['week'].iloc[-1])
+        # Get previous week
+        prev_weeks = df_idx[(df_idx['year'] < current_yw[0]) |
+                            ((df_idx['year'] == current_yw[0]) & (df_idx['week'] < current_yw[1]))]
+        if prev_weeks.empty:
+            print("  ⚠️  No previous week data found")
+            return outlook
+        last_yw = (prev_weeks['year'].iloc[-1], prev_weeks['week'].iloc[-1])
+        pw = prev_weeks[(prev_weeks['year'] == last_yw[0]) & (prev_weeks['week'] == last_yw[1])]
+        pw_high  = float(pw['High'].max())
+        pw_low   = float(pw['Low'].min())
+        pw_close = float(pw['Close'].iloc[-1])
+        pw_open  = float(pw['Open'].iloc[0])
+        outlook['prev_week'] = {'high': pw_high, 'low': pw_low, 'close': pw_close, 'open': pw_open}
+        print(f"  📅 Prev Week: H={pw_high:.0f} L={pw_low:.0f} C={pw_close:.0f}")
+
+        # ═══ 1. WEEKLY PIVOT POINTS ════════════════════════════════════
+        pp = (pw_high + pw_low + pw_close) / 3
+        # Classic
+        classic = {
+            'PP': round(pp),
+            'R1': round(2 * pp - pw_low),      'S1': round(2 * pp - pw_high),
+            'R2': round(pp + (pw_high - pw_low)), 'S2': round(pp - (pw_high - pw_low)),
+            'R3': round(pw_high + 2 * (pp - pw_low)), 'S3': round(pw_low - 2 * (pw_high - pp)),
+        }
+        # Fibonacci Pivots
+        diff_hl = pw_high - pw_low
+        fib_pivots = {
+            'PP': round(pp),
+            'R1': round(pp + 0.382 * diff_hl), 'S1': round(pp - 0.382 * diff_hl),
+            'R2': round(pp + 0.618 * diff_hl), 'S2': round(pp - 0.618 * diff_hl),
+            'R3': round(pp + 1.000 * diff_hl), 'S3': round(pp - 1.000 * diff_hl),
+        }
+        # Camarilla
+        camarilla = {
+            'PP': round(pp),
+            'R1': round(pw_close + 1.1 * diff_hl / 12), 'S1': round(pw_close - 1.1 * diff_hl / 12),
+            'R2': round(pw_close + 1.1 * diff_hl / 6),  'S2': round(pw_close - 1.1 * diff_hl / 6),
+            'R3': round(pw_close + 1.1 * diff_hl / 4),  'S3': round(pw_close - 1.1 * diff_hl / 4),
+            'R4': round(pw_close + 1.1 * diff_hl / 2),  'S4': round(pw_close - 1.1 * diff_hl / 2),
+        }
+        outlook['weekly_pivots'] = {'classic': classic, 'fibonacci': fib_pivots, 'camarilla': camarilla}
+        print(f"  📊 Classic Pivots: S2={classic['S2']} S1={classic['S1']} PP={classic['PP']} R1={classic['R1']} R2={classic['R2']}")
+
+        # ═══ 2. FIBONACCI RETRACEMENT (20-day swing) ══════════════════
+        last_20 = df.tail(20)
+        swing_high = float(last_20['High'].max())
+        swing_low  = float(last_20['Low'].min())
+        swing_range = swing_high - swing_low
+        fib_retrace = {
+            'swing_high': round(swing_high),
+            'swing_low':  round(swing_low),
+            '23.6': round(swing_high - 0.236 * swing_range),
+            '38.2': round(swing_high - 0.382 * swing_range),
+            '50.0': round(swing_high - 0.500 * swing_range),
+            '61.8': round(swing_high - 0.618 * swing_range),
+            '78.6': round(swing_high - 0.786 * swing_range),
+        }
+        outlook['fib_levels'] = fib_retrace
+        print(f"  📐 Fibonacci: Swing H={swing_high:.0f} L={swing_low:.0f} | 38.2%={fib_retrace['38.2']} 61.8%={fib_retrace['61.8']}")
+
+        # ═══ 3. ATR (14-day) → Expected weekly range ══════════════════
+        df_atr = df.copy()
+        df_atr['H-L']  = df_atr['High'] - df_atr['Low']
+        df_atr['H-PC'] = abs(df_atr['High'] - df_atr['Close'].shift(1))
+        df_atr['L-PC'] = abs(df_atr['Low']  - df_atr['Close'].shift(1))
+        df_atr['TR']   = df_atr[['H-L', 'H-PC', 'L-PC']].max(axis=1)
+        atr_14 = float(df_atr['TR'].rolling(14).mean().iloc[-1])
+        atr_weekly = atr_14 * np.sqrt(5)  # scale daily ATR to weekly
+        outlook['atr'] = round(atr_14)
+        outlook['atr_weekly_range'] = round(atr_weekly)
+        print(f"  📏 ATR-14: {atr_14:.0f} | Weekly range: ±{atr_weekly:.0f}")
+
+        # ═══ 4. VIX-implied weekly range ══════════════════════════════
+        if vix_val and vix_val > 0:
+            # VIX is annualized → weekly: VIX / sqrt(52) / 100 * price
+            vix_weekly_pct = vix_val / (52 ** 0.5)
+            vix_weekly_pts = current_price * vix_weekly_pct / 100
+            outlook['vix_weekly_range'] = round(vix_weekly_pts)
+            print(f"  🌡️  VIX ({vix_val:.1f}) → Weekly range: ±{vix_weekly_pts:.0f} pts ({vix_weekly_pct:.2f}%)")
+
+        # ═══ 5. OI walls from html_data ═══════════════════════════════
+        oi_walls = {}
+        if html_data.get('has_option_data'):
+            oi_walls = {
+                'ce_wall': html_data.get('max_ce_oi', 0),
+                'pe_wall': html_data.get('max_pe_oi', 0),
+                'support': html_data.get('support', 0),
+                'resistance': html_data.get('resistance', 0),
+                'strong_support': html_data.get('strong_support', 0),
+                'strong_resistance': html_data.get('strong_resistance', 0),
+                'max_pain': html_data.get('max_pain', 0),
+            }
+        outlook['oi_walls'] = oi_walls
+
+        # ═══ 6. SMA zones ═════════════════════════════════════════════
+        outlook['sma_zones'] = {
+            'sma_20':  round(float(html_data.get('sma_20', 0))),
+            'sma_50':  round(float(html_data.get('sma_50', 0))),
+            'sma_200': round(float(html_data.get('sma_200', 0))),
+        }
+
+        # ═══ 7. LEVEL CLUSTERING ══════════════════════════════════════
+        # Gather ALL levels into a single list, then cluster within 50 pts
+        all_levels = []
+
+        def _add(val, label, category):
+            if val and val > 0:
+                all_levels.append({'value': round(val), 'label': label, 'cat': category})
+
+        # Pivots (classic)
+        _add(classic.get('R1'), 'Pivot R1', 'resistance')
+        _add(classic.get('R2'), 'Pivot R2', 'resistance')
+        _add(classic.get('R3'), 'Pivot R3', 'resistance')
+        _add(classic.get('S1'), 'Pivot S1', 'support')
+        _add(classic.get('S2'), 'Pivot S2', 'support')
+        _add(classic.get('S3'), 'Pivot S3', 'support')
+        _add(classic.get('PP'), 'Pivot PP', 'neutral')
+        # Fibonacci pivots
+        _add(fib_pivots.get('R1'), 'Fib Pivot R1', 'resistance')
+        _add(fib_pivots.get('R2'), 'Fib Pivot R2', 'resistance')
+        _add(fib_pivots.get('S1'), 'Fib Pivot S1', 'support')
+        _add(fib_pivots.get('S2'), 'Fib Pivot S2', 'support')
+        # Camarilla
+        _add(camarilla.get('R3'), 'Cam R3', 'resistance')
+        _add(camarilla.get('R4'), 'Cam R4', 'resistance')
+        _add(camarilla.get('S3'), 'Cam S3', 'support')
+        _add(camarilla.get('S4'), 'Cam S4', 'support')
+        # Fibonacci retracement
+        _add(fib_retrace.get('23.6'), 'Fib 23.6%', 'resistance' if current_price < fib_retrace.get('23.6', 0) else 'support')
+        _add(fib_retrace.get('38.2'), 'Fib 38.2%', 'resistance' if current_price < fib_retrace.get('38.2', 0) else 'support')
+        _add(fib_retrace.get('50.0'), 'Fib 50%',   'resistance' if current_price < fib_retrace.get('50.0', 0) else 'support')
+        _add(fib_retrace.get('61.8'), 'Fib 61.8%', 'resistance' if current_price < fib_retrace.get('61.8', 0) else 'support')
+        # OI walls
+        _add(oi_walls.get('ce_wall'),          'CE Wall (Max OI)',  'resistance')
+        _add(oi_walls.get('pe_wall'),          'PE Wall (Max OI)',  'support')
+        _add(oi_walls.get('resistance'),       'OI Resistance',     'resistance')
+        _add(oi_walls.get('support'),          'OI Support',        'support')
+        _add(oi_walls.get('strong_resistance'),'Strong OI Res',     'resistance')
+        _add(oi_walls.get('strong_support'),   'Strong OI Sup',     'support')
+        _add(oi_walls.get('max_pain'),         'Max Pain',          'neutral')
+        # SMA zones
+        for sma_key in ('sma_20', 'sma_50', 'sma_200'):
+            sma_v = outlook['sma_zones'].get(sma_key, 0)
+            if sma_v > 0:
+                cat = 'resistance' if current_price < sma_v else 'support'
+                _add(sma_v, sma_key.upper().replace('_', ' '), cat)
+        # ATR projected bounds
+        _add(round(current_price + atr_weekly), 'ATR Upper', 'resistance')
+        _add(round(current_price - atr_weekly), 'ATR Lower', 'support')
+        # VIX projected bounds
+        if outlook.get('vix_weekly_range'):
+            _add(round(current_price + outlook['vix_weekly_range']), 'VIX Upper', 'resistance')
+            _add(round(current_price - outlook['vix_weekly_range']), 'VIX Lower', 'support')
+
+        # Cluster: group levels within 50 pts of each other
+        CLUSTER_GAP = 50
+        sorted_levels = sorted(all_levels, key=lambda x: x['value'])
+        clusters = []
+        used = set()
+        for i, lvl in enumerate(sorted_levels):
+            if i in used:
+                continue
+            group = [lvl]
+            used.add(i)
+            for j in range(i + 1, len(sorted_levels)):
+                if j in used:
+                    continue
+                if sorted_levels[j]['value'] - lvl['value'] <= CLUSTER_GAP:
+                    group.append(sorted_levels[j])
+                    used.add(j)
+                else:
+                    break
+            avg_val = round(sum(g['value'] for g in group) / len(group))
+            labels  = [g['label'] for g in group]
+            cats    = [g['cat'] for g in group]
+            # Determine cluster type by majority
+            r_count = cats.count('resistance')
+            s_count = cats.count('support')
+            if r_count > s_count:
+                ctype = 'resistance'
+            elif s_count > r_count:
+                ctype = 'support'
+            else:
+                ctype = 'neutral'
+            clusters.append({
+                'value': avg_val, 'count': len(group), 'labels': labels,
+                'type': ctype, 'strength': 'STRONG' if len(group) >= 3 else ('MODERATE' if len(group) == 2 else 'WEAK'),
+            })
+
+        # Separate into bull/bear/neutral targets
+        outlook['clusters_bull'] = sorted(
+            [c for c in clusters if c['type'] == 'resistance' and c['value'] > current_price],
+            key=lambda x: x['value']
+        )
+        outlook['clusters_bear'] = sorted(
+            [c for c in clusters if c['type'] == 'support' and c['value'] < current_price],
+            key=lambda x: -x['value']
+        )
+        outlook['clusters_neutral'] = [c for c in clusters if c['type'] == 'neutral']
+
+        # ═══ 8. BUILD SCENARIOS ═══════════════════════════════════════
+        bull_t1 = outlook['clusters_bull'][0] if outlook['clusters_bull'] else None
+        bull_t2 = outlook['clusters_bull'][1] if len(outlook['clusters_bull']) > 1 else None
+        bear_t1 = outlook['clusters_bear'][0] if outlook['clusters_bear'] else None
+        bear_t2 = outlook['clusters_bear'][1] if len(outlook['clusters_bear']) > 1 else None
+
+        range_upper = current_price + (outlook.get('vix_weekly_range') or outlook.get('atr_weekly_range') or 200)
+        range_lower = current_price - (outlook.get('vix_weekly_range') or outlook.get('atr_weekly_range') or 200)
+
+        outlook['scenarios'] = {
+            'bullish': {
+                'target_1': bull_t1['value'] if bull_t1 else round(current_price + 150),
+                'target_1_strength': bull_t1['strength'] if bull_t1 else 'WEAK',
+                'target_1_confluence': bull_t1['labels'] if bull_t1 else [],
+                'target_2': bull_t2['value'] if bull_t2 else round(current_price + 300),
+                'target_2_strength': bull_t2['strength'] if bull_t2 else 'WEAK',
+                'target_2_confluence': bull_t2['labels'] if bull_t2 else [],
+            },
+            'bearish': {
+                'target_1': bear_t1['value'] if bear_t1 else round(current_price - 150),
+                'target_1_strength': bear_t1['strength'] if bear_t1 else 'WEAK',
+                'target_1_confluence': bear_t1['labels'] if bear_t1 else [],
+                'target_2': bear_t2['value'] if bear_t2 else round(current_price - 300),
+                'target_2_strength': bear_t2['strength'] if bear_t2 else 'WEAK',
+                'target_2_confluence': bear_t2['labels'] if bear_t2 else [],
+            },
+            'neutral': {
+                'range_high': round(range_upper),
+                'range_low':  round(range_lower),
+            },
+        }
+        print(f"  🎯 Bull T1={outlook['scenarios']['bullish']['target_1']} T2={outlook['scenarios']['bullish']['target_2']}")
+        print(f"  🎯 Bear T1={outlook['scenarios']['bearish']['target_1']} T2={outlook['scenarios']['bearish']['target_2']}")
+        print(f"  🎯 Neutral Range: {outlook['scenarios']['neutral']['range_low']} – {outlook['scenarios']['neutral']['range_high']}")
+        print(f"  ✅ Weekly Outlook computed with {len(clusters)} level clusters")
+
+    except Exception as e:
+        print(f"  ❌ Weekly Outlook computation failed: {e}")
+        import traceback; traceback.print_exc()
+
+    return outlook
+
+
+def build_weekly_outlook_tab_html(outlook):
+    """Builds the complete HTML for the Weekly Outlook tab."""
+    cp       = outlook.get('current_price', 0)
+    pw       = outlook.get('prev_week', {})
+    pivots   = outlook.get('weekly_pivots', {})
+    fib      = outlook.get('fib_levels', {})
+    atr      = outlook.get('atr', 0)
+    atr_wr   = outlook.get('atr_weekly_range', 0)
+    vix_wr   = outlook.get('vix_weekly_range', 0)
+    oi       = outlook.get('oi_walls', {})
+    sma      = outlook.get('sma_zones', {})
+    sc       = outlook.get('scenarios', {})
+    cl_bull  = outlook.get('clusters_bull', [])
+    cl_bear  = outlook.get('clusters_bear', [])
+    classic  = pivots.get('classic', {})
+    fib_piv  = pivots.get('fibonacci', {})
+    cam      = pivots.get('camarilla', {})
+    sc_bull  = sc.get('bullish', {})
+    sc_bear  = sc.get('bearish', {})
+    sc_neut  = sc.get('neutral', {})
+
+    def fmt(v):
+        if v and v > 0:
+            return f"₹{int(v):,}"
+        return "N/A"
+
+    def strength_badge(s):
+        if s == 'STRONG':
+            return '<span style="background:rgba(0,230,118,0.15);color:#00e676;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:1px;border:1px solid rgba(0,230,118,0.3);">STRONG</span>'
+        elif s == 'MODERATE':
+            return '<span style="background:rgba(255,183,77,0.15);color:#ffb74d;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:1px;border:1px solid rgba(255,183,77,0.3);">MODERATE</span>'
+        return '<span style="background:rgba(176,190,197,0.1);color:rgba(176,190,197,0.5);padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:1px;border:1px solid rgba(176,190,197,0.15);">WEAK</span>'
+
+    def confluence_tags(labels):
+        if not labels:
+            return '<span style="color:rgba(176,190,197,0.3);">—</span>'
+        html_t = ''
+        for lb in labels[:5]:
+            html_t += f'<span style="display:inline-block;background:rgba(79,195,247,0.08);color:rgba(128,222,234,0.7);padding:1px 7px;border-radius:6px;font-size:9px;margin:2px 3px 2px 0;border:1px solid rgba(79,195,247,0.15);">{lb}</span>'
+        if len(labels) > 5:
+            html_t += f'<span style="color:rgba(176,190,197,0.4);font-size:9px;">+{len(labels)-5} more</span>'
+        return html_t
+
+    # ── Cluster bars for visual ────────────────────────────────────
+    all_clusters = []
+    for c in cl_bull[:4]:
+        all_clusters.append(('bull', c))
+    for c in cl_bear[:4]:
+        all_clusters.append(('bear', c))
+    all_clusters.sort(key=lambda x: x[1]['value'])
+
+    # ── Build the visual range bar ─────────────────────────────────
+    range_low  = sc_neut.get('range_low', cp - 300)
+    range_high = sc_neut.get('range_high', cp + 300)
+    bar_min = min(range_low, cp - 400, min((c[1]['value'] for c in all_clusters), default=cp-400))
+    bar_max = max(range_high, cp + 400, max((c[1]['value'] for c in all_clusters), default=cp+400))
+    bar_span = bar_max - bar_min if bar_max > bar_min else 1
+
+    def to_pct(v):
+        return max(2, min(98, (v - bar_min) / bar_span * 100))
+
+    cp_pct = to_pct(cp)
+
+    # Build marker divs
+    marker_html = ''
+    for ctype, cl in all_clusters:
+        pct = to_pct(cl['value'])
+        color = '#00e676' if ctype == 'bear' else '#ff5252'  # support=green, resistance=red
+        if cl['strength'] == 'STRONG':
+            sz = 12; opacity = 1.0
+        elif cl['strength'] == 'MODERATE':
+            sz = 9; opacity = 0.7
+        else:
+            sz = 6; opacity = 0.4
+        marker_html += f'<div style="position:absolute;left:{pct:.1f}%;top:50%;transform:translate(-50%,-50%);width:{sz}px;height:{sz}px;background:{color};border-radius:50%;opacity:{opacity};z-index:2;" title="{fmt(cl["value"])} ({cl["strength"]} — {", ".join(cl["labels"][:3])})"></div>'
+
+    # Pivot point table builder
+    def pivot_row(label, val, cls=''):
+        if not val:
+            return ''
+        dist = val - cp
+        dist_pct = dist / cp * 100 if cp > 0 else 0
+        arrow = '▲' if dist > 0 else '▼' if dist < 0 else '—'
+        dcol = '#34d399' if dist > 0 else '#f87171' if dist < 0 else 'rgba(176,190,197,0.5)'
+        return f'''<tr class="{cls}">
+            <td style="color:rgba(128,222,234,0.8);font-weight:600;">{label}</td>
+            <td style="font-family:'JetBrains Mono',monospace;color:#e0f7fa;font-weight:700;">{fmt(val)}</td>
+            <td style="font-family:'JetBrains Mono',monospace;color:{dcol};font-size:12px;">{arrow} {abs(dist):.0f} pts ({abs(dist_pct):.2f}%)</td>
+        </tr>'''
+
+    html = f"""
+    <div class="tab-panel" id="tab-weekly">
+    <style>
+        .wo-card{{background:linear-gradient(135deg,rgba(10,14,26,0.96),rgba(13,18,37,0.92));border:1px solid rgba(79,195,247,0.12);border-radius:14px;padding:20px 24px;margin:16px 0;}}
+        .wo-title{{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}}
+        .wo-title svg{{width:16px;height:16px;stroke:#4fc3f7;fill:none;stroke-width:1.5;}}
+        .wo-scenario{{background:linear-gradient(135deg,rgba(10,14,26,0.98),rgba(8,12,24,0.95));border:1px solid rgba(79,195,247,0.1);border-radius:12px;padding:18px 20px;flex:1;min-width:240px;}}
+        .wo-sc-head{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}}
+        .wo-sc-row{{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(79,195,247,0.06);}}
+        .wo-sc-label{{font-size:12px;color:rgba(176,190,197,0.6);}}
+        .wo-sc-val{{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;}}
+        .wo-sc-conf{{padding:6px 0;}}
+        .wo-tbl{{width:100%;border-collapse:collapse;font-size:13px;}}
+        .wo-tbl th{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:#4fc3f7;text-align:left;padding:8px 10px;border-bottom:1px solid rgba(79,195,247,0.15);text-transform:uppercase;}}
+        .wo-tbl td{{padding:7px 10px;border-bottom:1px solid rgba(79,195,247,0.05);}}
+        .wo-tbl tr:hover td{{background:rgba(79,195,247,0.04);}}
+        .wo-range-bar{{position:relative;height:40px;background:linear-gradient(90deg,rgba(239,68,68,0.08),rgba(79,195,247,0.04) 50%,rgba(16,185,129,0.08));border-radius:20px;margin:20px 0 30px;border:1px solid rgba(79,195,247,0.1);overflow:visible;}}
+        .wo-range-zone{{position:absolute;top:4px;bottom:4px;background:rgba(79,195,247,0.06);border-radius:16px;border:1px dashed rgba(79,195,247,0.15);}}
+        .wo-cp-marker{{position:absolute;top:50%;transform:translate(-50%,-50%);z-index:5;}}
+        .wo-cp-dot{{width:16px;height:16px;background:#00e5ff;border-radius:50%;box-shadow:0 0 12px rgba(0,229,255,0.5);}}
+        .wo-cp-label{{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;color:#00e5ff;white-space:nowrap;letter-spacing:0.5px;}}
+        .wo-piv-toggle{{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}}
+        .wo-piv-btn{{padding:4px 14px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(128,222,234,0.4);background:transparent;border:1px solid rgba(79,195,247,0.15);border-radius:16px;cursor:pointer;transition:all 0.2s;}}
+        .wo-piv-btn:hover{{color:#4fc3f7;border-color:rgba(79,195,247,0.4);}}
+        .wo-piv-btn.active{{color:#00e5ff;border-color:rgba(79,195,247,0.6);background:rgba(79,195,247,0.12);box-shadow:0 0 8px rgba(79,195,247,0.1);}}
+        .wo-piv-panel{{display:none;}}.wo-piv-panel.active{{display:block;}}
+        .wo-stat{{display:inline-flex;flex-direction:column;align-items:center;padding:10px 18px;background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.08);border-radius:10px;min-width:100px;}}
+        .wo-stat-val{{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#e0f7fa;}}
+        .wo-stat-lbl{{font-size:9px;color:rgba(176,190,197,0.5);margin-top:3px;letter-spacing:0.5px;}}
+        @media(max-width:768px){{
+            .wo-sc-wrap{{flex-direction:column!important;}}
+            .wo-stat{{min-width:70px;padding:8px 12px;}}
+            .wo-stat-val{{font-size:13px;}}
+        }}
+    </style>
+
+    <div style="padding:16px 0 8px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(79,195,247,0.5);margin-bottom:6px;">WEEKLY OUTLOOK</div>
+        <div style="font-size:22px;font-weight:700;color:#e0f7fa;">Projected Support &amp; Resistance</div>
+        <div style="font-size:12px;color:rgba(176,190,197,0.5);margin-top:4px;">Confluence-based levels from Pivots · Fibonacci · ATR · VIX · OI Walls · SMA</div>
+    </div>
+
+    <!-- ── Quick Stats ── -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 24px;">
+        <div class="wo-stat"><div class="wo-stat-val">{fmt(cp)}</div><div class="wo-stat-lbl">SPOT PRICE</div></div>
+        <div class="wo-stat"><div class="wo-stat-val">±{atr_wr or '—'}</div><div class="wo-stat-lbl">ATR WEEKLY</div></div>
+        <div class="wo-stat"><div class="wo-stat-val">±{vix_wr or '—'}</div><div class="wo-stat-lbl">VIX RANGE</div></div>
+        <div class="wo-stat"><div class="wo-stat-val">{fmt(pw.get('high'))}</div><div class="wo-stat-lbl">PREV WK HIGH</div></div>
+        <div class="wo-stat"><div class="wo-stat-val">{fmt(pw.get('low'))}</div><div class="wo-stat-lbl">PREV WK LOW</div></div>
+        <div class="wo-stat"><div class="wo-stat-val">{atr or '—'}</div><div class="wo-stat-lbl">ATR-14 DAILY</div></div>
+    </div>
+
+    <!-- ══ SCENARIO CARDS ══ -->
+    <div class="wo-card">
+        <div class="wo-title">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 4v4l3 2"/></svg>
+            WEEKLY SCENARIO PROJECTIONS
+        </div>
+        <div class="wo-sc-wrap" style="display:flex;gap:14px;flex-wrap:wrap;">
+
+            <!-- BULLISH -->
+            <div class="wo-scenario" style="border-top:2px solid rgba(0,230,118,0.4);">
+                <div class="wo-sc-head" style="color:#00e676;">📈 BULLISH SCENARIO</div>
+                <div class="wo-sc-row">
+                    <span class="wo-sc-label">Target 1</span>
+                    <span class="wo-sc-val" style="color:#34d399;">{fmt(sc_bull.get('target_1'))}</span>
+                </div>
+                <div class="wo-sc-conf">{strength_badge(sc_bull.get('target_1_strength',''))} {confluence_tags(sc_bull.get('target_1_confluence',[]))}</div>
+                <div class="wo-sc-row">
+                    <span class="wo-sc-label">Target 2</span>
+                    <span class="wo-sc-val" style="color:#00e676;">{fmt(sc_bull.get('target_2'))}</span>
+                </div>
+                <div class="wo-sc-conf">{strength_badge(sc_bull.get('target_2_strength',''))} {confluence_tags(sc_bull.get('target_2_confluence',[]))}</div>
+            </div>
+
+            <!-- BEARISH -->
+            <div class="wo-scenario" style="border-top:2px solid rgba(255,82,82,0.4);">
+                <div class="wo-sc-head" style="color:#ff5252;">📉 BEARISH SCENARIO</div>
+                <div class="wo-sc-row">
+                    <span class="wo-sc-label">Target 1</span>
+                    <span class="wo-sc-val" style="color:#f87171;">{fmt(sc_bear.get('target_1'))}</span>
+                </div>
+                <div class="wo-sc-conf">{strength_badge(sc_bear.get('target_1_strength',''))} {confluence_tags(sc_bear.get('target_1_confluence',[]))}</div>
+                <div class="wo-sc-row">
+                    <span class="wo-sc-label">Target 2</span>
+                    <span class="wo-sc-val" style="color:#ff5252;">{fmt(sc_bear.get('target_2'))}</span>
+                </div>
+                <div class="wo-sc-conf">{strength_badge(sc_bear.get('target_2_strength',''))} {confluence_tags(sc_bear.get('target_2_confluence',[]))}</div>
+            </div>
+
+            <!-- NEUTRAL -->
+            <div class="wo-scenario" style="border-top:2px solid rgba(255,183,77,0.4);">
+                <div class="wo-sc-head" style="color:#ffb74d;">↔️ SIDEWAYS RANGE</div>
+                <div class="wo-sc-row">
+                    <span class="wo-sc-label">Range High</span>
+                    <span class="wo-sc-val" style="color:#34d399;">{fmt(sc_neut.get('range_high'))}</span>
+                </div>
+                <div class="wo-sc-conf">{strength_badge('MODERATE')} <span style="font-size:10px;color:rgba(176,190,197,0.5);">VIX/ATR implied upper bound</span></div>
+                <div class="wo-sc-row">
+                    <span class="wo-sc-label">Range Low</span>
+                    <span class="wo-sc-val" style="color:#f87171;">{fmt(sc_neut.get('range_low'))}</span>
+                </div>
+                <div class="wo-sc-conf">{strength_badge('MODERATE')} <span style="font-size:10px;color:rgba(176,190,197,0.5);">VIX/ATR implied lower bound</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ VISUAL RANGE BAR ══ -->
+    <div class="wo-card">
+        <div class="wo-title">
+            <svg viewBox="0 0 16 16"><line x1="2" y1="8" x2="14" y2="8"/><polyline points="4,5 2,8 4,11"/><polyline points="12,5 14,8 12,11"/></svg>
+            CONFLUENCE MAP
+        </div>
+        <div style="font-size:11px;color:rgba(176,190,197,0.4);margin-bottom:6px;">
+            Each dot = a clustered level. Larger &amp; brighter = more confluences.
+            <span style="color:#00e676;">● Support</span> &nbsp;
+            <span style="color:#ff5252;">● Resistance</span> &nbsp;
+            <span style="color:#00e5ff;">● Current Price</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(176,190,197,0.4);margin-bottom:2px;">
+            <span>{fmt(bar_min)}</span><span>{fmt(bar_max)}</span>
+        </div>
+        <div class="wo-range-bar">
+            <!-- Neutral range zone -->
+            <div class="wo-range-zone" style="left:{to_pct(range_low):.1f}%;width:{to_pct(range_high)-to_pct(range_low):.1f}%;"></div>
+            <!-- Level markers -->
+            {marker_html}
+            <!-- Current price -->
+            <div class="wo-cp-marker" style="left:{cp_pct:.1f}%;">
+                <div class="wo-cp-label">{fmt(cp)}</div>
+                <div class="wo-cp-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ PIVOT TABLES ══ -->
+    <div class="wo-card">
+        <div class="wo-title">
+            <svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="12" rx="2"/><line x1="2" y1="6" x2="14" y2="6"/><line x1="6" y1="2" x2="6" y2="14"/></svg>
+            WEEKLY PIVOT POINTS
+        </div>
+        <div class="wo-piv-toggle">
+            <button class="wo-piv-btn active" onclick="switchWoPiv('classic',this)">CLASSIC</button>
+            <button class="wo-piv-btn" onclick="switchWoPiv('fibonacci',this)">FIBONACCI</button>
+            <button class="wo-piv-btn" onclick="switchWoPiv('camarilla',this)">CAMARILLA</button>
+        </div>
+
+        <!-- Classic -->
+        <div class="wo-piv-panel active" id="wo-piv-classic">
+        <table class="wo-tbl">
+            <tr><th>Level</th><th>Price</th><th>Distance from Spot</th></tr>
+            {pivot_row('R3', classic.get('R3'))}
+            {pivot_row('R2', classic.get('R2'))}
+            {pivot_row('R1', classic.get('R1'))}
+            {pivot_row('PP (Pivot)', classic.get('PP'), 'style="background:rgba(79,195,247,0.05);"' if False else '')}
+            {pivot_row('S1', classic.get('S1'))}
+            {pivot_row('S2', classic.get('S2'))}
+            {pivot_row('S3', classic.get('S3'))}
+        </table>
+        </div>
+
+        <!-- Fibonacci Pivots -->
+        <div class="wo-piv-panel" id="wo-piv-fibonacci">
+        <table class="wo-tbl">
+            <tr><th>Level</th><th>Price</th><th>Distance from Spot</th></tr>
+            {pivot_row('R3', fib_piv.get('R3'))}
+            {pivot_row('R2', fib_piv.get('R2'))}
+            {pivot_row('R1', fib_piv.get('R1'))}
+            {pivot_row('PP (Pivot)', fib_piv.get('PP'))}
+            {pivot_row('S1', fib_piv.get('S1'))}
+            {pivot_row('S2', fib_piv.get('S2'))}
+            {pivot_row('S3', fib_piv.get('S3'))}
+        </table>
+        </div>
+
+        <!-- Camarilla -->
+        <div class="wo-piv-panel" id="wo-piv-camarilla">
+        <table class="wo-tbl">
+            <tr><th>Level</th><th>Price</th><th>Distance from Spot</th></tr>
+            {pivot_row('R4', cam.get('R4'))}
+            {pivot_row('R3', cam.get('R3'))}
+            {pivot_row('R2', cam.get('R2'))}
+            {pivot_row('R1', cam.get('R1'))}
+            {pivot_row('PP (Pivot)', cam.get('PP'))}
+            {pivot_row('S1', cam.get('S1'))}
+            {pivot_row('S2', cam.get('S2'))}
+            {pivot_row('S3', cam.get('S3'))}
+            {pivot_row('S4', cam.get('S4'))}
+        </table>
+        </div>
+    </div>
+
+    <!-- ══ FIBONACCI RETRACEMENT ══ -->
+    <div class="wo-card">
+        <div class="wo-title">
+            <svg viewBox="0 0 16 16"><polyline points="2,13 6,5 10,9 14,3"/></svg>
+            FIBONACCI RETRACEMENT (20-DAY SWING)
+        </div>
+        <div style="font-size:11px;color:rgba(176,190,197,0.4);margin-bottom:12px;">
+            Swing High: <span style="color:#34d399;font-weight:700;">{fmt(fib.get('swing_high'))}</span> &nbsp;·&nbsp;
+            Swing Low: <span style="color:#f87171;font-weight:700;">{fmt(fib.get('swing_low'))}</span>
+        </div>
+        <table class="wo-tbl">
+            <tr><th>Level</th><th>Price</th><th>Distance from Spot</th></tr>
+            {pivot_row('23.6%', fib.get('23.6'))}
+            {pivot_row('38.2%', fib.get('38.2'))}
+            {pivot_row('50.0%', fib.get('50.0'))}
+            {pivot_row('61.8%', fib.get('61.8'))}
+            {pivot_row('78.6%', fib.get('78.6'))}
+        </table>
+    </div>
+
+    <!-- ══ CONFLUENCE CLUSTERS ══ -->
+    <div class="wo-card">
+        <div class="wo-title">
+            <svg viewBox="0 0 16 16"><circle cx="5" cy="8" r="3"/><circle cx="11" cy="8" r="3"/></svg>
+            LEVEL CONFLUENCE CLUSTERS
+        </div>
+        <div style="font-size:11px;color:rgba(176,190,197,0.4);margin-bottom:12px;">
+            Levels within 50 pts are grouped. More confluences = stronger zone.
+        </div>
+        <table class="wo-tbl">
+            <tr><th>Zone</th><th>Price</th><th>Strength</th><th>Confluences</th></tr>"""
+
+    # Add resistance clusters (above price)
+    for cl in (cl_bull[:5] if cl_bull else []):
+        html += f"""
+            <tr>
+                <td style="color:#f87171;font-weight:600;">Resistance</td>
+                <td style="font-family:'JetBrains Mono',monospace;color:#e0f7fa;font-weight:700;">{fmt(cl['value'])}</td>
+                <td>{strength_badge(cl['strength'])}</td>
+                <td>{confluence_tags(cl['labels'])}</td>
+            </tr>"""
+    # Current price row
+    html += f"""
+            <tr style="background:rgba(0,229,255,0.06);">
+                <td style="color:#00e5ff;font-weight:700;">▶ CURRENT</td>
+                <td style="font-family:'JetBrains Mono',monospace;color:#00e5ff;font-weight:700;">{fmt(cp)}</td>
+                <td></td><td></td>
+            </tr>"""
+    # Add support clusters (below price)
+    for cl in (cl_bear[:5] if cl_bear else []):
+        html += f"""
+            <tr>
+                <td style="color:#34d399;font-weight:600;">Support</td>
+                <td style="font-family:'JetBrains Mono',monospace;color:#e0f7fa;font-weight:700;">{fmt(cl['value'])}</td>
+                <td>{strength_badge(cl['strength'])}</td>
+                <td>{confluence_tags(cl['labels'])}</td>
+            </tr>"""
+
+    html += """
+        </table>
+    </div>
+
+    <!-- ══ HOW TO READ ══ -->
+    <div class="wo-card" style="border-color:rgba(79,195,247,0.08);">
+        <div class="wo-title" style="color:rgba(176,190,197,0.5);">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="8.5"/><circle cx="8" cy="11" r="0.6" fill="currentColor"/></svg>
+            HOW TO READ THIS TAB
+        </div>
+        <div style="font-size:12px;color:rgba(176,190,197,0.5);line-height:1.8;">
+            <b style="color:rgba(128,222,234,0.7);">Scenario Cards:</b> If the bias is BUY → check Bullish targets. SELL → check Bearish targets. SIDEWAYS → expect price to stay within the neutral range.<br>
+            <b style="color:rgba(128,222,234,0.7);">Confluence Map:</b> Larger, brighter dots = zones where 3+ independent methods agree (e.g., Pivot R1 + Fibonacci 38.2% + OI Wall all near the same price). These are the highest-conviction levels.<br>
+            <b style="color:rgba(128,222,234,0.7);">STRONG Zones:</b> 3+ confluences — price is very likely to stall here. <b>MODERATE:</b> 2 confluences. <b>WEAK:</b> single indicator only.<br>
+            <b style="color:rgba(128,222,234,0.7);">Pivot Types:</b> Classic is the most widely used. Fibonacci adds golden-ratio precision. Camarilla is best for intraday reversal points.<br>
+            <b style="color:rgba(128,222,234,0.7);">Weekly Range (ATR/VIX):</b> The market is expected to move within ± this many points from the current price over the week. If price hits this boundary, expect a slowdown.
+        </div>
+    </div>
+
+    <script>
+    function switchWoPiv(panel, btn) {
+        document.querySelectorAll('.wo-piv-panel').forEach(function(p){ p.classList.remove('active'); });
+        document.querySelectorAll('.wo-piv-btn').forEach(function(b){ b.classList.remove('active'); });
+        var el = document.getElementById('wo-piv-' + panel);
+        if (el) el.classList.add('active');
+        if (btn) btn.classList.add('active');
+    }
+    </script>
+
+    </div><!-- /tab-weekly -->
+"""
+    return html
+
 
 def build_heatmap_tab_html(heatmap_data, timestamp, advance, decline, neutral):
     """
@@ -4924,6 +5587,10 @@ class NiftyHTMLAnalyzer:
         intraday_oi_tab_html = build_intraday_oi_tab_html()
         pretrade_tab_html = build_pretrade_checklist_tab_html()
 
+        # ── Weekly Outlook tab HTML ───────────────────────────────────
+        weekly_outlook_data = compute_weekly_outlook(d, vix_val=d.get('vix_val'))
+        weekly_outlook_tab_html = build_weekly_outlook_tab_html(weekly_outlook_data)
+
         # ── Heatmap tab HTML ─────────────────────────────────────────
         heatmap_tab_html = build_heatmap_tab_html(
             self.heatmap_data,
@@ -7226,6 +7893,11 @@ function mobNavTo(secId, tabId, label) {
                 <span class="nsb-label">Intraday OI</span>
                 <span class="nsb-tip">Intraday OI Trend</span>
             </div>
+            <div class="nsb-item" id="nsi-weekly" onclick="navSidebarTo('weekly','weekly')">
+                <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="12" height="11" rx="2"/><line x1="2" y1="7" x2="14" y2="7"/><line x1="5" y1="3" x2="5" y2="1"/><line x1="11" y1="3" x2="11" y2="1"/></svg></div>
+                <span class="nsb-label">Weekly</span>
+                <span class="nsb-tip">Weekly Outlook</span>
+            </div>
             <div class="nsb-item" id="nsi-checklist" onclick="navSidebarTo('checklist','checklist')">
                 <div class="nsb-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="4,8 7,11 12,5"/><rect x="2" y="2" width="12" height="12" rx="2"/></svg></div>
                 <span class="nsb-label">Strategy</span>
@@ -7282,11 +7954,12 @@ function mobNavTo(secId, tabId, label) {
 """
         html += heatmap_tab_html
         html += intraday_oi_tab_html
+        html += weekly_outlook_tab_html
         html += checklist_tab_html
         html += pretrade_tab_html
         html += """
     <div class="footer">
-        <p>Automated Nifty 50 · Option Chain + Technical + Heatmap + Intraday OI Trend + Strategy Checklist</p>
+        <p>Automated Nifty 50 · Option Chain + Technical + Heatmap + Intraday OI Trend + Weekly Outlook + Strategy Checklist</p>
         <p style="margin-top:6px;">&#169; 2026 · Deep Ocean Theme · Navy Command OI · Pulse Flow FII/DII · IST Timestamps · For Educational Purposes Only</p>
     </div>
     </div><!-- /page-content -->
@@ -7310,6 +7983,7 @@ function mobNavTo(secId, tabId, label) {
         <div class="nsb-group" style="padding:10px 18px 4px;">OTHER VIEWS</div>
         <div class="nsb-mob-item" id="nsmd-heatmap" onclick="mobNavTo('heatmap','heatmap','&#127956; Heatmap')">&#127956; Heatmap</div>
         <div class="nsb-mob-item" id="nsmd-oitrend" onclick="mobNavTo('oitrend','oi-trend','&#128202; Intraday OI')">&#128202; Intraday OI</div>
+        <div class="nsb-mob-item" id="nsmd-weekly" onclick="mobNavTo('weekly','weekly','&#128197; Weekly Outlook')">&#128197; Weekly Outlook</div>
         <div class="nsb-mob-item" id="nsmd-checklist" onclick="mobNavTo('checklist','checklist','&#129504; Strategy')">&#129504; Strategy</div>
         <div class="nsb-mob-item" id="nsmd-pretrade" onclick="mobNavTo('pretrade','pretrade','&#9989; Pre-Trade')">&#9989; Pre-Trade</div>
     </div>
