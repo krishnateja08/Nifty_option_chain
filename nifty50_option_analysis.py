@@ -5248,6 +5248,7 @@ function filterByInterval(data, mins) {
 var _oiViewMode = 'focus';
 function setOIView(mode) {
     _oiViewMode = mode;
+    try { history.replaceState(null, '', mode === 'detail' ? '#oi-detail' : ' '); } catch(e) {}
     var tableWrap = document.querySelector('.oi-table-wrap');
     if (!tableWrap) return;
     if (mode === 'detail') {
@@ -5260,8 +5261,8 @@ function setOIView(mode) {
     if (btnFocus)  btnFocus.classList.toggle('oi-view-active',  mode === 'focus');
     if (btnDetail) btnDetail.classList.toggle('oi-view-active', mode === 'detail');
 }
-/* Apply FOCUS mode on page load */
-window.addEventListener('load', function(){ setOIView('focus'); });
+/* Restore last chosen OI view mode (default: focus) */
+window.addEventListener('load', function(){ setOIView(location.hash === '#oi-detail' ? 'detail' : 'focus'); });
 
 /* ══ ELAPSED TIMER SYSTEM — replaces static LIVE badge ══════════════════ */
 var _elapsedTimerRef = null;   // Date.now() when current live entry was first seen
