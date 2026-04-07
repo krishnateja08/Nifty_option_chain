@@ -636,9 +636,9 @@ def build_weekly_outlook_tab_html(outlook):
             return '<span style="color:rgba(176,190,197,0.3);">—</span>'
         html_t = ''
         for lb in labels[:5]:
-            html_t += f'<span style="display:inline-block;background:rgba(79,195,247,0.12);color:rgba(128,222,234,0.85);padding:3px 10px;border-radius:6px;font-size:11px;margin:2px 3px 2px 0;border:1px solid rgba(79,195,247,0.25);">{lb}</span>'
+            html_t += f'<span style="display:inline-block;background:rgba(79,195,247,0.15);color:#80deea;padding:4px 12px;border-radius:6px;font-size:12px;font-weight:500;margin:3px 4px 3px 0;border:1px solid rgba(79,195,247,0.35);">{lb}</span>'
         if len(labels) > 5:
-            html_t += f'<span style="color:rgba(176,190,197,0.5);font-size:11px;">+{len(labels)-5} more</span>'
+            html_t += f'<span style="color:#90a4ae;font-size:11px;">+{len(labels)-5} more</span>'
         return html_t
 
     # ── Cluster bars for visual ────────────────────────────────────
@@ -697,12 +697,12 @@ def build_weekly_outlook_tab_html(outlook):
         .wo-scenario{{background:linear-gradient(135deg,rgba(10,14,26,0.98),rgba(8,12,24,0.95));border:1px solid rgba(79,195,247,0.1);border-radius:12px;padding:18px 20px;flex:1;min-width:240px;}}
         .wo-sc-head{{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:2px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-shadow:0 0 10px rgba(0,229,255,0.15);}}
         .wo-sc-row{{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(79,195,247,0.06);}}
-        .wo-sc-label{{font-size:14px;color:rgba(176,190,197,0.7);}}
+        .wo-sc-label{{font-size:14px;color:#b0bec5;}}
         .wo-sc-val{{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}}
         .wo-sc-conf{{padding:6px 0;}}
         .wo-tbl{{width:100%;border-collapse:collapse;font-size:14px;}}
         .wo-tbl th{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:#00e5ff;text-align:left;padding:10px 12px;border-bottom:1px solid rgba(79,195,247,0.15);text-transform:uppercase;}}
-        .wo-tbl td{{padding:9px 12px;border-bottom:1px solid rgba(79,195,247,0.05);}}
+        .wo-tbl td{{padding:9px 12px;border-bottom:1px solid rgba(79,195,247,0.05);color:#cfd8dc;}}
         .wo-tbl tr:hover td{{background:rgba(79,195,247,0.04);}}
         .wo-range-bar{{position:relative;height:40px;background:linear-gradient(90deg,rgba(239,68,68,0.08),rgba(79,195,247,0.04) 50%,rgba(16,185,129,0.08));border-radius:20px;margin:20px 0 30px;border:1px solid rgba(79,195,247,0.1);overflow:visible;}}
         .wo-range-zone{{position:absolute;top:4px;bottom:4px;background:rgba(79,195,247,0.06);border-radius:16px;border:1px dashed rgba(79,195,247,0.15);}}
@@ -716,7 +716,7 @@ def build_weekly_outlook_tab_html(outlook):
         .wo-piv-panel{{display:none;}}.wo-piv-panel.active{{display:block;}}
         .wo-stat{{display:inline-flex;flex-direction:column;align-items:center;padding:10px 18px;background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.08);border-radius:10px;min-width:100px;}}
         .wo-stat-val{{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e0f7fa;}}
-        .wo-stat-lbl{{font-size:10px;color:rgba(176,190,197,0.65);margin-top:4px;letter-spacing:0.8px;font-weight:500;}}
+        .wo-stat-lbl{{font-size:11px;color:#90a4ae;margin-top:4px;letter-spacing:0.8px;font-weight:600;}}
         @media(max-width:768px){{
             .wo-sc-wrap{{flex-direction:column!important;}}
             .wo-stat{{min-width:70px;padding:8px 12px;}}
@@ -727,7 +727,7 @@ def build_weekly_outlook_tab_html(outlook):
     <div style="padding:16px 0 8px;">
         <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:3px;color:#4fc3f7;margin-bottom:6px;">WEEKLY OUTLOOK</div>
         <div style="font-size:26px;font-weight:700;color:#e0f7fa;text-shadow:0 0 20px rgba(0,229,255,0.15);">Projected Support &amp; Resistance</div>
-        <div style="font-size:14px;color:rgba(176,190,197,0.7);margin-top:4px;">Confluence-based levels from Pivots · Fibonacci · ATR · VIX · OI Walls · SMA</div>
+        <div style="font-size:14px;color:#90a4ae;margin-top:4px;">Confluence-based levels from Pivots · Fibonacci · ATR · VIX · OI Walls · SMA</div>
     </div>
 
     <!-- ── Quick Stats ── -->
@@ -785,12 +785,12 @@ def build_weekly_outlook_tab_html(outlook):
                     <span class="wo-sc-label">Range High</span>
                     <span class="wo-sc-val" style="color:#34d399;">{fmt(sc_neut.get('range_high'))}</span>
                 </div>
-                <div class="wo-sc-conf">{strength_badge('MODERATE')} <span style="font-size:12px;color:rgba(176,190,197,0.7);">VIX/ATR implied upper bound</span></div>
+                <div class="wo-sc-conf">{strength_badge('MODERATE')} <span style="font-size:13px;color:#b0bec5;">VIX/ATR implied upper bound</span></div>
                 <div class="wo-sc-row">
                     <span class="wo-sc-label">Range Low</span>
                     <span class="wo-sc-val" style="color:#f87171;">{fmt(sc_neut.get('range_low'))}</span>
                 </div>
-                <div class="wo-sc-conf">{strength_badge('MODERATE')} <span style="font-size:12px;color:rgba(176,190,197,0.7);">VIX/ATR implied lower bound</span></div>
+                <div class="wo-sc-conf">{strength_badge('MODERATE')} <span style="font-size:13px;color:#b0bec5;">VIX/ATR implied lower bound</span></div>
             </div>
         </div>
     </div>
@@ -801,13 +801,13 @@ def build_weekly_outlook_tab_html(outlook):
             <svg viewBox="0 0 16 16"><line x1="2" y1="8" x2="14" y2="8"/><polyline points="4,5 2,8 4,11"/><polyline points="12,5 14,8 12,11"/></svg>
             CONFLUENCE MAP
         </div>
-        <div style="font-size:13px;color:rgba(176,190,197,0.65);margin-bottom:6px;">
+        <div style="font-size:13px;color:#b0bec5;margin-bottom:8px;">
             Each dot = a clustered level. Larger &amp; brighter = more confluences.
-            <span style="color:#00e676;">● Support</span> &nbsp;
-            <span style="color:#ff5252;">● Resistance</span> &nbsp;
-            <span style="color:#00e5ff;">● Current Price</span>
+            <span style="color:#00e676;font-weight:600;">● Support</span> &nbsp;
+            <span style="color:#ff5252;font-weight:600;">● Resistance</span> &nbsp;
+            <span style="color:#00e5ff;font-weight:600;">● Current Price</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(176,190,197,0.55);margin-bottom:2px;">
+        <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11px;color:#90a4ae;margin-bottom:2px;">
             <span>{fmt(bar_min)}</span><span>{fmt(bar_max)}</span>
         </div>
         <div class="wo-range-bar">
@@ -886,7 +886,7 @@ def build_weekly_outlook_tab_html(outlook):
             <svg viewBox="0 0 16 16"><polyline points="2,13 6,5 10,9 14,3"/></svg>
             FIBONACCI RETRACEMENT (20-DAY SWING)
         </div>
-        <div style="font-size:14px;color:rgba(176,190,197,0.65);margin-bottom:12px;">
+        <div style="font-size:14px;color:#b0bec5;margin-bottom:12px;">
             Swing High: <span style="color:#34d399;font-weight:700;">{fmt(fib.get('swing_high'))}</span> &nbsp;·&nbsp;
             Swing Low: <span style="color:#f87171;font-weight:700;">{fmt(fib.get('swing_low'))}</span>
         </div>
@@ -906,7 +906,7 @@ def build_weekly_outlook_tab_html(outlook):
             <svg viewBox="0 0 16 16"><circle cx="5" cy="8" r="3"/><circle cx="11" cy="8" r="3"/></svg>
             LEVEL CONFLUENCE CLUSTERS
         </div>
-        <div style="font-size:13px;color:rgba(176,190,197,0.65);margin-bottom:12px;">
+        <div style="font-size:13px;color:#b0bec5;margin-bottom:12px;">
             Levels within 50 pts are grouped. More confluences = stronger zone.
         </div>
         <table class="wo-tbl">
@@ -944,16 +944,16 @@ def build_weekly_outlook_tab_html(outlook):
 
     <!-- ══ HOW TO READ ══ -->
     <div class="wo-card" style="border-color:rgba(79,195,247,0.08);">
-        <div class="wo-title" style="color:rgba(128,222,234,0.7);">
+        <div class="wo-title" style="color:#80deea;">
             <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="8.5"/><circle cx="8" cy="11" r="0.6" fill="currentColor"/></svg>
             HOW TO READ THIS TAB
         </div>
-        <div style="font-size:14px;color:rgba(176,190,197,0.7);line-height:1.9;">
-            <b style="color:rgba(128,222,234,0.9);">Scenario Cards:</b> If the bias is BUY → check Bullish targets. SELL → check Bearish targets. SIDEWAYS → expect price to stay within the neutral range.<br>
-            <b style="color:rgba(128,222,234,0.9);">Confluence Map:</b> Larger, brighter dots = zones where 3+ independent methods agree (e.g., Pivot R1 + Fibonacci 38.2% + OI Wall all near the same price). These are the highest-conviction levels.<br>
-            <b style="color:rgba(128,222,234,0.9);">STRONG Zones:</b> 3+ confluences — price is very likely to stall here. <b>MODERATE:</b> 2 confluences. <b>WEAK:</b> single indicator only.<br>
-            <b style="color:rgba(128,222,234,0.9);">Pivot Types:</b> Classic is the most widely used. Fibonacci adds golden-ratio precision. Camarilla is best for intraday reversal points.<br>
-            <b style="color:rgba(128,222,234,0.9);">Weekly Range (ATR/VIX):</b> The market is expected to move within ± this many points from the current price over the week. If price hits this boundary, expect a slowdown.
+        <div style="font-size:14px;color:#b0bec5;line-height:2.0;">
+            <b style="color:#4dd0e1;">Scenario Cards:</b> If the bias is BUY → check Bullish targets. SELL → check Bearish targets. SIDEWAYS → expect price to stay within the neutral range.<br>
+            <b style="color:#4dd0e1;">Confluence Map:</b> Larger, brighter dots = zones where 3+ independent methods agree (e.g., Pivot R1 + Fibonacci 38.2% + OI Wall all near the same price). These are the highest-conviction levels.<br>
+            <b style="color:#4dd0e1;">STRONG Zones:</b> 3+ confluences — price is very likely to stall here. <b style="color:#e0e0e0;">MODERATE:</b> 2 confluences. <b style="color:#e0e0e0;">WEAK:</b> single indicator only.<br>
+            <b style="color:#4dd0e1;">Pivot Types:</b> Classic is the most widely used. Fibonacci adds golden-ratio precision. Camarilla is best for intraday reversal points.<br>
+            <b style="color:#4dd0e1;">Weekly Range (ATR/VIX):</b> The market is expected to move within ± this many points from the current price over the week. If price hits this boundary, expect a slowdown.
         </div>
     </div>
 
