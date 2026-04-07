@@ -692,17 +692,17 @@ def build_weekly_outlook_tab_html(outlook):
     <div class="tab-panel" id="tab-weekly">
     <style>
         .wo-card{{background:linear-gradient(135deg,rgba(10,14,26,0.96),rgba(13,18,37,0.92));border:1px solid rgba(79,195,247,0.12);border-radius:14px;padding:20px 24px;margin:16px 0;}}
-        .wo-title{{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;color:#4fc3f7;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}}
-        .wo-title svg{{width:16px;height:16px;stroke:#4fc3f7;fill:none;stroke-width:1.5;}}
+        .wo-title{{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:2.5px;color:#00e5ff;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-shadow:0 0 12px rgba(0,229,255,0.3);}}
+        .wo-title svg{{width:18px;height:18px;stroke:#00e5ff;fill:none;stroke-width:1.5;}}
         .wo-scenario{{background:linear-gradient(135deg,rgba(10,14,26,0.98),rgba(8,12,24,0.95));border:1px solid rgba(79,195,247,0.1);border-radius:12px;padding:18px 20px;flex:1;min-width:240px;}}
-        .wo-sc-head{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}}
-        .wo-sc-row{{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(79,195,247,0.06);}}
-        .wo-sc-label{{font-size:12px;color:rgba(176,190,197,0.6);}}
-        .wo-sc-val{{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;}}
+        .wo-sc-head{{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:2px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-shadow:0 0 10px rgba(0,229,255,0.15);}}
+        .wo-sc-row{{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(79,195,247,0.06);}}
+        .wo-sc-label{{font-size:14px;color:rgba(176,190,197,0.7);}}
+        .wo-sc-val{{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}}
         .wo-sc-conf{{padding:6px 0;}}
-        .wo-tbl{{width:100%;border-collapse:collapse;font-size:13px;}}
-        .wo-tbl th{{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:#4fc3f7;text-align:left;padding:8px 10px;border-bottom:1px solid rgba(79,195,247,0.15);text-transform:uppercase;}}
-        .wo-tbl td{{padding:7px 10px;border-bottom:1px solid rgba(79,195,247,0.05);}}
+        .wo-tbl{{width:100%;border-collapse:collapse;font-size:14px;}}
+        .wo-tbl th{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:#00e5ff;text-align:left;padding:10px 12px;border-bottom:1px solid rgba(79,195,247,0.15);text-transform:uppercase;}}
+        .wo-tbl td{{padding:9px 12px;border-bottom:1px solid rgba(79,195,247,0.05);}}
         .wo-tbl tr:hover td{{background:rgba(79,195,247,0.04);}}
         .wo-range-bar{{position:relative;height:40px;background:linear-gradient(90deg,rgba(239,68,68,0.08),rgba(79,195,247,0.04) 50%,rgba(16,185,129,0.08));border-radius:20px;margin:20px 0 30px;border:1px solid rgba(79,195,247,0.1);overflow:visible;}}
         .wo-range-zone{{position:absolute;top:4px;bottom:4px;background:rgba(79,195,247,0.06);border-radius:16px;border:1px dashed rgba(79,195,247,0.15);}}
@@ -710,13 +710,13 @@ def build_weekly_outlook_tab_html(outlook):
         .wo-cp-dot{{width:16px;height:16px;background:#00e5ff;border-radius:50%;box-shadow:0 0 12px rgba(0,229,255,0.5);}}
         .wo-cp-label{{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;color:#00e5ff;white-space:nowrap;letter-spacing:0.5px;}}
         .wo-piv-toggle{{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}}
-        .wo-piv-btn{{padding:4px 14px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1.5px;color:rgba(128,222,234,0.4);background:transparent;border:1px solid rgba(79,195,247,0.15);border-radius:16px;cursor:pointer;transition:all 0.2s;}}
+        .wo-piv-btn{{padding:6px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(128,222,234,0.5);background:transparent;border:1px solid rgba(79,195,247,0.15);border-radius:16px;cursor:pointer;transition:all 0.2s;}}
         .wo-piv-btn:hover{{color:#4fc3f7;border-color:rgba(79,195,247,0.4);}}
         .wo-piv-btn.active{{color:#00e5ff;border-color:rgba(79,195,247,0.6);background:rgba(79,195,247,0.12);box-shadow:0 0 8px rgba(79,195,247,0.1);}}
         .wo-piv-panel{{display:none;}}.wo-piv-panel.active{{display:block;}}
         .wo-stat{{display:inline-flex;flex-direction:column;align-items:center;padding:10px 18px;background:rgba(79,195,247,0.04);border:1px solid rgba(79,195,247,0.08);border-radius:10px;min-width:100px;}}
-        .wo-stat-val{{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#e0f7fa;}}
-        .wo-stat-lbl{{font-size:9px;color:rgba(176,190,197,0.5);margin-top:3px;letter-spacing:0.5px;}}
+        .wo-stat-val{{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e0f7fa;}}
+        .wo-stat-lbl{{font-size:10px;color:rgba(176,190,197,0.65);margin-top:4px;letter-spacing:0.8px;font-weight:500;}}
         @media(max-width:768px){{
             .wo-sc-wrap{{flex-direction:column!important;}}
             .wo-stat{{min-width:70px;padding:8px 12px;}}
@@ -725,8 +725,8 @@ def build_weekly_outlook_tab_html(outlook):
     </style>
 
     <div style="padding:16px 0 8px;">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:rgba(79,195,247,0.5);margin-bottom:6px;">WEEKLY OUTLOOK</div>
-        <div style="font-size:22px;font-weight:700;color:#e0f7fa;">Projected Support &amp; Resistance</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:3px;color:#4fc3f7;margin-bottom:6px;">WEEKLY OUTLOOK</div>
+        <div style="font-size:26px;font-weight:700;color:#e0f7fa;text-shadow:0 0 20px rgba(0,229,255,0.15);">Projected Support &amp; Resistance</div>
         <div style="font-size:12px;color:rgba(176,190,197,0.5);margin-top:4px;">Confluence-based levels from Pivots · Fibonacci · ATR · VIX · OI Walls · SMA</div>
     </div>
 
