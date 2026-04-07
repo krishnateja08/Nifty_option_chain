@@ -7825,6 +7825,9 @@ function mobNavTo(secId, tabId, label) {
             <button class="tab-btn" data-tab="oi-trend" onclick="switchTab('oi-trend')">
                 <span class="tab-dot"></span> &#128202; Intraday OI <span class="tab-badge">IST</span>
             </button>
+            <button class="tab-btn" data-tab="weekly" onclick="switchTab('weekly')">
+                <span class="tab-dot"></span> &#128197; Weekly Outlook <span class="tab-badge">NEW</span>
+            </button>
             <button class="tab-btn new-badge" data-tab="checklist" onclick="switchTab('checklist')">
                 <span class="tab-dot"></span> &#129504; Strategy <span class="tab-badge">NEW</span>
             </button>
