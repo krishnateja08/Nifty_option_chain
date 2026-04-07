@@ -22,7 +22,7 @@ FIX v5: Nifty 50 Heatmap tab added
 FIX v4: Intraday OI Trend tab + oi_log.json persistence
 FIX v3: Holiday-aware expiry logic
 FIX v2: Expiry date now time-aware
-FIX v1: Net OI = CE Δ - PE Δ
+FIX v1: Net OI = PE Δ - CE Δ (positive = bullish)
 """
 from curl_cffi import requests
 import pandas as pd
@@ -1629,7 +1629,7 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
 
     ce_chg  = option_analysis.get('total_ce_oi_change', 0)
     pe_chg  = option_analysis.get('total_pe_oi_change', 0)
-    diff    = ce_chg - pe_chg
+    diff    = pe_chg - ce_chg
     pcr     = round(option_analysis.get('pcr_oi', 0), 2)
     spot    = round(float(technical.get('current_price', 0)), 2)
 
@@ -2134,7 +2134,7 @@ def build_intraday_oi_tab_html():
 
             <div class="oi-chart-wrap" style="margin-bottom:0;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                <div class="oi-chart-label">NET OI DIFF (CE &#916; &#8722; PE &#916;) &mdash; INTRADAY SPARKLINE</div>
+                <div class="oi-chart-label">NET OI DIFF (PE &#916; &#8722; CE &#916;) &mdash; INTRADAY SPARKLINE</div>
                 <div id="oiChartEntries" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(128,222,234,0.8);letter-spacing:1px;"></div>
               </div>
               <!-- Chart: Y-labels + Canvas + Crosshair + Tooltip -->
@@ -2244,7 +2244,7 @@ def build_intraday_oi_tab_html():
           <div class="logic-grid">
             <div class="logic-item"><span class="lc-bear">Call OI +</span> Writers adding calls &#8594; Bearish pressure</div>
             <div class="logic-item"><span class="lc-bull">Put OI +</span> Writers adding puts &#8594; Bullish support</div>
-            <div class="logic-item"><span class="lc-info">DIFF</span> = CE &#916; &#8722; PE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
+            <div class="logic-item"><span class="lc-info">DIFF</span> = PE &#916; &#8722; CE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
             <div class="logic-item"><span class="lc-info">3/5/15 Min · 1 Hr</span> filters raw rows or aggregates into time slots</div>
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
             <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
