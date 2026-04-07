@@ -663,16 +663,24 @@ def build_weekly_outlook_tab_html(outlook):
 
     # Build marker divs
     marker_html = ''
+    label_flip = True  # alternate above/below to avoid overlap
     for ctype, cl in all_clusters:
         pct = to_pct(cl['value'])
         color = '#00e676' if ctype == 'bear' else '#ff5252'  # support=green, resistance=red
         if cl['strength'] == 'STRONG':
-            sz = 12; opacity = 1.0
+            sz = 16; opacity = 1.0
         elif cl['strength'] == 'MODERATE':
-            sz = 9; opacity = 0.7
+            sz = 12; opacity = 0.8
         else:
-            sz = 6; opacity = 0.4
-        marker_html += f'<div style="position:absolute;left:{pct:.1f}%;top:50%;transform:translate(-50%,-50%);width:{sz}px;height:{sz}px;background:{color};border-radius:50%;opacity:{opacity};z-index:2;" title="{fmt(cl["value"])} ({cl["strength"]} — {", ".join(cl["labels"][:3])})"></div>'
+            sz = 8; opacity = 0.5
+        # Dot
+        marker_html += f'<div style="position:absolute;left:{pct:.1f}%;top:50%;transform:translate(-50%,-50%);width:{sz}px;height:{sz}px;background:{color};border-radius:50%;opacity:{opacity};z-index:2;box-shadow:0 0 {sz}px {color}40;" title="{fmt(cl["value"])} ({cl["strength"]} — {", ".join(cl["labels"][:3])})"></div>'
+        # Price label for STRONG and MODERATE dots
+        if cl['strength'] in ('STRONG', 'MODERATE'):
+            lbl_top = '-22px' if label_flip else '38px'
+            lbl_color = color
+            marker_html += f'<div style="position:absolute;left:{pct:.1f}%;top:{lbl_top};transform:translateX(-50%);font-family:\'JetBrains Mono\',monospace;font-size:10px;color:{lbl_color};white-space:nowrap;z-index:3;opacity:0.85;font-weight:600;">{fmt(cl["value"])}</div>'
+            label_flip = not label_flip
 
     # Pivot point table builder
     def pivot_row(label, val, cls=''):
@@ -704,11 +712,11 @@ def build_weekly_outlook_tab_html(outlook):
         .wo-tbl th{{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:#00e5ff;text-align:left;padding:10px 12px;border-bottom:1px solid rgba(79,195,247,0.15);text-transform:uppercase;}}
         .wo-tbl td{{padding:9px 12px;border-bottom:1px solid rgba(79,195,247,0.05);color:#cfd8dc;}}
         .wo-tbl tr:hover td{{background:rgba(79,195,247,0.04);}}
-        .wo-range-bar{{position:relative;height:40px;background:linear-gradient(90deg,rgba(239,68,68,0.08),rgba(79,195,247,0.04) 50%,rgba(16,185,129,0.08));border-radius:20px;margin:20px 0 30px;border:1px solid rgba(79,195,247,0.1);overflow:visible;}}
+        .wo-range-bar{{position:relative;height:50px;background:linear-gradient(90deg,rgba(239,68,68,0.08),rgba(79,195,247,0.04) 50%,rgba(16,185,129,0.08));border-radius:20px;margin:28px 0 40px;border:1px solid rgba(79,195,247,0.1);overflow:visible;}}
         .wo-range-zone{{position:absolute;top:4px;bottom:4px;background:rgba(79,195,247,0.06);border-radius:16px;border:1px dashed rgba(79,195,247,0.15);}}
         .wo-cp-marker{{position:absolute;top:50%;transform:translate(-50%,-50%);z-index:5;}}
-        .wo-cp-dot{{width:16px;height:16px;background:#00e5ff;border-radius:50%;box-shadow:0 0 12px rgba(0,229,255,0.5);}}
-        .wo-cp-label{{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:9px;color:#00e5ff;white-space:nowrap;letter-spacing:0.5px;}}
+        .wo-cp-dot{{width:18px;height:18px;background:#00e5ff;border-radius:50%;box-shadow:0 0 14px rgba(0,229,255,0.6);}}
+        .wo-cp-label{{position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:13px;color:#00e5ff;white-space:nowrap;letter-spacing:0.5px;font-weight:700;}}
         .wo-piv-toggle{{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}}
         .wo-piv-btn{{padding:6px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(128,222,234,0.5);background:transparent;border:1px solid rgba(79,195,247,0.15);border-radius:16px;cursor:pointer;transition:all 0.2s;}}
         .wo-piv-btn:hover{{color:#4fc3f7;border-color:rgba(79,195,247,0.4);}}
@@ -807,7 +815,7 @@ def build_weekly_outlook_tab_html(outlook):
             <span style="color:#ff5252;font-weight:600;">● Resistance</span> &nbsp;
             <span style="color:#00e5ff;font-weight:600;">● Current Price</span>
         </div>
-        <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:11px;color:#90a4ae;margin-bottom:2px;">
+        <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:13px;color:#90a4ae;margin-bottom:4px;font-weight:600;">
             <span>{fmt(bar_min)}</span><span>{fmt(bar_max)}</span>
         </div>
         <div class="wo-range-bar">
