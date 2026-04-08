@@ -5894,7 +5894,7 @@ function filterByInterval(data, mins) {
             // Summing them across snapshots was wrong (5x inflation). Use latest snapshot.
             call_oi_chg:   latest.call_oi_chg || 0,
             put_oi_chg:    latest.put_oi_chg  || 0,
-            diff:          (latest.call_oi_chg||0) - (latest.put_oi_chg||0),
+            diff:          (latest.put_oi_chg||0) - (latest.call_oi_chg||0),
             pcr:           latest.pcr,
             opt_signal:    latest.opt_signal,
             vwap:           latest.vwap,
