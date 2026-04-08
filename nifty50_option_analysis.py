@@ -5672,56 +5672,16 @@ class NiftyHTMLAnalyzer:
                     // First load — just store the current timestamp, don't reload
                     _lastKnownTimestamp = ts;
                 } else if (ts && ts !== _lastKnownTimestamp) {
-                    _lastKnownTimestamp = ts;
+                    // Save scroll position + active tab before reload
                     var activeTab = getActiveTab();
-                    console.log('[AutoRefresh] New data (' + ts + ') — patching changed elements…');
-                    // Fetch new page, diff against current DOM, patch ONLY what changed
-                    fetch(location.href + '?_=' + Date.now(), {cache:'no-store'})
-                        .then(function(r){ return r.text(); })
-                        .then(function(newHtml){
-                            var parser = new DOMParser();
-                            var newDoc = parser.parseFromString(newHtml, 'text/html');
-                            // 1) Patch all elements with IDs — only if content actually differs
-                            var newEls = newDoc.querySelectorAll('[id]');
-                            var patched = 0;
-                            newEls.forEach(function(newEl){
-                                if (!newEl.id || newEl.tagName === 'SCRIPT') return;
-                                var curEl = document.getElementById(newEl.id);
-                                if (!curEl) return;
-                                if (curEl.innerHTML !== newEl.innerHTML) {
-                                    // Brief highlight pulse on changed element
-                                    curEl.innerHTML = newEl.innerHTML;
-                                    curEl.style.transition = 'opacity 0.15s ease';
-                                    curEl.style.opacity = '0.6';
-                                    setTimeout(function(){ curEl.style.opacity = '1'; }, 160);
-                                    patched++;
-                                }
-                                // Sync attributes (class, style, etc.)
-                                for (var i = 0; i < newEl.attributes.length; i++) {
-                                    var attr = newEl.attributes[i];
-                                    if (attr.name !== 'id' && curEl.getAttribute(attr.name) !== attr.value) {
-                                        curEl.setAttribute(attr.name, attr.value);
-                                    }
-                                }
-                            });
-                            // 2) Re-run inline scripts from new page to update any embedded data
-                            var newScripts = newDoc.querySelectorAll('script:not([src])');
-                            newScripts.forEach(function(ns){
-                                var code = ns.textContent || '';
-                                // Only re-run data-embedding scripts (contain JSON/var assignments)
-                                if (code.indexOf('_oiData') > -1 || code.indexOf('renderHeatmap') > -1 ||
-                                    code.indexOf('loadOILog') > -1) {
-                                    try { eval(code); } catch(e){ console.warn('[Patch] script error:', e); }
-                                }
-                            });
-                            // 3) Refresh OI log + heatmap if those tabs are active
-                            if (activeTab === 'oi-trend' && typeof loadOILog === 'function') loadOILog();
-                            if (activeTab === 'heatmap' && typeof renderHeatmap === 'function') renderHeatmap();
-                            console.log('[AutoRefresh] Patched ' + patched + ' elements — no reload needed');
-                        })
-                        .catch(function(err){
-                            console.warn('[AutoRefresh] Patch failed:', err);
-                        });
+                    if (activeTab) sessionStorage.setItem('activeTab', activeTab);
+                    var scrollY = window.scrollY || window.pageYOffset;
+                    sessionStorage.setItem('scrollY', scrollY);
+                    console.log('[AutoRefresh] New data (' + ts + ') — fading out then reloading…');
+                    // Smooth fade-out before reload — no white flash
+                    document.body.style.transition = 'opacity 0.25s ease';
+                    document.body.style.opacity = '0';
+                    setTimeout(function(){ location.reload(); }, 260);
                 }
                 // else: same timestamp → do nothing
             })
@@ -5736,11 +5696,8 @@ class NiftyHTMLAnalyzer:
 
     // ── Restore tab + scroll position after reload ────────────────────────
     (function restoreTabAfterReload() {
-        var wasAutoRefresh = sessionStorage.getItem('autoRefreshing');
         var savedTab = sessionStorage.getItem('activeTab');
         var savedScroll = sessionStorage.getItem('scrollY');
-
-        sessionStorage.removeItem('autoRefreshing');
 
         if (savedTab) {
             sessionStorage.removeItem('activeTab');
@@ -5750,9 +5707,7 @@ class NiftyHTMLAnalyzer:
             sessionStorage.removeItem('scrollY');
             // Restore scroll while page is still hidden (hidden by <head> script)
             window.scrollTo(0, parseInt(savedScroll, 10));
-        }
-        // Fade in after restore (or immediately if not an auto-refresh)
-        if (wasAutoRefresh) {
+            // Wait for browser to apply scroll, then fade in
             requestAnimationFrame(function() {
                 requestAnimationFrame(function() {
                     document.documentElement.style.transition = 'opacity 0.3s ease';
@@ -6952,7 +6907,7 @@ function mobNavTo(secId, tabId, label) {
 """
 
         html = f"""<!DOCTYPE html>
-<html style="background:#04080f;">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7790,7 +7745,7 @@ function mobNavTo(secId, tabId, label) {
     // Instant-hide: if we're restoring from auto-refresh, hide body BEFORE it renders
     // This prevents the flash/jump to top that occurs when JS runs after first paint
     try {{
-        if (sessionStorage.getItem('autoRefreshing')) {{
+        if (sessionStorage.getItem('scrollY')) {{
             document.documentElement.style.opacity = '0';
             document.documentElement.style.overflow = 'hidden';
         }}
