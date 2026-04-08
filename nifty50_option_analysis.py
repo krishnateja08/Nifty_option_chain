@@ -5672,19 +5672,46 @@ class NiftyHTMLAnalyzer:
                     // First load — just store the current timestamp, don't reload
                     _lastKnownTimestamp = ts;
                 } else if (ts && ts !== _lastKnownTimestamp) {
-                    // Save scroll position + active tab before reload
+                    _lastKnownTimestamp = ts;
                     var activeTab = getActiveTab();
-                    if (activeTab) sessionStorage.setItem('activeTab', activeTab);
                     var scrollY = window.scrollY || window.pageYOffset;
-                    sessionStorage.setItem('scrollY', scrollY);
-                    sessionStorage.setItem('autoRefreshing', '1');
-                    console.log('[AutoRefresh] New data (' + ts + ') — fading out then reloading…');
-                    // Smooth fade-out before reload — no white flash
-                    document.body.style.transition = 'opacity 0.25s ease';
-                    document.body.style.opacity = '0';
-                    document.documentElement.style.transition = 'opacity 0.25s ease';
-                    document.documentElement.style.opacity = '0';
-                    setTimeout(function(){ location.reload(); }, 260);
+                    console.log('[AutoRefresh] New data (' + ts + ') — hot-swapping DOM…');
+                    // Fetch the new page and swap body content — NO reload, NO white flash
+                    fetch(location.href + '?_=' + Date.now(), {cache:'no-store'})
+                        .then(function(r){ return r.text(); })
+                        .then(function(newHtml){
+                            var parser = new DOMParser();
+                            var newDoc = parser.parseFromString(newHtml, 'text/html');
+                            // Smooth crossfade
+                            document.body.style.transition = 'opacity 0.2s ease';
+                            document.body.style.opacity = '0';
+                            setTimeout(function(){
+                                // Swap body content
+                                document.body.innerHTML = newDoc.body.innerHTML;
+                                // Copy and execute new scripts
+                                var scripts = document.body.querySelectorAll('script');
+                                scripts.forEach(function(oldS){
+                                    var newS = document.createElement('script');
+                                    if (oldS.src) { newS.src = oldS.src; }
+                                    else { newS.textContent = oldS.textContent; }
+                                    oldS.parentNode.replaceChild(newS, oldS);
+                                });
+                                // Restore tab + scroll
+                                if (activeTab) {
+                                    try { switchTab(activeTab); } catch(e){}
+                                }
+                                window.scrollTo(0, scrollY);
+                                // Fade back in
+                                requestAnimationFrame(function(){
+                                    document.body.style.transition = 'opacity 0.3s ease';
+                                    document.body.style.opacity = '1';
+                                });
+                            }, 220);
+                        })
+                        .catch(function(err){
+                            console.warn('[AutoRefresh] DOM swap failed, falling back to reload:', err);
+                            location.reload();
+                        });
                 }
                 // else: same timestamp → do nothing
             })
