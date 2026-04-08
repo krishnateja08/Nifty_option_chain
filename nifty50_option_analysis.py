@@ -5674,43 +5674,53 @@ class NiftyHTMLAnalyzer:
                 } else if (ts && ts !== _lastKnownTimestamp) {
                     _lastKnownTimestamp = ts;
                     var activeTab = getActiveTab();
-                    var scrollY = window.scrollY || window.pageYOffset;
-                    console.log('[AutoRefresh] New data (' + ts + ') — hot-swapping DOM…');
-                    // Fetch the new page and swap body content — NO reload, NO white flash
+                    console.log('[AutoRefresh] New data (' + ts + ') — patching changed elements…');
+                    // Fetch new page, diff against current DOM, patch ONLY what changed
                     fetch(location.href + '?_=' + Date.now(), {cache:'no-store'})
                         .then(function(r){ return r.text(); })
                         .then(function(newHtml){
                             var parser = new DOMParser();
                             var newDoc = parser.parseFromString(newHtml, 'text/html');
-                            // Smooth crossfade
-                            document.body.style.transition = 'opacity 0.2s ease';
-                            document.body.style.opacity = '0';
-                            setTimeout(function(){
-                                // Swap body content
-                                document.body.innerHTML = newDoc.body.innerHTML;
-                                // Copy and execute new scripts
-                                var scripts = document.body.querySelectorAll('script');
-                                scripts.forEach(function(oldS){
-                                    var newS = document.createElement('script');
-                                    if (oldS.src) { newS.src = oldS.src; }
-                                    else { newS.textContent = oldS.textContent; }
-                                    oldS.parentNode.replaceChild(newS, oldS);
-                                });
-                                // Restore tab + scroll
-                                if (activeTab) {
-                                    try { switchTab(activeTab); } catch(e){}
+                            // 1) Patch all elements with IDs — only if content actually differs
+                            var newEls = newDoc.querySelectorAll('[id]');
+                            var patched = 0;
+                            newEls.forEach(function(newEl){
+                                if (!newEl.id || newEl.tagName === 'SCRIPT') return;
+                                var curEl = document.getElementById(newEl.id);
+                                if (!curEl) return;
+                                if (curEl.innerHTML !== newEl.innerHTML) {
+                                    // Brief highlight pulse on changed element
+                                    curEl.innerHTML = newEl.innerHTML;
+                                    curEl.style.transition = 'opacity 0.15s ease';
+                                    curEl.style.opacity = '0.6';
+                                    setTimeout(function(){ curEl.style.opacity = '1'; }, 160);
+                                    patched++;
                                 }
-                                window.scrollTo(0, scrollY);
-                                // Fade back in
-                                requestAnimationFrame(function(){
-                                    document.body.style.transition = 'opacity 0.3s ease';
-                                    document.body.style.opacity = '1';
-                                });
-                            }, 220);
+                                // Sync attributes (class, style, etc.)
+                                for (var i = 0; i < newEl.attributes.length; i++) {
+                                    var attr = newEl.attributes[i];
+                                    if (attr.name !== 'id' && curEl.getAttribute(attr.name) !== attr.value) {
+                                        curEl.setAttribute(attr.name, attr.value);
+                                    }
+                                }
+                            });
+                            // 2) Re-run inline scripts from new page to update any embedded data
+                            var newScripts = newDoc.querySelectorAll('script:not([src])');
+                            newScripts.forEach(function(ns){
+                                var code = ns.textContent || '';
+                                // Only re-run data-embedding scripts (contain JSON/var assignments)
+                                if (code.indexOf('_oiData') > -1 || code.indexOf('renderHeatmap') > -1 ||
+                                    code.indexOf('loadOILog') > -1) {
+                                    try { eval(code); } catch(e){ console.warn('[Patch] script error:', e); }
+                                }
+                            });
+                            // 3) Refresh OI log + heatmap if those tabs are active
+                            if (activeTab === 'oi-trend' && typeof loadOILog === 'function') loadOILog();
+                            if (activeTab === 'heatmap' && typeof renderHeatmap === 'function') renderHeatmap();
+                            console.log('[AutoRefresh] Patched ' + patched + ' elements — no reload needed');
                         })
                         .catch(function(err){
-                            console.warn('[AutoRefresh] DOM swap failed, falling back to reload:', err);
-                            location.reload();
+                            console.warn('[AutoRefresh] Patch failed:', err);
                         });
                 }
                 // else: same timestamp → do nothing
