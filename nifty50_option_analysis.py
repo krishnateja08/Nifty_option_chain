@@ -5677,10 +5677,13 @@ class NiftyHTMLAnalyzer:
                     if (activeTab) sessionStorage.setItem('activeTab', activeTab);
                     var scrollY = window.scrollY || window.pageYOffset;
                     sessionStorage.setItem('scrollY', scrollY);
+                    sessionStorage.setItem('autoRefreshing', '1');
                     console.log('[AutoRefresh] New data (' + ts + ') — fading out then reloading…');
                     // Smooth fade-out before reload — no white flash
                     document.body.style.transition = 'opacity 0.25s ease';
                     document.body.style.opacity = '0';
+                    document.documentElement.style.transition = 'opacity 0.25s ease';
+                    document.documentElement.style.opacity = '0';
                     setTimeout(function(){ location.reload(); }, 260);
                 }
                 // else: same timestamp → do nothing
@@ -5696,8 +5699,11 @@ class NiftyHTMLAnalyzer:
 
     // ── Restore tab + scroll position after reload ────────────────────────
     (function restoreTabAfterReload() {
+        var wasAutoRefresh = sessionStorage.getItem('autoRefreshing');
         var savedTab = sessionStorage.getItem('activeTab');
         var savedScroll = sessionStorage.getItem('scrollY');
+
+        sessionStorage.removeItem('autoRefreshing');
 
         if (savedTab) {
             sessionStorage.removeItem('activeTab');
@@ -5707,7 +5713,9 @@ class NiftyHTMLAnalyzer:
             sessionStorage.removeItem('scrollY');
             // Restore scroll while page is still hidden (hidden by <head> script)
             window.scrollTo(0, parseInt(savedScroll, 10));
-            // Wait for browser to apply scroll, then fade in
+        }
+        // Fade in after restore (or immediately if not an auto-refresh)
+        if (wasAutoRefresh) {
             requestAnimationFrame(function() {
                 requestAnimationFrame(function() {
                     document.documentElement.style.transition = 'opacity 0.3s ease';
@@ -6907,7 +6915,7 @@ function mobNavTo(secId, tabId, label) {
 """
 
         html = f"""<!DOCTYPE html>
-<html>
+<html style="background:#04080f;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7745,7 +7753,7 @@ function mobNavTo(secId, tabId, label) {
     // Instant-hide: if we're restoring from auto-refresh, hide body BEFORE it renders
     // This prevents the flash/jump to top that occurs when JS runs after first paint
     try {{
-        if (sessionStorage.getItem('scrollY')) {{
+        if (sessionStorage.getItem('autoRefreshing')) {{
             document.documentElement.style.opacity = '0';
             document.documentElement.style.overflow = 'hidden';
         }}
