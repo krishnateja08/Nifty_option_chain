@@ -2555,38 +2555,50 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     vwap_signal = "BUY" if spot_above_vwap else "SELL"
 
     # ── Nifty 50 % move from previous day's close ──
+    # Use NSE API directly — yfinance ^NSEI is unreliable for Indian indices
     nifty_move_pct = None
     try:
-        import yfinance as _yf
-        _nsei = _yf.Ticker("^NSEI")
+        _nse_prev_close = None
 
-        # Method 1: fast_info previousClose (most reliable, no date ambiguity)
-        _prev_close = None
+        # Method 1: NSE equity-stockIndices API (most accurate)
         try:
-            _prev_close = float(_nsei.fast_info.get('previous_close', 0) or 0)
-            if _prev_close > 0:
-                print(f"  ✅ Prev close via fast_info: {_prev_close}")
-        except Exception:
-            _prev_close = None
+            _nse_session = requests.Session()
+            _nse_headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "application/json",
+                "Referer": "https://www.nseindia.com/",
+            }
+            _nse_session.get("https://www.nseindia.com/", headers=_nse_headers, impersonate="chrome", timeout=10)
+            time.sleep(1)
+            _idx_resp = _nse_session.get(
+                "https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%2050",
+                headers=_nse_headers, impersonate="chrome", timeout=10
+            )
+            if _idx_resp.status_code == 200:
+                _idx_data = _idx_resp.json()
+                for _item in _idx_data.get('data', []):
+                    if _item.get('symbol') == 'NIFTY 50':
+                        _nse_prev_close = float(_item.get('previousClose', 0))
+                        if _nse_prev_close > 0:
+                            print(f"  ✅ Prev close via NSE API: {_nse_prev_close}")
+                        break
+        except Exception as _e:
+            print(f"  ⚠️  NSE API prev close failed: {_e}")
 
-        # Method 2: fallback to daily history — find last COMPLETED trading day
-        if not _prev_close or _prev_close <= 0:
-            _df_daily = _nsei.history(period="10d", interval="1d")
-            if _df_daily is not None and len(_df_daily) >= 2:
-                _today_date = ist_now.date()
-                # Filter out today's (potentially incomplete) bar
-                _completed = _df_daily[_df_daily.index.date < _today_date]
-                if len(_completed) >= 1:
-                    _prev_close = float(_completed['Close'].iloc[-1])
-                    print(f"  ✅ Prev close via history filter: {_prev_close} ({_completed.index[-1].date()})")
-                else:
-                    # All bars might be from today — use iloc[-2] as last resort
-                    _prev_close = float(_df_daily['Close'].iloc[-2])
-                    print(f"  ⚠️  Prev close via iloc[-2] fallback: {_prev_close}")
+        # Method 2: yfinance fallback
+        if not _nse_prev_close or _nse_prev_close <= 0:
+            import yfinance as _yf
+            _nsei = _yf.Ticker("^NSEI")
+            try:
+                _nse_prev_close = float(_nsei.fast_info.get('previous_close', 0) or 0)
+                if _nse_prev_close > 0:
+                    print(f"  ⚠️  Prev close via yfinance fallback: {_nse_prev_close}")
+            except Exception:
+                pass
 
-        if _prev_close and _prev_close > 0:
-            nifty_move_pct = round((spot - _prev_close) / _prev_close * 100, 2)
-            print(f"  ✅ Nifty Move %: {nifty_move_pct:+.2f}% (Spot={spot}, Prev Close={_prev_close})")
+        if _nse_prev_close and _nse_prev_close > 0:
+            nifty_move_pct = round((spot - _nse_prev_close) / _nse_prev_close * 100, 2)
+            print(f"  ✅ Nifty Move %: {nifty_move_pct:+.2f}% (Spot={spot}, Prev Close={_nse_prev_close})")
         else:
             print(f"  ⚠️  Nifty move %: could not determine prev close")
     except Exception as e:
