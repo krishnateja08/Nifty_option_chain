@@ -2676,10 +2676,12 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     ema13_val  = None
     try:
         import yfinance as _yf
-        # Use NIFTYBEES.NS (Nifty ETF) — ^NSEI is unreliable on yfinance
-        # NIFTYBEES tracks Nifty 1:1, RSI/EMA signals are identical
-        df_15 = _yf.Ticker("NIFTYBEES.NS").history(period="5d", interval="15m")
+        # Use yf.download() — yf.Ticker("^NSEI").history() mangles the symbol
+        df_15 = _yf.download("^NSEI", period="5d", interval="15m", progress=False, auto_adjust=True)
         if df_15 is not None and len(df_15) >= 20:
+            # yf.download may return MultiIndex columns — flatten if needed
+            if isinstance(df_15.columns, pd.MultiIndex):
+                df_15.columns = df_15.columns.get_level_values(0)
             close = df_15['Close'].dropna()
             # ── RSI 14 ──────────────────────────────────────────────────
             delta  = close.diff()
@@ -2695,7 +2697,7 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
             ema13_val = round(float(ema13.iloc[-1]), 2) if not pd.isna(ema13.iloc[-1]) else None
             if ema5_val and ema13_val:
                 ema_signal = "BUY" if ema5_val > ema13_val else "SELL"
-            print(f"  ✅ RSI 15m: {rsi_15m} | EMA5: {ema5_val} EMA13: {ema13_val} → {ema_signal} (via NIFTYBEES)")
+            print(f"  ✅ RSI 15m: {rsi_15m} | EMA5: {ema5_val} EMA13: {ema13_val} → {ema_signal}")
         else:
             print(f"  ⚠️  RSI/EMA: insufficient 15m bars ({len(df_15) if df_15 is not None else 0})")
     except Exception as e:
