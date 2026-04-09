@@ -6538,14 +6538,13 @@ function renderNiftyLiveFeed(filtered) {
         }
 
         // Streak
+        // Streak — count from full filtered data, not just visible entries
         var sCount = 1;
         var curSig = (row.opt_signal || '').toUpperCase();
-        for (var si = idx + 1; si < entries.length; si++) {
-            if ((entries[si].opt_signal || '').toUpperCase() === curSig) sCount++;
+        for (var si = idx + 1; si < filtered.length; si++) {
+            if ((filtered[si].opt_signal || '').toUpperCase() === curSig) sCount++;
             else break;
         }
-        // Add total streak from full filtered data for first entry
-        if (idx === 0) sCount = streakCount;
 
         // RSI
         var rsiVal = row.rsi_15m;
