@@ -2547,7 +2547,7 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
         import yfinance as _yf
         # Try Nifty near-month futures first, then NIFTYBEES ETF × calibration
         _fut_fetched = False
-        for _fut_sym in ("0NIFTY.NS", "NIFTYBEES.NS"):
+        for _fut_sym in ("^NSEI", "NIFTYBEES.NS"):
             try:
                 _fut_df = _yf.Ticker(_fut_sym).history(period="1d", interval="1m")
                 if _fut_df is not None and not _fut_df.empty:
