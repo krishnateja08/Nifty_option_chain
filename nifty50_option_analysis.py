@@ -2506,14 +2506,8 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
             if len(_recent_spots) >= 5:
                 # Compute consecutive deltas: spots[0]-spots[1], spots[1]-spots[2], ...
                 _deltas = [_recent_spots[i] - _recent_spots[i+1] for i in range(len(_recent_spots)-1)]
-                # FIX v8: Use 3-of-4 instead of all-4 to allow one dip/spike in a trend.
-                # Also require only 2-of-4 for soft NEUTRAL override (catches partial recoveries).
-                _up_count   = sum(1 for d in _deltas[:4] if d > 0)
-                _down_count = sum(1 for d in _deltas[:4] if d < 0)
-                _consec_up   = _up_count >= 3   # 3 of 4 rising (was: all 4)
-                _consec_down = _down_count >= 3  # 3 of 4 falling (was: all 4)
-                _partial_up   = _up_count >= 2   # for soft NEUTRAL override
-                _partial_down = _down_count >= 2
+                _consec_up   = all(d > 0 for d in _deltas[:4])
+                _consec_down = all(d < 0 for d in _deltas[:4])
 
                 # Compute move % from 6-reading low/high
                 _low6  = min(_recent_spots)
@@ -2521,67 +2515,32 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                 _up_pct   = ((spot - _low6) / _low6 * 100) if _low6 > 0 else 0
                 _down_pct = ((_high6 - spot) / _high6 * 100) if _high6 > 0 else 0
 
-                # Also compute absolute move in points for a floor check (avoid noise at low % moves)
-                _up_pts   = spot - _low6
-                _down_pts = _high6 - spot
-
                 # Override: Price rising but signal is SELL
-                # FIX v8: Lowered thresholds from 0.5%/0.25% → 0.3%/0.15%
-                # Also added absolute pts floor (50 pts) so tiny % moves on a high index don't trigger.
+                # FIX v6: Lowered thresholds from 1.0%/0.5% → 0.5%/0.25%
+                # At Nifty ~22700, old 1.0% = 227 pts — too slow to catch V-shaped reversals.
                 if _consec_up and opt_signal in ("SELL", "STRONG SELL"):
-                    if _up_pct > 0.3 and _up_pts > 50:
+                    if _up_pct > 0.5:
                         opt_signal = "BUY"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → BUY "
-                              f"(3+ of 4 ▲ deltas, +{_up_pct:.2f}% / +{_up_pts:.0f}pts from 6-reading low)")
-                    elif _up_pct > 0.15 and _up_pts > 25:
+                              f"(4 consecutive ▲ deltas, +{_up_pct:.2f}% from 6-reading low)")
+                    elif _up_pct > 0.25:
                         opt_signal = "NEUTRAL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → NEUTRAL "
-                              f"(3+ of 4 ▲ deltas, +{_up_pct:.2f}% / +{_up_pts:.0f}pts from 6-reading low)")
-                elif _partial_up and not _consec_up and opt_signal == "STRONG SELL":
-                    # Partial recovery (2 of 4 up): at minimum soften STRONG SELL → SELL
-                    if _up_pct > 0.15 and _up_pts > 25:
-                        opt_signal = "SELL"
-                        print(f"  ⚡ MOMENTUM SOFTEN: STRONG SELL → SELL "
-                              f"(2 of 4 ▲ deltas, +{_up_pct:.2f}% / +{_up_pts:.0f}pts)")
+                              f"(4 consecutive ▲ deltas, +{_up_pct:.2f}% from 6-reading low)")
 
                 # Override: Price falling but signal is BUY
                 elif _consec_down and opt_signal in ("BUY", "STRONG BUY"):
-                    if _down_pct > 0.3 and _down_pts > 50:
+                    if _down_pct > 0.5:
                         opt_signal = "SELL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → SELL "
-                              f"(3+ of 4 ▼ deltas, -{_down_pct:.2f}% / -{_down_pts:.0f}pts from 6-reading high)")
-                    elif _down_pct > 0.15 and _down_pts > 25:
+                              f"(4 consecutive ▼ deltas, -{_down_pct:.2f}% from 6-reading high)")
+                    elif _down_pct > 0.25:
                         opt_signal = "NEUTRAL"
                         print(f"  ⚡ MOMENTUM OVERRIDE: {_oi_signal_before_override} → NEUTRAL "
-                              f"(3+ of 4 ▼ deltas, -{_down_pct:.2f}% / -{_down_pts:.0f}pts from 6-reading high)")
-                elif _partial_down and not _consec_down and opt_signal == "STRONG BUY":
-                    if _down_pct > 0.15 and _down_pts > 25:
-                        opt_signal = "BUY"
-                        print(f"  ⚡ MOMENTUM SOFTEN: STRONG BUY → BUY "
-                              f"(2 of 4 ▼ deltas, -{_down_pct:.2f}% / -{_down_pts:.0f}pts)")
+                              f"(4 consecutive ▼ deltas, -{_down_pct:.2f}% from 6-reading high)")
 
     except Exception as _e:
         print(f"  ⚠️  Momentum override check failed: {_e} — using OI signal as-is")
-
-    # ══ DAY-MOVE SIGNAL CAP ═══════════════════════════════════════════════════
-    # FIX v8: If the market has moved significantly from VWAP in the opposite
-    # direction to the OI signal, cap STRONG signals to regular signals.
-    # Rationale: A STRONG SELL when price is +0.5% above VWAP is misleading —
-    # OI may still be bearish structurally but price action contradicts strength.
-    # ═════════════════════════════════════════════════════════════════════════
-    try:
-        if vwap and vwap > 0:
-            vwap_dev_pct = (spot - vwap) / vwap * 100   # positive = spot above VWAP
-            if opt_signal == "STRONG SELL" and vwap_dev_pct > 0.2:
-                opt_signal = "SELL"
-                print(f"  ⚡ DAY-MOVE CAP: STRONG SELL → SELL "
-                      f"(spot {vwap_dev_pct:+.2f}% above VWAP — price contradicts strong bearish)")
-            elif opt_signal == "STRONG BUY" and vwap_dev_pct < -0.2:
-                opt_signal = "BUY"
-                print(f"  ⚡ DAY-MOVE CAP: STRONG BUY → BUY "
-                      f"(spot {vwap_dev_pct:+.2f}% below VWAP — price contradicts strong bullish)")
-    except Exception as _dmc_e:
-        print(f"  ⚠️  Day-move cap check failed: {_dmc_e}")
 
     fut_price = round(spot - 25, 2)
     try:
@@ -5795,29 +5754,47 @@ class NiftyHTMLAnalyzer:
     pollForUpdate();   // run once immediately on page load to capture baseline timestamp
 
     // ── Restore tab + scroll position after reload ────────────────────────
+    // FIX: Do NOT fade in here. Stay hidden (opacity:0 set by <head> script)
+    // until loadOILog() finishes rendering the table. This prevents the scroll
+    // jump caused by table rows being inserted AFTER the page was already visible.
     (function restoreTabAfterReload() {
-        var savedTab = sessionStorage.getItem('activeTab');
+        var savedTab    = sessionStorage.getItem('activeTab');
         var savedScroll = sessionStorage.getItem('scrollY');
 
-        if (savedTab) {
-            sessionStorage.removeItem('activeTab');
-            setTimeout(function() { switchTab(savedTab); }, 50);
-        }
+        if (!savedScroll && !savedTab) return;   // normal first load — nothing to restore
+
         if (savedScroll) {
+            window._pendingScrollY = parseInt(savedScroll, 10);
             sessionStorage.removeItem('scrollY');
-            // Restore scroll while page is still hidden (hidden by <head> script)
-            window.scrollTo(0, parseInt(savedScroll, 10));
-            // Wait for browser to apply scroll, then fade in
-            requestAnimationFrame(function() {
-                requestAnimationFrame(function() {
-                    document.documentElement.style.transition = 'opacity 0.3s ease';
-                    document.documentElement.style.opacity = '1';
-                    document.documentElement.style.overflow = '';
-                    document.body.style.opacity = '1';
-                });
-            });
         }
+        if (savedTab) {
+            window._pendingTab = savedTab;
+            sessionStorage.removeItem('activeTab');
+            try { switchTab(savedTab); } catch(e) {}
+        }
+
+        // Safety net: if loadOILog never calls back within 3s, force reveal anyway
+        window._revealTimer = setTimeout(function() {
+            _revealPage(window._pendingScrollY || 0);
+        }, 3000);
     })();
+
+    // Central reveal — called by loadOILog AFTER table rows are in DOM
+    function _revealPage(scrollY) {
+        if (window._revealDone) return;
+        window._revealDone = true;
+        clearTimeout(window._revealTimer);
+        if (scrollY) window.scrollTo(0, scrollY);
+        requestAnimationFrame(function() {
+            if (scrollY) window.scrollTo(0, scrollY);   // re-apply after layout
+            requestAnimationFrame(function() {
+                document.documentElement.style.transition = 'opacity 0.25s ease';
+                document.documentElement.style.opacity    = '1';
+                document.documentElement.style.overflow   = '';
+                document.body.style.opacity = '1';
+            });
+        });
+    }
 })();
 
 function switchTab(tab) {
@@ -6420,50 +6397,23 @@ function renderOITable(data) {
 
                     if (cTotal === 0) {
                         cLabel = '—'; cColor = 'rgba(176,190,197,0.3)'; cBg = 'transparent'; cBdr = 'transparent'; cIcon = ''; cStrength = '';
-                    } else {
-                        // ── FIX v8: Add intraday spot momentum as 6th signal ──
-                        // If price has risen > 30 pts in the last 3 rows, count as a bullish signal.
-                        // If price has fallen > 30 pts in the last 3 rows, count as a bearish signal.
-                        // This prevents STRONG SELL when price is actively bouncing.
-                        var cMomRef = null;
-                        for (var cmi = 2; cmi <= 3; cmi++) {
-                            if (filtered[idx + cmi] && filtered[idx + cmi].spot_price) {
-                                cMomRef = filtered[idx + cmi].spot_price; break;
-                            }
-                        }
-                        if (cMomRef && row.spot_price) {
-                            cTotal++;
-                            var cMomDelta = row.spot_price - cMomRef;
-                            if (cMomDelta > 30)        cBuy++;    // rising >30 pts = bullish momentum
-                            else if (cMomDelta < -30)  cSell++;   // falling >30 pts = bearish momentum
-                            // flat (-30 to +30): neither — momentum is not contributing
-                        }
-
-                        var cScore = cBuy > cSell ? cBuy : cSell;
-                        var cDir = cBuy > cSell ? 'BUY' : (cSell > cBuy ? 'SELL' : 'MIXED');
-
-                        if (cScore >= 4) {
-                            cStrength = 'STRONG';
-                            if (cDir === 'BUY') {
-                                cLabel = cScore + '/' + cTotal; cColor = '#00e676'; cBg = 'rgba(0,230,118,0.18)'; cBdr = 'rgba(0,230,118,0.45)'; cIcon = '▲';
-                            } else if (cDir === 'SELL') {
-                                cLabel = cScore + '/' + cTotal; cColor = '#ff4757'; cBg = 'rgba(255,71,87,0.18)'; cBdr = 'rgba(255,71,87,0.45)'; cIcon = '▼';
-                            } else {
-                                cStrength = 'MIXED'; cLabel = cScore + '/' + cTotal; cColor = '#ffb74d'; cBg = 'rgba(255,183,77,0.10)'; cBdr = 'rgba(255,183,77,0.3)'; cIcon = '~';
-                            }
-                        } else if (cScore >= 3) {
-                            cStrength = cDir;
-                            if (cDir === 'BUY') {
-                                cLabel = cScore + '/' + cTotal; cColor = '#69f0ae'; cBg = 'rgba(105,240,174,0.12)'; cBdr = 'rgba(105,240,174,0.3)'; cIcon = '▲';
-                            } else if (cDir === 'SELL') {
-                                cLabel = cScore + '/' + cTotal; cColor = '#fca5a5'; cBg = 'rgba(252,165,165,0.12)'; cBdr = 'rgba(252,165,165,0.3)'; cIcon = '▼';
-                            } else {
-                                cStrength = 'MIXED'; cLabel = cScore + '/' + cTotal; cColor = '#ffb74d'; cBg = 'rgba(255,183,77,0.08)'; cBdr = 'rgba(255,183,77,0.2)'; cIcon = '~';
-                            }
+                    } else if (cScore >= 4) {
+                        cStrength = 'STRONG';
+                        if (cDir === 'BUY') {
+                            cLabel = cScore + '/' + cTotal; cColor = '#00e676'; cBg = 'rgba(0,230,118,0.18)'; cBdr = 'rgba(0,230,118,0.45)'; cIcon = '▲';
                         } else {
-                            cStrength = 'WEAK';
-                            cLabel = cScore + '/' + cTotal; cColor = '#ffb74d'; cBg = 'rgba(255,183,77,0.08)'; cBdr = 'rgba(255,183,77,0.2)'; cIcon = '~';
+                            cLabel = cScore + '/' + cTotal; cColor = '#ff4757'; cBg = 'rgba(255,71,87,0.18)'; cBdr = 'rgba(255,71,87,0.45)'; cIcon = '▼';
                         }
+                    } else if (cScore >= 3) {
+                        cStrength = cDir;
+                        if (cDir === 'BUY') {
+                            cLabel = cScore + '/' + cTotal; cColor = '#69f0ae'; cBg = 'rgba(105,240,174,0.12)'; cBdr = 'rgba(105,240,174,0.3)'; cIcon = '▲';
+                        } else {
+                            cLabel = cScore + '/' + cTotal; cColor = '#fca5a5'; cBg = 'rgba(252,165,165,0.12)'; cBdr = 'rgba(252,165,165,0.3)'; cIcon = '▼';
+                        }
+                    } else {
+                        cStrength = 'WEAK';
+                        cLabel = cScore + '/' + cTotal; cColor = '#ffb74d'; cBg = 'rgba(255,183,77,0.08)'; cBdr = 'rgba(255,183,77,0.2)'; cIcon = '~';
                     }
 
                     // Time-of-day noise warning overrides strength display
@@ -6992,10 +6942,14 @@ function loadOILog() {
                 var el  = document.getElementById('oiLastFetch');
                 if (el) el.textContent = 'Last fetch: ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0') + ' IST';
             }
+            // FIX: Reveal page AFTER table rows are in DOM so scroll restore
+            // happens after content shift. No-op on normal (non-reload) loads.
+            if (typeof _revealPage === 'function') _revealPage(window._pendingScrollY || 0);
         })
         .catch(function(e) {
             var tbody = document.getElementById('oiTableBody');
             if (tbody) tbody.innerHTML = '<tr><td colspan="15" class="oi-empty-state">&#9888; Could not load oi_log.json</td></tr>';
+            if (typeof _revealPage === 'function') _revealPage(window._pendingScrollY || 0);
         });
 }
 
