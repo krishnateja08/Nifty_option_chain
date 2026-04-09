@@ -6151,8 +6151,25 @@ function renderOITable(data) {
                 } else {
                     arrow = '▼'; cls = 'oi-nifty-dn-weak';
                 }
-                niftyMovePctHtml = '<span class="oi-nifty-move ' + cls + '">'
-                    + arrow + ' ' + sign + nmp.toFixed(2) + '%</span>';
+                // Diff vs previous candle
+                var nmpPrev = (filtered[idx + 1] && filtered[idx + 1].nifty_move_pct != null) ? filtered[idx + 1].nifty_move_pct : null;
+                var nmpDiffHtml = '';
+                if (nmpPrev !== null) {
+                    var nmpDiff = Math.round((nmp - nmpPrev) * 100) / 100;
+                    if (Math.abs(nmpDiff) < 0.005) {
+                        nmpDiffHtml = '<div style="font-size:10px;color:rgba(176,190,197,0.4);font-family:monospace;margin-top:2px;">= 0.00</div>';
+                    } else {
+                        var ndArrow = nmpDiff > 0 ? '▲' : '▼';
+                        var ndColor = nmpDiff > 0 ? '#00e676' : '#ff4757';
+                        var ndSign  = nmpDiff > 0 ? '+' : '';
+                        nmpDiffHtml = '<div style="font-size:10px;color:' + ndColor + ';font-family:monospace;font-weight:600;margin-top:2px;">'
+                            + ndArrow + ' ' + ndSign + nmpDiff.toFixed(2) + '</div>';
+                    }
+                }
+                niftyMovePctHtml = '<div style="display:flex;flex-direction:column;align-items:center;">'
+                    + '<span class="oi-nifty-move ' + cls + '">'
+                    + arrow + ' ' + sign + nmp.toFixed(2) + '%</span>'
+                    + nmpDiffHtml + '</div>';
             }
 
             // ── Signal Streak — Intensity Badge ──
