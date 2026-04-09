@@ -2331,11 +2331,29 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
                     # This locks calibration for the day, letting VWAP move independently.
                     nifty_approx_open = spot  # fallback
                     try:
-                        df_nifty_1d = _yf.Ticker("^NSEI").history(period="1d", interval="1d")
-                        if not df_nifty_1d.empty:
-                            nifty_approx_open = float(df_nifty_1d['Open'].iloc[-1])
-                    except Exception:
-                        pass
+                        # Use NSE API for today's open — yfinance ^NSEI is unreliable
+                        _vwap_session = requests.Session()
+                        _vwap_headers = {
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                            "Accept": "application/json",
+                            "Referer": "https://www.nseindia.com/",
+                        }
+                        _vwap_session.get("https://www.nseindia.com/", headers=_vwap_headers, impersonate="chrome", timeout=10)
+                        time.sleep(0.5)
+                        _vwap_resp = _vwap_session.get(
+                            "https://www.nseindia.com/api/equity-stockIndices?index=NIFTY%2050",
+                            headers=_vwap_headers, impersonate="chrome", timeout=10
+                        )
+                        if _vwap_resp.status_code == 200:
+                            for _vi in _vwap_resp.json().get('data', []):
+                                if _vi.get('symbol') == 'NIFTY 50':
+                                    _nse_open = float(_vi.get('open', 0))
+                                    if _nse_open > 0:
+                                        nifty_approx_open = _nse_open
+                                        print(f"  ✅ Nifty day open via NSE API: {nifty_approx_open}")
+                                    break
+                    except Exception as _ve:
+                        print(f"  ⚠️  NSE API open fetch failed: {_ve} — using spot as fallback")
                     calibration = nifty_approx_open / first_etf_open
                     vwap = round(float(last_vwap) * calibration, 2)
                     print(f"  ✅ VWAP (NIFTYBEES × {calibration:.4f} day-open locked): {vwap}")
@@ -2658,7 +2676,9 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
     ema13_val  = None
     try:
         import yfinance as _yf
-        df_15 = _yf.Ticker("^NSEI").history(period="5d", interval="15m")
+        # Use NIFTYBEES.NS (Nifty ETF) — ^NSEI is unreliable on yfinance
+        # NIFTYBEES tracks Nifty 1:1, RSI/EMA signals are identical
+        df_15 = _yf.Ticker("NIFTYBEES.NS").history(period="5d", interval="15m")
         if df_15 is not None and len(df_15) >= 20:
             close = df_15['Close'].dropna()
             # ── RSI 14 ──────────────────────────────────────────────────
@@ -2675,7 +2695,7 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
             ema13_val = round(float(ema13.iloc[-1]), 2) if not pd.isna(ema13.iloc[-1]) else None
             if ema5_val and ema13_val:
                 ema_signal = "BUY" if ema5_val > ema13_val else "SELL"
-            print(f"  ✅ RSI 15m: {rsi_15m} | EMA5: {ema5_val} EMA13: {ema13_val} → {ema_signal}")
+            print(f"  ✅ RSI 15m: {rsi_15m} | EMA5: {ema5_val} EMA13: {ema13_val} → {ema_signal} (via NIFTYBEES)")
         else:
             print(f"  ⚠️  RSI/EMA: insufficient 15m bars ({len(df_15) if df_15 is not None else 0})")
     except Exception as e:
