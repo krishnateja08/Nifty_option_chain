@@ -2861,13 +2861,13 @@ def build_intraday_oi_tab_html():
               <!-- Table Header -->
               <div class="nlf-thead">
                 <span class="nlf-th" style="text-align:left;">TIME</span>
-                <span class="nlf-th">SPOT</span>
+                <span class="nlf-th" style="text-align:center;">PCR</span>
                 <span class="nlf-th" style="text-align:right;">&#916;</span>
-                <span class="nlf-th" style="text-align:right;">NIFTY%</span>
                 <span class="nlf-th" style="text-align:center;">VWAP</span>
-                <span class="nlf-th" style="text-align:right;">NET OI</span>
-                <span class="nlf-th" style="text-align:right;">STK</span>
+                <span class="nlf-th" style="text-align:center;">STK</span>
+                <span class="nlf-th" style="text-align:center;">LEVEL</span>
                 <span class="nlf-th" style="text-align:right;">RSI</span>
+                <span class="nlf-th" style="text-align:center;">CONF</span>
               </div>
               <!-- Table Body (populated by JS) -->
               <div id="nlfBody" class="nlf-tbody"></div>
@@ -6559,15 +6559,56 @@ function renderNiftyLiveFeed(filtered) {
             rsiHtml = rsiVal.toFixed(1);
         }
 
+        // PCR
+        var pcrV = parseFloat(row.pcr) || 0;
+        var pcrColor = pcrV >= 1.1 ? '#00e676' : pcrV <= 0.9 ? '#ff4757' : '#ffb74d';
+        var pcrHtml = row.pcr ? '<span style="color:' + pcrColor + ';">' + row.pcr + '</span>' : '<span style="color:rgba(176,190,197,0.25);">—</span>';
+
+        // Nearest Level
+        var isBuy = (row.opt_signal||'').toUpperCase().indexOf('BUY') >= 0;
+        var isSell = (row.opt_signal||'').toUpperCase().indexOf('SELL') >= 0;
+        var nlabel = row.nearest_label || (isBuy ? 'R1' : isSell ? 'S1' : '—');
+        var nval = row.nearest_level ? '₹' + Number(row.nearest_level).toLocaleString('en-IN') : '';
+        var levelHtml;
+        if (row.nearest_level) {
+            var lColor = isBuy ? '#00e676' : '#ff4757';
+            levelHtml = '<span style="color:' + lColor + ';font-size:10px;font-weight:800;">' + nlabel + '</span><br><span style="color:' + lColor + ';font-size:11px;">' + nval + '</span>';
+        } else {
+            levelHtml = '<span style="color:rgba(176,190,197,0.25);">—</span>';
+        }
+
+        // Confluence
+        var cBuy = 0, cSell = 0, cTotal = 0;
+        if (pcrV > 0) { cTotal++; if (pcrV > 1.0) cBuy++; else if (pcrV < 0.9) cSell++; }
+        var oiSig = (row.opt_signal||'').toUpperCase();
+        if (oiSig.indexOf('BUY') >= 0) { cTotal++; cBuy++; } else if (oiSig.indexOf('SELL') >= 0) { cTotal++; cSell++; } else if (oiSig === 'NEUTRAL') { cTotal++; }
+        var cVwap = row.vwap; var cSpot = row.spot_price || 0;
+        if (cVwap && cVwap > 0 && cSpot > 0) { cTotal++; if (cSpot >= cVwap) cBuy++; else cSell++; }
+        var cRsi = row.rsi_15m;
+        if (cRsi != null) { cTotal++; if (cRsi >= 55) cBuy++; else if (cRsi <= 45) cSell++; }
+        var cEma = row.ema_signal;
+        if (cEma === 'BUY') { cTotal++; cBuy++; } else if (cEma === 'SELL') { cTotal++; cSell++; }
+        var cMax = Math.max(cBuy, cSell);
+        var cDir = cBuy > cSell ? 'BUY' : (cSell > cBuy ? 'SELL' : 'MIXED');
+        var confColor, confLabel;
+        if (cTotal === 0) { confColor = 'rgba(176,190,197,0.3)'; confLabel = '—'; }
+        else if (cMax >= 4 && cDir === 'BUY') { confColor = '#00e676'; confLabel = '▲ ' + cMax + '/' + cTotal; }
+        else if (cMax >= 4 && cDir === 'SELL') { confColor = '#ff4757'; confLabel = '▼ ' + cMax + '/' + cTotal; }
+        else if (cMax >= 3 && cDir === 'BUY') { confColor = '#69f0ae'; confLabel = '▲ ' + cMax + '/' + cTotal; }
+        else if (cMax >= 3 && cDir === 'SELL') { confColor = '#fca5a5'; confLabel = '▼ ' + cMax + '/' + cTotal; }
+        else { confColor = '#ffb74d'; confLabel = '~ ' + cMax + '/' + cTotal; }
+        var confStrength = cMax >= 4 ? 'STRONG' : cMax >= 3 ? cDir : 'WEAK';
+        var confHtml = '<span style="color:' + confColor + ';">' + confLabel + '</span><br><span style="font-size:9px;color:' + confColor + ';opacity:0.7;">' + confStrength + '</span>';
+
         html += '<div class="nlf-row' + (isLive ? ' nlf-row-live' : '') + '">'
             + '<span class="nlf-row-time">' + t + (isLive ? '&nbsp;<span class="nlf-elapsed"></span>' : '') + '</span>'
-            + '<span class="nlf-row-spot">' + spotStr + '</span>'
+            + '<span class="nlf-row-pcr">' + pcrHtml + '</span>'
             + '<span class="nlf-row-delta">' + dHtml + '</span>'
-            + '<span class="nlf-row-nifty">' + nmpHtml + '</span>'
             + '<span class="nlf-row-vwap">' + vwapHtml + '</span>'
-            + '<span class="nlf-row-netoi">' + netOiHtml + '</span>'
             + '<span class="nlf-row-stk">*' + sCount + '</span>'
+            + '<span class="nlf-row-level">' + levelHtml + '</span>'
             + '<span class="nlf-row-rsi" style="color:' + rsiColor + ';">' + rsiHtml + '</span>'
+            + '<span class="nlf-row-conf">' + confHtml + '</span>'
             + '</div>';
     });
     body.innerHTML = html;
@@ -7494,19 +7535,19 @@ function mobNavTo(secId, tabId, label) {
         .nlf-badge-warn{{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
         .nlf-badge-info{{background:rgba(200,221,232,0.06);color:#c8dde8;border:1px solid rgba(200,221,232,0.2);}}
         .nlf-badge-danger{{background:rgba(255,58,74,0.1);color:#ff6b6b;border:1px solid rgba(255,58,74,0.3);}}
-        .nlf-thead{{display:grid;grid-template-columns:60px 96px 62px 66px 76px 72px 44px 48px;gap:0;font-size:12px;letter-spacing:1.2px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
+        .nlf-thead{{display:grid;grid-template-columns:58px 42px 58px 62px 40px minmax(70px,1fr) 42px 58px;gap:0;font-size:11px;letter-spacing:1.2px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
         .nlf-th-mom{{text-align:center;}}
         .nlf-tbody{{flex:1;display:flex;flex-direction:column;}}
-        .nlf-row{{display:grid;grid-template-columns:60px 96px 62px 66px 76px 72px 44px 48px;gap:0;padding:8px 0;align-items:center;font-size:14px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
+        .nlf-row{{display:grid;grid-template-columns:58px 42px 58px 62px 40px minmax(70px,1fr) 42px 58px;gap:0;padding:8px 0;align-items:center;font-size:13px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
         .nlf-row-live{{background:rgba(0,200,83,0.04);border-left:2px solid rgba(0,230,118,0.5);padding-left:4px;}}
-        .nlf-row-time{{color:rgba(176,190,197,0.6);font-size:14px;display:inline-flex;align-items:center;gap:4px;}}
-        .nlf-row-spot{{font-weight:700;color:#fff;font-size:14px;}}
-        .nlf-row-delta{{font-weight:700;font-size:13px;text-align:right;}}
-        .nlf-row-nifty{{font-size:13px;font-weight:700;text-align:right;}}
-        .nlf-row-vwap{{text-align:center;font-size:13px;font-weight:700;}}
-        .nlf-row-netoi{{text-align:right;font-size:13px;font-weight:700;}}
-        .nlf-row-stk{{text-align:right;color:#ffd32a;font-weight:700;font-size:13px;}}
-        .nlf-row-rsi{{text-align:right;font-weight:700;font-size:13px;}}
+        .nlf-row-time{{color:rgba(176,190,197,0.6);font-size:13px;display:inline-flex;align-items:center;gap:4px;}}
+        .nlf-row-pcr{{font-weight:700;font-size:12px;text-align:center;}}
+        .nlf-row-delta{{font-weight:700;font-size:12px;text-align:right;}}
+        .nlf-row-vwap{{text-align:center;font-size:12px;font-weight:700;}}
+        .nlf-row-stk{{text-align:center;color:#ffd32a;font-weight:700;font-size:13px;}}
+        .nlf-row-level{{text-align:center;font-size:11px;font-weight:700;overflow:hidden;text-overflow:ellipsis;}}
+        .nlf-row-rsi{{text-align:right;font-weight:700;font-size:12px;}}
+        .nlf-row-conf{{text-align:center;font-weight:800;font-size:11px;}}
         .nlf-footer{{display:flex;justify-content:space-between;padding-top:8px;margin-top:auto;border-top:1px solid rgba(79,195,247,0.08);font-size:13px;}}
         .nlf-footer-left{{color:rgba(176,190,197,0.45);}}
         .nlf-footer-right{{font-weight:700;}}
@@ -7515,8 +7556,8 @@ function mobNavTo(secId, tabId, label) {
             .nlf-right{{width:100%;}}
         }}
         @media(max-width:600px){{
-            .nlf-thead,.nlf-row{{grid-template-columns:44px minmax(0,1fr) 48px 52px 60px 58px 34px 38px;}}
-            .nlf-row-spot{{font-size:12px;}}
+            .nlf-thead,.nlf-row{{grid-template-columns:44px 36px 48px 52px 34px minmax(56px,1fr) 36px 50px;}}
+            .nlf-row-level span{{font-size:9px !important;}}
             .nlf-panel{{padding:10px;}}
         }}
         @media(max-width:1024px){{
