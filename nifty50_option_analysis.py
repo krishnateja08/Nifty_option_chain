@@ -2554,16 +2554,16 @@ def log_oi_snapshot(option_analysis, technical, key_levels=None, bias=None):
 
     vwap_signal = "BUY" if spot_above_vwap else "SELL"
 
-    # ── Nifty 50 % move from previous day close ──
+    # ── Nifty 50 % move from today's open (intraday direction) ──
     nifty_move_pct = None
     try:
         import yfinance as _yf
-        df_nsei = _yf.Ticker("^NSEI").history(period="5d", interval="1d")
-        if df_nsei is not None and len(df_nsei) >= 2:
-            prev_close_day = float(df_nsei['Close'].iloc[-2])
-            if prev_close_day > 0:
-                nifty_move_pct = round((spot - prev_close_day) / prev_close_day * 100, 2)
-                print(f"  ✅ Nifty Move %: {nifty_move_pct:+.2f}% (Spot={spot}, Prev Close={prev_close_day})")
+        df_nsei_intra = _yf.Ticker("^NSEI").history(period="1d", interval="5m")
+        if df_nsei_intra is not None and len(df_nsei_intra) >= 1:
+            day_open = float(df_nsei_intra['Open'].iloc[0])
+            if day_open > 0:
+                nifty_move_pct = round((spot - day_open) / day_open * 100, 2)
+                print(f"  ✅ Nifty Move %: {nifty_move_pct:+.2f}% (Spot={spot}, Day Open={day_open})")
     except Exception as e:
         print(f"  ⚠️  Nifty move % calc failed: {e}")
 
@@ -2918,7 +2918,7 @@ def build_intraday_oi_tab_html():
             <div class="logic-item"><span class="lc-info">DIFF</span> = PE &#916; &#8722; CE &#916; &nbsp;&middot;&nbsp; <span class="lc-bull">+ve = Bullish</span> &nbsp;<span class="lc-bear">&#8722;ve = Bearish</span></div>
             <div class="logic-item"><span class="lc-info">3/5/15 Min · 1 Hr</span> filters raw rows or aggregates into time slots</div>
             <div class="logic-item"><span class="lc-bull">SPOT &#916;</span> Price change since previous snapshot &nbsp;&middot;&nbsp; &#9650; up &nbsp; &#9660; down &nbsp; &#8594; flat</div>
-            <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from previous day close &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
+            <div class="logic-item"><span class="lc-bull">NIFTY MOVE %</span> % change from today's open (intraday direction) &nbsp;&middot;&nbsp; &#9650; green = up &nbsp; &#9660; red = down &nbsp; &#8594; flat = ±0.1%</div>
             <div class="logic-item"><span class="lc-bull">STREAK</span> Consecutive snapshots with same signal &nbsp;&middot;&nbsp; &#215;1 = just flipped &nbsp;&middot;&nbsp; &#215;5+ = strong trend</div>
             <div class="logic-item"><span class="lc-info">RSI 15M</span> 14-period RSI on 15-min candles &nbsp;&middot;&nbsp; <span class="lc-bull">&lt;30 = Oversold (OS) &nbsp;BUY zone</span> &nbsp;<span class="lc-bear">&gt;70 = Overbought (OB) &nbsp;SELL zone</span> &nbsp;&middot;&nbsp; 55+ = mild bull &nbsp;45&minus; = mild bear</div>
             <div class="logic-item"><span class="lc-info">EMA 5/13</span> 15-min EMA crossover &nbsp;&middot;&nbsp; <span class="lc-bull">▲ BUY = EMA5 &gt; EMA13 (uptrend)</span> &nbsp;<span class="lc-bear">▼ SELL = EMA5 &lt; EMA13 (downtrend)</span> &nbsp;&middot;&nbsp; Gap = distance between EMAs (bigger = stronger trend)</div>
@@ -6631,7 +6631,7 @@ function renderNiftyLiveFeed(filtered) {
     var footer = document.getElementById('nlfFooter');
     if (footer) {
         var nmp0 = latest.nifty_move_pct;
-        var nmpFmt = (nmp0 != null) ? ((nmp0 >= 0 ? '+' : '') + nmp0.toFixed(2) + '% from prev close') : '';
+        var nmpFmt = (nmp0 != null) ? ((nmp0 >= 0 ? '+' : '') + nmp0.toFixed(2) + '% from open') : '';
         var nmpFootColor = (nmp0 != null && nmp0 >= 0) ? '#00e676' : '#ff4757';
         footer.innerHTML = '<span class="nlf-footer-left">' + filtered.length + ' candles &middot; signals active</span>'
             + '<span class="nlf-footer-right" style="color:' + nmpFootColor + ';">▲ ' + nmpFmt + '</span>';
