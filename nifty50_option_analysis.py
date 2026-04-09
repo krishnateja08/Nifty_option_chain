@@ -6515,9 +6515,7 @@ function renderNiftyLiveFeed(filtered) {
             var aboveVwap = vwapGap >= 0;
             var vwapColor = aboveVwap ? '#00e676' : '#ff4757';
             var vwapArrow = aboveVwap ? '▲' : '▼';
-            vwapHtml = '<span style="color:' + vwapColor + ';">' + vwapArrow + Math.abs(vwapGap) + '</span>'
-                + '<br><span style="font-size:9px;color:' + (aboveVwap ? 'rgba(0,230,118,0.45)' : 'rgba(255,71,87,0.45)') + ';">'
-                + (aboveVwap ? 'above' : 'below') + '</span>';
+            vwapHtml = '<span style="color:' + vwapColor + ';font-size:12px;">' + vwapArrow + Math.abs(vwapGap) + '</span>';
         } else {
             vwapHtml = '<span style="color:rgba(176,190,197,0.25);">—</span>';
         }
@@ -6572,7 +6570,7 @@ function renderNiftyLiveFeed(filtered) {
         var levelHtml;
         if (row.nearest_level) {
             var lColor = isBuy ? '#00e676' : '#ff4757';
-            levelHtml = '<span style="color:' + lColor + ';font-size:10px;font-weight:800;">' + nlabel + '</span><br><span style="color:' + lColor + ';font-size:11px;">' + nval + '</span>';
+            levelHtml = '<span style="color:' + lColor + ';font-size:11px;"><span style="font-size:9px;font-weight:800;opacity:0.7;">' + nlabel + '</span> ' + nval + '</span>';
         } else {
             levelHtml = '<span style="color:rgba(176,190,197,0.25);">—</span>';
         }
@@ -6598,10 +6596,10 @@ function renderNiftyLiveFeed(filtered) {
         else if (cMax >= 3 && cDir === 'SELL') { confColor = '#fca5a5'; confLabel = '▼ ' + cMax + '/' + cTotal; }
         else { confColor = '#ffb74d'; confLabel = '~ ' + cMax + '/' + cTotal; }
         var confStrength = cMax >= 4 ? 'STRONG' : cMax >= 3 ? cDir : 'WEAK';
-        var confHtml = '<span style="color:' + confColor + ';">' + confLabel + '</span><br><span style="font-size:9px;color:' + confColor + ';opacity:0.7;">' + confStrength + '</span>';
+        var confHtml = '<span style="color:' + confColor + ';font-size:12px;">' + confLabel + '</span>';
 
         html += '<div class="nlf-row' + (isLive ? ' nlf-row-live' : '') + '">'
-            + '<span class="nlf-row-time">' + t + (isLive ? '&nbsp;<span class="nlf-elapsed"></span>' : '') + '</span>'
+            + '<span class="nlf-row-time">' + t + '</span>'
             + '<span class="nlf-row-pcr">' + pcrHtml + '</span>'
             + '<span class="nlf-row-delta">' + dHtml + '</span>'
             + '<span class="nlf-row-vwap">' + vwapHtml + '</span>'
@@ -7535,10 +7533,10 @@ function mobNavTo(secId, tabId, label) {
         .nlf-badge-warn{{background:rgba(255,183,77,0.1);color:#ffb74d;border:1px solid rgba(255,183,77,0.35);}}
         .nlf-badge-info{{background:rgba(200,221,232,0.06);color:#c8dde8;border:1px solid rgba(200,221,232,0.2);}}
         .nlf-badge-danger{{background:rgba(255,58,74,0.1);color:#ff6b6b;border:1px solid rgba(255,58,74,0.3);}}
-        .nlf-thead{{display:grid;grid-template-columns:58px 42px 58px 62px 40px minmax(70px,1fr) 42px 58px;gap:0;font-size:11px;letter-spacing:1.2px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
+        .nlf-thead{{display:grid;grid-template-columns:2fr 2fr 2.5fr 2.5fr 1.5fr 3.5fr 2fr 2.5fr;gap:4px;font-size:11px;letter-spacing:1px;color:rgba(128,222,234,0.7);text-transform:uppercase;font-weight:700;padding:6px 0;border-bottom:1px solid rgba(79,195,247,0.12);}}
         .nlf-th-mom{{text-align:center;}}
         .nlf-tbody{{flex:1;display:flex;flex-direction:column;}}
-        .nlf-row{{display:grid;grid-template-columns:58px 42px 58px 62px 40px minmax(70px,1fr) 42px 58px;gap:0;padding:8px 0;align-items:center;font-size:13px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
+        .nlf-row{{display:grid;grid-template-columns:2fr 2fr 2.5fr 2.5fr 1.5fr 3.5fr 2fr 2.5fr;gap:4px;padding:8px 0;align-items:center;font-size:13px;color:#c8dde8;border-bottom:1px solid rgba(255,255,255,0.03);}}
         .nlf-row-live{{background:rgba(0,200,83,0.04);border-left:2px solid rgba(0,230,118,0.5);padding-left:4px;}}
         .nlf-row-time{{color:rgba(176,190,197,0.6);font-size:13px;display:inline-flex;align-items:center;gap:4px;}}
         .nlf-row-pcr{{font-weight:700;font-size:12px;text-align:center;}}
@@ -7556,8 +7554,11 @@ function mobNavTo(secId, tabId, label) {
             .nlf-right{{width:100%;}}
         }}
         @media(max-width:600px){{
-            .nlf-thead,.nlf-row{{grid-template-columns:44px 36px 48px 52px 34px minmax(56px,1fr) 36px 50px;}}
+            .nlf-thead,.nlf-row{{grid-template-columns:2fr 2fr 2.5fr 2.5fr 1.5fr 3.5fr 2fr 2.5fr;gap:2px;font-size:11px;}}
             .nlf-row-level span{{font-size:9px !important;}}
+            .nlf-row-time{{font-size:11px;}}
+            .nlf-row-pcr,.nlf-row-delta,.nlf-row-vwap,.nlf-row-stk,.nlf-row-rsi,.nlf-row-conf{{font-size:11px;}}
+            .nlf-badge{{font-size:11px;padding:3px 8px;}}
             .nlf-panel{{padding:10px;}}
         }}
         @media(max-width:1024px){{
