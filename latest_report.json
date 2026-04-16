@@ -1,12 +1,12 @@
 {
-  "timestamp": "16-Apr-2026 12:18 IST",
-  "current_price": 24162.5,
+  "timestamp": "16-Apr-2026 12:21 IST",
+  "current_price": 24174.400390625,
   "bias": "WATCH BEAR",
   "confidence": "MEDIUM",
-  "rsi": 67.94115410706799,
-  "pcr": 0.645,
+  "rsi": 68.11745546102819,
+  "pcr": 0.607,
   "stop_loss": null,
   "risk_reward_ratio": 0,
-  "heatmap_advance": 21,
-  "heatmap_decline": 29
+  "heatmap_advance": 25,
+  "heatmap_decline": 26
 }
