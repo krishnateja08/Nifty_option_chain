@@ -1,12 +1,12 @@
 {
-  "timestamp": "29-Apr-2026 12:39 IST",
-  "current_price": 24328.5,
+  "timestamp": "29-Apr-2026 12:43 IST",
+  "current_price": 24322.19921875,
   "bias": "BULLISH",
   "confidence": "HIGH",
-  "rsi": 55.88826708545209,
-  "pcr": 1.28,
-  "stop_loss": 24178.0,
-  "risk_reward_ratio": 0.64,
-  "heatmap_advance": 47,
-  "heatmap_decline": 4
+  "rsi": 55.78920328884304,
+  "pcr": 1.278,
+  "stop_loss": 24172.0,
+  "risk_reward_ratio": 0.52,
+  "heatmap_advance": 44,
+  "heatmap_decline": 6
 }
