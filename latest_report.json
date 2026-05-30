@@ -1,5 +1,5 @@
 {
-  "timestamp": "30-May-2026 10:06 IST",
+  "timestamp": "30-May-2026 10:09 IST",
   "current_price": 23547.75,
   "bias": "SIDEWAYS",
   "confidence": "LOW",
@@ -8,5 +8,5 @@
   "stop_loss": null,
   "risk_reward_ratio": 0,
   "heatmap_advance": 5,
-  "heatmap_decline": 45
+  "heatmap_decline": 46
 }
