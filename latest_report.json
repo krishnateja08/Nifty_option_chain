@@ -1,12 +1,12 @@
 {
-  "timestamp": "01-Jul-2026 15:14 IST",
-  "current_price": 24011.55078125,
+  "timestamp": "01-Jul-2026 15:17 IST",
+  "current_price": 24001.599609375,
   "bias": "WATCH BULL",
   "confidence": "MEDIUM",
-  "rsi": 68.51525672407156,
-  "pcr": 1.092,
+  "rsi": 68.36893574053585,
+  "pcr": 1.094,
   "stop_loss": null,
   "risk_reward_ratio": 0,
-  "heatmap_advance": 34,
-  "heatmap_decline": 17
+  "heatmap_advance": 33,
+  "heatmap_decline": 18
 }
