@@ -1,12 +1,12 @@
 {
-  "timestamp": "13-Jul-2026 11:24 IST",
-  "current_price": 24151.75,
+  "timestamp": "13-Jul-2026 11:27 IST",
+  "current_price": 24146.849609375,
   "bias": "BULLISH",
   "confidence": "HIGH",
-  "rsi": 51.11333085837449,
-  "pcr": 1.435,
-  "stop_loss": 24045.0,
-  "risk_reward_ratio": 0.69,
-  "heatmap_advance": 15,
-  "heatmap_decline": 36
+  "rsi": 50.9994137293917,
+  "pcr": 1.449,
+  "stop_loss": 24020.0,
+  "risk_reward_ratio": 0.42,
+  "heatmap_advance": 16,
+  "heatmap_decline": 35
 }
