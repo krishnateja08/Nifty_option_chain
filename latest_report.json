@@ -1,12 +1,12 @@
 {
-  "timestamp": "28-Aug-2026 11:02 IST",
-  "current_price": 24160.5,
+  "timestamp": "28-Aug-2026 11:05 IST",
+  "current_price": 24158.25,
   "bias": "WATCH BEAR",
   "confidence": "MEDIUM",
-  "rsi": 31.450447797984225,
-  "pcr": 1.063,
+  "rsi": 31.315004116355652,
+  "pcr": 1.062,
   "stop_loss": null,
   "risk_reward_ratio": 0,
-  "heatmap_advance": 29,
-  "heatmap_decline": 22
+  "heatmap_advance": 27,
+  "heatmap_decline": 24
 }
