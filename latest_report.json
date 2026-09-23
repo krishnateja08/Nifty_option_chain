@@ -1,12 +1,12 @@
 {
-  "timestamp": "23-Sep-2026 11:15 IST",
-  "current_price": 23435.099609375,
-  "bias": "SIDEWAYS",
-  "confidence": "LOW",
-  "rsi": 27.74949974724808,
-  "pcr": 1.051,
+  "timestamp": "23-Sep-2026 11:18 IST",
+  "current_price": 23423.400390625,
+  "bias": "WATCH BULL",
+  "confidence": "MEDIUM",
+  "rsi": 27.138356475826427,
+  "pcr": 1.137,
   "stop_loss": null,
   "risk_reward_ratio": 0,
-  "heatmap_advance": 36,
-  "heatmap_decline": 15
+  "heatmap_advance": 35,
+  "heatmap_decline": 16
 }
