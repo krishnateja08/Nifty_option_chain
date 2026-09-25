@@ -1,12 +1,12 @@
 {
-  "timestamp": "25-Sep-2026 12:52 IST",
-  "current_price": 23046.55078125,
+  "timestamp": "25-Sep-2026 12:55 IST",
+  "current_price": 23043.19921875,
   "bias": "WATCH BEAR",
   "confidence": "MEDIUM",
-  "rsi": 24.547610058507104,
-  "pcr": 0.974,
+  "rsi": 24.497066269903158,
+  "pcr": 0.951,
   "stop_loss": null,
   "risk_reward_ratio": 0,
-  "heatmap_advance": 19,
-  "heatmap_decline": 31
+  "heatmap_advance": 16,
+  "heatmap_decline": 35
 }
