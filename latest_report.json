@@ -1,12 +1,12 @@
 {
-  "timestamp": "06-Oct-2026 11:57 IST",
-  "current_price": 22684.349609375,
+  "timestamp": "06-Oct-2026 12:00 IST",
+  "current_price": 22683.5,
   "bias": "SIDEWAYS",
   "confidence": "LOW",
-  "rsi": 38.81292278090967,
-  "pcr": 1.328,
+  "rsi": 38.786126411103375,
+  "pcr": 1.316,
   "stop_loss": null,
   "risk_reward_ratio": 0,
-  "heatmap_advance": 30,
-  "heatmap_decline": 21
+  "heatmap_advance": 28,
+  "heatmap_decline": 23
 }
