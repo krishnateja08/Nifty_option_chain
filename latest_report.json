@@ -1,12 +1,12 @@
 {
-  "timestamp": "06-Nov-2026 11:15 IST",
-  "current_price": 24615.5,
+  "timestamp": "06-Nov-2026 11:18 IST",
+  "current_price": 24615.349609375,
   "bias": "BULLISH",
   "confidence": "MEDIUM",
-  "rsi": 77.5123078307133,
-  "pcr": 0.951,
+  "rsi": 77.51104128173957,
+  "pcr": 0.965,
   "stop_loss": 24520.0,
   "risk_reward_ratio": 0.1,
-  "heatmap_advance": 29,
-  "heatmap_decline": 22
+  "heatmap_advance": 30,
+  "heatmap_decline": 21
 }
